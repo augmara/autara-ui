@@ -1,0 +1,8 @@
+/* ─── Autara Typography Tokens ─── */
+/* Font: Satoshi — loaded via next/font/local in each app */
+
+@theme inline {
+    --font-brand: var(--font-brand-var), system-ui, -apple-system, sans-serif;
+    --font-sans: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+    --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}

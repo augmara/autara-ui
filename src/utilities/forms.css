@@ -1,0 +1,94 @@
+/* ─── Autara Form Styles ─── */
+
+/* Dark theme form (marketing, onboarding dark sections) */
+.merchant-form {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 32px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+.merchant-form label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 6px;
+}
+.merchant-form input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 12px 14px;
+    color: white;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+.merchant-form input:focus {
+    border-color: var(--color-autara-purple);
+}
+.merchant-form input::placeholder {
+    color: rgba(255, 255, 255, 0.25);
+}
+
+/* Light theme inputs (onboarding, admin) */
+.input-light {
+    width: 100%;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 12px 14px;
+    color: #111827;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+.input-light:focus {
+    border-color: var(--color-autara-purple);
+    box-shadow: 0 0 0 3px rgba(78, 27, 189, 0.1);
+}
+.input-light::placeholder {
+    color: #9ca3af;
+}
+
+/* Search bar */
+.search-bar {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 6px;
+    max-width: 640px;
+    transition: border-color 0.3s;
+}
+.search-bar:focus-within {
+    border-color: rgba(78, 27, 189, 0.5);
+    background: rgba(255, 255, 255, 0.08);
+}
+.search-bar input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: white;
+    flex: 1;
+    padding: 12px 16px;
+    font-size: 15px;
+}
+.search-bar input::placeholder { color: rgba(255, 255, 255, 0.35); }
+.search-bar button {
+    padding: 12px 24px;
+    border-radius: 8px;
+    background: var(--color-autara-purple);
+    color: white;
+    font-weight: 500;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.3s;
+}
+.search-bar button:hover { background: var(--color-autara-purple-dark); }

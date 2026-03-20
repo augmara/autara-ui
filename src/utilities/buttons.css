@@ -1,0 +1,103 @@
+/* ─── Autara Button Styles ─── */
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 28px;
+    border-radius: 8px;
+    background: var(--color-autara-purple);
+    color: white;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary:hover {
+    background: var(--color-autara-purple-dark);
+    box-shadow: 0 0 30px rgba(78, 27, 189, 0.4);
+}
+
+/* Shine sweep */
+.btn-primary::after {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: linear-gradient(to right, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%);
+    transform: rotate(25deg) translateX(-150%);
+    transition: transform 0.6s ease;
+}
+.btn-primary:hover::after {
+    transform: rotate(25deg) translateX(50%);
+}
+
+.btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 28px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.03);
+    color: white;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-outline:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Light mode outline button */
+.btn-outline-light {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 28px;
+    border-radius: 8px;
+    border: 1px solid #d4d4d4;
+    background: white;
+    color: #171717;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-outline-light:hover {
+    background: #fafafa;
+    border-color: #a3a3a3;
+    box-shadow: 0 4px 12px rgba(78, 27, 189, 0.1);
+}
+
+/* Section pill badge */
+.section-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 0.02em;
+}
+
+/* Light mode section pill */
+.section-pill-light {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1px solid #e5e5e5;
+    background: #fafafa;
+    font-size: 13px;
+    font-weight: 500;
+    color: #525252;
+    letter-spacing: 0.02em;
+}

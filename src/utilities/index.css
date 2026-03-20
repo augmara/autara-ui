@@ -1,0 +1,9 @@
+/* ─── Autara Design System — Utilities ─── */
+/* Import this file to get all Autara CSS utilities */
+
+@import "./gradients.css";
+@import "./glass.css";
+@import "./sections.css";
+@import "./buttons.css";
+@import "./forms.css";
+@import "./animations.css";

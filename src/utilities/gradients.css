@@ -1,0 +1,35 @@
+/* ─── Autara Gradient Utilities ─── */
+
+/* Top bar — appears on all Autara web properties */
+.gradient-bar {
+    height: 3px;
+    background: linear-gradient(90deg, #4E1BBD 0%, #4CEAFF 50%, #B7E149 100%);
+}
+
+/* Gradient text variants */
+.text-gradient-brand {
+    background: linear-gradient(135deg, #4E1BBD 0%, #4B5AD9 50%, #47B1FF 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.text-gradient-core {
+    background: linear-gradient(135deg, #4E1BBD 0%, #4CEAFF 50%, #B7E149 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.text-gradient-aqua {
+    background: linear-gradient(135deg, #4CEAFF 0%, #B7E149 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Section divider */
+.divider-gradient {
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(78, 27, 189, 0.3) 50%, transparent 100%);
+}

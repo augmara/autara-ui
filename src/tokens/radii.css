@@ -1,0 +1,10 @@
+/* ─── Autara Border Radius Tokens ─── */
+
+@theme inline {
+    --radius-autara-sm: 4px;
+    --radius-autara: 6px;
+    --radius-autara-md: 8px;
+    --radius-autara-lg: 10px;
+    --radius-autara-xl: 12px;
+    --radius-autara-full: 20px;
+}

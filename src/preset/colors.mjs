@@ -1,0 +1,30 @@
+/** @type {Record<string, string>} Autara brand color palette */
+export const colors = {
+    purple: {
+        DEFAULT: '#4E1BBD',
+        dark: '#3d1595',
+        darker: '#2e1070',
+        light: '#6d3dd4',
+        lighter: '#8c5fe8',
+        50: '#f5f0ff',
+        100: '#ede5ff',
+    },
+    'sky-aqua': '#4CEAFF',
+    'lime-drive': '#B7E149',
+    gray: {
+        50: '#f9fafb',
+        100: '#f3f4f6',
+        200: '#e5e7eb',
+        300: '#d1d5db',
+        400: '#9ca3af',
+        500: '#6b7280',
+        600: '#4b5563',
+        700: '#374151',
+        800: '#1f2937',
+        900: '#111827',
+    },
+    error: '#dd3838',
+    success: '#22c55e',
+    warning: '#f59e0b',
+    info: '#3b82f6',
+}

@@ -1,0 +1,37 @@
+/* ─── Autara Brand Colors ─── */
+/* Single source of truth for all Autara web properties */
+
+@theme inline {
+    /* Primary */
+    --color-autara-purple: #4e1bbd;
+    --color-autara-purple-dark: #3d1595;
+    --color-autara-purple-darker: #2e1070;
+    --color-autara-purple-light: #6d3dd4;
+    --color-autara-purple-lighter: #8c5fe8;
+
+    /* Accent */
+    --color-autara-sky-aqua: #4ceaff;
+    --color-autara-lime-drive: #b7e149;
+
+    /* Purple scale */
+    --color-autara-purple-50: #f5f0ff;
+    --color-autara-purple-100: #ede5ff;
+
+    /* Neutral gray scale */
+    --color-autara-gray-50: #f9fafb;
+    --color-autara-gray-100: #f3f4f6;
+    --color-autara-gray-200: #e5e7eb;
+    --color-autara-gray-300: #d1d5db;
+    --color-autara-gray-400: #9ca3af;
+    --color-autara-gray-500: #6b7280;
+    --color-autara-gray-600: #4b5563;
+    --color-autara-gray-700: #374151;
+    --color-autara-gray-800: #1f2937;
+    --color-autara-gray-900: #111827;
+
+    /* Semantic */
+    --color-autara-error: #dd3838;
+    --color-autara-success: #22c55e;
+    --color-autara-warning: #f59e0b;
+    --color-autara-info: #3b82f6;
+}

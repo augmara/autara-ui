@@ -1,0 +1,35 @@
+/* ─── Autara Branded Color Sections ─── */
+
+.section-lime {
+    background: #B7E149;
+    color: #111827;
+}
+.section-lime h1, .section-lime h2, .section-lime h3,
+.section-lime h4, .section-lime h5, .section-lime h6 { color: #111827; }
+
+.section-aqua {
+    background: #4CEAFF;
+    color: #111827;
+}
+.section-aqua h1, .section-aqua h2, .section-aqua h3 { color: #111827; }
+
+.section-gradient-core {
+    background: linear-gradient(135deg, #4E1BBD 0%, #4CEAFF 50%, #B7E149 100%);
+    color: white;
+}
+
+/* Light card for use on colored backgrounds */
+.card-light {
+    background: white;
+    border-radius: 12px;
+    padding: 28px;
+    color: #111827;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+        box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card-light:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 20px -4px rgba(0, 0, 0, 0.1);
+}
+.card-light h3 { color: #111827; }
