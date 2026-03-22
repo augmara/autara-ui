@@ -1,10 +1,11 @@
 /* ─── Autara Border Radius Tokens ─── */
+/* Aligned across web (@autara/ui) + Flutter (AppColors.radius*) */
 
 @theme inline {
-    --radius-autara-sm: 4px;
-    --radius-autara: 6px;
-    --radius-autara-md: 8px;
-    --radius-autara-lg: 10px;
-    --radius-autara-xl: 12px;
-    --radius-autara-full: 20px;
+    --radius-autara-sm: 6px;     /* small buttons, checkboxes, tags */
+    --radius-autara: 8px;        /* default (base) */
+    --radius-autara-md: 10px;    /* buttons, inputs */
+    --radius-autara-lg: 12px;    /* cards, section containers */
+    --radius-autara-xl: 16px;    /* dialogs, sheets, hero images */
+    --radius-autara-full: 24px;  /* badges, pills, avatars */
 }
