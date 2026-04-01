@@ -1,42 +1,45 @@
-/* ─── Autara Glass Effects (Dark Theme) ─── */
+/* ─── Autara Card & Glass Effects ─── */
 
+/* Light theme cards (default) */
 .glass-card {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
     border-radius: 12px;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 1px 3px rgba(78, 27, 189, 0.06), 0 1px 2px rgba(78, 27, 189, 0.04);
     transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-card:hover {
-    background: rgba(255, 255, 255, 0.06);
     border-color: rgba(78, 27, 189, 0.3);
+    box-shadow: 0 10px 15px -3px rgba(78, 27, 189, 0.08), 0 4px 6px -2px rgba(78, 27, 189, 0.04);
     transform: translateY(-2px);
 }
 
+/* Light nav bar */
 .nav-glass {
-    background: rgba(5, 0, 8, 0.7);
+    background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(24px) saturate(1.2);
     -webkit-backdrop-filter: blur(24px) saturate(1.2);
     border: none;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), inset 0 0 0 1px rgba(0, 0, 0, 0.05);
     border-radius: 12px;
     will-change: transform;
     transform: translateZ(0);
 }
 
+/* Light service card */
 .service-card {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
     border-radius: 12px;
     padding: 24px;
+    box-shadow: 0 1px 2px rgba(78, 27, 189, 0.04);
     transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     cursor: pointer;
 }
 
 .service-card:hover {
-    background: rgba(255, 255, 255, 0.07);
     border-color: rgba(78, 27, 189, 0.3);
+    box-shadow: 0 10px 15px -3px rgba(78, 27, 189, 0.08), 0 4px 6px -2px rgba(78, 27, 189, 0.04);
     transform: translateY(-3px);
 }

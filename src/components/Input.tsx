@@ -10,8 +10,8 @@ const inputVariants = cva(
                 light: [
                     'h-11 bg-white border border-autara-gray-300 px-4 py-3',
                     'text-autara-gray-900 placeholder:text-autara-gray-400',
-                    'focus:border-autara-purple focus:ring-1 focus:ring-autara-purple',
-                    'focus:shadow-[0_0_0_3px_rgba(78,27,189,0.1)]',
+                    'focus:border-autara-purple/40 focus:outline-none focus:ring-transparent',
+                    'focus:[box-shadow:0_0_0_3px_rgba(78,27,189,0.08)]',
                 ].join(' '),
                 dark: [
                     'h-11 bg-white/[0.06] border border-white/[0.1] px-4 py-3',
