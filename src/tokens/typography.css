@@ -5,4 +5,15 @@
     --font-brand: var(--font-brand-var), system-ui, -apple-system, sans-serif;
     --font-sans: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
     --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+    /* Body-copy scale — bumped one step up from Tailwind defaults so
+       default paragraphs read comfortably on desktop without requiring
+       every component to opt into text-base. Keeps hierarchy intact:
+       xs(13) < sm(15) < base(16) < lg(18). */
+    --text-xs: 0.8125rem;      /* 13px — was 12px */
+    --text-xs--line-height: 1.125rem;
+    --text-sm: 0.9375rem;      /* 15px — was 14px */
+    --text-sm--line-height: 1.375rem;
+    --text-base: 1rem;         /* 16px */
+    --text-base--line-height: 1.5rem;
 }
