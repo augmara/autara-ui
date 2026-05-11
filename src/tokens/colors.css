@@ -29,9 +29,19 @@
     --color-autara-gray-800: #1f2937;
     --color-autara-gray-900: #111827;
 
+    /* Operator neutrals — bold monochrome surface/foreground system */
+    --color-autara-bg: #f7f7f7;
+    --color-autara-surface: #ffffff;
+    --color-autara-fg: #0a0a0a;
+    --color-autara-fg-muted: #666666;
+    --color-autara-fg-subtle: #9ca3af;
+    --color-autara-border: #e5e5e5;
+    --color-autara-track: #eeeeee;
+
     /* Semantic */
     --color-autara-error: #dd3838;
-    --color-autara-success: #22c55e;
-    --color-autara-warning: #f59e0b;
-    --color-autara-info: #3b82f6;
+    --color-autara-success: #0f9d58;
+    --color-autara-warning: #f5a623;
+    --color-autara-warning-text: #b4760e;
+    --color-autara-info: #1f6feb;
 }
