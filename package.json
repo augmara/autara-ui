@@ -1,17 +1,25 @@
 {
-  "name": "@autara/ui",
+  "name": "@augmara/autara-ui",
   "version": "0.1.0",
-  "private": true,
+  "description": "Shared UI components, design tokens, and Tailwind preset for Autara web apps",
   "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
-    ".": "./dist/index.js",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
     "./tokens": "./src/tokens/index.css",
     "./tokens/*": "./src/tokens/*.css",
     "./utilities": "./src/utilities/index.css",
     "./utilities/*": "./src/utilities/*.css",
     "./preset": "./src/preset/index.mjs",
     "./preset/*": "./src/preset/*.mjs",
-    "./cn": "./dist/lib/cn.js"
+    "./cn": {
+      "types": "./dist/lib/cn.d.ts",
+      "default": "./dist/lib/cn.js"
+    }
   },
   "files": [
     "dist",
@@ -21,8 +29,26 @@
   ],
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch"
+    "clean": "rm -rf dist",
+    "dev": "tsc --watch",
+    "prepublishOnly": "pnpm run clean && pnpm run build",
+    "typecheck": "tsc --noEmit"
   },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/augmara/autara-ui.git"
+  },
+  "keywords": [
+    "autara",
+    "ui",
+    "design-system",
+    "tailwind"
+  ],
+  "author": "Autara",
+  "license": "UNLICENSED",
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-avatar": "^1.1.11",
@@ -49,7 +75,12 @@
     "react": "^19.0.0"
   },
   "devDependencies": {
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/github": "^10.3.5",
+    "@semantic-release/npm": "^12.0.2",
+    "@semantic-release/release-notes-generator": "^14.1.0",
     "@types/react": "^19.0.0",
+    "semantic-release": "^23.1.1",
     "typescript": "^5.7.0"
   }
 }
