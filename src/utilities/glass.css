@@ -1,45 +1,58 @@
-/* ─── Autara Card & Glass Effects ─── */
+/* ─── Autara Card & Glass Effects ────────────────────────────────────────
+ *
+ * Light-theme canonical defaults from autara-customer-web/globals.css.
+ *
+ *   "AUTARA AESTHETIC: NO DROP SHADOWS. The brand reads as solid,
+ *    editorial, hairline-edged — never floating-card. Lift comes from
+ *    the 1px hairline border + backdrop-blur alone."
+ *
+ * v1.0.x shipped these with purple-tinted shadows + translateY(-2px)
+ * on hover; v1.1.0 brings them in line with the editorial identity.
+ * Border-color shift on hover is the only depth signal.
+ */
 
-/* Light theme cards (default) */
+/* ─── Glass card — generic light surface ─────────────────────────────── */
+
 .glass-card {
     background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(78, 27, 189, 0.06), 0 1px 2px rgba(78, 27, 189, 0.04);
-    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    transition: border-color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+        background-color 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    color: var(--text-strong);
 }
 
 .glass-card:hover {
-    border-color: rgba(78, 27, 189, 0.3);
-    box-shadow: 0 10px 15px -3px rgba(78, 27, 189, 0.08), 0 4px 6px -2px rgba(78, 27, 189, 0.04);
-    transform: translateY(-2px);
+    border-color: rgba(78, 27, 189, 0.18);
 }
 
-/* Light nav bar */
+/* ─── Nav glass — sticky/floating navigation bar ─────────────────────── */
+
 .nav-glass {
     background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(24px) saturate(1.2);
-    -webkit-backdrop-filter: blur(24px) saturate(1.2);
-    border: none;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(20px) saturate(1.2);
+    -webkit-backdrop-filter: blur(20px) saturate(1.2);
+    border: 1px solid var(--border-subtle);
+    /* No box-shadow — Autara aesthetic. Lift comes from the 1px
+     * hairline border + backdrop-blur. */
     border-radius: 12px;
     will-change: transform;
     transform: translateZ(0);
 }
 
-/* Light service card */
+/* ─── Service card — for service catalogue rows ──────────────────────── */
+
 .service-card {
     background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
     padding: 24px;
-    box-shadow: 0 1px 2px rgba(78, 27, 189, 0.04);
-    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: border-color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+        background-color 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     cursor: pointer;
+    color: var(--text-strong);
 }
 
 .service-card:hover {
-    border-color: rgba(78, 27, 189, 0.3);
-    box-shadow: 0 10px 15px -3px rgba(78, 27, 189, 0.08), 0 4px 6px -2px rgba(78, 27, 189, 0.04);
-    transform: translateY(-3px);
+    border-color: rgba(78, 27, 189, 0.18);
 }
