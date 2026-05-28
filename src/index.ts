@@ -45,6 +45,8 @@ export {
     KpiCard, type KpiCardProps,
     AsyncSkeleton, type AsyncSkeletonProps,
     ErrorCard, type ErrorCardProps,
+    // v1.3.0 — markers
+    TrendingPill, trendingPillVariants, type TrendingPillProps, type TrendingPillShape, type TrendingPillTone, type TrendingPillSize,
 } from './components'
 
 // Utilities

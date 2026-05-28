@@ -116,3 +116,13 @@ export { StepCard, type StepCardProps } from './StepCard'
 export { KpiCard, type KpiCardProps } from './KpiCard'
 export { AsyncSkeleton, type AsyncSkeletonProps } from './AsyncSkeleton'
 export { ErrorCard, type ErrorCardProps } from './ErrorCard'
+
+// ─── v1.3.0 — markers ────────────────────────────────────────────────────
+export {
+    TrendingPill,
+    trendingPillVariants,
+    type TrendingPillProps,
+    type TrendingPillShape,
+    type TrendingPillTone,
+    type TrendingPillSize,
+} from './TrendingPill'

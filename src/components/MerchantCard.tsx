@@ -1,5 +1,6 @@
 import { forwardRef, type ElementType, type ReactNode } from "react";
 import { cn } from "../lib/cn";
+import { TrendingPill } from "./TrendingPill";
 
 /**
  * MerchantCard — the photo-led marketplace card used in the homepage
@@ -59,12 +60,6 @@ const BADGE_LABEL: Record<MerchantBadge, string> = {
   new: "New",
 };
 
-const BADGE_TONE: Record<MerchantBadge, string> = {
-  featured: "bg-white/95 text-[#0a0a0a]",
-  trending: "bg-[var(--color-autara-purple)] text-white",
-  new: "bg-[var(--color-autara-lime-drive)] text-[#0a0a0a]",
-};
-
 export const MerchantCard = forwardRef<HTMLDivElement, MerchantCardProps>(
   function MerchantCard(
     {
@@ -105,14 +100,11 @@ export const MerchantCard = forwardRef<HTMLDivElement, MerchantCardProps>(
           />
 
           {badge ? (
-            <span
-              className={cn(
-                "absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em]",
-                BADGE_TONE[badge],
-              )}
-            >
-              {BADGE_LABEL[badge]}
-            </span>
+            <TrendingPill
+              label={BADGE_LABEL[badge]}
+              tone={badge}
+              className="absolute left-3 top-3"
+            />
           ) : null}
 
           {topRightDecor ? (
