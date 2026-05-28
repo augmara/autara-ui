@@ -1,23 +1,47 @@
-/* ─── Autara Brand Colors ─── */
-/* Single source of truth for all Autara web properties */
+/* ─── Autara Brand Colors + Semantic Surface Stack ───────────────────────
+ *
+ * Canonical Autara identity, harvested from autara-customer-web/globals.css
+ * in v1.1.0. The semantic tokens (`--background`, `--surface`, `--text-strong`,
+ * etc.) are the primary API — consumers should reference these rather than
+ * the brand-color hexes. The `--color-autara-*` tokens remain available as
+ * backwards-compat aliases for v1.0.x consumers.
+ *
+ * Aesthetic rules ride alongside these tokens (enforced in shadows.css +
+ * glass.css): NO DROP SHADOWS. Depth comes from border-color shifts on hover.
+ * Warm-cream surfaces, never clinical white. Hairline-edged, editorial,
+ * solid — never floating-card.
+ */
 
 @theme inline {
-    /* Primary */
+    /* ─── Semantic surface stack — primary API ───────────────────────── */
+    /* Warm off-white to keep the brand from feeling clinical. */
+    --background: #fbfaf6;
+    --foreground: #0e0a1a;
+    --surface: #ffffff;
+    --surface-elevated: #f4f2ec;
+    --surface-warm: #f7f5ee;
+    --border-subtle: rgba(17, 24, 39, 0.08);
+    --border-hover: rgba(78, 27, 189, 0.35);
+    --text-strong: #0e0a1a;
+    --text-muted: rgba(14, 10, 26, 0.62);
+    --text-subtle: rgba(14, 10, 26, 0.42);
+
+    /* ─── Brand colors (the inviolable hex set) ──────────────────────── */
     --color-autara-purple: #4e1bbd;
     --color-autara-purple-dark: #3d1595;
     --color-autara-purple-darker: #2e1070;
     --color-autara-purple-light: #6d3dd4;
     --color-autara-purple-lighter: #8c5fe8;
 
-    /* Accent */
+    /* Accent — used sparingly, mostly in marketing surfaces. */
     --color-autara-sky-aqua: #4ceaff;
     --color-autara-lime-drive: #b7e149;
 
-    /* Purple scale */
+    /* Purple scale — for tints/backgrounds. */
     --color-autara-purple-50: #f5f0ff;
     --color-autara-purple-100: #ede5ff;
 
-    /* Neutral gray scale */
+    /* Neutral gray scale — retained for utility but not Autara identity. */
     --color-autara-gray-50: #f9fafb;
     --color-autara-gray-100: #f3f4f6;
     --color-autara-gray-200: #e5e7eb;
@@ -29,16 +53,17 @@
     --color-autara-gray-800: #1f2937;
     --color-autara-gray-900: #111827;
 
-    /* Operator neutrals — bold monochrome surface/foreground system */
-    --color-autara-bg: #f7f7f7;
-    --color-autara-surface: #ffffff;
-    --color-autara-fg: #0a0a0a;
-    --color-autara-fg-muted: #666666;
-    --color-autara-fg-subtle: #9ca3af;
-    --color-autara-border: #e5e5e5;
-    --color-autara-track: #eeeeee;
+    /* ─── Backwards-compat aliases (v1.0.x consumers) ────────────────── */
+    /* Replaced by the semantic stack above. Will be deprecated in v2.0. */
+    --color-autara-bg: var(--background);
+    --color-autara-surface: var(--surface);
+    --color-autara-fg: var(--foreground);
+    --color-autara-fg-muted: var(--text-muted);
+    --color-autara-fg-subtle: var(--text-subtle);
+    --color-autara-border: var(--border-subtle);
+    --color-autara-track: var(--surface-elevated);
 
-    /* Semantic */
+    /* ─── Semantic intent colors ─────────────────────────────────────── */
     --color-autara-error: #dd3838;
     --color-autara-success: #0f9d58;
     --color-autara-warning: #f5a623;

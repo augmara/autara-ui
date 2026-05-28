@@ -1,0 +1,86 @@
+/* ─── Autara Editorial Primitives ────────────────────────────────────────
+ *
+ * Harvested from autara-customer-web/globals.css. Use these on marketing
+ * surfaces, "how it works" sections, hero billboards, and anywhere the
+ * page should read as editorial publication rather than utilitarian SaaS.
+ */
+
+/* ─── Hairline-divided card grid ─────────────────────────────────────────
+ * Single 1px hairline border separating tiles, with a single outer ring.
+ * Used in customer-web's "how it works" section. */
+.hairline-grid {
+    display: grid;
+    overflow: hidden;
+    border-radius: 16px;
+    border: 1px solid var(--border-subtle);
+    background: var(--border-subtle);
+    gap: 1px;
+}
+.hairline-grid > * {
+    background: var(--surface);
+}
+
+/* ─── Editorial eyebrow ──────────────────────────────────────────────────
+ * Uppercase 11px label with a 2rem hairline tick before it. Use above
+ * section headings to anchor the "this is a labeled section" treatment. */
+.editorial-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+.editorial-eyebrow::before {
+    content: "";
+    width: 2rem;
+    height: 1px;
+    background: var(--text-subtle);
+}
+
+/* ─── Editorial typography utilities ─────────────────────────────────── */
+
+.headline-editorial {
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+}
+
+.counter-huge {
+    font-size: clamp(2.5rem, 7vw, 5rem);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--text-strong);
+}
+
+.stat-number {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+}
+
+/* ─── Horizontal scroll rails ────────────────────────────────────────── */
+
+.scroll-track {
+    display: flex;
+    gap: 16px;
+    animation: scroll-x 30s linear infinite;
+    width: max-content;
+}
+.scroll-track:hover {
+    animation-play-state: paused;
+}
+
+@keyframes scroll-x {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+/* Hide scrollbar for horizontally-scrolling rails (merchant sections, etc.)
+ * Pair with `style={{ scrollbarWidth: 'none' }}` on the element for Firefox;
+ * this rule handles WebKit/Blink. */
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}

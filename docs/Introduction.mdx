@@ -1,0 +1,89 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Design System/Introduction" />
+
+# Autara Design System
+
+Welcome to the Autara design system Storybook. This is the canonical
+reference for every visual decision across Autara's products —
+`autara-customer-web`, `autara-merchant-web`, `autara-merchant-mobile`,
+and `autara-admin`.
+
+## The aesthetic, in one sentence
+
+> **Solid, editorial, hairline-edged — never floating-card.**
+
+Lift comes from a 1px hairline border shift on hover. **No drop shadows.**
+We're closer in feel to Linear, Stripe, and Cal.com than to Fresha or
+Material — the warm-cream `#FBFAF6` surface plus the brand purple
+`#4E1BBD` is the entire identity.
+
+## What's in this Storybook
+
+- **Atoms** — `Button`, `Input`, `Label`, `Checkbox`, `Switch`, `Radio`,
+  `Badge`, `Avatar`, `Skeleton`, `Progress`, `Separator`
+- **Molecules** — `FormField`, `MetaChip`, `RatingStars`, `SectionHeading`,
+  `Tooltip`, `EmptyState`
+- **Organisms** — `Dialog`, `Sheet`, `DropdownMenu`, `NavigationMenu`,
+  `Tabs`, `Accordion`, `Select`, `MultiSelect`, `Toast`, `Table`, `Card`,
+  `ServiceCard`
+- **Tokens** — colors, surfaces, text tiers, radii, shadows (all `none`),
+  typography (Satoshi)
+- **Patterns** — async surfaces (success / loading / error / empty),
+  form fieldsets, trust strips, editorial sections
+
+## Rules every consumer follows
+
+1. **Three states minimum per async surface.** Success, loading skeleton,
+   error with retry. Empty if applicable. No silent `?` defaults.
+2. **Accessibility non-negotiable.** Semantic labels on icon-only
+   buttons, color contrast ≥ 4.5:1, system text-scale up to 200%,
+   screen-reader-friendly heading hierarchy. The a11y addon runs axe
+   against every story — keep it green.
+3. **Copy is content.** "Loading…" is lazy. "Fetching your bookings…" is
+   honest. "Something went wrong" is useless. "We couldn't load your
+   bookings — check your connection and tap retry" is recoverable.
+4. **No emojis in UI** unless explicitly requested.
+5. **Mobile-first.** Tap targets 44×44, inputs anchor at 16px below sm
+   to defeat iOS zoom-on-focus.
+
+## Where this lives
+
+Source: `autara-ui` (PR-only repo, semantic-release publishes
+`@augmara/autara-ui` to GitHub Packages on merge).
+
+Consumers pin via `package.json`:
+
+```json
+"@augmara/autara-ui": "^1.1.0"
+```
+
+CSS-side imports from the package:
+
+```css
+@import "@augmara/autara-ui/tokens";
+@import "@augmara/autara-ui/utilities";
+```
+
+Tailwind preset:
+
+```js
+// tailwind.config.mjs
+import preset from "@augmara/autara-ui/preset";
+export default { presets: [preset] };
+```
+
+## Contributing
+
+See the repo's `CLAUDE.md` for the full design-system policy. Quick rules:
+
+- New component? Add a `.stories.tsx` next to it with at least three
+  stories (default, an interesting variant, edge case).
+- Adding a token? Add it to `src/tokens/{colors,radii,shadows,typography}.css`
+  with a one-line comment explaining the design intent.
+- Adding a utility? Pick the right file under `src/utilities/` —
+  `forms.css` for form controls, `editorial.css` for marketing
+  primitives, `glass.css` for surface treatments.
+- Changing existing public API? Note it in the PR — semantic-release
+  picks the right semver bump from your commit message
+  (`feat:` → minor, `fix:` → patch, `feat!:` → major).

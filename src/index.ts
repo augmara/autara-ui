@@ -29,6 +29,18 @@ export {
     Progress,
     MultiSelect, type MultiSelectOption, type MultiSelectProps,
     Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption,
+    // v1.1.0 — promoted from autara-customer-web
+    BrandButton, brandButtonVariants, type BrandButtonProps,
+    MetaChip, type MetaChipProps,
+    RatingStars, type RatingStarsProps,
+    EmptyState, type EmptyStateProps,
+    MerchantCard, type MerchantCardProps, type MerchantBadge,
+    SectionHeading, type SectionHeadingProps,
+    CarouselHeader, type CarouselHeaderProps,
+    ServiceCard, type ServiceCardProps,
+    TrustItem, type TrustItemProps,
+    SectionBand, type SectionBandProps,
+    StepCard, type StepCardProps,
 } from './components'
 
 // Utilities

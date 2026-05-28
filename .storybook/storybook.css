@@ -1,0 +1,62 @@
+/* ─── Storybook global styles ────────────────────────────────────────────
+ *
+ * Loads the full canonical Autara design system into Storybook so every
+ * story renders against the v1.1.0 tokens.
+ */
+
+@import "tailwindcss";
+
+@import "../src/tokens/index.css";
+@import "../src/utilities/index.css";
+
+/* ─── Body defaults — match autara-customer-web/globals.css ───────────── */
+
+/* Storybook 10 defaults the docs/canvas iframe to white/dark depending on
+ * theme — force the warm-cream Autara surface everywhere so stories render
+ * against the canonical background instead of Storybook chrome. */
+html,
+body,
+#storybook-root,
+.docs-story,
+.sb-show-main,
+.sbdocs-preview,
+.sbdocs-wrapper {
+    background: var(--background) !important;
+    color: var(--foreground);
+}
+
+body {
+    font-family: var(--font-brand);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-brand);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--text-strong);
+    letter-spacing: -0.02em;
+}
+
+*:focus-visible {
+    outline: 2px solid var(--color-autara-purple);
+    outline-offset: 2px;
+}
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    outline: none;
+}
+
+/* Force 16px font-size on form inputs below sm (defeats iOS zoom-on-focus
+ * — matters when previewing in mobile viewports). */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+input[type="password"],
+textarea,
+select {
+    font-size: 16px;
+}

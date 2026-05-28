@@ -98,3 +98,16 @@ export {
     TableCell,
     TableCaption,
 } from './Table'
+
+// ─── v1.1.0 promotions from autara-customer-web ──────────────────────────
+export { BrandButton, brandButtonVariants, type BrandButtonProps } from './BrandButton'
+export { MetaChip, type MetaChipProps } from './MetaChip'
+export { RatingStars, type RatingStarsProps } from './RatingStars'
+export { EmptyState, type EmptyStateProps } from './EmptyState'
+export { MerchantCard, type MerchantCardProps, type MerchantBadge } from './MerchantCard'
+export { SectionHeading, type SectionHeadingProps } from './SectionHeading'
+export { CarouselHeader, type CarouselHeaderProps } from './CarouselHeader'
+export { ServiceCard, type ServiceCardProps } from './ServiceCard'
+export { TrustItem, type TrustItemProps } from './TrustItem'
+export { SectionBand, type SectionBandProps } from './SectionBand'
+export { StepCard, type StepCardProps } from './StepCard'

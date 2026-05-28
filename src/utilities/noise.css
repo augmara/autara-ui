@@ -1,0 +1,32 @@
+/* ─── Autara Noise Texture ───────────────────────────────────────────────
+ *
+ * Subtle paper-grain texture used by customer-web as a body::before
+ * fixed-position background, and as a per-section anchor via the
+ * `.noise-overlay` utility.
+ *
+ * NOTE: this utility depends on a `/noise.png` asset being served from
+ * the consumer app's public/ folder. Each consuming app needs to copy
+ * `noise.png` into their public assets. v1.2.0 will inline this as a
+ * data URI to remove the per-consumer setup step.
+ */
+
+.noise-overlay {
+    position: relative;
+    isolation: isolate;
+}
+.noise-overlay::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background-image: url("/noise.png");
+    background-repeat: repeat;
+    background-size: 128px 128px;
+    opacity: 0.18;
+    mix-blend-mode: multiply;
+}
+.noise-overlay > * {
+    position: relative;
+    z-index: 2;
+}

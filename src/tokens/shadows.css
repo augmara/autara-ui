@@ -1,7 +1,30 @@
-/* ─── Autara Purple-Tinted Shadows ─── */
+/* ─── Autara Shadow Tokens — DELIBERATELY `none` ──────────────────────────
+ *
+ * Verbatim from the canonical autara-customer-web/globals.css rule:
+ *
+ *   "AUTARA AESTHETIC: NO DROP SHADOWS. The brand reads as solid,
+ *    editorial, hairline-edged — never floating-card. These tokens are
+ *    kept as `none` so any consumer that still references them gets the
+ *    correct treatment; depth comes from border-color shifts on hover."
+ *
+ * If you're tempted to add a shadow, ask: "Would Linear, Stripe, or
+ * Cal.com add one here?" If the answer's still yes, push back via PR
+ * conversation rather than silently re-introducing depth-by-shadow.
+ *
+ * The variable names are retained for backwards compat with v1.0.x
+ * consumers — they evaluate to `none`, so `box-shadow: var(--shadow-autara)`
+ * resolves to `box-shadow: none` and produces the correct treatment.
+ */
 
 @theme inline {
-    --shadow-autara: 0 1px 3px rgba(78, 27, 189, 0.06), 0 1px 2px rgba(78, 27, 189, 0.04);
-    --shadow-autara-md: 0 4px 6px -1px rgba(78, 27, 189, 0.08), 0 2px 4px -1px rgba(78, 27, 189, 0.04);
-    --shadow-autara-lg: 0 10px 15px -3px rgba(78, 27, 189, 0.08), 0 4px 6px -2px rgba(78, 27, 189, 0.04);
+    --shadow-card: none;
+    --shadow-card-hover: none;
+    --shadow-cta: none;
+
+    /* Backwards-compat — these used to ship as purple-tinted shadows in
+     * v1.0.x. v1.1.0 collapses them to `none` to enforce the editorial
+     * aesthetic across every consumer. */
+    --shadow-autara: none;
+    --shadow-autara-md: none;
+    --shadow-autara-lg: none;
 }

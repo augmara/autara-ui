@@ -3,3 +3,7 @@ dist/
 showcase/
 .next/
 *.tgz
+storybook-static
+
+.vercel
+storybook-static/
