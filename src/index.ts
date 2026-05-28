@@ -41,6 +41,10 @@ export {
     TrustItem, type TrustItemProps,
     SectionBand, type SectionBandProps,
     StepCard, type StepCardProps,
+    // v1.2.0 — async-surface primitives
+    KpiCard, type KpiCardProps,
+    AsyncSkeleton, type AsyncSkeletonProps,
+    ErrorCard, type ErrorCardProps,
 } from './components'
 
 // Utilities

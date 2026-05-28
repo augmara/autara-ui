@@ -111,3 +111,8 @@ export { ServiceCard, type ServiceCardProps } from './ServiceCard'
 export { TrustItem, type TrustItemProps } from './TrustItem'
 export { SectionBand, type SectionBandProps } from './SectionBand'
 export { StepCard, type StepCardProps } from './StepCard'
+
+// ─── v1.2.0 — async-surface primitives ───────────────────────────────────
+export { KpiCard, type KpiCardProps } from './KpiCard'
+export { AsyncSkeleton, type AsyncSkeletonProps } from './AsyncSkeleton'
+export { ErrorCard, type ErrorCardProps } from './ErrorCard'
