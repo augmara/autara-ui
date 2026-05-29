@@ -32,6 +32,7 @@ type Variant =
   | "ghost"
   | "destructive"
   | "link"
+  | "acid"
   // v1.0.x legacy names — backwards-compat aliases.
   | "light"
   | "light-primary"
@@ -68,6 +69,11 @@ const VARIANT_CLASSES: Record<Variant, string> = {
     "bg-rose-600 text-white hover:-translate-y-0.5 hover:bg-rose-700 active:translate-y-0 focus-visible:ring-rose-500/35",
   link:
     "text-[var(--color-autara-purple)] underline-offset-4 hover:underline bg-transparent focus-visible:ring-[var(--color-autara-purple)]/30",
+
+  // ─── Acid lime — high-pop CTA on cream surfaces ──────────────────────
+  // Dark-surface companion deferred to a future PR.
+  acid:
+    "bg-[var(--color-autara-lime-bright)] text-[#0E0A1A] hover:-translate-y-0.5 hover:bg-[#c2ee3a] active:translate-y-0 focus-visible:ring-[var(--color-autara-lime-bright)]/55",
 
   // ─── v1.0.x backwards-compat aliases ─────────────────────────────────
   "light-primary":

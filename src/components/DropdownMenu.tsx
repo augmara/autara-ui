@@ -4,24 +4,54 @@ import * as React from 'react'
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import { cn } from '../lib/cn'
 
+/**
+ * DropdownMenu — Radix dropdown primitive in the Autara cream-canvas
+ * grammar. Used for kebab menus on table rows, context menus on
+ * cards, and any "more actions" trigger.
+ *
+ * - **Content / SubContent**: portaled, hairline `--border-subtle`
+ *   ring, `--surface` fill, no drop shadow, no backdrop blur (Autara
+ *   house rule). Radix slide+fade animations preserved.
+ * - **Item**: ink text by default; hover/keyboard focus tints to
+ *   `--surface-elevated`. Destructive items use
+ *   `data-destructive` (caller adds `className="text-[var(--color-autara-error)]"`).
+ * - **Label**: editorial uppercase eyebrow (matches Select + the rest
+ *   of the design system).
+ * - **Separator**: hairline `--border-subtle`.
+ * - **SubTrigger**: Solar Bold chevron-right, rotates on data state.
+ */
 const DropdownMenu = DropdownMenuPrimitive.Root
 const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
 const DropdownMenuGroup = DropdownMenuPrimitive.Group
 const DropdownMenuPortal = DropdownMenuPrimitive.Portal
 const DropdownMenuSub = DropdownMenuPrimitive.Sub
 
+// Shared surface for Content and SubContent.
+const SURFACE = cn(
+    'z-50 min-w-[10rem] overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-[var(--surface)] p-1 text-[var(--text-strong)]',
+    'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
+    'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
+    'data-[side=bottom]:slide-in-from-top-1 data-[side=top]:slide-in-from-bottom-1',
+    'data-[side=left]:slide-in-from-right-1 data-[side=right]:slide-in-from-left-1'
+)
+
+// Shared item grammar for Item and SubTrigger.
+const ITEM = cn(
+    'relative flex w-full cursor-pointer select-none items-center gap-2 rounded-md px-3 py-2 text-sm text-[var(--text-strong)] outline-none transition-colors',
+    'data-[highlighted]:bg-[var(--surface-elevated)]',
+    'data-[state=open]:bg-[var(--surface-elevated)]',
+    'data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
+)
+
 const DropdownMenuContent = React.forwardRef<
     React.ComponentRef<typeof DropdownMenuPrimitive.Content>,
     React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>
->(({ className, sideOffset = 4, ...props }, ref) => (
+>(({ className, sideOffset = 6, ...props }, ref) => (
     <DropdownMenuPrimitive.Portal>
         <DropdownMenuPrimitive.Content
             ref={ref}
             sideOffset={sideOffset}
-            className={cn(
-                'z-50 min-w-[8rem] overflow-hidden rounded-xl border border-white/[0.08] bg-[#0c0614]/95 p-1.5 text-white/80 shadow-2xl backdrop-blur-xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
-                className
-            )}
+            className={cn(SURFACE, className)}
             {...props}
         />
     </DropdownMenuPrimitive.Portal>
@@ -31,16 +61,13 @@ DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName
 const DropdownMenuItem = React.forwardRef<
     React.ComponentRef<typeof DropdownMenuPrimitive.Item>,
     React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> & {
+        /** Add left padding so this row aligns with sibling items that carry an icon. */
         inset?: boolean
     }
 >(({ className, inset, ...props }, ref) => (
     <DropdownMenuPrimitive.Item
         ref={ref}
-        className={cn(
-            'relative flex cursor-default select-none items-center rounded-lg px-3 py-2 text-sm outline-none transition-colors focus:bg-white/[0.06] focus:text-white data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-            inset && 'pl-8',
-            className
-        )}
+        className={cn(ITEM, inset && 'pl-9', className)}
         {...props}
     />
 ))
@@ -55,8 +82,9 @@ const DropdownMenuLabel = React.forwardRef<
     <DropdownMenuPrimitive.Label
         ref={ref}
         className={cn(
-            'px-3 py-1.5 text-xs font-semibold text-white/40 uppercase tracking-wider',
-            inset && 'pl-8',
+            // Editorial eyebrow — matches Select label + the rest of the system.
+            'px-3 pb-1 pt-2 text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]',
+            inset && 'pl-9',
             className
         )}
         {...props}
@@ -70,7 +98,10 @@ const DropdownMenuSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <DropdownMenuPrimitive.Separator
         ref={ref}
-        className={cn('-mx-1 my-1 h-px bg-white/[0.06]', className)}
+        className={cn(
+            'mx-2 my-1 h-px bg-[var(--border-subtle)]',
+            className
+        )}
         {...props}
     />
 ))
@@ -84,16 +115,23 @@ const DropdownMenuSubTrigger = React.forwardRef<
 >(({ className, inset, children, ...props }, ref) => (
     <DropdownMenuPrimitive.SubTrigger
         ref={ref}
-        className={cn(
-            'flex cursor-default select-none items-center rounded-lg px-3 py-2 text-sm outline-none focus:bg-white/[0.06] data-[state=open]:bg-white/[0.06]',
-            inset && 'pl-8',
-            className
-        )}
+        className={cn(ITEM, inset && 'pl-9', className)}
         {...props}
     >
-        {children}
-        <svg className="ml-auto h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+        <span className="min-w-0 flex-1 truncate">{children}</span>
+        <svg
+            aria-hidden
+            viewBox="0 0 24 24"
+            width="14"
+            height="14"
+            className="shrink-0 text-[var(--text-subtle)]"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2.4}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <path d="M9 6l6 6-6 6" />
         </svg>
     </DropdownMenuPrimitive.SubTrigger>
 ))
@@ -102,13 +140,11 @@ DropdownMenuSubTrigger.displayName = DropdownMenuPrimitive.SubTrigger.displayNam
 const DropdownMenuSubContent = React.forwardRef<
     React.ComponentRef<typeof DropdownMenuPrimitive.SubContent>,
     React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubContent>
->(({ className, ...props }, ref) => (
+>(({ className, sideOffset = 4, ...props }, ref) => (
     <DropdownMenuPrimitive.SubContent
         ref={ref}
-        className={cn(
-            'z-50 min-w-[8rem] overflow-hidden rounded-xl border border-white/[0.08] bg-[#0c0614]/95 p-1.5 text-white/80 shadow-2xl backdrop-blur-xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
-            className
-        )}
+        sideOffset={sideOffset}
+        className={cn(SURFACE, className)}
         {...props}
     />
 ))

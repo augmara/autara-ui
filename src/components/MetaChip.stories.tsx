@@ -31,7 +31,8 @@ export const WithDot: Story = {
   args: { tone: "success", dot: true, children: "Open now" },
 };
 
-/** All tones rendered together — the canonical chip vocabulary. */
+/** All tones rendered together — the canonical chip vocabulary in the
+ *  refreshed editorial weight (uppercase + tracked, brand-aligned ink). */
 export const Vocabulary: Story = {
   parameters: { layout: "padded" },
   render: () => (

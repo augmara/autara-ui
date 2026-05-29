@@ -3,6 +3,24 @@
 import * as React from 'react'
 import { cn } from '../lib/cn'
 
+/**
+ * MultiSelect — token-style multi-value picker on the Autara cream
+ * canvas. Container matches the `.field-input` grammar (hairline
+ * border, 4 px brand-purple halo on focus-within, aria-invalid red
+ * ring). Chips reuse the brand-tinted MetaChip grammar.
+ *
+ * Behaviour kept from the v1.0.x implementation:
+ *   - Free-text filter typed inline alongside the chips
+ *   - `Backspace` on empty input removes the last chip
+ *   - `Enter` selects the top filtered result
+ *   - `Escape` closes the dropdown and blurs
+ *   - Click outside closes the dropdown
+ *
+ * `theme` prop preserved for source-level compatibility but is
+ * currently a **no-op** — only the light treatment ships; dark
+ * companion deferred.
+ */
+
 interface MultiSelectOption {
     label: string
     value: string
@@ -13,21 +31,51 @@ interface MultiSelectProps {
     value?: string[]
     onChange?: (value: string[]) => void
     placeholder?: string
+    /** @deprecated currently a no-op — dark companion deferred */
     theme?: 'dark' | 'light'
     className?: string
     disabled?: boolean
+    'aria-invalid'?: boolean | 'true' | 'false'
+    id?: string
 }
 
+const ChipCloseIcon: React.FC = () => (
+    <svg
+        aria-hidden
+        viewBox="0 0 24 24"
+        width="10"
+        height="10"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2.4}
+        strokeLinecap="round"
+    >
+        <path d="M6 6l12 12M18 6L6 18" />
+    </svg>
+)
+
 const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
-    ({ options, value = [], onChange, placeholder = 'Select...', theme = 'dark', className, disabled }, ref) => {
+    function MultiSelect(
+        {
+            options,
+            value = [],
+            onChange,
+            placeholder = 'Select…',
+            theme: _theme,
+            className,
+            disabled,
+            'aria-invalid': ariaInvalid,
+            id,
+        },
+        ref
+    ) {
         const [isOpen, setIsOpen] = React.useState(false)
         const [search, setSearch] = React.useState('')
         const containerRef = React.useRef<HTMLDivElement>(null)
         const inputRef = React.useRef<HTMLInputElement>(null)
-        const isDark = theme === 'dark'
 
         const selected = value
-        const setSelected = (newVal: string[]) => onChange?.(newVal)
+        const setSelected = (next: string[]) => onChange?.(next)
 
         const filteredOptions = options.filter(
             (opt) =>
@@ -59,10 +107,13 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
             }
         }
 
-        // Close dropdown on click outside
+        // Close on click outside.
         React.useEffect(() => {
             const handler = (e: MouseEvent) => {
-                if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+                if (
+                    containerRef.current &&
+                    !containerRef.current.contains(e.target as Node)
+                ) {
                     setIsOpen(false)
                 }
             }
@@ -70,60 +121,63 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
             return () => document.removeEventListener('mousedown', handler)
         }, [])
 
-        const getLabel = (val: string) => options.find((o) => o.value === val)?.label ?? val
+        const getLabel = (val: string) =>
+            options.find((o) => o.value === val)?.label ?? val
+
+        const invalid = ariaInvalid === true || ariaInvalid === 'true'
 
         return (
-            <div ref={containerRef} className={cn('relative', className)}>
+            <div
+                ref={containerRef}
+                className={cn('relative', className)}
+            >
                 <div
                     ref={ref}
-                    className={cn(
-                        'flex flex-wrap items-center gap-1.5 min-h-[40px] w-full rounded-autara-md border px-2 py-1.5 text-sm transition-colors',
-                        isDark
-                            ? 'border-white/[0.1] bg-white/[0.04] focus-within:border-autara-purple/50 focus-within:ring-2 focus-within:ring-autara-purple/20'
-                            : 'border-autara-gray-300 bg-white focus-within:border-autara-purple focus-within:ring-2 focus-within:ring-autara-purple/20',
-                        disabled && 'opacity-50 cursor-not-allowed'
-                    )}
+                    role="combobox"
+                    aria-expanded={isOpen}
+                    aria-invalid={ariaInvalid}
                     onClick={() => {
-                        if (!disabled) {
-                            inputRef.current?.focus()
-                            setIsOpen(true)
-                        }
+                        if (disabled) return
+                        inputRef.current?.focus()
+                        setIsOpen(true)
                     }}
+                    className={cn(
+                        'flex min-h-11 w-full flex-wrap items-center gap-1.5 rounded-lg border bg-[var(--surface)] px-2.5 py-1.5 text-sm transition-colors',
+                        'cursor-text',
+                        invalid
+                            ? 'border-[var(--color-autara-error)] focus-within:[box-shadow:0_0_0_4px_rgba(221,56,56,0.10)]'
+                            : 'border-[var(--border-subtle)] hover:border-[rgba(17,24,39,0.18)] focus-within:border-[var(--color-autara-purple)] focus-within:[box-shadow:0_0_0_4px_rgba(78,27,189,0.10)]',
+                        disabled &&
+                            'cursor-not-allowed bg-[var(--surface-warm)] opacity-70'
+                    )}
                 >
                     {selected.map((val) => (
                         <span
                             key={val}
                             className={cn(
-                                'inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium transition-colors',
-                                isDark
-                                    ? 'bg-autara-purple/20 text-autara-purple-200 border border-autara-purple/30'
-                                    : 'bg-autara-purple-50 text-autara-purple border border-autara-purple-200'
+                                'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-[0.12em] ring-1 ring-inset',
+                                'bg-[rgba(78,27,189,0.08)] text-[var(--color-autara-purple)] ring-[rgba(78,27,189,0.22)]'
                             )}
                         >
                             {getLabel(val)}
                             {!disabled && (
                                 <button
                                     type="button"
+                                    aria-label={`Remove ${getLabel(val)}`}
                                     onClick={(e) => {
                                         e.stopPropagation()
                                         handleRemove(val)
                                     }}
-                                    className={cn(
-                                        'rounded-sm transition-colors',
-                                        isDark
-                                            ? 'hover:bg-white/[0.1] text-white/40 hover:text-white/70'
-                                            : 'hover:bg-autara-purple/10 text-autara-purple/50 hover:text-autara-purple'
-                                    )}
+                                    className="grid h-4 w-4 place-items-center rounded-full text-[var(--color-autara-purple)]/55 transition-colors hover:bg-[rgba(78,27,189,0.10)] hover:text-[var(--color-autara-purple)]"
                                 >
-                                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
+                                    <ChipCloseIcon />
                                 </button>
                             )}
                         </span>
                     ))}
                     <input
                         ref={inputRef}
+                        id={id}
                         type="text"
                         value={search}
                         onChange={(e) => {
@@ -135,53 +189,36 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                         placeholder={selected.length === 0 ? placeholder : ''}
                         disabled={disabled}
                         className={cn(
-                            'flex-1 min-w-[80px] bg-transparent outline-none text-sm',
-                            isDark
-                                ? 'text-white placeholder:text-white/30'
-                                : 'text-autara-gray-900 placeholder:text-autara-gray-400'
+                            'min-w-[80px] flex-1 bg-transparent text-sm text-[var(--text-strong)] outline-none',
+                            'placeholder:text-[var(--text-subtle)]',
+                            'disabled:cursor-not-allowed'
                         )}
                     />
                 </div>
 
-                {isOpen && filteredOptions.length > 0 && (
+                {isOpen && !disabled && filteredOptions.length > 0 && (
                     <div
-                        className={cn(
-                            'absolute top-full left-0 right-0 z-50 mt-1 max-h-60 overflow-auto rounded-autara-lg border shadow-xl',
-                            isDark
-                                ? 'border-white/[0.08] bg-[#1a1025]/95 backdrop-blur-xl'
-                                : 'border-autara-gray-200 bg-white shadow-autara-lg'
-                        )}
+                        role="listbox"
+                        className="absolute left-0 right-0 top-full z-50 mt-1.5 max-h-60 overflow-auto rounded-xl border border-[var(--border-subtle)] bg-[var(--surface)] p-1"
                     >
-                        <div className="p-1">
-                            {filteredOptions.map((opt) => (
-                                <button
-                                    key={opt.value}
-                                    type="button"
-                                    onClick={() => handleSelect(opt.value)}
-                                    className={cn(
-                                        'w-full text-left rounded-md px-3 py-1.5 text-sm transition-colors',
-                                        isDark
-                                            ? 'text-white/70 hover:bg-autara-purple/20 hover:text-white'
-                                            : 'text-autara-gray-700 hover:bg-autara-purple/10 hover:text-autara-purple'
-                                    )}
-                                >
-                                    {opt.label}
-                                </button>
-                            ))}
-                        </div>
+                        {filteredOptions.map((opt) => (
+                            <button
+                                key={opt.value}
+                                type="button"
+                                role="option"
+                                aria-selected="false"
+                                onClick={() => handleSelect(opt.value)}
+                                className="w-full rounded-md px-3 py-2 text-left text-sm text-[var(--text-strong)] transition-colors hover:bg-[var(--surface-elevated)]"
+                            >
+                                {opt.label}
+                            </button>
+                        ))}
                     </div>
                 )}
 
-                {isOpen && filteredOptions.length === 0 && search && (
-                    <div
-                        className={cn(
-                            'absolute top-full left-0 right-0 z-50 mt-1 rounded-autara-lg border shadow-xl p-3',
-                            isDark
-                                ? 'border-white/[0.08] bg-[#1a1025]/95 backdrop-blur-xl'
-                                : 'border-autara-gray-200 bg-white'
-                        )}
-                    >
-                        <p className={cn('text-sm', isDark ? 'text-white/30' : 'text-autara-gray-400')}>
+                {isOpen && !disabled && filteredOptions.length === 0 && search && (
+                    <div className="absolute left-0 right-0 top-full z-50 mt-1.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface)] p-3">
+                        <p className="text-sm text-[var(--text-muted)]">
                             No results for &ldquo;{search}&rdquo;
                         </p>
                     </div>
@@ -190,6 +227,5 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
         )
     }
 )
-MultiSelect.displayName = 'MultiSelect'
 
 export { MultiSelect, type MultiSelectOption, type MultiSelectProps }

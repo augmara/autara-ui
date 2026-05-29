@@ -2,41 +2,58 @@ import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '../lib/cn'
 
-const inputVariants = cva(
-    'flex w-full rounded-autara-md text-base outline-none transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50',
-    {
-        variants: {
-            theme: {
-                light: [
-                    'h-11 bg-white border border-autara-gray-300 px-4 py-3',
-                    'text-autara-gray-900 placeholder:text-autara-gray-400',
-                    'focus:border-autara-purple/40 focus:outline-none focus:ring-transparent',
-                    'focus:[box-shadow:0_0_0_3px_rgba(78,27,189,0.08)]',
-                ].join(' '),
-                dark: [
-                    'h-11 bg-white/[0.06] border border-white/[0.1] px-4 py-3',
-                    'text-white placeholder:text-white/25',
-                    'focus:border-autara-purple focus:ring-0',
-                ].join(' '),
-            },
+/**
+ * Input — the canonical Autara text input. Renders the
+ * `.field-input` utility class from `autara-ui/utilities/forms.css`,
+ * which encodes the hairline border, the signature **4px brand-purple
+ * halo on focus**, and the `aria-invalid` red-ring state. Consumers
+ * who already import `@augmara/autara-ui/utilities` (every web app
+ * does) get the look automatically.
+ *
+ * Visual rules — see [`autara-ui/CLAUDE.md` § Aesthetic invariants](../../CLAUDE.md):
+ *   - 44 × full-width pill on cream surface (`size="md"`, default).
+ *   - 48 × full-width on hero / onboarding panels (`size="lg"`).
+ *   - 4px brand-purple halo on focus — never a doubled outline.
+ *   - Red border + red halo when `aria-invalid="true"`.
+ *   - Disabled fills with `--surface-warm` and dims text.
+ *
+ * `theme` prop preserved for source-level compatibility (was the
+ * legacy axis switching between light cream and dark photo surfaces).
+ * It is now a **no-op** — only the light treatment ships. A dark-
+ * surface companion can land later without breaking consumers.
+ */
+const inputVariants = cva('field-input', {
+    variants: {
+        size: {
+            md: '',
+            lg: 'field-input--lg',
         },
-        defaultVariants: {
-            theme: 'light',
-        },
-    }
-)
+    },
+    defaultVariants: {
+        size: 'md',
+    },
+})
 
 export interface InputProps
-    extends React.InputHTMLAttributes<HTMLInputElement>,
-        VariantProps<typeof inputVariants> {}
+    extends Omit<
+            React.InputHTMLAttributes<HTMLInputElement>,
+            'size'
+        >,
+        VariantProps<typeof inputVariants> {
+    /** @deprecated currently a no-op — dark companion deferred */
+    theme?: 'dark' | 'light'
+}
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-    ({ className, type, theme, ...props }, ref) => {
+    function Input(
+        { className, type = 'text', size, theme: _theme, ...props },
+        ref
+    ) {
         return (
             <input
-                type={type}
-                className={cn(inputVariants({ theme }), className)}
                 ref={ref}
+                type={type}
+                className={cn(inputVariants({ size }), className)}
                 {...props}
             />
         )

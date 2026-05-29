@@ -3,7 +3,7 @@ import { SectionBand } from "./SectionBand";
 import { SectionHeading } from "./SectionHeading";
 
 const meta = {
-  title: "Layout/SectionBand",
+  title: "Marketing/SectionBand",
   component: SectionBand,
   parameters: { layout: "fullscreen" },
   args: { tone: "lime", children: null },

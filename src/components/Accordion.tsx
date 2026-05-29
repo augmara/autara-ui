@@ -4,6 +4,22 @@ import * as React from 'react'
 import * as AccordionPrimitive from '@radix-ui/react-accordion'
 import { cn } from '../lib/cn'
 
+/**
+ * Accordion — Radix accordion primitive in the Autara cream-canvas
+ * grammar. Designed for FAQ blocks, expandable settings rows, and
+ * onboarding "more info" affordances.
+ *
+ * - Items separated by `--border-subtle` hairlines (top + bottom of
+ *   the group, between every item).
+ * - Trigger: `--text-strong` ink, Satoshi medium. Hover lifts the
+ *   muted chevron to ink. Open state keeps the chevron rotated 180°.
+ * - Content: `--text-muted` body copy with relaxed leading.
+ * - Solar Bold chevron (2.4 stroke, rounded caps).
+ *
+ * Animation classes (`animate-accordion-up` / `animate-accordion-down`)
+ * are defined in `autara-ui/src/utilities/animations.css` and ship
+ * with the package automatically.
+ */
 const Accordion = AccordionPrimitive.Root
 
 const AccordionItem = React.forwardRef<
@@ -12,7 +28,10 @@ const AccordionItem = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <AccordionPrimitive.Item
         ref={ref}
-        className={cn('border-b border-white/[0.06]', className)}
+        className={cn(
+            'border-b border-[var(--border-subtle)] last:border-b-0',
+            className
+        )}
         {...props}
     />
 ))
@@ -26,20 +45,29 @@ const AccordionTrigger = React.forwardRef<
         <AccordionPrimitive.Trigger
             ref={ref}
             className={cn(
-                'flex flex-1 items-center justify-between py-4 text-sm font-medium text-white/80 transition-all hover:text-white [&[data-state=open]>svg]:rotate-180',
+                'group flex flex-1 items-center justify-between gap-4 py-4 text-left text-[15px] font-medium text-[var(--text-strong)] transition-colors',
+                'hover:[&_svg]:text-[var(--text-strong)]',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-autara-purple/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]',
+                'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
+                '[&[data-state=open]>svg]:rotate-180',
                 className
             )}
             {...props}
         >
             {children}
             <svg
-                className="h-4 w-4 shrink-0 text-white/40 transition-transform duration-200"
-                fill="none"
+                aria-hidden
                 viewBox="0 0 24 24"
-                strokeWidth={2}
+                width="16"
+                height="16"
+                className="shrink-0 text-[var(--text-subtle)] transition-transform duration-200 ease-out"
+                fill="none"
                 stroke="currentColor"
+                strokeWidth={2.4}
+                strokeLinecap="round"
+                strokeLinejoin="round"
             >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                <path d="M6 9l6 6 6-6" />
             </svg>
         </AccordionPrimitive.Trigger>
     </AccordionPrimitive.Header>
@@ -52,7 +80,7 @@ const AccordionContent = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
     <AccordionPrimitive.Content
         ref={ref}
-        className="overflow-hidden text-sm text-white/40 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+        className="overflow-hidden text-[14px] leading-relaxed text-[var(--text-muted)] data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
         {...props}
     >
         <div className={cn('pb-4 pt-0', className)}>{children}</div>

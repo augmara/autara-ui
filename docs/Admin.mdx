@@ -1,0 +1,44 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Admin/Overview" />
+
+# Admin — placeholder
+
+The **Admin** surface (`autara-admin`) doesn't have any
+admin-specific reusable components in `autara-ui` yet. This page is a
+deliberate placeholder so the sidebar reflects the four product
+surfaces that exist in the workspace today:
+
+- **Marketing** — customer-web marketing pages
+- **Marketplace** — customer-web booking + browsing
+- **Merchant portal** — merchant-web + merchant-mobile operating UI
+- **Admin** — staff dashboard *(this section, not built yet)*
+
+When admin-specific patterns surface, land them under
+`Admin/<ComponentName>` in this folder so they're easy to find
+without searching the full atom/molecule catalogue.
+
+## What lives here today
+
+Nothing. The admin dashboard currently composes the global atoms
+(`Atoms/Button`, `Atoms/Input`, `Atoms/Dialog`, etc.) and molecules
+directly. Patterns that get reused twice or more across admin pages
+should graduate here — same Storybook-first rule that applies to
+every other surface (see
+[autara-ui/CLAUDE.md](https://github.com/augmaratteam/autara-ui)
+§ *The hard rule that brought v1.1.0 into being*).
+
+## Likely future inhabitants
+
+These patterns have already shown up in admin-api review or admin
+mocks and are good candidates for the first admin-specific
+primitives. None are built yet — listing them so future sessions
+don't reinvent.
+
+- **`Admin/StatusCell`** — coloured status pill for table rows (verified, suspended, waitlisted).
+- **`Admin/AuditLogEntry`** — timeline row showing actor + action + diff + timestamp.
+- **`Admin/SearchCommand`** — ⌘K command palette wired to admin entities (merchants, bookings, customers).
+- **`Admin/RoleChip`** — admin role badge (owner, support, finance).
+
+When you build one, drop the placeholder line from the inventory and
+add a sentence about when to reach for it.

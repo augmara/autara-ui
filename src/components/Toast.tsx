@@ -1,16 +1,67 @@
 'use client'
 
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { cn } from '../lib/cn'
 
-type ToastType = 'default' | 'success' | 'error' | 'warning' | 'info'
+/**
+ * Toast — Autara notification primitive, modelled on the Torph
+ * "Processing Transaction" pill (https://torph.lochie.me): a single-
+ * line ink capsule with a leading Solar-Bold status icon and white
+ * text. No drop shadow, no backdrop blur — depth comes from the ink
+ * contrast against the cream canvas, in line with the Autara house
+ * rule.
+ *
+ * The provider exposes a singleton `toast()` plus `toast.success /
+ * .error / .warning / .info / .loading` shortcuts. A new
+ * `toast.update(id, opts)` lets a single capsule morph in place
+ * (e.g. "Submitting booking…" → "Booking confirmed"), the canonical
+ * Torph status-pill pattern.
+ *
+ * The `theme` prop on `<ToastProvider>` is preserved for source-
+ * level compat with existing consumers (autara-merchant-web) but is
+ * currently a **no-op** — there is only one ink treatment. A
+ * light-fill companion is deferred to a future PR.
+ */
+
+type ToastType =
+    | 'default'
+    | 'success'
+    | 'error'
+    | 'warning'
+    | 'info'
+    | 'loading'
+
+/**
+ * Six anchor positions, matching Sonner / react-hot-toast conventions.
+ * Default is `bottom-center` (the historical Autara position).
+ */
+type ToastPosition =
+    | 'top-left'
+    | 'top-center'
+    | 'top-right'
+    | 'bottom-left'
+    | 'bottom-center'
+    | 'bottom-right'
+
+/**
+ * Capsule variant. `dark` is the canonical Torph ink aesthetic;
+ * `light` is the cream-canvas companion (white surface, ink text,
+ * hairline border). Set once on the Provider, override per toast if
+ * needed.
+ */
+type ToastVariant = 'dark' | 'light'
 
 interface Toast {
     id: string
+    /** Legacy field — combined with `description` on the single-line capsule. */
     title?: string
     description?: string
     type?: ToastType
+    /** Milliseconds before auto-dismiss. `0` keeps the toast open (use with `loading`). */
     duration?: number
+    /** Override the provider's variant for this single capsule. */
+    variant?: ToastVariant
     action?: {
         label: string
         onClick: () => void
@@ -20,6 +71,7 @@ interface Toast {
 interface ToastContextValue {
     toasts: Toast[]
     addToast: (toast: Omit<Toast, 'id'>) => string
+    updateToast: (id: string, patch: Partial<Omit<Toast, 'id'>>) => void
     removeToast: (id: string) => void
 }
 
@@ -35,6 +87,10 @@ function useToast() {
 
 // Standalone toast function (works with the singleton provider)
 let globalAddToast: ((toast: Omit<Toast, 'id'>) => string) | null = null
+let globalUpdateToast:
+    | ((id: string, patch: Partial<Omit<Toast, 'id'>>) => void)
+    | null = null
+let globalRemoveToast: ((id: string) => void) | null = null
 
 const toast = Object.assign(
     (opts: Omit<Toast, 'id'> | string) => {
@@ -64,6 +120,19 @@ const toast = Object.assign(
             const o = typeof opts === 'string' ? { description: opts } : opts
             return toast({ ...o, type: 'info' })
         },
+        loading: (opts: Omit<Toast, 'id' | 'type'> | string) => {
+            const o = typeof opts === 'string' ? { description: opts } : opts
+            // Loading toasts persist until `update` or `dismiss` is called.
+            return toast({ duration: 0, ...o, type: 'loading' })
+        },
+        /** Morph an existing toast in place (e.g. loading → success). */
+        update: (id: string, patch: Partial<Omit<Toast, 'id'>>) => {
+            globalUpdateToast?.(id, patch)
+        },
+        /** Programmatically dismiss a toast by id. */
+        dismiss: (id: string) => {
+            globalRemoveToast?.(id)
+        },
     }
 )
 
@@ -71,18 +140,39 @@ let toastCounter = 0
 
 function ToastProvider({
     children,
-    theme = 'dark',
+    position = 'bottom-center',
+    variant = 'dark',
+    theme: _theme,
 }: {
     children: React.ReactNode
+    /** Anchor edge / corner for the toast stack. Defaults to `bottom-center`. */
+    position?: ToastPosition
+    /** Default capsule variant. `dark` is the canonical Torph ink; `light`
+     *  uses a white surface + ink text for the cream canvas. Per-toast
+     *  `variant` overrides this default. Defaults to `'dark'`. */
+    variant?: ToastVariant
+    /** @deprecated superseded by `variant` — currently a no-op */
     theme?: 'dark' | 'light'
 }) {
     const [toasts, setToasts] = React.useState<Toast[]>([])
 
-    const addToast = React.useCallback((toast: Omit<Toast, 'id'>) => {
+    const addToast = React.useCallback((t: Omit<Toast, 'id'>) => {
         const id = `toast-${++toastCounter}`
-        setToasts((prev) => [...prev, { id, duration: 4000, type: 'default', ...toast }])
+        setToasts((prev) => [
+            ...prev,
+            { id, duration: 4000, type: 'default', ...t },
+        ])
         return id
     }, [])
+
+    const updateToast = React.useCallback(
+        (id: string, patch: Partial<Omit<Toast, 'id'>>) => {
+            setToasts((prev) =>
+                prev.map((t) => (t.id === id ? { ...t, ...patch } : t))
+            )
+        },
+        []
+    )
 
     const removeToast = React.useCallback((id: string) => {
         setToasts((prev) => prev.filter((t) => t.id !== id))
@@ -90,75 +180,260 @@ function ToastProvider({
 
     React.useEffect(() => {
         globalAddToast = addToast
+        globalUpdateToast = updateToast
+        globalRemoveToast = removeToast
         return () => {
             globalAddToast = null
+            globalUpdateToast = null
+            globalRemoveToast = null
         }
-    }, [addToast])
+    }, [addToast, updateToast, removeToast])
 
     return (
-        <ToastContext.Provider value={{ toasts, addToast, removeToast }}>
+        <ToastContext.Provider
+            value={{ toasts, addToast, updateToast, removeToast }}
+        >
             {children}
-            <ToastViewport toasts={toasts} removeToast={removeToast} theme={theme} />
+            <ToastViewport
+                toasts={toasts}
+                removeToast={removeToast}
+                position={position}
+                providerVariant={variant}
+            />
         </ToastContext.Provider>
     )
 }
 
-const typeIcons: Record<ToastType, React.ReactNode> = {
-    default: null,
-    success: (
-        <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-    ),
-    error: (
-        <svg className="w-4 h-4 text-red-400" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-        </svg>
-    ),
-    warning: (
-        <svg className="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-        </svg>
-    ),
-    info: (
-        <svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
-        </svg>
-    ),
+// ─── Solar Bold-style status icons ────────────────────────────────
+// Accent colours for each variant — light versions are slightly
+// darker so they keep ≥ 4.5:1 against the cream / white surface.
+
+const ACCENT: Record<ToastVariant, Record<Exclude<ToastType, 'default'>, string>> = {
+    dark: {
+        loading: 'var(--color-autara-lime-bright)',
+        success: 'var(--color-autara-lime-bright)',
+        error: '#ff8a73',
+        warning: '#ffc864',
+        info: 'var(--color-autara-sky-aqua)',
+    },
+    light: {
+        loading: '#4a7a14',
+        success: '#3a6b14',
+        error: 'var(--color-autara-error)',
+        warning: 'var(--color-autara-warning-text)',
+        info: '#0d4f8c',
+    },
+}
+
+const SpinnerIcon: React.FC<{ color: string }> = ({ color }) => (
+    <svg
+        aria-hidden
+        viewBox="0 0 24 24"
+        width="16"
+        height="16"
+        className="autara-toast-spin"
+        style={{ color }}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2.4}
+        strokeLinecap="round"
+    >
+        <path opacity="0.25" d="M22 12a10 10 0 1 1-10-10" />
+        <path d="M22 12a10 10 0 0 0-10-10" />
+    </svg>
+)
+
+const CheckIcon: React.FC<{ color: string }> = ({ color }) => (
+    <svg
+        aria-hidden
+        viewBox="0 0 24 24"
+        width="16"
+        height="16"
+        style={{ color }}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2.4}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+    >
+        <path d="M5 12.5l4.5 4.5L19 7.5" />
+    </svg>
+)
+
+const CrossIcon: React.FC<{ color: string }> = ({ color }) => (
+    <svg
+        aria-hidden
+        viewBox="0 0 24 24"
+        width="16"
+        height="16"
+        style={{ color }}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2.4}
+        strokeLinecap="round"
+    >
+        <path d="M6 6l12 12M18 6L6 18" />
+    </svg>
+)
+
+const WarningIcon: React.FC<{ color: string }> = ({ color }) => (
+    <svg
+        aria-hidden
+        viewBox="0 0 24 24"
+        width="16"
+        height="16"
+        style={{ color }}
+        fill="currentColor"
+    >
+        <circle cx="12" cy="12" r="10" opacity="0.2" />
+        <rect x="11" y="7" width="2" height="7" rx="1" />
+        <circle cx="12" cy="17" r="1.2" />
+    </svg>
+)
+
+const InfoIcon: React.FC<{ color: string }> = ({ color }) => (
+    <svg
+        aria-hidden
+        viewBox="0 0 24 24"
+        width="16"
+        height="16"
+        style={{ color }}
+        fill="currentColor"
+    >
+        <circle cx="12" cy="12" r="10" opacity="0.2" />
+        <circle cx="12" cy="8" r="1.2" />
+        <rect x="11" y="10.5" width="2" height="7" rx="1" />
+    </svg>
+)
+
+function renderTypeIcon(
+    type: ToastType,
+    variant: ToastVariant
+): React.ReactNode {
+    if (type === 'default') return null
+    const color = ACCENT[variant][type]
+    switch (type) {
+        case 'loading':
+            return <SpinnerIcon color={color} />
+        case 'success':
+            return <CheckIcon color={color} />
+        case 'error':
+            return <CrossIcon color={color} />
+        case 'warning':
+            return <WarningIcon color={color} />
+        case 'info':
+            return <InfoIcon color={color} />
+    }
+}
+
+// ─── Viewport + Item ──────────────────────────────────────────────
+
+// Maps the 6 anchor positions to viewport-layout classes. Corner
+// positions hug their corner; centre positions span the full
+// horizontal axis so the capsules sit dead-centre. `top-*` positions
+// use `flex-col-reverse` so the newest toast renders at the corner /
+// edge and older ones recede further into the page — matching Sonner.
+const VIEWPORT_POS: Record<ToastPosition, string> = {
+    'top-left': 'top-0 left-0 items-start flex-col-reverse',
+    'top-center': 'top-0 inset-x-0 items-center flex-col-reverse',
+    'top-right': 'top-0 right-0 items-end flex-col-reverse',
+    'bottom-left': 'bottom-0 left-0 items-start flex-col',
+    'bottom-center': 'bottom-0 inset-x-0 items-center flex-col',
+    'bottom-right': 'bottom-0 right-0 items-end flex-col',
 }
 
 function ToastViewport({
     toasts,
     removeToast,
-    theme,
+    position,
+    providerVariant,
 }: {
     toasts: Toast[]
     removeToast: (id: string) => void
-    theme: 'dark' | 'light'
+    position: ToastPosition
+    providerVariant: ToastVariant
 }) {
-    if (toasts.length === 0) return null
+    // Portal to document.body so transformed / contained ancestors
+    // (Storybook Docs sections, modal containers with `transform`,
+    // CSS `contain`, etc.) don't capture the `position: fixed`
+    // anchor. SSR-safe via the mounted guard.
+    const [mounted, setMounted] = React.useState(false)
+    React.useEffect(() => setMounted(true), [])
 
-    return (
-        <div className="fixed bottom-0 right-0 z-[100] flex flex-col gap-2 p-4 max-w-[420px] w-full pointer-events-none">
-            {toasts.map((t) => (
-                <ToastItem key={t.id} toast={t} onDismiss={() => removeToast(t.id)} theme={theme} />
-            ))}
-        </div>
+    if (!mounted || toasts.length === 0) return null
+
+    const isTop = position.startsWith('top')
+
+    const viewport = (
+        <>
+            {/* Keyframes for the spinner icon — scoped, no global side effects. */}
+            <style>{`
+                @keyframes autaraToastSpin { to { transform: rotate(360deg); } }
+                .autara-toast-spin { animation: autaraToastSpin 1s linear infinite; transform-origin: 50% 50%; }
+            `}</style>
+            <div
+                className={cn(
+                    'fixed z-[100] flex gap-2 p-4 pointer-events-none',
+                    VIEWPORT_POS[position]
+                )}
+                role="region"
+                aria-label="Notifications"
+            >
+                {toasts.map((t) => (
+                    <ToastItem
+                        key={t.id}
+                        toast={t}
+                        onDismiss={() => removeToast(t.id)}
+                        isTop={isTop}
+                        variant={t.variant ?? providerVariant}
+                    />
+                ))}
+            </div>
+        </>
     )
+
+    return createPortal(viewport, document.body)
 }
 
 function ToastItem({
     toast: t,
     onDismiss,
-    theme,
+    isTop,
+    variant,
 }: {
     toast: Toast
     onDismiss: () => void
-    theme: 'dark' | 'light'
+    /** Mirror enter/exit slide direction so top toasts come down from above. */
+    isTop: boolean
+    /** Resolved variant — provider default, optionally overridden per toast. */
+    variant: ToastVariant
 }) {
     const [isVisible, setIsVisible] = React.useState(false)
     const [isLeaving, setIsLeaving] = React.useState(false)
-    const isDark = theme === 'dark'
+    const [contentKey, setContentKey] = React.useState(0)
+    const prevContent = React.useRef<{
+        title?: string
+        description?: string
+        type?: ToastType
+    }>({ title: t.title, description: t.description, type: t.type })
+
+    // Bump contentKey whenever the user-visible content changes — drives
+    // the Torph-style cross-fade morph on `toast.update(...)`.
+    React.useEffect(() => {
+        const prev = prevContent.current
+        if (
+            prev.title !== t.title ||
+            prev.description !== t.description ||
+            prev.type !== t.type
+        ) {
+            setContentKey((k) => k + 1)
+            prevContent.current = {
+                title: t.title,
+                description: t.description,
+                type: t.type,
+            }
+        }
+    }, [t.title, t.description, t.type])
 
     React.useEffect(() => {
         requestAnimationFrame(() => setIsVisible(true))
@@ -168,7 +443,7 @@ function ToastItem({
         if (t.duration && t.duration > 0) {
             const timer = setTimeout(() => {
                 setIsLeaving(true)
-                setTimeout(onDismiss, 200)
+                setTimeout(onDismiss, 180)
             }, t.duration)
             return () => clearTimeout(timer)
         }
@@ -176,64 +451,99 @@ function ToastItem({
 
     const handleDismiss = () => {
         setIsLeaving(true)
-        setTimeout(onDismiss, 200)
+        setTimeout(onDismiss, 180)
     }
+
+    // Single-line message — combine legacy title + description.
+    const message = [t.title, t.description].filter(Boolean).join(' — ')
+
+    // Slide IN from above for top-anchored stacks, from below for
+    // bottom-anchored ones. Same idle / leaving offsets — the direction
+    // is the only thing that flips.
+    const idleOffset = isTop ? '-translate-y-2' : 'translate-y-2'
+
+    // Variant grammar — dark is the Torph ink capsule; light is the
+    // cream-canvas companion (white surface + ink text + hairline).
+    const isDark = variant === 'dark'
+    const variantCls = isDark
+        ? 'bg-[#0E0A1A] text-white'
+        : 'bg-[var(--surface)] text-[var(--text-strong)] ring-1 ring-inset ring-[var(--border-subtle)]'
 
     return (
         <div
             className={cn(
-                'pointer-events-auto rounded-xl border p-4 shadow-xl transition-all duration-200 ease-out',
+                'pointer-events-auto inline-flex max-w-[min(560px,calc(100vw-32px))] items-center gap-2.5 rounded-full px-4 py-2 text-[13px] font-medium transition-all duration-[180ms] ease-out',
+                variantCls,
                 isVisible && !isLeaving
                     ? 'translate-y-0 opacity-100'
-                    : 'translate-y-2 opacity-0',
-                isDark
-                    ? 'border-white/[0.08] bg-[#1a1025]/95 backdrop-blur-xl'
-                    : 'border-autara-gray-200 bg-white shadow-autara-lg'
+                    : `${idleOffset} opacity-0`
             )}
+            role={t.type === 'error' ? 'alert' : 'status'}
         >
-            <div className="flex items-start gap-3">
-                {t.type && t.type !== 'default' && (
-                    <div className="mt-0.5 shrink-0">{typeIcons[t.type]}</div>
-                )}
-                <div className="flex-1 min-w-0">
-                    {t.title && (
-                        <div className={cn('text-sm font-semibold', isDark ? 'text-white' : 'text-autara-gray-900')}>
-                            {t.title}
-                        </div>
-                    )}
-                    {t.description && (
-                        <div className={cn('text-sm', t.title ? 'mt-1' : '', isDark ? 'text-white/60' : 'text-autara-gray-500')}>
-                            {t.description}
-                        </div>
-                    )}
-                </div>
-                {t.action && (
-                    <button
-                        onClick={t.action.onClick}
-                        className={cn(
-                            'shrink-0 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors',
-                            isDark
-                                ? 'bg-white/[0.08] text-white hover:bg-white/[0.15]'
-                                : 'bg-autara-purple/10 text-autara-purple hover:bg-autara-purple/20'
-                        )}
-                    >
-                        {t.action.label}
-                    </button>
-                )}
+            {t.type && t.type !== 'default' && (
+                <span className="grid h-4 w-4 shrink-0 place-items-center">
+                    {renderTypeIcon(t.type, variant)}
+                </span>
+            )}
+            <span
+                key={contentKey}
+                className="autara-toast-content min-w-0 truncate"
+            >
+                {message}
+            </span>
+            {t.action && (
                 <button
-                    onClick={handleDismiss}
+                    onClick={t.action.onClick}
                     className={cn(
-                        'shrink-0 rounded-md p-1 transition-opacity opacity-50 hover:opacity-100',
-                        isDark ? 'text-white' : 'text-autara-gray-400'
+                        'ml-1 shrink-0 rounded-full px-2.5 py-1 text-[11px] uppercase tracking-[0.12em] transition-colors',
+                        isDark
+                            ? 'bg-white/10 text-white hover:bg-white/20'
+                            : 'bg-[var(--surface-elevated)] text-[var(--text-strong)] hover:bg-[rgba(78,27,189,0.08)]'
                     )}
                 >
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    {t.action.label}
                 </button>
-            </div>
+            )}
+            <button
+                onClick={handleDismiss}
+                className={cn(
+                    'ml-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full transition-colors',
+                    isDark
+                        ? 'text-white/45 hover:bg-white/10 hover:text-white'
+                        : 'text-[var(--text-subtle)] hover:bg-[var(--surface-elevated)] hover:text-[var(--text-strong)]'
+                )}
+                aria-label="Dismiss notification"
+            >
+                <svg
+                    aria-hidden
+                    viewBox="0 0 24 24"
+                    width="12"
+                    height="12"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2.4}
+                    strokeLinecap="round"
+                >
+                    <path d="M6 6l12 12M18 6L6 18" />
+                </svg>
+            </button>
+            <style>{`
+                .autara-toast-content { animation: autaraToastMorph 220ms ease-out; }
+                @keyframes autaraToastMorph {
+                    0%   { opacity: 0; transform: translateY(2px); filter: blur(2px); }
+                    100% { opacity: 1; transform: translateY(0);  filter: blur(0);  }
+                }
+            `}</style>
         </div>
     )
 }
 
-export { ToastProvider, useToast, toast, type Toast, type ToastType }
+export {
+    ToastProvider,
+    useToast,
+    toast,
+    type Toast,
+    type ToastType,
+    type ToastPosition,
+    type ToastVariant,
+}

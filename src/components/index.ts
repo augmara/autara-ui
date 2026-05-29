@@ -1,6 +1,13 @@
 export { GradientBar } from './GradientBar'
 export { Button, buttonVariants, type ButtonProps } from './Button'
 export { Input, inputVariants, type InputProps } from './Input'
+export {
+    PhoneInput,
+    DEFAULT_COUNTRIES,
+    findCountryByIso,
+    type PhoneInputProps,
+    type PhoneCountry,
+} from './PhoneInput'
 export { Textarea, textareaVariants, type TextareaProps } from './Textarea'
 export { Label, labelVariants, type LabelProps } from './Label'
 export { FormField, type FormFieldProps } from './FormField'
@@ -67,7 +74,7 @@ export {
 export { ScrollReveal, type ScrollRevealProps } from './ScrollReveal'
 export { FadeIn, FadeInView, ScaleIn, StaggerContainer, StaggerItem } from './MotionDiv'
 
-export { ToastProvider, useToast, toast, type Toast, type ToastType } from './Toast'
+export { ToastProvider, useToast, toast, type Toast, type ToastType, type ToastPosition, type ToastVariant } from './Toast'
 
 export {
     Select,
@@ -116,3 +123,13 @@ export { StepCard, type StepCardProps } from './StepCard'
 export { KpiCard, type KpiCardProps } from './KpiCard'
 export { AsyncSkeleton, type AsyncSkeletonProps } from './AsyncSkeleton'
 export { ErrorCard, type ErrorCardProps } from './ErrorCard'
+
+// ─── v1.3.0 — markers ────────────────────────────────────────────────────
+export {
+    TrendingPill,
+    trendingPillVariants,
+    type TrendingPillProps,
+    type TrendingPillShape,
+    type TrendingPillTone,
+    type TrendingPillSize,
+} from './TrendingPill'

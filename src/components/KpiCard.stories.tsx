@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { KpiCard } from "./KpiCard";
 
 const meta = {
-  title: "Molecules/KpiCard",
+  title: "Merchant portal/KpiCard",
   component: KpiCard,
   parameters: { layout: "padded" },
   args: { label: "Bookings today", value: 12 },

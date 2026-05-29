@@ -11,6 +11,7 @@ export const colors = {
     },
     'sky-aqua': '#4CEAFF',
     'lime-drive': '#B7E149',
+    'lime-bright': '#D4FF4F',
     gray: {
         50: '#f9fafb',
         100: '#f3f4f6',

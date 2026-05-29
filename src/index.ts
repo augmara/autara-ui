@@ -3,6 +3,7 @@ export {
     GradientBar,
     Button, buttonVariants, type ButtonProps,
     Input, inputVariants, type InputProps,
+    PhoneInput, DEFAULT_COUNTRIES, findCountryByIso, type PhoneInputProps, type PhoneCountry,
     Textarea, textareaVariants, type TextareaProps,
     Label, labelVariants, type LabelProps,
     FormField, type FormFieldProps,
@@ -19,7 +20,7 @@ export {
     ScrollReveal, type ScrollRevealProps,
     FadeIn, FadeInView, ScaleIn, StaggerContainer, StaggerItem,
     // New components
-    ToastProvider, useToast, toast, type Toast, type ToastType,
+    ToastProvider, useToast, toast, type Toast, type ToastType, type ToastPosition, type ToastVariant,
     Select, SelectGroup, SelectValue, SelectTrigger, SelectContent, SelectLabel, SelectItem, SelectSeparator,
     Switch,
     Checkbox,
@@ -45,6 +46,8 @@ export {
     KpiCard, type KpiCardProps,
     AsyncSkeleton, type AsyncSkeletonProps,
     ErrorCard, type ErrorCardProps,
+    // v1.3.0 — markers
+    TrendingPill, trendingPillVariants, type TrendingPillProps, type TrendingPillShape, type TrendingPillTone, type TrendingPillSize,
 } from './components'
 
 // Utilities

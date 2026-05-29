@@ -2,9 +2,22 @@
 
 import * as React from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
-import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '../lib/cn'
 
+/**
+ * Dialog — Radix dialog primitive styled for the Autara cream canvas.
+ *
+ * Single light treatment (a dark companion for photo/ink surfaces is
+ * deferred to a future PR). Honors the Autara house rules:
+ *   - `--surface` (white) fill, `--text-strong` ink text
+ *   - Hairline `--border-subtle` ring instead of any drop shadow
+ *   - Ink overlay at 50% opacity (no backdrop blur — flat
+ *     editorial scrim)
+ *   - Solar Bold close icon at the top-right
+ *
+ * The `theme` prop on `DialogContent` is preserved for source-level
+ * compatibility but is currently a **no-op**.
+ */
 const Dialog = DialogPrimitive.Root
 const DialogTrigger = DialogPrimitive.Trigger
 const DialogClose = DialogPrimitive.Close
@@ -17,7 +30,9 @@ const DialogOverlay = React.forwardRef<
     <DialogPrimitive.Overlay
         ref={ref}
         className={cn(
-            'fixed inset-0 z-50 bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+            'fixed inset-0 z-50 bg-[#0E0A1A]/55',
+            'data-[state=open]:animate-in data-[state=open]:fade-in-0',
+            'data-[state=closed]:animate-out data-[state=closed]:fade-out-0',
             className
         )}
         {...props}
@@ -25,41 +40,50 @@ const DialogOverlay = React.forwardRef<
 ))
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
-const dialogContentVariants = cva(
-    'fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-autara-xl p-6 shadow-2xl duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-    {
-        variants: {
-            theme: {
-                dark: 'border border-white/[0.08] bg-[#0c0614]/95 backdrop-blur-xl',
-                light: 'border border-autara-gray-200 bg-white',
-            },
-        },
-        defaultVariants: {
-            theme: 'dark',
-        },
-    }
-)
-
 const DialogContent = React.forwardRef<
     React.ComponentRef<typeof DialogPrimitive.Content>,
-    React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & VariantProps<typeof dialogContentVariants>
->(({ className, children, theme, ...props }, ref) => (
+    React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
+        /** @deprecated currently a no-op — dark companion deferred */
+        theme?: 'dark' | 'light'
+    }
+>(({ className, children, theme: _theme, ...props }, ref) => (
     <DialogPortal>
         <DialogOverlay />
         <DialogPrimitive.Content
             ref={ref}
-            className={cn(dialogContentVariants({ theme }), className)}
+            className={cn(
+                'fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4',
+                'rounded-2xl bg-[var(--surface)] p-6',
+                'ring-1 ring-inset ring-[var(--border-subtle)]',
+                'duration-200',
+                'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
+                'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
+                className
+            )}
             {...props}
         >
             {children}
-            <DialogPrimitive.Close className={cn(
-                'absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-autara-purple/50 focus:ring-offset-2 disabled:pointer-events-none',
-                theme === 'light' ? 'text-autara-gray-400 ring-offset-white' : 'text-white/40 ring-offset-transparent'
-            )}>
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            <DialogPrimitive.Close
+                aria-label="Close dialog"
+                className={cn(
+                    'absolute right-4 top-4 grid h-7 w-7 place-items-center rounded-full',
+                    'text-[var(--text-subtle)] transition-colors',
+                    'hover:bg-[var(--surface-elevated)] hover:text-[var(--text-strong)]',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-autara-purple/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]'
+                )}
+            >
+                <svg
+                    aria-hidden
+                    viewBox="0 0 24 24"
+                    width="14"
+                    height="14"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2.4}
+                    strokeLinecap="round"
+                >
+                    <path d="M6 6l12 12M18 6L6 18" />
                 </svg>
-                <span className="sr-only">Close</span>
             </DialogPrimitive.Close>
         </DialogPrimitive.Content>
     </DialogPortal>
@@ -70,7 +94,13 @@ const DialogHeader = ({
     className,
     ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
-    <div className={cn('flex flex-col space-y-1.5 text-center sm:text-left', className)} {...props} />
+    <div
+        className={cn(
+            'flex flex-col space-y-1.5 text-left',
+            className
+        )}
+        {...props}
+    />
 )
 DialogHeader.displayName = 'DialogHeader'
 
@@ -78,7 +108,13 @@ const DialogFooter = ({
     className,
     ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
-    <div className={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', className)} {...props} />
+    <div
+        className={cn(
+            'flex flex-col-reverse gap-2 sm:flex-row sm:justify-end',
+            className
+        )}
+        {...props}
+    />
 )
 DialogFooter.displayName = 'DialogFooter'
 
@@ -88,7 +124,11 @@ const DialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <DialogPrimitive.Title
         ref={ref}
-        className={cn('text-lg font-semibold leading-none tracking-tight text-white', className)}
+        className={cn(
+            // Satoshi: 500 only, no semibold/bold.
+            'text-lg font-medium leading-tight text-[var(--text-strong)]',
+            className
+        )}
         {...props}
     />
 ))
@@ -100,7 +140,10 @@ const DialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <DialogPrimitive.Description
         ref={ref}
-        className={cn('text-sm text-white/50', className)}
+        className={cn(
+            'text-sm leading-relaxed text-[var(--text-muted)]',
+            className
+        )}
         {...props}
     />
 ))
