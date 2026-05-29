@@ -34,6 +34,7 @@ const meta = {
         "ghost",
         "destructive",
         "link",
+        "acid",
       ],
     },
     size: {
@@ -67,6 +68,11 @@ export const Destructive: Story = {
   args: { variant: "destructive", children: "Cancel booking" },
 };
 export const Link: Story = { args: { variant: "link", children: "View terms" } };
+
+export const Acid: Story = {
+  name: "Acid — high-pop CTA on cream",
+  args: { variant: "acid", children: "Try it free" },
+};
 
 export const Small: Story = { args: { size: "sm" } };
 export const Large: Story = { args: { size: "lg", children: "Get started" } };
@@ -134,6 +140,7 @@ export const Matrix: Story = {
           "ghost",
           "destructive",
           "link",
+          "acid",
         ] as const
       ).map((variant) => (
         <div key={variant} className="flex items-center gap-3">

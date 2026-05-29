@@ -7,8 +7,12 @@ const TrendingFlameIcon = () => (
     </svg>
 )
 
+const DotIcon = ({ color }: { color: string }) => (
+    <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${color}`} />
+)
+
 const meta: Meta<typeof TrendingPill> = {
-    title: 'Markers/TrendingPill',
+    title: 'Marketing/TrendingPill',
     component: TrendingPill,
     args: {
         label: 'Trending',
@@ -22,13 +26,20 @@ type Story = StoryObj<typeof TrendingPill>
 
 export const Default: Story = {}
 
+// ─── Marker tones (v1.0) — corner markers on hero imagery ──────────
+
 export const TrendingTone: Story = {
     args: { label: 'Trending', tone: 'trending', icon: <TrendingFlameIcon /> },
 }
 
 export const NewTone: Story = {
-    name: 'Tone — new (higgsfield)',
+    name: 'Tone — new (dark theme — lime on ink)',
     args: { label: 'New', tone: 'new' },
+}
+
+export const NewLightTone: Story = {
+    name: 'Tone — new-light (light theme — ink on lime)',
+    args: { label: 'New', tone: 'new-light' },
 }
 
 export const FeaturedTone: Story = {
@@ -50,12 +61,91 @@ export const Sizes: Story = {
     ),
 }
 
-export const AllTones: Story = {
+export const MarkerTones: Story = {
+    name: 'Marker tones — all four',
     render: () => (
         <div className="flex items-center gap-3">
             <TrendingPill label="Trending" tone="trending" icon={<TrendingFlameIcon />} />
             <TrendingPill label="New" tone="new" />
+            <TrendingPill label="New" tone="new-light" />
             <TrendingPill label="Featured" tone="featured" />
+        </div>
+    ),
+}
+
+// ─── Status tones (v1.3+) — booking / availability state on cream ──
+
+export const StatusInfo: Story = {
+    name: 'Status — info (booking confirmed / in progress)',
+    args: { label: 'Confirmed', tone: 'info' },
+}
+
+export const StatusSuccess: Story = {
+    name: 'Status — success (open / completed)',
+    args: { label: 'Completed', tone: 'success' },
+}
+
+export const StatusWarning: Story = {
+    name: 'Status — warning (pending / paused)',
+    args: { label: 'Pending', tone: 'warning' },
+}
+
+export const StatusDestructive: Story = {
+    name: 'Status — destructive (cancelled / failed)',
+    args: { label: 'Cancelled', tone: 'destructive' },
+}
+
+export const StatusNeutral: Story = {
+    name: 'Status — neutral (no-show / unknown)',
+    args: { label: 'No-show', tone: 'neutral' },
+}
+
+export const StatusTones: Story = {
+    name: 'Status tones — all five',
+    render: () => (
+        <div className="flex flex-wrap items-center gap-3">
+            <TrendingPill label="Confirmed" tone="info" />
+            <TrendingPill label="Completed" tone="success" />
+            <TrendingPill label="Pending" tone="warning" />
+            <TrendingPill label="Cancelled" tone="destructive" />
+            <TrendingPill label="No-show" tone="neutral" />
+        </div>
+    ),
+}
+
+// ─── Status tones with a leading dot — open/paused availability ────
+
+export const AvailabilityOpen: Story = {
+    name: 'Availability — Open · accepting bookings',
+    args: {
+        label: 'Open · accepting bookings',
+        tone: 'success',
+        icon: <DotIcon color="bg-[#3a6b14]" />,
+    },
+}
+
+export const AvailabilityPaused: Story = {
+    name: 'Availability — Paused',
+    args: {
+        label: 'Paused',
+        tone: 'warning',
+        icon: <DotIcon color="bg-[var(--color-autara-warning-text)]" />,
+    },
+}
+
+/**
+ * `new-light` (ink on lime) — the cream-surface marker. Pairs with
+ * `Badge variant="new"`.
+ */
+export const NewLightOnCream: Story = {
+    name: 'New-light — on cream surface',
+    parameters: { layout: 'padded' },
+    render: () => (
+        <div className="flex items-center gap-3 rounded-xl bg-[var(--background)] p-6 ring-1 ring-inset ring-[var(--border-subtle)]">
+            <TrendingPill label="New" tone="new-light" />
+            <span className="text-xs uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                on cream surface
+            </span>
         </div>
     ),
 }
@@ -77,6 +167,66 @@ export const OnHeroImage: Story = {
                 icon={<TrendingFlameIcon />}
                 className="absolute left-3 top-3"
             />
+        </div>
+    ),
+}
+
+// In-context — booking row showing status pills in mixed-status list.
+export const InBookingRow: Story = {
+    name: 'In context — booking list row',
+    parameters: { layout: 'padded' },
+    render: () => (
+        <div className="w-[460px] space-y-2">
+            {[
+                {
+                    time: '09:00',
+                    service: 'Premium wash',
+                    customer: 'Sarah Chen · Bondi',
+                    tone: 'info' as const,
+                    label: 'Confirmed',
+                },
+                {
+                    time: '10:30',
+                    service: 'Ceramic coating',
+                    customer: 'Marcus Lee · Surry Hills',
+                    tone: 'warning' as const,
+                    label: 'Pending',
+                },
+                {
+                    time: '13:00',
+                    service: 'Interior detail',
+                    customer: 'Priya Patel · Newtown',
+                    tone: 'success' as const,
+                    label: 'Completed',
+                },
+                {
+                    time: '15:00',
+                    service: 'Engine bay',
+                    customer: 'Tom Briggs · Paddington',
+                    tone: 'destructive' as const,
+                    label: 'Cancelled',
+                },
+            ].map((row) => (
+                <div
+                    key={row.time}
+                    className="flex items-center gap-4 rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)] p-4"
+                >
+                    <div className="w-[64px] shrink-0 border-r border-[var(--border-subtle)] pr-3">
+                        <p className="text-[15px] font-bold tabular-nums text-[var(--text-strong)]">
+                            {row.time}
+                        </p>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                        <p className="truncate text-[14px] font-semibold text-[var(--text-strong)]">
+                            {row.service}
+                        </p>
+                        <p className="mt-0.5 truncate text-[12px] text-[var(--text-muted)]">
+                            {row.customer}
+                        </p>
+                    </div>
+                    <TrendingPill label={row.label} tone={row.tone} />
+                </div>
+            ))}
         </div>
     ),
 }

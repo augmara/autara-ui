@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { RatingStars } from "./RatingStars";
 
 const meta = {
-  title: "Molecules/RatingStars",
+  title: "Marketplace/RatingStars",
   component: RatingStars,
   parameters: { layout: "centered" },
   argTypes: {

@@ -36,6 +36,8 @@
     /* Accent — used sparingly, mostly in marketing surfaces. */
     --color-autara-sky-aqua: #4ceaff;
     --color-autara-lime-drive: #b7e149;
+    /* Brighter acid lime — pairs with dark text on light surfaces. */
+    --color-autara-lime-bright: #d4ff4f;
 
     /* Purple scale — for tints/backgrounds. */
     --color-autara-purple-50: #f5f0ff;

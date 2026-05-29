@@ -4,7 +4,7 @@ import { SectionBand } from "./SectionBand";
 import { SectionHeading } from "./SectionHeading";
 
 const meta = {
-  title: "Marketplace/StepCard",
+  title: "Marketing/StepCard",
   component: StepCard,
   parameters: { layout: "padded" },
   args: {

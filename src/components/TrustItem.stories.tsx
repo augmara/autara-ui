@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { TrustItem } from "./TrustItem";
 
 const meta = {
-  title: "Molecules/TrustItem",
+  title: "Marketing/TrustItem",
   component: TrustItem,
   parameters: { layout: "padded" },
   args: {

@@ -2,40 +2,39 @@ import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '../lib/cn'
 
-const textareaVariants = cva(
-    'flex min-h-[80px] w-full rounded-autara-md text-base outline-none transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50',
-    {
-        variants: {
-            theme: {
-                light: [
-                    'bg-white border border-autara-gray-300 px-4 py-3',
-                    'text-autara-gray-900 placeholder:text-autara-gray-400',
-                    'focus:border-autara-purple focus:ring-1 focus:ring-autara-purple',
-                    'focus:shadow-[0_0_0_3px_rgba(78,27,189,0.1)]',
-                ].join(' '),
-                dark: [
-                    'bg-white/[0.06] border border-white/[0.1] px-4 py-3',
-                    'text-white placeholder:text-white/25',
-                    'focus:border-autara-purple focus:ring-0',
-                ].join(' '),
-            },
-        },
-        defaultVariants: {
-            theme: 'light',
-        },
-    }
-)
+/**
+ * Textarea — the canonical multi-line input. Renders the
+ * `.field-textarea` utility class from `autara-ui/utilities/forms.css`,
+ * sharing the hairline border, 4px brand-purple halo, and
+ * `aria-invalid` red-ring grammar with `Input`.
+ *
+ * Defaults to `min-h-[96px]` with vertical resize. Override via
+ * `rows` / `className` when you need a fixed height or no-resize.
+ *
+ * `theme` prop kept as no-op for source-level compatibility; dark-
+ * surface companion deferred.
+ */
+const textareaVariants = cva('field-textarea', {
+    variants: {
+        // Reserved for future size axis — keep the API parallel to Input.
+        size: { md: '' },
+    },
+    defaultVariants: { size: 'md' },
+})
 
 export interface TextareaProps
     extends React.TextareaHTMLAttributes<HTMLTextAreaElement>,
-        VariantProps<typeof textareaVariants> {}
+        VariantProps<typeof textareaVariants> {
+    /** @deprecated currently a no-op — dark companion deferred */
+    theme?: 'dark' | 'light'
+}
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-    ({ className, theme, ...props }, ref) => {
+    function Textarea({ className, size, theme: _theme, ...props }, ref) {
         return (
             <textarea
-                className={cn(textareaVariants({ theme }), className)}
                 ref={ref}
+                className={cn(textareaVariants({ size }), className)}
                 {...props}
             />
         )

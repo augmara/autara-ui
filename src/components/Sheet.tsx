@@ -5,6 +5,17 @@ import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '../lib/cn'
 
+/**
+ * Sheet — Radix dialog primitive as an edge-anchored drawer.
+ *
+ * Same grammar as `Dialog`: `--surface` fill, `--text-strong` ink,
+ * `--border-subtle` hairline edge — no drop shadow, no backdrop blur.
+ * `side` picks the anchor; the four entrance animations match the
+ * anchor direction.
+ *
+ * Dark companion (for sheets over photo / ink contexts) deferred to a
+ * future PR.
+ */
 const Sheet = DialogPrimitive.Root
 const SheetTrigger = DialogPrimitive.Trigger
 const SheetClose = DialogPrimitive.Close
@@ -15,25 +26,40 @@ const SheetOverlay = React.forwardRef<
     React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
 >(({ className, ...props }, ref) => (
     <DialogPrimitive.Overlay
+        ref={ref}
         className={cn(
-            'fixed inset-0 z-50 bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+            'fixed inset-0 z-50 bg-[#0E0A1A]/55',
+            'data-[state=open]:animate-in data-[state=open]:fade-in-0',
+            'data-[state=closed]:animate-out data-[state=closed]:fade-out-0',
             className
         )}
         {...props}
-        ref={ref}
     />
 ))
 SheetOverlay.displayName = DialogPrimitive.Overlay.displayName
 
 const sheetVariants = cva(
-    'fixed z-50 gap-4 border-white/[0.08] bg-[#0c0614]/95 backdrop-blur-xl shadow-2xl transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out',
+    cn(
+        'fixed z-50 flex flex-col bg-[var(--surface)] text-[var(--text-strong)]',
+        'transition ease-in-out',
+        'data-[state=closed]:duration-200 data-[state=open]:duration-300',
+        'data-[state=open]:animate-in data-[state=closed]:animate-out'
+    ),
     {
         variants: {
             side: {
-                top: 'inset-x-0 top-0 border-b data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top',
-                bottom: 'inset-x-0 bottom-0 border-t data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom',
-                left: 'inset-y-0 left-0 h-full w-3/4 border-r sm:max-w-sm data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left',
-                right: 'inset-y-0 right-0 h-full w-3/4 border-r sm:max-w-sm data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right',
+                top:
+                    'inset-x-0 top-0 border-b border-[var(--border-subtle)] ' +
+                    'data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top',
+                bottom:
+                    'inset-x-0 bottom-0 border-t border-[var(--border-subtle)] ' +
+                    'data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom',
+                left:
+                    'inset-y-0 left-0 h-full w-3/4 border-r border-[var(--border-subtle)] sm:max-w-sm ' +
+                    'data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left',
+                right:
+                    'inset-y-0 right-0 h-full w-3/4 border-l border-[var(--border-subtle)] sm:max-w-sm ' +
+                    'data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right',
             },
         },
         defaultVariants: {
@@ -57,11 +83,27 @@ const SheetContent = React.forwardRef<
             className={cn(sheetVariants({ side }), className)}
             {...props}
         >
-            <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm text-white/40 opacity-70 ring-offset-transparent transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-autara-purple/50 focus:ring-offset-2 disabled:pointer-events-none">
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            <DialogPrimitive.Close
+                aria-label="Close drawer"
+                className={cn(
+                    'absolute right-4 top-4 grid h-7 w-7 place-items-center rounded-full',
+                    'text-[var(--text-subtle)] transition-colors',
+                    'hover:bg-[var(--surface-elevated)] hover:text-[var(--text-strong)]',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-autara-purple/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]'
+                )}
+            >
+                <svg
+                    aria-hidden
+                    viewBox="0 0 24 24"
+                    width="14"
+                    height="14"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2.4}
+                    strokeLinecap="round"
+                >
+                    <path d="M6 6l12 12M18 6L6 18" />
                 </svg>
-                <span className="sr-only">Close</span>
             </DialogPrimitive.Close>
             {children}
         </DialogPrimitive.Content>
@@ -74,7 +116,10 @@ const SheetHeader = ({
     ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
     <div
-        className={cn('flex flex-col space-y-2 text-center sm:text-left p-6 pb-0', className)}
+        className={cn(
+            'flex flex-col gap-1.5 p-6 pb-4 text-left',
+            className
+        )}
         {...props}
     />
 )
@@ -85,7 +130,10 @@ const SheetFooter = ({
     ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
     <div
-        className={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 p-6 pt-0', className)}
+        className={cn(
+            'mt-auto flex flex-col-reverse gap-2 border-t border-[var(--border-subtle)] p-6 sm:flex-row sm:justify-end',
+            className
+        )}
         {...props}
     />
 )
@@ -97,7 +145,10 @@ const SheetTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <DialogPrimitive.Title
         ref={ref}
-        className={cn('text-lg font-semibold text-white', className)}
+        className={cn(
+            'text-lg font-medium leading-tight text-[var(--text-strong)]',
+            className
+        )}
         {...props}
     />
 ))
@@ -109,7 +160,10 @@ const SheetDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <DialogPrimitive.Description
         ref={ref}
-        className={cn('text-sm text-white/40', className)}
+        className={cn(
+            'text-sm leading-relaxed text-[var(--text-muted)]',
+            className
+        )}
         {...props}
     />
 ))
