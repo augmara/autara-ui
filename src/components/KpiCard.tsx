@@ -6,24 +6,79 @@ import { cn } from "../lib/cn";
  * (Bookings tab KPI strip, Earnings overview, customer counts).
  *
  * Anatomy:
- *   - Tiny uppercase label (text-subtle)
- *   - Big tabular-nums value (text-strong)
- *   - Optional trend chip (▲ +12% / ▼ −3%)
+ *   - Tone tick (optional, hairline 20×1 px before the label) — keys
+ *     the metric to a semantic role: money in, money out, needs action,
+ *     status live, or brand. Purple was doing too much work on the
+ *     merchant Today screen (every label, every CTA, every check) —
+ *     `tone` reserves brand-purple for the brand mark and gives
+ *     finance metrics a glanceable lime / sky / amber differentiation.
+ *   - Tiny uppercase label
+ *   - Big tabular-nums value
+ *   - Optional sublabel (single line, muted) — preferred over `trend`
+ *     for "Through 30 May" / "Awaiting first booking" copy where a
+ *     direction arrow would read as broken.
+ *   - Optional `trend` chip (▲ +12% / ▼ −3%)
  *   - Optional icon glyph top-right
  *
  * Loading state: pass `value={null}` (or `loading={true}`) to render a
  * pulse-skeleton bar where the value would go — preserves the card's
- * shape so the layout doesn't reflow when data arrives.
+ * shape so the layout doesn't reflow when data arrives. Sublabel +
+ * trend are suppressed while loading.
  */
+
+/**
+ * Semantic role for the tile. Drives the hairline tick colour before
+ * the eyebrow label. See `autara-aesthetic` skill — purple is an
+ * accent, not a default; financial metrics deserve role-keyed colour.
+ *
+ *   - `brand`         — autara-purple. Default. Use for non-financial
+ *                       KPIs (rating, count, status) where the tick
+ *                       should read as quiet brand chrome.
+ *   - `money-in`      — lime-drive. Revenue, earnings, payouts received.
+ *   - `money-out`     — sky-aqua. Pending payouts, next payout, escrow.
+ *   - `needs-action`  — warning-amber. Outstanding bookings, expiring
+ *                       requests, action queue depth.
+ *   - `status-live`   — success-green. Currently active / accepting.
+ *   - `none`          — no tick rendered. Use for legacy call sites
+ *                       that pre-date `tone`.
+ */
+export type KpiTone =
+  | "brand"
+  | "money-in"
+  | "money-out"
+  | "needs-action"
+  | "status-live"
+  | "none";
+
+const TONE_TICK: Record<KpiTone, string | null> = {
+  brand: "var(--color-autara-purple)",
+  "money-in": "var(--color-autara-lime-drive)",
+  "money-out": "var(--color-autara-sky-aqua)",
+  "needs-action": "var(--color-autara-warning)",
+  "status-live": "var(--color-autara-success)",
+  none: null,
+};
+
 export interface KpiCardProps {
   label: string;
   /** Pre-formatted value string. `null` or `undefined` → loading skeleton. */
   value?: string | number | null;
-  /** Optional trend indicator. */
+  /**
+   * Single-line muted caption rendered under the value. Prefer this
+   * over `trend` for non-directional copy ("Through 30 May",
+   * "Awaiting first booking", "5 jobs"). Suppressed while loading.
+   */
+  sublabel?: string | null;
+  /** Optional directional trend chip. Coexists with `sublabel`. */
   trend?: {
     value: string; // e.g. "+12%"
     direction: "up" | "down" | "flat";
   };
+  /**
+   * Semantic role for the tile. Defaults to `"none"` for backward
+   * compatibility — existing call sites render unchanged.
+   */
+  tone?: KpiTone;
   /** Force the loading state regardless of value. */
   loading?: boolean;
   /** Optional 20px icon glyph rendered top-right. */
@@ -34,12 +89,15 @@ export interface KpiCardProps {
 export function KpiCard({
   label,
   value,
+  sublabel,
   trend,
+  tone = "none",
   loading,
   icon,
   className,
 }: KpiCardProps) {
   const isLoading = loading || value == null;
+  const tickColor = TONE_TICK[tone];
   return (
     <div
       className={cn(
@@ -48,7 +106,14 @@ export function KpiCard({
       )}
     >
       <div className="flex items-start justify-between gap-2">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-subtle)]">
+        <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wider text-[var(--text-subtle)]">
+          {tickColor != null ? (
+            <span
+              aria-hidden
+              className="block h-px w-5"
+              style={{ background: tickColor }}
+            />
+          ) : null}
           {label}
         </p>
         {icon ? (
@@ -71,6 +136,10 @@ export function KpiCard({
           {value}
         </p>
       )}
+
+      {sublabel != null && !isLoading ? (
+        <p className="mt-1 text-[12px] text-[var(--text-muted)]">{sublabel}</p>
+      ) : null}
 
       {trend && !isLoading ? (
         <p
