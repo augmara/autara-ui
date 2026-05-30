@@ -74,21 +74,20 @@ export const LightDestructive: Story = {
 }
 
 // ─── Marker tones — parallelogram (corner-of-card use case) ────────
-export const Trending: Story = {
-    name: 'Marker — trending (parallelogram)',
-    args: { variant: 'trending', shape: 'parallelogram', children: 'Trending' },
+// Three Autara accent colors. The label is consumer-supplied — the
+// same `purple` tone might say "FEATURED" on one rail and "VERIFIED"
+// on another. Stories below show one canonical label per tone.
+export const MarkerPurple: Story = {
+    name: 'Marker — purple (parallelogram)',
+    args: { variant: 'purple', shape: 'parallelogram', children: 'Featured' },
 }
-export const New: Story = {
-    name: 'Marker — new (parallelogram)',
-    args: { variant: 'new', shape: 'parallelogram', children: 'New' },
+export const MarkerAqua: Story = {
+    name: 'Marker — aqua (parallelogram)',
+    args: { variant: 'aqua', shape: 'parallelogram', children: 'New' },
 }
-export const NewLight: Story = {
-    name: 'Marker — new-light (parallelogram)',
-    args: { variant: 'new-light', shape: 'parallelogram', children: 'Just joined' },
-}
-export const Featured: Story = {
-    name: 'Marker — featured (parallelogram)',
-    args: { variant: 'featured', shape: 'parallelogram', children: 'Featured' },
+export const MarkerLime: Story = {
+    name: 'Marker — lime (parallelogram)',
+    args: { variant: 'lime', shape: 'parallelogram', children: 'Trending' },
 }
 
 // ─── Shape comparison — same tone, different silhouette ────────────
@@ -102,10 +101,9 @@ export const ShapeComparison: Story = {
                     pill
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
-                    <Badge variant="trending">Trending</Badge>
-                    <Badge variant="new">New</Badge>
-                    <Badge variant="new-light">Just joined</Badge>
-                    <Badge variant="featured">Featured</Badge>
+                    <Badge variant="purple">Featured</Badge>
+                    <Badge variant="aqua">New</Badge>
+                    <Badge variant="lime">Trending</Badge>
                 </div>
             </div>
             <div>
@@ -113,17 +111,14 @@ export const ShapeComparison: Story = {
                     parallelogram (marketing default)
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
-                    <Badge variant="trending" shape="parallelogram">
-                        Trending
+                    <Badge variant="purple" shape="parallelogram">
+                        Featured
                     </Badge>
-                    <Badge variant="new" shape="parallelogram">
+                    <Badge variant="aqua" shape="parallelogram">
                         New
                     </Badge>
-                    <Badge variant="new-light" shape="parallelogram">
-                        Just joined
-                    </Badge>
-                    <Badge variant="featured" shape="parallelogram">
-                        Featured
+                    <Badge variant="lime" shape="parallelogram">
+                        Trending
                     </Badge>
                 </div>
             </div>
@@ -152,7 +147,6 @@ export const LightVocabulary: Story = {
     parameters: { layout: 'padded' },
     render: () => (
         <div className="flex max-w-xl flex-wrap gap-1.5 rounded-xl bg-[var(--background)] p-6 ring-1 ring-inset ring-[var(--border-subtle)]">
-            <Badge variant="new">New</Badge>
             <Badge variant="light-default">15+ years</Badge>
             <Badge variant="light-primary">Highly rated</Badge>
             <Badge variant="light-success">Open today</Badge>

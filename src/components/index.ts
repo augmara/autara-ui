@@ -127,8 +127,11 @@ export { ErrorCard, type ErrorCardProps } from './ErrorCard'
 // v1.3.0 introduced a standalone TrendingPill component for marker
 // pills. AUTAA-UI-006 (v1.2.0+ — or whatever semantic-release picks)
 // folded it into Badge via shape="parallelogram". The TrendingPill
-// surface is gone — use `<Badge variant="trending" shape="parallelogram">`
-// instead. Marker, status, and legacy tones now all live on Badge.
+// surface is gone — use the marker tones on Badge:
+// `<Badge variant="purple" shape="parallelogram">Featured</Badge>`
+// `<Badge variant="aqua"   shape="parallelogram">New</Badge>`
+// `<Badge variant="lime"   shape="parallelogram">Trending</Badge>`
+// Marker, status, and legacy tones all live on Badge.
 
 // ─── v1.4.0 — merchant-mobile harvest ────────────────────────────────────
 // Promoted from inline merchant-mobile components after the Phase 3
