@@ -124,15 +124,11 @@ export { KpiCard, type KpiCardProps } from './KpiCard'
 export { AsyncSkeleton, type AsyncSkeletonProps } from './AsyncSkeleton'
 export { ErrorCard, type ErrorCardProps } from './ErrorCard'
 
-// ─── v1.3.0 — markers ────────────────────────────────────────────────────
-export {
-    TrendingPill,
-    trendingPillVariants,
-    type TrendingPillProps,
-    type TrendingPillShape,
-    type TrendingPillTone,
-    type TrendingPillSize,
-} from './TrendingPill'
+// v1.3.0 introduced a standalone TrendingPill component for marker
+// pills. AUTAA-UI-006 (v1.2.0+ — or whatever semantic-release picks)
+// folded it into Badge via shape="parallelogram". The TrendingPill
+// surface is gone — use `<Badge variant="trending" shape="parallelogram">`
+// instead. Marker, status, and legacy tones now all live on Badge.
 
 // ─── v1.4.0 — merchant-mobile harvest ────────────────────────────────────
 // Promoted from inline merchant-mobile components after the Phase 3

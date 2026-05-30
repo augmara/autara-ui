@@ -46,8 +46,8 @@ export {
     KpiCard, type KpiCardProps,
     AsyncSkeleton, type AsyncSkeletonProps,
     ErrorCard, type ErrorCardProps,
-    // v1.3.0 — markers
-    TrendingPill, trendingPillVariants, type TrendingPillProps, type TrendingPillShape, type TrendingPillTone, type TrendingPillSize,
+    // v1.3.0 markers — TrendingPill was folded into Badge via
+    // shape="parallelogram" by AUTAA-UI-006.
     // v1.4.0 — merchant-mobile harvest (StatsStrip, InfoRow, ListSection, ModeChip, Logo, SearchInput, FilterChipRow)
     StatsStrip, type StatsStripProps, type StatItem,
     InfoRow, type InfoRowProps,
