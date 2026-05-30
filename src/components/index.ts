@@ -149,3 +149,22 @@ export {
     type FilterChipRowProps,
     type FilterChipOption,
 } from './FilterChipRow'
+
+// ─── v2.1.0 — customer-web marketing harvest (AUTAA-UI-007) ────────────
+// Promoted from autara-customer-web after the homepage refactor surfaced
+// the same patterns about to show up on merchant-web and admin too.
+export {
+    CategoryRail,
+    type CategoryRailProps,
+    type CategoryRailItem,
+} from './CategoryRail'
+export { PWAInstallBanner, type PWAInstallBannerProps } from './PWAInstallBanner'
+export {
+    NavSearchPill,
+    type NavSearchPillProps,
+    type NavSearchPillField,
+} from './NavSearchPill'
+export {
+    CompactSearchPill,
+    type CompactSearchPillProps,
+} from './CompactSearchPill'

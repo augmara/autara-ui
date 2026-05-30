@@ -41,17 +41,26 @@ const badgeVariants = cva(
     {
         variants: {
             variant: {
-                // ─── Marker tones (v1.2.0 — ex-TrendingPill) ─────────────
+                // ─── Marker tones — three-accent brand palette ─────────────
                 // Markers sit over hero photos and need to read against
                 // arbitrary imagery — no ring, no tonal softness.
+                // Per Don 2026-05-30: each tone maps to one of Autara's
+                // three accent colours, so the three sit beside one
+                // another as a balanced editorial set:
+                //   trending → lime drive  (the "this is hot" accent)
+                //   featured → autara purple (brand-primary stamp)
+                //   new      → sky aqua    (third accent — fresh / recent)
                 trending:
+                    'bg-autara-lime-drive text-[#0E0A1A] px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
+                featured:
                     'bg-autara-purple text-white px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
                 new:
-                    'bg-[#0E0A1A] text-autara-lime-drive px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
+                    'bg-autara-sky-aqua text-[#062436] px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
+                // Optional softer companion — for cases where the bold
+                // lime-bright fill works better than aqua (e.g. on dark
+                // hero photos where aqua washes out).
                 'new-light':
                     'bg-[var(--color-autara-lime-bright)] text-[#0E0A1A] ring-1 ring-inset ring-[#0E0A1A]/15 px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
-                featured:
-                    'bg-white/95 text-[#0a0a0a] px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
 
                 // ─── Status tones (v1.2.0 — ex-TrendingPill) ─────────────
                 // Soft fill + AA-readable accent ink + hairline ring —
