@@ -20,7 +20,7 @@ import { Badge } from "./Badge";
  * consumers pass their framework's link component (Next, React Router).
  */
 
-export type MerchantBadge = "featured" | "trending" | "new";
+export type MerchantBadge = "featured" | "trending" | "new" | "new-light";
 
 export interface MerchantCardProps {
   name: string;
@@ -58,6 +58,10 @@ const BADGE_LABEL: Record<MerchantBadge, string> = {
   featured: "Featured",
   trending: "Trending",
   new: "New",
+  // `new-light` ships the brighter lime fill (vs trending's solid
+  // lime-drive). Consumers that want the editorial Trending label but
+  // with the brighter pill (e.g. on dark hero photos) pass `new-light`.
+  "new-light": "Trending",
 };
 
 export const MerchantCard = forwardRef<HTMLDivElement, MerchantCardProps>(
