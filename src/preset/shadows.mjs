@@ -1,6 +1,24 @@
-/** @type {Record<string, string>} Purple-tinted shadow definitions */
+/**
+ * Autara shadow scale — deliberately empty.
+ *
+ * Per the canonical autara-aesthetic rule (workspace CLAUDE.md, customer-web
+ * globals.css, autara-ui CLAUDE.md): NO drop shadows. The brand reads as
+ * solid, editorial, hairline-edged — never floating-card. Depth comes from
+ * border-color shifts on hover, never `box-shadow`.
+ *
+ * The named scale (`autara`, `autara-md`, `autara-lg`) is retained for
+ * backwards compat with v1.0.x consumers that ship `className="shadow-autara"`
+ * — those resolve to `box-shadow: none` and produce the correct treatment
+ * without breaking compile. Same pattern as `tokens/shadows.css`.
+ *
+ * If you're tempted to put a value back here, ask: "Would Linear, Stripe,
+ * or Cal.com add one?" If the answer's still yes, push back via PR
+ * conversation rather than silently re-introducing depth-by-shadow.
+ */
+
+/** @type {Record<string, string>} */
 export const shadows = {
-    autara: '0 1px 3px rgba(78, 27, 189, 0.06), 0 1px 2px rgba(78, 27, 189, 0.04)',
-    'autara-md': '0 4px 6px -1px rgba(78, 27, 189, 0.08), 0 2px 4px -1px rgba(78, 27, 189, 0.04)',
-    'autara-lg': '0 10px 15px -3px rgba(78, 27, 189, 0.08), 0 4px 6px -2px rgba(78, 27, 189, 0.04)',
+    autara: 'none',
+    'autara-md': 'none',
+    'autara-lg': 'none',
 }

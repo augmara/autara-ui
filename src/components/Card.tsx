@@ -17,11 +17,15 @@ const cardVariants = cva('transition-all duration-[350ms]', {
             ].join(' '),
             outline: 'rounded-autara-xl border border-white/[0.08] bg-transparent',
             solid: 'rounded-autara-xl bg-white/[0.04] border border-white/[0.06]',
-            // Light theme cards
+            // Light theme cards — Autara aesthetic ships shadow-free.
+            // Depth comes from the 1px hairline border, lift on hover from
+            // a border-color shift (purple/30). No box-shadow, no translate
+            // — `translateY` on a card-shaped surface reads as "this card
+            // is floating" which contradicts the editorial brand.
             light: [
                 'rounded-autara-xl bg-white p-7 text-autara-gray-900',
-                'shadow-autara',
-                'hover:translate-y-[-3px] hover:shadow-autara-lg',
+                'border border-[var(--border-subtle)]',
+                'hover:border-autara-purple/30',
             ].join(' '),
         },
     },

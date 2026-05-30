@@ -133,3 +133,23 @@ export {
     type TrendingPillTone,
     type TrendingPillSize,
 } from './TrendingPill'
+
+// ─── v1.4.0 — merchant-mobile harvest ────────────────────────────────────
+// Promoted from inline merchant-mobile components after the Phase 3
+// scaffold pass surfaced 3-4 duplications of the same pattern.
+export { StatsStrip, type StatsStripProps, type StatItem } from './StatsStrip'
+export { InfoRow, type InfoRowProps } from './InfoRow'
+export {
+    ListSection,
+    ListSectionRow,
+    type ListSectionProps,
+    type ListSectionRowProps,
+} from './ListSection'
+export { ModeChip, type ModeChipProps, type BookingMode } from './ModeChip'
+export { Logo, type LogoProps } from './Logo'
+export { SearchInput, type SearchInputProps } from './SearchInput'
+export {
+    FilterChipRow,
+    type FilterChipRowProps,
+    type FilterChipOption,
+} from './FilterChipRow'
