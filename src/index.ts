@@ -48,6 +48,14 @@ export {
     ErrorCard, type ErrorCardProps,
     // v1.3.0 — markers
     TrendingPill, trendingPillVariants, type TrendingPillProps, type TrendingPillShape, type TrendingPillTone, type TrendingPillSize,
+    // v1.4.0 — merchant-mobile harvest (StatsStrip, InfoRow, ListSection, ModeChip, Logo, SearchInput, FilterChipRow)
+    StatsStrip, type StatsStripProps, type StatItem,
+    InfoRow, type InfoRowProps,
+    ListSection, ListSectionRow, type ListSectionProps, type ListSectionRowProps,
+    ModeChip, type ModeChipProps, type BookingMode,
+    Logo, type LogoProps,
+    SearchInput, type SearchInputProps,
+    FilterChipRow, type FilterChipRowProps, type FilterChipOption,
 } from './components'
 
 // Utilities
