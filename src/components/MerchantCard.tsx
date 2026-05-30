@@ -1,6 +1,6 @@
 import { forwardRef, type ElementType, type ReactNode } from "react";
 import { cn } from "../lib/cn";
-import { TrendingPill } from "./TrendingPill";
+import { Badge } from "./Badge";
 
 /**
  * MerchantCard — the photo-led marketplace card used in the homepage
@@ -100,11 +100,13 @@ export const MerchantCard = forwardRef<HTMLDivElement, MerchantCardProps>(
           />
 
           {badge ? (
-            <TrendingPill
-              label={BADGE_LABEL[badge]}
-              tone={badge}
+            <Badge
+              variant={badge}
+              shape="parallelogram"
               className="absolute left-3 top-3"
-            />
+            >
+              {BADGE_LABEL[badge]}
+            </Badge>
           ) : null}
 
           {topRightDecor ? (
