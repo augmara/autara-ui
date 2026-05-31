@@ -56,6 +56,11 @@ export {
     Logo, type LogoProps,
     SearchInput, type SearchInputProps,
     FilterChipRow, type FilterChipRowProps, type FilterChipOption,
+    // v2.1.0 — customer-web marketing harvest (AUTAA-UI-007)
+    CategoryRail, type CategoryRailProps, type CategoryRailItem,
+    PWAInstallBanner, type PWAInstallBannerProps,
+    NavSearchPill, type NavSearchPillProps, type NavSearchPillField,
+    CompactSearchPill, type CompactSearchPillProps,
 } from './components'
 
 // Utilities

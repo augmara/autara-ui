@@ -127,8 +127,11 @@ export { ErrorCard, type ErrorCardProps } from './ErrorCard'
 // v1.3.0 introduced a standalone TrendingPill component for marker
 // pills. AUTAA-UI-006 (v1.2.0+ — or whatever semantic-release picks)
 // folded it into Badge via shape="parallelogram". The TrendingPill
-// surface is gone — use `<Badge variant="trending" shape="parallelogram">`
-// instead. Marker, status, and legacy tones now all live on Badge.
+// surface is gone — use the marker tones on Badge:
+// `<Badge variant="purple" shape="parallelogram">Featured</Badge>`
+// `<Badge variant="aqua"   shape="parallelogram">New</Badge>`
+// `<Badge variant="lime"   shape="parallelogram">Trending</Badge>`
+// Marker, status, and legacy tones all live on Badge.
 
 // ─── v1.4.0 — merchant-mobile harvest ────────────────────────────────────
 // Promoted from inline merchant-mobile components after the Phase 3
@@ -149,3 +152,22 @@ export {
     type FilterChipRowProps,
     type FilterChipOption,
 } from './FilterChipRow'
+
+// ─── v2.1.0 — customer-web marketing harvest (AUTAA-UI-007) ────────────
+// Promoted from autara-customer-web after the homepage refactor surfaced
+// the same patterns about to show up on merchant-web and admin too.
+export {
+    CategoryRail,
+    type CategoryRailProps,
+    type CategoryRailItem,
+} from './CategoryRail'
+export { PWAInstallBanner, type PWAInstallBannerProps } from './PWAInstallBanner'
+export {
+    NavSearchPill,
+    type NavSearchPillProps,
+    type NavSearchPillField,
+} from './NavSearchPill'
+export {
+    CompactSearchPill,
+    type CompactSearchPillProps,
+} from './CompactSearchPill'
