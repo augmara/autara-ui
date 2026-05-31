@@ -23,17 +23,24 @@ import { cn } from '../lib/cn'
  * Variants come in three families, all unified into the single
  * `variant` prop:
  *
- *   - **Marker tones** — `trending` / `new` / `new-light` / `featured`.
- *     Solid fills, white or ink text. Designed to sit over hero
- *     imagery (MerchantCard, ServiceCard).
+ *   - **Marker tones** — `purple` / `aqua` / `lime`. One per Autara
+ *     accent. Solid fills, white or ink text. Designed to sit over
+ *     hero imagery (MerchantCard, ServiceCard). The label is a free
+ *     string the consumer passes (FEATURED / NEW / TRENDING / etc.) —
+ *     the tone carries no semantic meaning on its own. Per Don
+ *     2026-05-30: collapsed from the previous semantic set
+ *     (`featured` / `new` / `new-light` / `trending`) — the harsh
+ *     lime-drive `trending` is gone; `lime` is the lime-bright one.
  *   - **Status tones** — `info` / `success` / `warning` /
  *     `destructive` / `neutral`. Soft tonal fills with hairline inset
  *     rings — designed to surface multiple sibling pills on the same
  *     row (booking row, status grid) without overwhelming.
  *   - **Legacy palette** — the original Badge variants (`default`,
- *     `primary`, `aqua`, `lime`, `success`, `warning`, `destructive`,
- *     `pill`, `live`, `light-*`). Kept for backward compatibility;
- *     prefer the marker + status tones above.
+ *     `primary`, `dark-aqua`, `dark-lime`, `live`, `light-*`). Kept
+ *     for backward compatibility; prefer the marker + status tones
+ *     above. The dark-theme `aqua` / `lime` were renamed to
+ *     `dark-aqua` / `dark-lime` to free the bare color names for the
+ *     marker family.
  */
 
 const badgeVariants = cva(
@@ -41,17 +48,22 @@ const badgeVariants = cva(
     {
         variants: {
             variant: {
-                // ─── Marker tones (v1.2.0 — ex-TrendingPill) ─────────────
+                // ─── Marker tones — three Autara accents ─────────────────
                 // Markers sit over hero photos and need to read against
-                // arbitrary imagery — no ring, no tonal softness.
-                trending:
+                // arbitrary imagery — no ring (except lime, which needs
+                // a hairline against light heros), no tonal softness.
+                // Color names only — the label comes from the consumer:
+                //   purple → autara purple   (brand stamp)
+                //   aqua   → sky aqua        (cool / fresh)
+                //   lime   → lime bright     (warm / "hot" — replaces
+                //                             the old trending + new-light
+                //                             pair; lime-drive was dropped)
+                purple:
                     'bg-autara-purple text-white px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
-                new:
-                    'bg-[#0E0A1A] text-autara-lime-drive px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
-                'new-light':
+                aqua:
+                    'bg-autara-sky-aqua text-[#062436] px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
+                lime:
                     'bg-[var(--color-autara-lime-bright)] text-[#0E0A1A] ring-1 ring-inset ring-[#0E0A1A]/15 px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
-                featured:
-                    'bg-white/95 text-[#0a0a0a] px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
 
                 // ─── Status tones (v1.2.0 — ex-TrendingPill) ─────────────
                 // Soft fill + AA-readable accent ink + hairline ring —
@@ -74,9 +86,11 @@ const badgeVariants = cva(
                     'border border-white/[0.08] bg-white/[0.04] text-white/60 px-3 py-1 text-xs',
                 primary:
                     'border border-autara-purple/30 bg-autara-purple/10 text-autara-purple-lighter px-3 py-1 text-xs',
-                aqua:
+                // Renamed from `aqua` / `lime` (2026-05-30) so the bare
+                // color names belong to the marker family above.
+                'dark-aqua':
                     'border border-autara-sky-aqua/30 bg-autara-sky-aqua/10 text-autara-sky-aqua px-3 py-1 text-xs',
-                lime:
+                'dark-lime':
                     'border border-autara-lime-drive/30 bg-autara-lime-drive/10 text-autara-lime-drive px-3 py-1 text-xs',
                 live:
                     'border border-autara-lime-drive/20 bg-autara-lime-drive/10 text-autara-lime-drive px-4 py-1.5 text-xs tracking-wide gap-2',

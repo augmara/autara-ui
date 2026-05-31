@@ -20,7 +20,14 @@ import { Badge } from "./Badge";
  * consumers pass their framework's link component (Next, React Router).
  */
 
-export type MerchantBadge = "featured" | "trending" | "new";
+/** One of Autara's three accent colors — see Badge marker tones. */
+export type MerchantBadgeTone = "purple" | "aqua" | "lime";
+
+export interface MerchantBadge {
+  tone: MerchantBadgeTone;
+  /** The literal label rendered in the badge (e.g. "Featured", "New", "Trending"). */
+  label: string;
+}
 
 export interface MerchantCardProps {
   name: string;
@@ -63,12 +70,6 @@ export interface MerchantCardProps {
   /** Optional content rendered before the heart (e.g. a verified tick). */
   topRightDecor?: ReactNode;
 }
-
-const BADGE_LABEL: Record<MerchantBadge, string> = {
-  featured: "Featured",
-  trending: "Trending",
-  new: "New",
-};
 
 export const MerchantCard = forwardRef<HTMLDivElement, MerchantCardProps>(
   function MerchantCard(
@@ -123,11 +124,11 @@ export const MerchantCard = forwardRef<HTMLDivElement, MerchantCardProps>(
 
           {badge ? (
             <Badge
-              variant={badge}
+              variant={badge.tone}
               shape="parallelogram"
               className="absolute left-3 top-3"
             >
-              {BADGE_LABEL[badge]}
+              {badge.label}
             </Badge>
           ) : null}
 

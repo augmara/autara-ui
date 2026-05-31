@@ -40,7 +40,7 @@ const SAMPLE: MerchantCardProps[] = [
     reviewCount: 184,
     priceFromLabel: "$180",
     heroImageUrl: CARS.magenta,
-    badge: "featured",
+    badge: { tone: "purple", label: "Featured" },
   },
   {
     name: "Apex Wraps & Tint",
@@ -50,7 +50,7 @@ const SAMPLE: MerchantCardProps[] = [
     reviewCount: 92,
     priceFromLabel: "$2,500",
     heroImageUrl: CARS.wrap,
-    badge: "featured",
+    badge: { tone: "purple", label: "Featured" },
   },
   {
     name: "Liquid Glass Ceramic",
@@ -60,7 +60,7 @@ const SAMPLE: MerchantCardProps[] = [
     reviewCount: 67,
     priceFromLabel: "$950",
     heroImageUrl: CARS.bay,
-    badge: "featured",
+    badge: { tone: "purple", label: "Featured" },
   },
   {
     name: "ShineHaus Detailing",
@@ -74,10 +74,10 @@ const SAMPLE: MerchantCardProps[] = [
 ];
 
 const SAMPLE_NEW: MerchantCardProps[] = [
-  { ...SAMPLE[3], name: "Vivid Auto Studio", location: "Marrickville, NSW", priceFromLabel: "$140", rating: 5.0, reviewCount: 7, badge: "new" },
-  { ...SAMPLE[2], name: "Northside Ceramic", location: "Coburg, VIC", priceFromLabel: "$850", rating: 4.8, reviewCount: 12, badge: "new" },
-  { ...SAMPLE[0], name: "River City Tinting", primaryService: "Window tinting", location: "West End, QLD", priceFromLabel: "$320", rating: 4.9, reviewCount: 9, badge: "new" },
-  { ...SAMPLE[3], name: "Halo Mobile Wash", primaryService: "Mobile wash", location: "Bondi, NSW", priceFromLabel: "$85", rating: 4.9, reviewCount: 15, badge: "new" },
+  { ...SAMPLE[3], name: "Vivid Auto Studio", location: "Marrickville, NSW", priceFromLabel: "$140", rating: 5.0, reviewCount: 7, badge: { tone: "aqua", label: "New" } },
+  { ...SAMPLE[2], name: "Northside Ceramic", location: "Coburg, VIC", priceFromLabel: "$850", rating: 4.8, reviewCount: 12, badge: { tone: "aqua", label: "New" } },
+  { ...SAMPLE[0], name: "River City Tinting", primaryService: "Window tinting", location: "West End, QLD", priceFromLabel: "$320", rating: 4.9, reviewCount: 9, badge: { tone: "aqua", label: "New" } },
+  { ...SAMPLE[3], name: "Halo Mobile Wash", primaryService: "Mobile wash", location: "Bondi, NSW", priceFromLabel: "$85", rating: 4.9, reviewCount: 15, badge: { tone: "aqua", label: "New" } },
 ];
 
 // ─── Single-card stories ───────────────────────────────────────────────
@@ -102,9 +102,9 @@ export const NewBadge: Story = {
   ),
 };
 
-export const Trending: Story = {
+export const LimeBadge: Story = {
   parameters: { layout: "centered" },
-  args: { ...SAMPLE[1], badge: "trending" },
+  args: { ...SAMPLE[1], badge: { tone: "lime", label: "Trending" } },
   render: (args) => (
     <div className="w-80">
       <MerchantCard {...args} />
