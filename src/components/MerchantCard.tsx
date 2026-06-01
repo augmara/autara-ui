@@ -31,23 +31,28 @@ export interface MerchantBadge {
 
 export interface MerchantCardProps {
   name: string;
-  /** Category description, e.g. "Exterior detailing". */
-  primaryService: string;
+  /**
+   * Category description, e.g. "Exterior detailing". Optional — when omitted
+   * (e.g. search results that carry no primary service), the meta line shows
+   * just the location with no leading separator.
+   */
+  primaryService?: string;
   /** Suburb + state, e.g. "Surry Hills, NSW". */
   location: string;
-  /** Average rating, 0..5. */
-  rating: number;
-  reviewCount: number;
-  /** Pre-formatted price string, e.g. "$180". */
-  priceFromLabel: string;
-  /** Hero image URL. Required — the card is photo-led. */
-  heroImageUrl: string;
   /**
-   * Optional badge top-left of the photo. The tone is one of the three
-   * Autara accents; the label is consumer-supplied so the same color
-   * can mean different things on different rails ("New", "Trending",
-   * "Just joined", etc.).
+   * Average rating, 0..5. Optional — when omitted or 0 (a merchant with no
+   * reviews yet), the rating is hidden and a "New on Autara" eyebrow shows.
    */
+  rating?: number;
+  reviewCount?: number;
+  /**
+   * Pre-formatted price string, e.g. "$180". Optional — when omitted (search
+   * results have no price), the "FROM" row is not rendered.
+   */
+  priceFromLabel?: string;
+  /** Hero image URL. Optional — falls back to a monogram tile when absent. */
+  heroImageUrl?: string | null;
+  /** Optional badge top-left of the photo. */
   badge?: MerchantBadge | null;
   /**
    * Heart-button click handler. If omitted, the button is hidden.
@@ -87,6 +92,7 @@ export const MerchantCard = forwardRef<HTMLDivElement, MerchantCardProps>(
     ref,
   ) {
     const Comp = (as ?? "div") as ElementType;
+    const hasRating = typeof rating === "number" && rating > 0;
     return (
       <Comp
         ref={ref}
@@ -98,12 +104,23 @@ export const MerchantCard = forwardRef<HTMLDivElement, MerchantCardProps>(
       >
         {/* Hero image */}
         <div className="relative aspect-[5/4] overflow-hidden bg-[var(--surface-warm)]">
-          <img
-            src={heroImageUrl}
-            alt={`${name} — ${primaryService}`}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-            loading="lazy"
-          />
+          {heroImageUrl ? (
+            <img
+              src={heroImageUrl}
+              alt={primaryService ? `${name} — ${primaryService}` : name}
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+              loading="lazy"
+            />
+          ) : (
+            <div
+              aria-hidden
+              className="flex h-full w-full items-center justify-center text-[var(--text-subtle)]"
+            >
+              <span className="text-2xl font-semibold">
+                {name.charAt(0).toUpperCase()}
+              </span>
+            </div>
+          )}
 
           {badge ? (
             <Badge
@@ -157,34 +174,46 @@ export const MerchantCard = forwardRef<HTMLDivElement, MerchantCardProps>(
             <h3 className="truncate text-[15px] font-semibold tracking-[-0.005em] text-[var(--text-strong)]">
               {name}
             </h3>
-            <span className="inline-flex shrink-0 items-center gap-1 text-[13px] font-semibold text-[var(--text-strong)]">
-              <svg
-                viewBox="0 0 24 24"
-                className="h-3.5 w-3.5 text-[var(--color-autara-purple)]"
-                fill="currentColor"
-                aria-hidden
-              >
-                <path d="m12 17.27 6.18 3.73-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-              </svg>
-              {rating.toFixed(1)}
-              <span className="text-[12px] font-normal text-[var(--text-subtle)]">
-                ({reviewCount})
+            {hasRating ? (
+              <span className="inline-flex shrink-0 items-center gap-1 text-[13px] font-semibold text-[var(--text-strong)]">
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-3.5 w-3.5 text-[var(--color-autara-purple)]"
+                  fill="currentColor"
+                  aria-hidden
+                >
+                  <path d="m12 17.27 6.18 3.73-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                </svg>
+                {rating.toFixed(1)}
+                {typeof reviewCount === "number" ? (
+                  <span className="text-[12px] font-normal text-[var(--text-subtle)]">
+                    ({reviewCount})
+                  </span>
+                ) : null}
               </span>
-            </span>
+            ) : null}
           </div>
 
           <p className="mt-1 truncate text-[12.5px] text-[var(--text-muted)]">
-            {primaryService} · {location}
+            {primaryService ? `${primaryService} · ${location}` : location}
           </p>
 
-          <div className="mt-3 flex items-baseline gap-1.5">
-            <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-[var(--text-subtle)]">
-              From
-            </span>
-            <span className="text-[15px] font-bold tracking-[-0.01em] text-[var(--text-strong)]">
-              {priceFromLabel}
-            </span>
-          </div>
+          {priceFromLabel ? (
+            <div className="mt-3 flex items-baseline gap-1.5">
+              <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-[var(--text-subtle)]">
+                From
+              </span>
+              <span className="text-[15px] font-bold tracking-[-0.01em] text-[var(--text-strong)]">
+                {priceFromLabel}
+              </span>
+            </div>
+          ) : !hasRating ? (
+            /* No price + no rating (a brand-new search merchant) — show a
+               "New on Autara" eyebrow so the content row isn't left empty. */
+            <p className="mt-3 text-[11px] font-medium uppercase tracking-[0.16em] text-[var(--text-subtle)]">
+              New on Autara
+            </p>
+          ) : null}
         </div>
       </Comp>
     );

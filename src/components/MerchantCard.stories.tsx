@@ -242,3 +242,52 @@ export const JustJoinedRail: Story = {
     </div>
   ),
 };
+
+/**
+ * Search result (rated) — the customer-web /search surface renders merchants
+ * from `searchMerchants`, which carries NO primary service and NO price. The
+ * card omits both: the meta line shows just the location (no leading
+ * separator) and the "FROM" row is dropped. A rated result still shows the
+ * brand-purple star.
+ */
+export const SearchResultRated: Story = {
+  parameters: { layout: "centered" },
+  args: {
+    name: "Shine Mobile Detailing",
+    location: "Sydney, NSW",
+    rating: 4.8,
+    reviewCount: 24,
+    heroImageUrl:
+      "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=70",
+    primaryService: undefined,
+    priceFromLabel: undefined,
+  },
+  render: (args) => (
+    <div className="w-80">
+      <MerchantCard {...args} />
+    </div>
+  ),
+};
+
+/**
+ * Search result (brand-new merchant) — no service, no price, no rating, no
+ * hero. Shows the "New on Autara" eyebrow in place of the price row and a
+ * monogram tile instead of the photo.
+ */
+export const SearchResultNew: Story = {
+  parameters: { layout: "centered" },
+  args: {
+    name: "Wish Auto Detail",
+    location: "Dandenong South, VIC",
+    primaryService: undefined,
+    priceFromLabel: undefined,
+    rating: undefined,
+    reviewCount: undefined,
+    heroImageUrl: null,
+  },
+  render: (args) => (
+    <div className="w-80">
+      <MerchantCard {...args} />
+    </div>
+  ),
+};
