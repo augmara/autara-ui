@@ -7,6 +7,7 @@ export {
     Textarea, textareaVariants, type TextareaProps,
     Label, labelVariants, type LabelProps,
     FormField, type FormFieldProps,
+    FieldStack, FieldStackRow, FieldStackField, type FieldStackFieldProps,
     Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, cardVariants, type CardProps,
     Badge, badgeVariants, type BadgeProps,
     Separator,

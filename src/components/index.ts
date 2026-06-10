@@ -11,6 +11,12 @@ export {
 export { Textarea, textareaVariants, type TextareaProps } from './Textarea'
 export { Label, labelVariants, type LabelProps } from './Label'
 export { FormField, type FormFieldProps } from './FormField'
+export {
+    FieldStack,
+    FieldStackRow,
+    FieldStackField,
+    type FieldStackFieldProps,
+} from './FieldStack'
 export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, cardVariants, type CardProps } from './Card'
 export { Badge, badgeVariants, type BadgeProps } from './Badge'
 export { Separator } from './Separator'
