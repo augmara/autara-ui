@@ -106,6 +106,111 @@
     outline-color: transparent;
 }
 
+/* ─── Field stack — unified field-group grammar (AUT-683) ─────────────
+ *
+ * The grouped-card form grammar for marketing / conversion forms
+ * (waitlist, lead capture): every field lives inside ONE hairline
+ * container with internal hairline dividers — the stack IS the card,
+ * so never nest it inside another bordered panel. Each cell carries an
+ * uppercase eyebrow micro-label + a borderless input.
+ *
+ * Focus signature: the whole cell tints warm-cream and gets a 3px
+ * inset brand-purple bar. (The canonical 4px halo would clip against
+ * the container's `overflow: hidden`, so the bar replaces it in this
+ * grammar.) Invalid swaps bar + tint to error red.
+ *
+ * App-internal forms (onboarding wizard, checkout) keep `.field-input`.
+ */
+
+.field-stack {
+    background: var(--surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    overflow: hidden;
+}
+.field-stack > * + * {
+    border-top: 1px solid var(--border-subtle);
+}
+
+.field-stack-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.field-stack-row > * + * {
+    border-left: 1px solid var(--border-subtle);
+}
+
+.field-stack-cell {
+    display: block;
+    min-height: 64px;
+    padding: 11px 16px 12px;
+    cursor: text;
+    transition: background-color 150ms ease, box-shadow 150ms ease;
+}
+.field-stack-cell:focus-within {
+    background: var(--surface-warm);
+    box-shadow: inset 3px 0 0 var(--color-autara-purple);
+}
+
+.field-stack-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--text-subtle);
+    transition: color 150ms ease;
+}
+.field-stack-cell:focus-within .field-stack-label {
+    color: var(--color-autara-purple);
+}
+
+.field-stack-input {
+    display: block;
+    width: 100%;
+    margin-top: 3px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    color: var(--text-strong);
+    font-family: inherit;
+    font-size: 16px;
+    line-height: 1.4;
+    appearance: none;
+    -webkit-appearance: none;
+}
+.field-stack-input:focus,
+.field-stack-input:focus-visible {
+    outline: none;
+    outline-color: transparent;
+}
+.field-stack-input::placeholder {
+    color: var(--text-subtle);
+}
+.field-stack-input:disabled {
+    color: var(--text-subtle);
+    cursor: not-allowed;
+}
+
+/* Invalid state rides on aria-invalid, mirroring `.field-input`.
+ * Declared after :focus-within so the error treatment wins while the
+ * field is being corrected. */
+.field-stack-cell:has([aria-invalid='true']) {
+    background: rgba(221, 56, 56, 0.04);
+    box-shadow: inset 3px 0 0 var(--color-autara-error);
+}
+.field-stack-cell:has([aria-invalid='true']) .field-stack-label {
+    color: var(--color-autara-error);
+}
+
+.field-stack-error {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--color-autara-error);
+}
+
 /* ─── Backwards-compat alias ──────────────────────────────────────────
  * v1.0.x consumers using `.input-light` get the same treatment as
  * `.field-input`. Removal scheduled for v2.0. */
