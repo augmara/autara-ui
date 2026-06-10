@@ -42,11 +42,14 @@
 .field-input:hover:not(:disabled):not(:focus) {
     border-color: rgba(17, 24, 39, 0.18);
 }
+/* Autara focus signature (v2.4): the field tints warm-cream and its
+ * hairline border goes solid brand-purple — a clean, symmetric ring,
+ * no outer halo and no one-sided bar. */
 .field-input:focus,
 .field-input:focus-visible {
     outline: none;
+    background: var(--surface-warm);
     border-color: var(--color-autara-purple);
-    box-shadow: 0 0 0 4px rgba(78, 27, 189, 0.10);
 }
 .field-input:disabled {
     background: var(--surface-warm);
@@ -58,8 +61,8 @@
 }
 .field-input[aria-invalid="true"]:focus,
 .field-input[aria-invalid="true"]:focus-visible {
+    background: rgba(221, 56, 56, 0.04);
     border-color: var(--color-autara-error);
-    box-shadow: 0 0 0 4px rgba(221, 56, 56, 0.10);
 }
 
 .field-input--lg {
@@ -94,8 +97,8 @@
 .field-textarea:focus,
 .field-textarea:focus-visible {
     outline: none;
+    background: var(--surface-warm);
     border-color: var(--color-autara-purple);
-    box-shadow: 0 0 0 4px rgba(78, 27, 189, 0.10);
 }
 
 /* Force outline-none on inputs that own their focus treatment (matches
