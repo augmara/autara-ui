@@ -122,8 +122,11 @@ const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
             <div
                 className={cn(
                     'flex h-11 w-full items-stretch overflow-hidden rounded-lg border border-[var(--border-subtle)] bg-[var(--surface)] transition-colors',
-                    'focus-within:border-[var(--color-autara-purple)]/45',
-                    'focus-within:[box-shadow:0_0_0_4px_rgba(78,27,189,0.08)]',
+                    // Autara focus signature — cream tint + full
+                    // brand-purple border (matches .field-input). Clean,
+                    // symmetric; no halo, no one-sided bar.
+                    'focus-within:border-[var(--color-autara-purple)]',
+                    'focus-within:bg-[var(--surface-warm)]',
                     disabled && 'opacity-50',
                     className
                 )}
@@ -133,20 +136,24 @@ const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
                     onValueChange={handleCountryChange}
                     disabled={disabled}
                 >
+                    {/* Country selector — a quiet inline segment: flag ·
+                        dial code · chevron, divided from the number by a
+                        single hairline. The dial code sits in brand purple
+                        so it reads as the one accent, not a heavy chip. */}
                     <SelectPrimitive.Trigger
                         aria-label="Country"
                         className={cn(
-                            'flex shrink-0 items-center gap-2 border-r border-[var(--border-subtle)] pl-3 pr-2.5',
-                            'text-sm text-[var(--text-strong)] outline-none transition-colors',
-                            'hover:bg-[var(--surface-elevated)]',
-                            'focus-visible:bg-[var(--surface-elevated)]',
-                            'data-[state=open]:bg-[var(--surface-elevated)]'
+                            'flex shrink-0 items-center gap-1.5 border-r border-[var(--border-subtle)] pl-3.5 pr-3',
+                            'text-sm outline-none transition-colors',
+                            'hover:bg-[var(--surface-warm)]',
+                            'focus-visible:bg-[var(--surface-warm)]',
+                            'data-[state=open]:bg-[var(--surface-warm)]'
                         )}
                     >
                         <span className="text-base leading-none" aria-hidden>
                             {activeCountry.flag}
                         </span>
-                        <span className="font-medium tabular-nums">
+                        <span className="font-medium tabular-nums text-[var(--color-autara-purple)]">
                             {activeCountry.dial}
                         </span>
                         <SelectPrimitive.Icon asChild>
@@ -155,7 +162,7 @@ const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
                                 viewBox="0 0 24 24"
                                 width="12"
                                 height="12"
-                                className="text-[var(--text-subtle)]"
+                                className="text-[var(--text-subtle)] transition-transform data-[state=open]:rotate-180"
                                 fill="none"
                                 stroke="currentColor"
                                 strokeWidth={2.4}

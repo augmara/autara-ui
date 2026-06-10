@@ -144,9 +144,11 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                     className={cn(
                         'flex min-h-11 w-full flex-wrap items-center gap-1.5 rounded-lg border bg-[var(--surface)] px-2.5 py-1.5 text-sm transition-colors',
                         'cursor-text',
+                        // Autara focus signature — cream tint + 3px inset
+                        // brand-purple bar (matches .field-input / FieldStack).
                         invalid
-                            ? 'border-[var(--color-autara-error)] focus-within:[box-shadow:0_0_0_4px_rgba(221,56,56,0.10)]'
-                            : 'border-[var(--border-subtle)] hover:border-[rgba(17,24,39,0.18)] focus-within:border-[var(--color-autara-purple)] focus-within:[box-shadow:0_0_0_4px_rgba(78,27,189,0.10)]',
+                            ? 'border-[var(--color-autara-error)] focus-within:bg-[rgba(221,56,56,0.04)]'
+                            : 'border-[var(--border-subtle)] hover:border-[rgba(17,24,39,0.18)] focus-within:border-[var(--color-autara-purple)] focus-within:bg-[var(--surface-warm)]',
                         disabled &&
                             'cursor-not-allowed bg-[var(--surface-warm)] opacity-70'
                     )}
@@ -154,9 +156,12 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                     {selected.map((val) => (
                         <span
                             key={val}
+                            /* Torph ink capsule — the Autara floating-chip
+                               grammar (ink fill, white text, hairline inset
+                               ring); replaces the soft purple-tint pill. */
                             className={cn(
-                                'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-[0.12em] ring-1 ring-inset',
-                                'bg-[rgba(78,27,189,0.08)] text-[var(--color-autara-purple)] ring-[rgba(78,27,189,0.22)]'
+                                'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[12px] font-medium ring-1 ring-inset',
+                                'bg-[#0E0A1A] text-white ring-white/10'
                             )}
                         >
                             {getLabel(val)}
@@ -168,7 +173,7 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                                         e.stopPropagation()
                                         handleRemove(val)
                                     }}
-                                    className="grid h-4 w-4 place-items-center rounded-full text-[var(--color-autara-purple)]/55 transition-colors hover:bg-[rgba(78,27,189,0.10)] hover:text-[var(--color-autara-purple)]"
+                                    className="grid h-4 w-4 place-items-center rounded-full text-white/55 transition-colors hover:bg-white/15 hover:text-white"
                                 >
                                     <ChipCloseIcon />
                                 </button>
