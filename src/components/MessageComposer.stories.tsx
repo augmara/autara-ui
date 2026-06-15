@@ -47,3 +47,28 @@ export const WithError: Story = {
     />
   ),
 };
+
+/** With a leading control (e.g. an attach / plus button) left of the field. */
+export const WithLeading: Story = {
+  render: () => (
+    <Demo
+      leading={
+        <button
+          type="button"
+          aria-label="Add attachment"
+          className="grid h-11 w-11 shrink-0 place-items-center rounded-lg text-[var(--text-subtle)] transition-colors hover:text-[var(--text-muted)]"
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2.2" />
+            <path
+              d="M12 8.5v7M8.5 12h7"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+            />
+          </svg>
+        </button>
+      }
+    />
+  ),
+};

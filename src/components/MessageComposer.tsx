@@ -1,4 +1,4 @@
-import { type KeyboardEvent } from "react";
+import { type KeyboardEvent, type ReactNode } from "react";
 import { Button } from "./Button";
 import { Textarea } from "./Textarea";
 import { cn } from "../lib/cn";
@@ -37,6 +37,12 @@ export interface MessageComposerProps {
   placeholder?: string;
   sendLabel?: string;
   sendingLabel?: string;
+  /**
+   * Optional control rendered to the LEFT of the field — e.g. an attach
+   * / plus button. Aligned to the field's bottom edge (items-end); the
+   * consumer owns its styling + handler.
+   */
+  leading?: ReactNode;
   /** Centered-measure class shared with MessageThread. */
   measureClassName?: string;
   className?: string;
@@ -51,6 +57,7 @@ export function MessageComposer({
   placeholder = "Type a message",
   sendLabel = "Send",
   sendingLabel = "Sending…",
+  leading,
   measureClassName = "max-w-[680px]",
   className,
 }: MessageComposerProps) {
@@ -71,6 +78,7 @@ export function MessageComposer({
       )}
     >
       <div className={cn("mx-auto flex w-full items-end gap-2", measureClassName)}>
+        {leading}
         <Textarea
           value={value}
           onChange={(e) => onChange(e.target.value)}
