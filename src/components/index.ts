@@ -130,6 +130,11 @@ export { KpiCard, type KpiCardProps } from './KpiCard'
 export { AsyncSkeleton, type AsyncSkeletonProps } from './AsyncSkeleton'
 export { ErrorCard, type ErrorCardProps } from './ErrorCard'
 
+// ─── Chat / conversation primitives (AUTM-159) ───────────────────────────
+export { MessageBubble, type MessageBubbleProps, type MessageSide } from './MessageBubble'
+export { MessageComposer, type MessageComposerProps } from './MessageComposer'
+export { MessageThread, type MessageThreadProps, type MessageItem } from './MessageThread'
+
 // v1.3.0 introduced a standalone TrendingPill component for marker
 // pills. AUTAA-UI-006 (v1.2.0+ — or whatever semantic-release picks)
 // folded it into Badge via shape="parallelogram". The TrendingPill

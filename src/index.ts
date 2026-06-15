@@ -62,6 +62,10 @@ export {
     PWAInstallBanner, type PWAInstallBannerProps,
     NavSearchPill, type NavSearchPillProps, type NavSearchPillField,
     CompactSearchPill, type CompactSearchPillProps,
+    // chat / conversation primitives (AUTM-159)
+    MessageBubble, type MessageBubbleProps, type MessageSide,
+    MessageComposer, type MessageComposerProps,
+    MessageThread, type MessageThreadProps, type MessageItem,
 } from './components'
 
 // Utilities
