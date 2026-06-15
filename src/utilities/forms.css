@@ -72,6 +72,32 @@
     font-size: 16px;
 }
 
+/* Native date / time controls — keep the value vertically centered.
+ * WebKit (iOS WKWebView + desktop Chrome/Safari) lays the value out via
+ * ::-webkit-date-and-time-value, which floats to the TOP of a fixed-
+ * height block input instead of centering like typed text — so a
+ * `<Input type="date">` sitting in a row next to a text field reads as
+ * misaligned (the value clings to the top edge of the 44px box).
+ * Making the control a flex box centers the value child; zeroing the
+ * value's intrinsic margin and trailing-aligning the picker indicator
+ * restores parity with the text inputs alongside it. Composes with
+ * `.field-input--lg` automatically. */
+.field-input[type="date"],
+.field-input[type="time"],
+.field-input[type="datetime-local"],
+.field-input[type="month"],
+.field-input[type="week"] {
+    display: flex;
+    align-items: center;
+}
+.field-input::-webkit-date-and-time-value {
+    margin: 0;
+    text-align: left;
+}
+.field-input::-webkit-calendar-picker-indicator {
+    margin-inline-start: auto;
+}
+
 /* Textarea variant — same look, multi-line height. */
 .field-textarea {
     display: block;
