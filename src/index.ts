@@ -66,6 +66,8 @@ export {
     MessageBubble, type MessageBubbleProps, type MessageSide,
     MessageComposer, type MessageComposerProps,
     MessageThread, type MessageThreadProps, type MessageItem,
+    // Media — pick-then-crop dialog (AUTM-163)
+    ImageCropDialog, type ImageCropDialogProps,
 } from './components'
 
 // Utilities
