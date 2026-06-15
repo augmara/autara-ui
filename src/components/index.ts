@@ -182,3 +182,6 @@ export {
     CompactSearchPill,
     type CompactSearchPillProps,
 } from './CompactSearchPill'
+
+// ─── Media — pick-then-crop dialog (AUTM-163) ──────────────────────────
+export { ImageCropDialog, type ImageCropDialogProps } from './ImageCropDialog'
