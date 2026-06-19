@@ -1,6 +1,7 @@
 export { GradientBar } from './GradientBar'
 export { Button, buttonVariants, type ButtonProps } from './Button'
 export { Input, inputVariants, type InputProps } from './Input'
+export { OtpInput, type OtpInputProps } from './OtpInput'
 export {
     PhoneInput,
     DEFAULT_COUNTRIES,

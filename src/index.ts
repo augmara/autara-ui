@@ -34,6 +34,7 @@ export {
     // v1.1.0 — promoted from autara-customer-web
     BrandButton, brandButtonVariants, type BrandButtonProps,
     MetaChip, type MetaChipProps,
+    OtpInput, type OtpInputProps,
     RatingStars, type RatingStarsProps,
     EmptyState, type EmptyStateProps,
     MerchantCard, type MerchantCardProps, type MerchantBadge,
