@@ -48,9 +48,9 @@ const BASE =
   "inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-lg font-medium transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0";
 
 const SIZES: Record<Exclude<Size, "default">, string> = {
-  sm: "h-9 px-4 text-[13px]",
+  sm: "h-9 px-4 text-[0.8125rem]",
   md: "h-11 px-5 text-sm",
-  lg: "h-12 px-6 text-[15px]",
+  lg: "h-12 px-6 text-[0.9375rem]",
   icon: "h-10 w-10 p-0",
 };
 
