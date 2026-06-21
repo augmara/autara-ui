@@ -9,16 +9,15 @@ import { cn } from '../lib/cn'
  * v1.2.0 (AUTAA-UI-006): the standalone `TrendingPill` was folded in.
  * Badge now exposes a `shape` variant:
  *
- *   - `pill` (default) — `rounded-full` capsule. The original Badge
- *     behaviour. Children render straight into the wrapper.
- *   - `parallelogram` — the editorial higgsfield-style tilted slab.
- *     The wrapper is skewed `-12deg`; children get wrapped in a
- *     counter-skewed `<span>` so the label sits upright while the
- *     fill reads as a slanted ribbon.
+ *   - `parallelogram` (default) — the editorial tilted slab and the
+ *     unique Autara silhouette. The wrapper is skewed `-12deg`; children
+ *     get wrapped in a counter-skewed `<span>` so the label sits upright
+ *     while the fill reads as a slanted ribbon.
+ *   - `pill` — `rounded-full` capsule. Opt in with `shape="pill"` for
+ *     dense rows / data tables where the tilt would crowd.
  *
- * Marketing surfaces (customer-web, merchant-web) standardise on the
- * `parallelogram` shape; status pills on the cream canvas keep the
- * `pill` default.
+ * AUTM-211 (Don 2026-06-21): parallelogram + solid colour is the house
+ * style everywhere — the default flipped from `pill` to `parallelogram`.
  *
  * Variants come in three families, all unified into the single
  * `variant` prop:
@@ -116,22 +115,25 @@ const badgeVariants = cva(
                     'border border-[rgba(221,56,56,0.28)] bg-[rgba(221,56,56,0.1)] text-[var(--color-autara-error)] px-3 py-1 text-xs',
             },
             shape: {
-                // Default capsule — preserves the original Badge look so
-                // every existing consumer renders identically without
-                // opting in to a shape.
+                // Rounded capsule — still available, opt in with
+                // `shape="pill"`. Use for dense rows where the tilt would
+                // crowd (data tables, tight chips).
                 pill: 'rounded-full',
-                // Editorial tilted slab — the silhouette ex-TrendingPill
-                // contributed. `!rounded-md` overrides the legacy
-                // variants' rounded-full so the slanted edge reads
-                // straight. The inner counter-skew is applied in the
-                // component render below.
+                // Editorial tilted slab — the unique Autara silhouette and
+                // now the DEFAULT (AUTM-211; Don wants parallelogram +
+                // solid as the house style, not generic pills). `!rounded-md`
+                // overrides legacy variants' rounded-full so the slanted edge
+                // reads straight; the inner counter-skew is applied in the
+                // component render below so the label sits upright.
                 parallelogram:
                     '[transform:skewX(-12deg)] !rounded-md select-none whitespace-nowrap',
             },
         },
         defaultVariants: {
             variant: 'default',
-            shape: 'pill',
+            // AUTM-211: parallelogram is the Autara default silhouette. Pass
+            // `shape="pill"` to opt back into the rounded capsule.
+            shape: 'parallelogram',
         },
     }
 )
