@@ -32,9 +32,10 @@ import { cn } from '../lib/cn'
  *     (`featured` / `new` / `new-light` / `trending`) — the harsh
  *     lime-drive `trending` is gone; `lime` is the lime-bright one.
  *   - **Status tones** — `info` / `success` / `warning` /
- *     `destructive` / `neutral`. Soft tonal fills with hairline inset
- *     rings — designed to surface multiple sibling pills on the same
- *     row (booking row, status grid) without overwhelming.
+ *     `destructive` / `neutral`. SOLID semantic fills (blue / green /
+ *     amber / red / slate) with white-or-ink text — no soft tints, no
+ *     rings (AUTM-211; Don wants solid, never the pastel Tailwind look).
+ *     Used for booking + availability state. Reads in both shapes.
  *   - **Legacy palette** — the original Badge variants (`default`,
  *     `primary`, `dark-aqua`, `dark-lime`, `live`, `light-*`). Kept
  *     for backward compatibility; prefer the marker + status tones
@@ -65,19 +66,26 @@ const badgeVariants = cva(
                 lime:
                     'bg-[var(--color-autara-lime-bright)] text-[#0E0A1A] ring-1 ring-inset ring-[#0E0A1A]/15 px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
 
-                // ─── Status tones (v1.2.0 — ex-TrendingPill) ─────────────
-                // Soft fill + AA-readable accent ink + hairline ring —
-                // legible at 9-10 px and reads as one editorial family.
+                // ─── Status tones — SOLID (AUTM-211) ─────────────────────
+                // Don 2026-06-21: Autara reads as SOLID color, never the
+                // pastel "light tint + colored text + ring" look (that's
+                // generic Tailwind). Each status tone is a solid fill in a
+                // semantic colour with white/dark text for AA contrast — no
+                // rgba soft fills, no inset rings. Works in both pill and
+                // parallelogram shapes. See memory `feedback-solid-badges`.
+                //   info → solid blue · success → solid green ·
+                //   warning → solid amber (dark ink) · destructive → solid red ·
+                //   neutral → solid slate
                 info:
-                    'bg-[rgba(78,27,189,0.08)] text-[var(--color-autara-purple)] ring-1 ring-inset ring-[rgba(78,27,189,0.22)] px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
+                    'bg-[var(--color-autara-info)] text-white px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
                 success:
-                    'bg-[rgba(183,225,73,0.18)] text-[#3a6b14] ring-1 ring-inset ring-[rgba(183,225,73,0.55)] px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
+                    'bg-[var(--color-autara-success)] text-white px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
                 warning:
-                    'bg-[rgba(245,166,35,0.12)] text-[var(--color-autara-warning-text)] ring-1 ring-inset ring-[rgba(245,166,35,0.35)] px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
+                    'bg-[var(--color-autara-warning)] text-[#3a2a06] px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
                 destructive:
-                    'bg-[rgba(221,56,56,0.1)] text-[var(--color-autara-error)] ring-1 ring-inset ring-[rgba(221,56,56,0.28)] px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
+                    'bg-[var(--color-autara-error)] text-white px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
                 neutral:
-                    'bg-[var(--surface-elevated)] text-[var(--text-muted)] ring-1 ring-inset ring-[var(--border-subtle)] px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
+                    'bg-[#46414f] text-white px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
 
                 // ─── Legacy dark-theme palette (pre-v1.2.0) ─────────────
                 // Kept for backward compatibility — prefer the marker

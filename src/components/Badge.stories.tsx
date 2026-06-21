@@ -126,17 +126,29 @@ export const ShapeComparison: Story = {
     ),
 }
 
-// ─── Status tones — booking + availability state on cream ──────────
+// ─── Status tones — SOLID, booking + availability state (AUTM-211) ─
+// Solid semantic fills in both shapes. Pill = standalone status; the
+// parallelogram row is the preferred Autara silhouette for status pills
+// on a card corner / row.
 export const StatusTones: Story = {
-    name: 'Vocabulary — status tones',
+    name: 'Vocabulary — status tones (solid)',
     parameters: { layout: 'padded' },
     render: () => (
-        <div className="flex max-w-xl flex-wrap gap-2 rounded-xl bg-[var(--background)] p-6 ring-1 ring-inset ring-[var(--border-subtle)]">
-            <Badge variant="info">In review</Badge>
-            <Badge variant="success">Confirmed</Badge>
-            <Badge variant="warning">Pending</Badge>
-            <Badge variant="destructive">Cancelled</Badge>
-            <Badge variant="neutral">Archived</Badge>
+        <div className="flex max-w-xl flex-col gap-4 rounded-xl bg-[var(--background)] p-6 ring-1 ring-inset ring-[var(--border-subtle)]">
+            <div className="flex flex-wrap gap-2">
+                <Badge variant="info">In review</Badge>
+                <Badge variant="success">Confirmed</Badge>
+                <Badge variant="warning">Pending</Badge>
+                <Badge variant="destructive">Cancelled</Badge>
+                <Badge variant="neutral">Archived</Badge>
+            </div>
+            <div className="flex flex-wrap gap-2.5">
+                <Badge variant="info" shape="parallelogram">In review</Badge>
+                <Badge variant="success" shape="parallelogram">Confirmed</Badge>
+                <Badge variant="warning" shape="parallelogram">Pending</Badge>
+                <Badge variant="destructive" shape="parallelogram">Cancelled</Badge>
+                <Badge variant="neutral" shape="parallelogram">Archived</Badge>
+            </div>
         </div>
     ),
 }
