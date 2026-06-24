@@ -48,17 +48,22 @@ const sheetVariants = cva(
     {
         variants: {
             side: {
+                // Top-edge-anchored sides (top is full-width; left/right are
+                // full-height) butt against the device status bar, so their
+                // in-flow content (SheetHeader) clears the safe-area inset.
+                // `env(safe-area-inset-top)` is 0 on the web — harmless there.
+                // A bottom sheet's top is mid-screen, so it needs no inset.
                 top:
-                    'inset-x-0 top-0 border-b border-[var(--border-subtle)] ' +
+                    'inset-x-0 top-0 border-b border-[var(--border-subtle)] pt-[env(safe-area-inset-top)] ' +
                     'data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top',
                 bottom:
                     'inset-x-0 bottom-0 border-t border-[var(--border-subtle)] ' +
                     'data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom',
                 left:
-                    'inset-y-0 left-0 h-full w-3/4 border-r border-[var(--border-subtle)] sm:max-w-sm ' +
+                    'inset-y-0 left-0 h-full w-3/4 border-r border-[var(--border-subtle)] sm:max-w-sm pt-[env(safe-area-inset-top)] ' +
                     'data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left',
                 right:
-                    'inset-y-0 right-0 h-full w-3/4 border-l border-[var(--border-subtle)] sm:max-w-sm ' +
+                    'inset-y-0 right-0 h-full w-3/4 border-l border-[var(--border-subtle)] sm:max-w-sm pt-[env(safe-area-inset-top)] ' +
                     'data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right',
             },
         },
@@ -75,40 +80,50 @@ interface SheetContentProps
 const SheetContent = React.forwardRef<
     React.ComponentRef<typeof DialogPrimitive.Content>,
     SheetContentProps
->(({ side = 'right', className, children, ...props }, ref) => (
-    <SheetPortal>
-        <SheetOverlay />
-        <DialogPrimitive.Content
-            ref={ref}
-            className={cn(sheetVariants({ side }), className)}
-            {...props}
-        >
-            <DialogPrimitive.Close
-                aria-label="Close drawer"
-                className={cn(
-                    'absolute right-4 top-4 grid h-7 w-7 place-items-center rounded-full',
-                    'text-[var(--text-subtle)] transition-colors',
-                    'hover:bg-[var(--surface-elevated)] hover:text-[var(--text-strong)]',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-autara-purple/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]'
-                )}
+>(({ side = 'right', className, children, ...props }, ref) => {
+    // The close button is absolutely positioned, so the container's
+    // `pt-[env(safe-area-inset-top)]` doesn't move it — it carries its own
+    // inset. A bottom sheet sits mid-screen and keeps the plain top-4.
+    const closeTop =
+        side === 'bottom'
+            ? 'top-4'
+            : 'top-[calc(env(safe-area-inset-top)+16px)]'
+    return (
+        <SheetPortal>
+            <SheetOverlay />
+            <DialogPrimitive.Content
+                ref={ref}
+                className={cn(sheetVariants({ side }), className)}
+                {...props}
             >
-                <svg
-                    aria-hidden
-                    viewBox="0 0 24 24"
-                    width="14"
-                    height="14"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2.4}
-                    strokeLinecap="round"
+                <DialogPrimitive.Close
+                    aria-label="Close drawer"
+                    className={cn(
+                        'absolute right-4 grid h-7 w-7 place-items-center rounded-full',
+                        closeTop,
+                        'text-[var(--text-subtle)] transition-colors',
+                        'hover:bg-[var(--surface-elevated)] hover:text-[var(--text-strong)]',
+                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-autara-purple/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]'
+                    )}
                 >
-                    <path d="M6 6l12 12M18 6L6 18" />
-                </svg>
-            </DialogPrimitive.Close>
-            {children}
-        </DialogPrimitive.Content>
-    </SheetPortal>
-))
+                    <svg
+                        aria-hidden
+                        viewBox="0 0 24 24"
+                        width="14"
+                        height="14"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={2.4}
+                        strokeLinecap="round"
+                    >
+                        <path d="M6 6l12 12M18 6L6 18" />
+                    </svg>
+                </DialogPrimitive.Close>
+                {children}
+            </DialogPrimitive.Content>
+        </SheetPortal>
+    )
+})
 SheetContent.displayName = DialogPrimitive.Content.displayName
 
 const SheetHeader = ({
