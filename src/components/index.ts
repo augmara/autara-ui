@@ -49,6 +49,13 @@ export {
     SheetDescription,
 } from './Sheet'
 
+export {
+    PickerSheet,
+    type PickerOption,
+    type PickerRowRender,
+    type PickerSheetProps,
+} from './PickerSheet'
+
 export { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from './Accordion'
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './Tabs'
 
