@@ -70,6 +70,8 @@ export {
     MessageThread, type MessageThreadProps, type MessageItem,
     // Media — pick-then-crop dialog (AUTM-163)
     ImageCropDialog, type ImageCropDialogProps,
+    // Wizard step indicator (AUTM-322)
+    Stepper, type StepperProps, type StepperStep,
 } from './components'
 
 // Utilities

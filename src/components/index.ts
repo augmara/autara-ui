@@ -193,3 +193,6 @@ export {
 
 // ─── Media — pick-then-crop dialog (AUTM-163) ──────────────────────────
 export { ImageCropDialog, type ImageCropDialogProps } from './ImageCropDialog'
+
+// ─── Wizard step indicator (AUTM-322) ──────────────────────────────────
+export { Stepper, type StepperProps, type StepperStep } from './Stepper'
