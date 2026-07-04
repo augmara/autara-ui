@@ -29,7 +29,7 @@
     "src/fonts"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && node scripts/fix-esm-extensions.mjs",
     "clean": "rm -rf dist",
     "dev": "tsc --watch",
     "prepublishOnly": "pnpm run clean && pnpm run build",
