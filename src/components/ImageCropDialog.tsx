@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from 'react'
 import Cropper, { type Area } from 'react-easy-crop'
 

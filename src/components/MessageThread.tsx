@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useRef, type ReactNode } from "react";
 import { AsyncSkeleton } from "./AsyncSkeleton";
 import { ErrorCard } from "./ErrorCard";
