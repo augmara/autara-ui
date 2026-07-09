@@ -19,6 +19,7 @@ export {
     type FieldStackFieldProps,
 } from './FieldStack'
 export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, cardVariants, type CardProps } from './Card'
+export { BackButton, type BackButtonProps } from './BackButton'
 export { Badge, badgeVariants, type BadgeProps } from './Badge'
 export { Separator } from './Separator'
 export { Skeleton } from './Skeleton'

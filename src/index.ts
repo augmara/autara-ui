@@ -9,6 +9,7 @@ export {
     FormField, type FormFieldProps,
     FieldStack, FieldStackRow, FieldStackField, type FieldStackFieldProps,
     Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, cardVariants, type CardProps,
+    BackButton, type BackButtonProps,
     Badge, badgeVariants, type BadgeProps,
     Separator,
     Skeleton,
