@@ -246,3 +246,74 @@ export const InOnboardingForm: Story = {
         </form>
     ),
 }
+
+// ─── Icon + label value (AUTM-418 regression guard) ────────────────
+/**
+ * A value made of an icon + short label — the phone country picker shape.
+ *
+ * The trigger previously carried `[&>span]:line-clamp-1`, which compiles to
+ * `display:-webkit-box`. Radix mirrors the selected item into that span, so the
+ * flex icon+label row was mis-measured and ellipsised: the closed trigger read
+ * "+..." while the open list read "+61". Keep this story — the closed trigger
+ * must show the full dial code.
+ */
+const DIAL_CODES = [
+    { value: '+61', label: '+61', flag: '\u{1F1E6}\u{1F1FA}' },
+    { value: '+64', label: '+64', flag: '\u{1F1F3}\u{1F1FF}' },
+    { value: '+44', label: '+44', flag: '\u{1F1EC}\u{1F1E7}' },
+]
+
+export const IconValue: Story = {
+    render: () => (
+        <div className="flex items-start gap-3">
+            <div className="w-32 shrink-0">
+                <Select defaultValue="+61">
+                    <SelectTrigger aria-label="Country dial code">
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {DIAL_CODES.map((c) => (
+                            <SelectItem key={c.value} value={c.value}>
+                                <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+                                    <span aria-hidden="true">{c.flag}</span>
+                                    {c.label}
+                                </span>
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+            <input
+                className="field-input flex-1"
+                type="tel"
+                placeholder="4XX XXX XXX"
+                aria-label="Phone number"
+            />
+        </div>
+    ),
+}
+
+// ─── Long label still truncates (the behaviour we must NOT lose) ───
+/**
+ * The counterpart to `IconValue`: a text-only value longer than the control.
+ * Switching from `line-clamp-1` to `truncate` must keep this on one line with
+ * an ellipsis rather than overflowing or wrapping the trigger.
+ */
+export const LongValueTruncates: Story = {
+    render: () => (
+        <div className="max-w-[220px]">
+            <Select defaultValue="long">
+                <SelectTrigger>
+                    <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="long">
+                        Full exterior detail with ceramic coating and paint
+                        correction
+                    </SelectItem>
+                    <SelectItem value="short">Quick wash</SelectItem>
+                </SelectContent>
+            </Select>
+        </div>
+    ),
+}
