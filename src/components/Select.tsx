@@ -79,7 +79,26 @@ const SelectTrigger = React.forwardRef<
             'data-[state=open]:border-[var(--color-autara-purple)] data-[state=open]:[box-shadow:0_0_0_4px_rgba(78,27,189,0.10)]',
             'aria-invalid:border-[var(--color-autara-error)] aria-invalid:[box-shadow:0_0_0_4px_rgba(221,56,56,0.10)]',
             'disabled:cursor-not-allowed disabled:bg-[var(--surface-warm)] disabled:text-[var(--text-subtle)]',
-            '[&>span]:line-clamp-1',
+            /*
+              AUTM-418 — single-line truncation via `truncate`, NOT `line-clamp-1`.
+
+              `line-clamp-1` compiles to `display:-webkit-box; -webkit-box-orient:
+              vertical; -webkit-line-clamp:1`. Radix mirrors the selected item's
+              children into this span, so any consumer whose option is an icon +
+              label row (e.g. a phone country picker: flag + "+61") ends up with a
+              flex child inside a -webkit-box. That context mis-measures the child
+              and ellipsises content that easily fits — the country picker rendered
+              as "+..." instead of "+61".
+
+              `truncate` (overflow-hidden + text-ellipsis + whitespace-nowrap) gives
+              the same one-line behaviour for long text labels, but leaves `display`
+              alone so icon+label rows measure normally.
+
+              This bit twice: AUTM-317 patched the SelectItem side and AUTM-418 the
+              trigger, both downstream in merchant-web. Fixed here so consumers
+              don't keep re-patching it.
+            */
+            '[&>span]:truncate',
             className
         )}
         {...props}
