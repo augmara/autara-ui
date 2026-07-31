@@ -168,6 +168,12 @@ export const Default: Story = {
 /**
  * Edit mode — an address already exists, so the picker opens straight to the
  * details step with the location trusted (it passed the guard on the way in).
+ *
+ * "Search for a different address" must be present here. This is the merchant
+ * who moved premises: without it they can only retype the new address field by
+ * field, and the affordance that would let them search for it is hidden
+ * precisely because they already have one. Found by the merchant-mobile
+ * integration pass, not by reading the code.
  */
 export const EditingAnExistingAddress: Story = {
     render: () => (

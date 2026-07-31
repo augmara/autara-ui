@@ -581,8 +581,15 @@ export function AddressPickerSheet(props: AddressPickerSheetProps) {
             </div>
         ) : null
 
+    // Always offer the way back to search — including in edit mode, where the
+    // picker opened straight to details. Gating this on `!value` looked
+    // reasonable (there is no search step "behind" an edit) but broke the
+    // single most important case: a merchant who moved premises could only
+    // hand-retype the new address field by field, because the one affordance
+    // that would let them search for it was hidden precisely because they
+    // already had an address.
     const backButton =
-        step === 'details' && !value ? (
+        step === 'details' ? (
             <button
                 type="button"
                 onClick={() => {
@@ -591,7 +598,7 @@ export function AddressPickerSheet(props: AddressPickerSheetProps) {
                 }}
                 className="mb-1 inline-flex items-center gap-1 self-start rounded-md text-sm font-medium text-autara-purple focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-autara-purple/35"
             >
-                <BackGlyph /> Search again
+                <BackGlyph /> {value ? 'Search for a different address' : 'Search again'}
             </button>
         ) : null
 
