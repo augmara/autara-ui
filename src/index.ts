@@ -73,6 +73,12 @@ export {
     ImageCropDialog, type ImageCropDialogProps,
     // Wizard step indicator (AUTM-322)
     Stepper, type StepperProps, type StepperStep,
+    // Address search + map confirm (AUTM-586)
+    AddressPickerSheet,
+    type AddressPickerSheetProps,
+    type AddressSuggestion,
+    type ResolvedAddress,
+    type AddressMapRenderProps,
 } from './components'
 
 // Utilities
