@@ -16,8 +16,10 @@
 }
 
 .btn-primary:hover {
+    /* AUTM-715 — was also `box-shadow: 0 0 30px rgba(78,27,189,0.4)`, a
+       purple glow. The aesthetic bans drop shadows, and the darkened fill
+       already carries the hover state on its own. */
     background: var(--color-autara-purple-dark);
-    box-shadow: 0 0 30px rgba(78, 27, 189, 0.4);
 }
 
 /* Shine sweep */
@@ -69,9 +71,11 @@
 }
 
 .btn-outline-light:hover {
+    /* AUTM-715 — dropped `box-shadow: 0 4px 12px rgba(78,27,189,0.1)`. The
+       background and border-color shifts are the documented way to carry a
+       hover state here; the shadow was the banned one. */
     background: #fafafa;
     border-color: #a3a3a3;
-    box-shadow: 0 4px 12px rgba(78, 27, 189, 0.1);
 }
 
 /* Section pill badge */

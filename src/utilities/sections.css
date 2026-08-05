@@ -19,17 +19,24 @@
 }
 
 /* Light card for use on colored backgrounds */
+/* AUTM-715 — this was the worst of the three violations, and it broke two
+   rules at once. It carried a BLACK drop shadow (0 4px 6px -1px rgba(0,0,0,
+   .05)) where DESIGN.md is explicit that shadows are purple-tinted and never
+   black, and on hover it grew a second, heavier black shadow plus a
+   translateY(-3px) lift — the literal floating-card treatment the aesthetic
+   rules out ("hairline-edged, editorial, solid — never floating-card").
+
+   Depth now comes from the hairline, and hover from a border-color shift,
+   which is the documented mechanism. */
 .card-light {
     background: white;
     border-radius: 12px;
     padding: 28px;
     color: #111827;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-        box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid var(--border-subtle);
+    transition: border-color 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .card-light:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 20px -4px rgba(0, 0, 0, 0.1);
+    border-color: var(--border-hover);
 }
 .card-light h3 { color: #111827; }
