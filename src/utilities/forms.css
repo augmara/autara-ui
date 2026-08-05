@@ -30,7 +30,11 @@
     padding: 0 0.875rem;
     border-radius: 10px;
     background: var(--surface);
-    border: 1px solid rgba(17, 24, 39, 0.10);
+    /* AUTM-713 — was a hardcoded rgba(17,24,39,0.10) while every other
+       bordered control used the 0.08 token, so text fields sat a shade
+       darker than the Select, MultiSelect and FieldStack beside them. Now
+       the token: fields track the ladder instead of diverging from it. */
+    border: 1px solid var(--border-subtle);
     color: var(--text-strong);
     font-family: inherit;
     font-size: 1rem;
@@ -110,7 +114,11 @@
     padding: 12px 14px;
     border-radius: 10px;
     background: var(--surface);
-    border: 1px solid rgba(17, 24, 39, 0.10);
+    /* AUTM-713 — was a hardcoded rgba(17,24,39,0.10) while every other
+       bordered control used the 0.08 token, so text fields sat a shade
+       darker than the Select, MultiSelect and FieldStack beside them. Now
+       the token: fields track the ladder instead of diverging from it. */
+    border: 1px solid var(--border-subtle);
     color: var(--text-strong);
     font-family: inherit;
     font-size: 16px;
@@ -254,7 +262,11 @@
     padding: 0 14px;
     border-radius: 10px;
     background: var(--surface);
-    border: 1px solid rgba(17, 24, 39, 0.10);
+    /* AUTM-713 — was a hardcoded rgba(17,24,39,0.10) while every other
+       bordered control used the 0.08 token, so text fields sat a shade
+       darker than the Select, MultiSelect and FieldStack beside them. Now
+       the token: fields track the ladder instead of diverging from it. */
+    border: 1px solid var(--border-subtle);
     color: var(--text-strong);
     font-family: inherit;
     font-size: 16px;

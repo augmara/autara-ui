@@ -14,7 +14,10 @@
 /* ─── Glass card — generic light surface ─────────────────────────────── */
 
 .glass-card {
-    background: #ffffff;
+    /* AUTM-713 — was a literal #ffffff while the border beside it already
+       read var(--border-subtle): half-tokenised, so a surface change would
+       have moved the edge and left the fill behind. */
+    background: var(--surface);
     border: 1px solid var(--border-subtle);
     border-radius: 16px;
     transition: border-color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
@@ -43,7 +46,10 @@
 /* ─── Service card — for service catalogue rows ──────────────────────── */
 
 .service-card {
-    background: #ffffff;
+    /* AUTM-713 — was a literal #ffffff while the border beside it already
+       read var(--border-subtle): half-tokenised, so a surface change would
+       have moved the edge and left the fill behind. */
+    background: var(--surface);
     border: 1px solid var(--border-subtle);
     border-radius: 16px;
     padding: 24px;

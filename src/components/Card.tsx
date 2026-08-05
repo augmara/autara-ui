@@ -23,7 +23,7 @@ const cardVariants = cva('transition-all duration-[350ms]', {
             // — `translateY` on a card-shaped surface reads as "this card
             // is floating" which contradicts the editorial brand.
             light: [
-                'rounded-autara-xl bg-white p-7 text-autara-gray-900',
+                'rounded-autara-xl bg-[var(--surface)] p-7 text-autara-gray-900',
                 'border border-[var(--border-subtle)]',
                 'hover:border-autara-purple/30',
             ].join(' '),
