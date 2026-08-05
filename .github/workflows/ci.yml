@@ -30,15 +30,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # `version` is required — package.json has no `packageManager` field, so
+      # the action cannot infer it and fails outright. Pinned to 9 to match
+      # release.yml; if one moves, move both.
       - uses: pnpm/action-setup@v4
+        with:
+          version: 9
 
+      # After pnpm, because `cache: pnpm` needs the binary to resolve the
+      # store path. Registry config mirrors release.yml so a scoped @augmara
+      # dependency resolves here too.
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: pnpm
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@augmara"
 
       - name: Install
         run: pnpm install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Typecheck
         run: pnpm run typecheck
