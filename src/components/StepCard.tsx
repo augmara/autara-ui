@@ -55,7 +55,7 @@ export function StepCard({
     <Comp
       href={href}
       className={cn(
-        "group relative block h-full overflow-hidden bg-[#FBFAF5] p-8 lg:p-10",
+        "group relative block h-full overflow-hidden bg-[var(--background)] p-8 lg:p-10",
         "transition-colors duration-300",
         interactive && "cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-autara-purple)]",
         className,
