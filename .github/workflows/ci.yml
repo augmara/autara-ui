@@ -1,0 +1,52 @@
+# Typecheck, test and build on every PR and every push to main.
+#
+# AUTM-713 — this repo had tests (vitest, with a 100% threshold on cn.ts) and
+# a build, but NO workflow ran either on a pull request. The only workflow was
+# Release, which fires after main already moved. In practice a PR's only
+# checks were org-level CodeQL, so a red build or a failing test could not
+# block a merge — and this is the package every web surface renders through.
+#
+# That gap is also why the preset/token drift this ticket fixes survived: the
+# guard test added alongside it would have had nothing running it.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  packages: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      - name: Test
+        run: pnpm run test
+
+      # Last, because it is the slowest and the least likely to be the thing
+      # that broke.
+      - name: Build
+        run: pnpm run build
