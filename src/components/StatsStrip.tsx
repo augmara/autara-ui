@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { cn } from '../lib/cn'
+import { StatTile, type StatTone } from './StatTile'
 
 /**
  * StatsStrip — horizontal row of compact stat tiles. One pattern,
@@ -18,10 +19,15 @@ import { cn } from '../lib/cn'
  * value would go — preserves the tile's shape so the layout doesn't
  * reflow when data arrives.
  *
- * Sibling primitive to `KpiCard` — the difference is that `StatsStrip`
- * is a *strip* of tiles meant to be rendered as a row, while
- * `KpiCard` is a single tile with optional trend chip + icon. Use
- * `KpiCard` standalone, `StatsStrip` when you have 2–4 stats.
+ * AUTM-726 — this no longer draws the tile. `StatTile` does, and this is
+ * the grid around it. Before that they were separate implementations of the
+ * same idea, which is how merchant-mobile ended up with a hand-made KPI on
+ * Today that looked better than the shared one everywhere else. If you are
+ * changing how a stat LOOKS, change StatTile; this file only owns layout.
+ *
+ * Three stat surfaces still exist: `StatTile` (one stat), `StatsStrip` (a
+ * grid of them) and `KpiCard` (a single tile with a trend chip). Use
+ * `KpiCard` only when you need the trend chip.
  */
 
 export interface StatItem {
@@ -31,6 +37,8 @@ export interface StatItem {
     caption?: string
     /** Optional 20 px icon glyph rendered top-right of the tile. */
     icon?: ReactNode
+    /** AUTM-726 — semantic accent tick. See StatTile for the mapping. */
+    tone?: StatTone
 }
 
 export interface StatsStripProps {
@@ -59,39 +67,15 @@ export function StatsStrip({
     return (
         <div className={cn('grid grid-cols-2 gap-3', COLUMN_CLASS[cols], className)}>
             {stats.map((s, i) => (
-                <div
+                <StatTile
                     key={i}
-                    className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)] p-4"
-                >
-                    <div className="flex items-start justify-between gap-2">
-                        <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-[var(--text-subtle)]">
-                            {s.label}
-                        </p>
-                        {s.icon ? (
-                            <span
-                                aria-hidden
-                                className="grid h-7 w-7 place-items-center rounded-lg bg-[rgba(78,27,189,0.06)] text-[var(--color-autara-purple)]"
-                            >
-                                {s.icon}
-                            </span>
-                        ) : null}
-                    </div>
-                    {loading || s.value == null ? (
-                        <span
-                            aria-hidden
-                            className="mt-2 block h-7 w-16 animate-pulse rounded-md bg-[var(--surface-elevated)]"
-                        />
-                    ) : (
-                        <p className="mt-1 text-2xl font-bold tabular-nums tracking-tight text-[var(--text-strong)]">
-                            {s.value}
-                        </p>
-                    )}
-                    {s.caption ? (
-                        <p className="mt-1 text-[11px] text-[var(--text-muted)]">
-                            {s.caption}
-                        </p>
-                    ) : null}
-                </div>
+                    label={s.label}
+                    value={s.value}
+                    caption={s.caption}
+                    icon={s.icon}
+                    tone={s.tone}
+                    loading={loading}
+                />
             ))}
         </div>
     )

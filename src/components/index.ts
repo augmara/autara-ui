@@ -156,6 +156,7 @@ export { MessageThread, type MessageThreadProps, type MessageItem } from './Mess
 // ─── v1.4.0 — merchant-mobile harvest ────────────────────────────────────
 // Promoted from inline merchant-mobile components after the Phase 3
 // scaffold pass surfaced 3-4 duplications of the same pattern.
+export { StatTile, type StatTileProps, type StatTone } from './StatTile'
 export { StatsStrip, type StatsStripProps, type StatItem } from './StatsStrip'
 export { InfoRow, type InfoRowProps } from './InfoRow'
 export {
