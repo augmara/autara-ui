@@ -58,7 +58,7 @@ const VARIANT_CLASSES: Record<Variant, string> = {
   primary:
     "bg-[var(--accent-fill)] text-[var(--on-accent)] hover:-translate-y-0.5 hover:bg-[var(--accent-fill-hover)] active:translate-y-0 focus-visible:ring-[var(--accent)]/35",
   dark:
-    "bg-[var(--surface-inverse)] text-[var(--text-on-inverse)] hover:-translate-y-0.5 hover:bg-[var(--surface-inverse-hover)] active:translate-y-0 focus-visible:ring-[var(--surface-inverse)]/35",
+    "bg-[var(--cta-fill)] text-[var(--on-cta)] hover:-translate-y-0.5 hover:bg-[var(--cta-fill-hover)] active:translate-y-0 focus-visible:ring-[var(--cta-fill)]/35",
   outline:
     "border border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-strong)] hover:-translate-y-0.5 hover:border-[var(--border-hover)] hover:bg-[var(--surface-elevated)] active:translate-y-0 focus-visible:ring-[var(--accent)]/30",
   secondary:

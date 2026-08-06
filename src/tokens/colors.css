@@ -82,11 +82,26 @@
 
     /* ─── Inverse surface — the Torph ink capsule family ─────────────── */
     /* Tooltip, dark Toast, MultiSelect chips: "the high-contrast capsule
-     * that pops against the canvas". In dark theme it flips light. */
+     * that pops against the canvas". In dark theme it flips light — that
+     * is the POINT for a capsule. It is NOT right for a CTA; see below. */
     --surface-inverse: #0e0a1a;
     --surface-inverse-hover: #2a2238;
     --text-on-inverse: #ffffff;
     --border-on-inverse: rgba(255, 255, 255, 0.1);
+
+    /* ─── Primary CTA fill ───────────────────────────────────────────── */
+    /* Encodes the standing brand rule: "Primary CTAs on cream surfaces are
+     * solid black, not purple. Purple primary is reserved for dark/photo
+     * surfaces." So the CTA fill is ink on cream and BRAND PURPLE on dark —
+     * it does not merely invert.
+     *
+     * AUTM-734 QA: `Button variant="dark"` used --surface-inverse, which
+     * does invert, so the primary CTA turned into a near-white slab in dark
+     * theme — off-brand, and the same "white box" failure as the dock
+     * capsule. A CTA has to keep reading as a CTA in both themes. */
+    --cta-fill: #0e0a1a;
+    --cta-fill-hover: #2a2238;
+    --on-cta: #ffffff;
 
     /* ─── Intent, text-grade ─────────────────────────────────────────── */
     /* Darker than the fills on light surfaces, lighter on dark — always
@@ -142,6 +157,11 @@
     --surface-inverse-hover: #ffffff;
     --text-on-inverse: #16121f;
     --border-on-inverse: rgba(22, 18, 31, 0.12);
+
+    /* Purple primary on dark surfaces — the brand rule, not an inversion. */
+    --cta-fill: #6d3dd4;
+    --cta-fill-hover: #7d4fe0;
+    --on-cta: #ffffff;
 
     --intent-error-text: #ff9a86;
     --intent-success-text: #b7dd6b;
