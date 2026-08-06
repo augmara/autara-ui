@@ -20,8 +20,9 @@
  * everything at runtime — no per-component dark: classes needed for
  * token-driven surfaces.
  *
- * The dark ladder is the same warm purple-tinted ink family as the brand
- * ink (#0e0a1a), never neutral gray. Contrast is measured, not eyeballed:
+ * The dark ladder is near-black carrying a whisper of the brand's purple
+ * ink — NOT a violet ramp (see the AUTM-734 QA note on the dark block for
+ * why it moved). Contrast is measured, not eyeballed.
  *
  * The LIGHT ladder, measured the same way (AUTM-737):
  *
@@ -29,16 +30,19 @@
  *   text-muted   .72     vs surface            8.05:1
  *   text-subtle  .58     vs surface            4.80:1  (was .42 → 2.85:1 ✗)
  *
- *   text-strong  #f2eff8 vs surface #201a30   14.7:1  (body ≥4.5 ✓)
- *   text-muted   .72     vs surface            8.19:1  (elevated 7.46:1)
- *   text-subtle  .54     vs surface            5.19:1  (elevated 4.86:1)
- *   accent       #9d75ec vs surface             4.9:1  (link text ✓)
- *   accent-fill  #6d3dd4 under #fff text        6.4:1  (CTA ✓)
- *   elevated     #2a2342 vs canvas #14101f      1.26:1
+ * The DARK ladder:
+ *
+ *   text-strong  #f2eff8 vs surface #1b1822   15.4:1  (elevated 13.3:1)
+ *   text-muted   .72     vs surface            8.5:1  (elevated  7.6:1)
+ *   text-subtle  .54     vs surface            5.3:1  (elevated  5.0:1)
+ *   accent       #9d75ec vs surface            5.2:1  (link text ✓)
+ *   accent-fill  #6d3dd4 under #fff text       6.4:1  (CTA ✓)
+ *   surface      vs canvas #0f0c14             1.12:1
+ *   elevated     vs surface                    1.15:1
  *
  * Note on the AUTM-713 ≥1.3:1 canvas-to-card target: near black the WCAG
  * +0.05 veiling term dominates, so the same *perceptual* step yields a
- * smaller *ratio* than on cream. The dark ladder pairs a 1.11–1.26:1
+ * smaller *ratio* than on cream. The dark ladder pairs a 1.12–1.15:1
  * tonal step with hairline borders one notch stronger (0.12 vs 0.08
  * alpha) — edges stay legible without bleaching the cards pastel.
  *
@@ -157,11 +161,42 @@
 :root[data-theme="dark"] {
     color-scheme: dark;
 
-    --background: #14101f;
+    /* AUTM-734 QA — Don: "the background is a bit purplish, can we make it
+     * more dark vibe, narrow to black".
+     *
+     * The first dark ramp leaned hard into the brand's purple ink. Measured,
+     * it was leaning too hard: the per-channel chroma spread ran 15 → 31
+     * across the stack, so every surface read as violet rather than as a
+     * dark neutral carrying a hint of the brand.
+     *
+     * This ramp holds the spread at a near-constant 7–12 and drops the
+     * canvas 55% in luminance (#14101f → #0f0c14). It reads as near-black
+     * with a whisper of purple instead of purple-that-happens-to-be-dark.
+     *
+     * The tonal ladder did NOT get flatter in the process — that was the
+     * risk, since near black the WCAG +0.05 veiling term compresses equal
+     * steps. Widening the numeric gaps compensates, and both steps come out
+     * slightly better than the ramp they replace:
+     *
+     *   surface  vs canvas    1.12:1   (was 1.11:1)
+     *   elevated vs surface   1.15:1   (was 1.13:1)
+     *
+     * Text improves too, because the surfaces got darker under the same
+     * light ink — every AUTM-737 assertion clears with more headroom:
+     *
+     *   text-strong  15.4:1 surface · 13.3:1 elevated
+     *   text-muted    8.5:1 surface ·  7.6:1 elevated
+     *   text-subtle   5.3:1 surface ·  5.0:1 elevated
+     *   accent #9d75ec on surface 5.2:1 (was 4.9:1)
+     *
+     * Consumers that paint their own canvas (merchant-mobile's
+     * --app-canvas) must move with this or the cards stop sitting on
+     * anything. */
+    --background: #0f0c14;
     --foreground: #f2eff8;
-    --surface: #201a30;
-    --surface-elevated: #2a2342;
-    --surface-warm: #251e38;
+    --surface: #1b1822;
+    --surface-elevated: #282430;
+    --surface-warm: #171420;
     --border-subtle: rgba(242, 239, 248, 0.12);
     --border-strong: rgba(242, 239, 248, 0.24);
     --border-hover: rgba(157, 117, 236, 0.45);
@@ -176,7 +211,9 @@
      * .54 clears both (5.19:1 / 4.86:1) and keeps a wider muted-to-subtle
      * gap than .58 would (1.58x vs 1.42x), so the hierarchy reads. */
     --text-subtle: rgba(242, 239, 248, 0.54);
-    --nav-glass-bg: rgba(32, 26, 48, 0.85);
+    /* Tracks --surface (#1b1822) so the blurred nav reads as the same
+     * material as the cards under it. */
+    --nav-glass-bg: rgba(27, 24, 34, 0.85);
 
     --accent: #9d75ec;
     --accent-fill: #6d3dd4;
