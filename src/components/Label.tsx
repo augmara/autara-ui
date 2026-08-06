@@ -9,7 +9,14 @@ const labelVariants = cva(
         variants: {
             theme: {
                 dark: 'text-white/60',
-                light: 'text-autara-gray-900',
+                // AUTM-734 — was `text-autara-gray-900`, a STATIC palette hex.
+                // Every form label went near-black on the dark canvas, i.e.
+                // invisible (found on merchant-mobile /me: the First name /
+                // Last name labels rendered as bare asterisks). The `dark`
+                // variant here means "on an ink/marketing surface", which is
+                // a different axis from the app theme — only the default
+                // (light) branch tracks the themed ladder.
+                light: 'text-[var(--text-strong)]',
             },
         },
         defaultVariants: {

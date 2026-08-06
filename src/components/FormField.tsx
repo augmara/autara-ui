@@ -24,7 +24,8 @@ const FormField = React.forwardRef<HTMLDivElement, FormFieldProps>(
             {description && !error && (
                 <p className={cn(
                     'text-xs',
-                    theme === 'dark' ? 'text-white/30' : 'text-autara-gray-400'
+                    // AUTM-734 — static gray → themed subtle ink (see Label).
+                    theme === 'dark' ? 'text-white/30' : 'text-[var(--text-subtle)]'
                 )}>
                     {description}
                 </p>

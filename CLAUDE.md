@@ -118,6 +118,11 @@ docs/
   brand badges, focus rings, link underlines. Primary CTAs on cream
   surfaces are **solid black** (`BrandButton variant="dark"`), not
   purple. Purple primary is reserved for dark/photo surfaces.
+  Since AUTM-734 this rule is *encoded*, not just documented:
+  `variant="dark"` paints `--cta-fill`, which is ink in light theme and
+  brand purple in dark. Don't reach for `--surface-inverse` on a CTA —
+  that token inverts (correct for a Tooltip/Toast capsule, wrong for a
+  button, which turned into a white slab on dark before this landed).
 - **Satoshi typography** — bundled. Use weights 400 / 500 / 700 only
   (Black mapped to 700). Never 300, 600, 800, 900.
 - **4px brand-purple halo** on focused inputs (`.field-input`) — the

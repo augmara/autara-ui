@@ -71,7 +71,7 @@ const TableHead = React.forwardRef<
         ref={ref}
         className={cn(
             'h-10 px-4 text-left align-middle text-xs font-medium [&:has([role=checkbox])]:pr-0',
-            theme === 'dark' ? 'text-white/40' : 'text-autara-gray-500',
+            theme === 'dark' ? 'text-white/40' : 'text-[var(--text-muted)]',
             className
         )}
         {...props}
@@ -87,7 +87,7 @@ const TableCell = React.forwardRef<
         ref={ref}
         className={cn(
             'px-4 py-3 align-middle text-sm [&:has([role=checkbox])]:pr-0',
-            theme === 'dark' ? 'text-white/70' : 'text-autara-gray-700',
+            theme === 'dark' ? 'text-white/70' : 'text-[var(--text-strong)]',
             className
         )}
         {...props}
@@ -103,7 +103,7 @@ const TableCaption = React.forwardRef<
         ref={ref}
         className={cn(
             'mt-4 text-sm',
-            theme === 'dark' ? 'text-white/30' : 'text-autara-gray-400',
+            theme === 'dark' ? 'text-white/30' : 'text-[var(--text-subtle)]',
             className
         )}
         {...props}
