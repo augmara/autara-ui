@@ -54,6 +54,8 @@ export {
     // shape="parallelogram" by AUTAA-UI-006.
     // v1.4.0 — merchant-mobile harvest (StatsStrip, InfoRow, ListSection, ModeChip, Logo, SearchInput, FilterChipRow)
     StatsStrip, type StatsStripProps, type StatItem,
+    // v2.x — AUTM-726: StatsStrip is now a grid of these.
+    StatTile, type StatTileProps, type StatTone,
     InfoRow, type InfoRowProps,
     ListSection, ListSectionRow, type ListSectionProps, type ListSectionRowProps,
     ModeChip, type ModeChipProps, type BookingMode,
