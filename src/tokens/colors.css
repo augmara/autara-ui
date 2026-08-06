@@ -23,9 +23,15 @@
  * The dark ladder is the same warm purple-tinted ink family as the brand
  * ink (#0e0a1a), never neutral gray. Contrast is measured, not eyeballed:
  *
+ * The LIGHT ladder, measured the same way (AUTM-737):
+ *
+ *   text-strong  #0e0a1a vs surface #ffffff   19.5:1  (body ≥4.5 ✓)
+ *   text-muted   .72     vs surface            8.05:1
+ *   text-subtle  .58     vs surface            4.80:1  (was .42 → 2.85:1 ✗)
+ *
  *   text-strong  #f2eff8 vs surface #201a30   14.7:1  (body ≥4.5 ✓)
- *   text-muted   .72     vs surface            ~8.1:1
- *   text-subtle  .50     vs surface            ~4.6:1
+ *   text-muted   .72     vs surface            8.19:1  (elevated 7.46:1)
+ *   text-subtle  .54     vs surface            5.19:1  (elevated 4.86:1)
  *   accent       #9d75ec vs surface             4.9:1  (link text ✓)
  *   accent-fill  #6d3dd4 under #fff text        6.4:1  (CTA ✓)
  *   elevated     #2a2342 vs canvas #14101f      1.26:1
@@ -60,8 +66,27 @@
     --border-strong: rgba(17, 24, 39, 0.18);
     --border-hover: rgba(78, 27, 189, 0.35);
     --text-strong: #0e0a1a;
-    --text-muted: rgba(14, 10, 26, 0.62);
-    --text-subtle: rgba(14, 10, 26, 0.42);
+    /* AUTM-737 — the light ladder was never measured against the bar the
+     * DARK ladder was later held to, and it failed it. At .42, --text-subtle
+     * was 2.85:1 on --surface: below the 4.5:1 floor for text under 18pt,
+     * and nothing using it is above 18pt — it is the small-label token. All
+     * ~120 usages across merchant-mobile, plus both web surfaces, failed AA.
+     *
+     * Raising subtle alone would have collapsed it into muted (.58 vs .62),
+     * so the whole ladder moves to mirror dark's measured RATIOS rather than
+     * its alphas — dark sits on a different backdrop, so copying the numbers
+     * would not reproduce the relationship:
+     *
+     *              light          dark
+     *   muted      8.05:1   .72   ~8.1:1   .72
+     *   subtle     4.80:1   .58   ~4.6:1   .50
+     *
+     * Both clear 4.5:1 on --surface AND on --surface-elevated (#f4f2ec),
+     * which is the surface that actually loses the argument — it is darker
+     * than white, so a token that only just passes on white fails on it.
+     * Verified in colors.test.ts, both surfaces, both tokens. */
+    --text-muted: rgba(14, 10, 26, 0.72);
+    --text-subtle: rgba(14, 10, 26, 0.58);
     /* Translucent nav chrome (pairs with backdrop-blur in .nav-glass). */
     --nav-glass-bg: rgba(255, 255, 255, 0.85);
 
@@ -142,7 +167,15 @@
     --border-hover: rgba(157, 117, 236, 0.45);
     --text-strong: #f2eff8;
     --text-muted: rgba(242, 239, 248, 0.72);
-    --text-subtle: rgba(242, 239, 248, 0.5);
+    /* AUTM-737 — .50 was measured against --surface (#201a30) and cleared
+     * it at 4.65:1, but --surface-elevated (#2a2342) is LIGHTER, so light
+     * text has LESS contrast on it: 4.38:1, under the floor. The same blind
+     * spot the light ladder had, in the opposite direction — each ladder was
+     * checked against one surface and shipped.
+     *
+     * .54 clears both (5.19:1 / 4.86:1) and keeps a wider muted-to-subtle
+     * gap than .58 would (1.58x vs 1.42x), so the hierarchy reads. */
+    --text-subtle: rgba(242, 239, 248, 0.54);
     --nav-glass-bg: rgba(32, 26, 48, 0.85);
 
     --accent: #9d75ec;
