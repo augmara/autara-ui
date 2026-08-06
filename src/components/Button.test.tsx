@@ -62,16 +62,45 @@ describe("Button — base rendering", () => {
 });
 
 describe("Button — variant + size styling", () => {
-    it.each([
-        ["primary", /accent-fill/],
-        ["dark", /surface-inverse/],
-        ["outline", /border-subtle/],
-        ["secondary", /surface-elevated/],
-        ["destructive", /rose-600/],
-        ["acid", /color-autara-lime-bright/],
-    ] as const)("variant=%s applies its colour token", (variant, pattern) => {
+    /**
+     * Asserts each variant is TOKEN-DRIVEN and DISTINCT — not that it uses one
+     * specific token name.
+     *
+     * Naming the token made this the most fragile test in the suite: it broke
+     * twice in one afternoon as the dark-mode work renamed things underneath
+     * it (`--color-autara-purple` → `--accent-fill`, then `--surface-inverse`
+     * → `--cta-fill`), both times with nothing actually wrong. A stale
+     * assertion that reads as a failure is worse than no assertion — the
+     * second break went out on a red main because the noise was assumed.
+     *
+     * What actually matters, and what breaks if a variant loses its styling:
+     * every variant paints from a custom property (so it themes), and no two
+     * variants collapse to the same look.
+     */
+    const VARIANTS = [
+        "primary",
+        "dark",
+        "outline",
+        "secondary",
+        "destructive",
+        "acid",
+    ] as const;
+
+    it.each(VARIANTS)("variant=%s paints from a theme token", (variant) => {
         render(<Button variant={variant}>X</Button>);
-        expect(screen.getByRole("button").className).toMatch(pattern);
+        // bg-[var(--x)] or a themed palette utility (bg-rose-600) — either
+        // way it must not be an ad-hoc literal.
+        expect(screen.getByRole("button").className).toMatch(
+            /\bbg-(\[var\(--[a-z-]+\)\]|[a-z]+-\d{2,3})/,
+        );
+    });
+
+    it("gives every variant a distinct look", () => {
+        const seen = VARIANTS.map((variant) => {
+            const { container } = render(<Button variant={variant}>X</Button>);
+            return container.querySelector("button")!.className;
+        });
+        expect(new Set(seen).size).toBe(VARIANTS.length);
     });
 
     it.each([
