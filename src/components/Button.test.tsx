@@ -63,8 +63,8 @@ describe("Button — base rendering", () => {
 
 describe("Button — variant + size styling", () => {
     it.each([
-        ["primary", /color-autara-purple/],
-        ["dark", /text-strong/],
+        ["primary", /accent-fill/],
+        ["dark", /surface-inverse/],
         ["outline", /border-subtle/],
         ["secondary", /surface-elevated/],
         ["destructive", /rose-600/],
@@ -164,13 +164,13 @@ describe("Button — asChild polymorphism (Radix Slot)", () => {
 describe("buttonVariants — legacy CVA helper", () => {
     it("returns the same className as a rendered Button", () => {
         const cls = buttonVariants({ variant: "primary", size: "md" });
-        expect(cls).toMatch(/color-autara-purple/);
+        expect(cls).toMatch(/accent-fill/);
         expect(cls).toMatch(/\bh-11\b/);
     });
 
     it("defaults to primary + md when no opts provided", () => {
         const cls = buttonVariants();
-        expect(cls).toMatch(/color-autara-purple/);
+        expect(cls).toMatch(/accent-fill/);
         expect(cls).toMatch(/\bh-11\b/);
     });
 

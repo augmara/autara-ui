@@ -48,7 +48,12 @@ export function MessageBubble({ side, children, className }: MessageBubbleProps)
       className={cn(
         "max-w-[80%] whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2 text-[14px] leading-snug",
         isOwn
-          ? "self-end rounded-br-lg bg-[var(--text-strong)] text-white"
+          // AUTM-734 — was `bg-[var(--text-strong)] text-white`: a literal
+          // colour on a themed background. --text-strong flips to near-white
+          // in dark, so the merchant's own messages became white-on-white
+          // (1.14:1) and vanished. --surface-inverse / --text-on-inverse are
+          // the pair that flips together.
+          ? "self-end rounded-br-lg bg-[var(--surface-inverse)] text-[var(--text-on-inverse)]"
           : "self-start rounded-bl-lg border border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-strong)]",
         className,
       )}

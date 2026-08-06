@@ -7,7 +7,7 @@ import { cn } from '../lib/cn'
  * service status, notification tab).
  *
  * Active chip uses the canonical "Torph ink" capsule treatment
- * (`bg-[var(--text-strong)] text-white`); inactive chips are
+ * (`bg-[var(--surface-inverse)] text-[var(--text-on-inverse)]`); inactive chips are
  * hairline-bordered surface pills. The row scrolls horizontally on
  * narrow surfaces.
  *
@@ -69,7 +69,7 @@ export function FilterChipRow<V>({
                         className={cn(
                             'shrink-0 rounded-full px-3 py-1.5 text-[12px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-autara-purple)]/35',
                             active
-                                ? 'bg-[var(--text-strong)] text-white'
+                                ? 'bg-[var(--surface-inverse)] text-[var(--text-on-inverse)]'
                                 : 'border border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-muted)] hover:text-[var(--text-strong)]',
                         )}
                     >
