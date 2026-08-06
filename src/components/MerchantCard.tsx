@@ -98,7 +98,7 @@ export const MerchantCard = forwardRef<HTMLDivElement, MerchantCardProps>(
         ref={ref}
         href={href}
         className={cn(
-          "group relative block overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)] transition-colors hover:border-[rgba(78,27,189,0.3)]",
+          "group relative block overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)] transition-colors hover:border-[var(--border-hover)]",
           className,
         )}
       >
@@ -149,7 +149,7 @@ export const MerchantCard = forwardRef<HTMLDivElement, MerchantCardProps>(
                 "absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-white/90 backdrop-blur-sm transition-colors hover:bg-white",
                 isFavorite
                   ? "text-rose-500"
-                  : "text-[#0a0a0a]/70 hover:text-[var(--color-autara-purple)]",
+                  : "text-[var(--text-muted)] hover:text-[var(--accent)]",
               )}
             >
               <svg

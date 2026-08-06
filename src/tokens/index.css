@@ -5,3 +5,12 @@
 @import "./shadows.css";
 @import "./radii.css";
 @import "./typography.css";
+
+/* ─── Dark variant (AUTM-734) ────────────────────────────────────────────
+ * `dark:` utilities key off the `data-theme` attribute, NOT the OS
+ * `prefers-color-scheme` media query — the consuming app owns the
+ * switching logic (system-follow, manual override, persistence) and
+ * expresses the result by stamping `data-theme="dark"` on <html>.
+ * Token-driven surfaces re-theme without any `dark:` class; reach for
+ * `dark:` only where a one-off override is genuinely needed. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));

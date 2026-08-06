@@ -32,7 +32,9 @@ export interface SectionHeadingProps {
 }
 
 const EYEBROW_TONE = {
-  brand: "text-[var(--color-autara-purple)]",
+  brand: "text-[var(--accent)]",
+  // lime + aqua eyebrows sit on the static lime/aqua section bands
+  // (sections.css), so their ink stays literal — do not theme.
   lime: "text-[#111827]/70",
   aqua: "text-[#111827]/70",
   muted: "text-[var(--text-muted)]",

@@ -62,9 +62,9 @@
     justify-content: center;
     padding: 12px 28px;
     border-radius: 8px;
-    border: 1px solid #d4d4d4;
-    background: white;
-    color: #171717;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--text-strong);
     font-weight: 500;
     font-size: 14px;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -74,8 +74,8 @@
     /* AUTM-715 — dropped `box-shadow: 0 4px 12px rgba(78,27,189,0.1)`. The
        background and border-color shifts are the documented way to carry a
        hover state here; the shadow was the banned one. */
-    background: #fafafa;
-    border-color: #a3a3a3;
+    background: var(--surface-warm);
+    border-color: var(--text-subtle);
 }
 
 /* Section pill badge */
@@ -98,10 +98,10 @@
     align-items: center;
     padding: 6px 16px;
     border-radius: 20px;
-    border: 1px solid #e5e5e5;
-    background: #fafafa;
+    border: 1px solid var(--border-subtle);
+    background: var(--surface-warm);
     font-size: 13px;
     font-weight: 500;
-    color: #525252;
+    color: var(--text-muted);
     letter-spacing: 0.02em;
 }

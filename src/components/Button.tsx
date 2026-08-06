@@ -56,19 +56,19 @@ const SIZES: Record<Exclude<Size, "default">, string> = {
 
 const VARIANT_CLASSES: Record<Variant, string> = {
   primary:
-    "bg-[var(--color-autara-purple)] text-white hover:-translate-y-0.5 hover:bg-[#3D1595] active:translate-y-0 focus-visible:ring-[var(--color-autara-purple)]/35",
+    "bg-[var(--accent-fill)] text-[var(--on-accent)] hover:-translate-y-0.5 hover:bg-[var(--accent-fill-hover)] active:translate-y-0 focus-visible:ring-[var(--accent)]/35",
   dark:
-    "bg-[var(--text-strong)] text-white hover:-translate-y-0.5 hover:bg-[#2a2238] active:translate-y-0 focus-visible:ring-[var(--text-strong)]/35",
+    "bg-[var(--surface-inverse)] text-[var(--text-on-inverse)] hover:-translate-y-0.5 hover:bg-[var(--surface-inverse-hover)] active:translate-y-0 focus-visible:ring-[var(--surface-inverse)]/35",
   outline:
-    "border border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-strong)] hover:-translate-y-0.5 hover:border-[rgba(78,27,189,0.35)] hover:bg-[var(--surface-elevated)] active:translate-y-0 focus-visible:ring-[var(--color-autara-purple)]/30",
+    "border border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-strong)] hover:-translate-y-0.5 hover:border-[var(--border-hover)] hover:bg-[var(--surface-elevated)] active:translate-y-0 focus-visible:ring-[var(--accent)]/30",
   secondary:
-    "bg-[var(--surface-elevated)] text-[var(--text-strong)] hover:-translate-y-0.5 hover:bg-[rgba(78,27,189,0.06)] active:translate-y-0 focus-visible:ring-[var(--color-autara-purple)]/30",
+    "bg-[var(--surface-elevated)] text-[var(--text-strong)] hover:-translate-y-0.5 hover:bg-[var(--accent-tint)] active:translate-y-0 focus-visible:ring-[var(--accent)]/30",
   ghost:
-    "bg-transparent text-[var(--text-muted)] hover:text-[var(--text-strong)] hover:bg-[var(--surface-elevated)] focus-visible:ring-[var(--color-autara-purple)]/25",
+    "bg-transparent text-[var(--text-muted)] hover:text-[var(--text-strong)] hover:bg-[var(--surface-elevated)] focus-visible:ring-[var(--accent)]/25",
   destructive:
     "bg-rose-600 text-white hover:-translate-y-0.5 hover:bg-rose-700 active:translate-y-0 focus-visible:ring-rose-500/35",
   link:
-    "text-[var(--color-autara-purple)] underline-offset-4 hover:underline bg-transparent focus-visible:ring-[var(--color-autara-purple)]/30",
+    "text-[var(--accent)] underline-offset-4 hover:underline bg-transparent focus-visible:ring-[var(--accent)]/30",
 
   // ─── Acid lime — high-pop CTA on cream surfaces ──────────────────────
   // Dark-surface companion deferred to a future PR.
@@ -77,19 +77,19 @@ const VARIANT_CLASSES: Record<Variant, string> = {
 
   // ─── v1.0.x backwards-compat aliases ─────────────────────────────────
   "light-primary":
-    "bg-[var(--color-autara-purple)] text-white hover:-translate-y-0.5 hover:bg-[#3D1595] active:translate-y-0 focus-visible:ring-[var(--color-autara-purple)]/35",
+    "bg-[var(--accent-fill)] text-[var(--on-accent)] hover:-translate-y-0.5 hover:bg-[var(--accent-fill-hover)] active:translate-y-0 focus-visible:ring-[var(--accent)]/35",
   "light-outline":
-    "border border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-strong)] hover:-translate-y-0.5 hover:border-[rgba(78,27,189,0.35)] hover:bg-[var(--surface-elevated)] active:translate-y-0 focus-visible:ring-[var(--color-autara-purple)]/30",
+    "border border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-strong)] hover:-translate-y-0.5 hover:border-[var(--border-hover)] hover:bg-[var(--surface-elevated)] active:translate-y-0 focus-visible:ring-[var(--accent)]/30",
   "light-ghost":
-    "bg-transparent text-[var(--text-muted)] hover:text-[var(--text-strong)] hover:bg-[var(--surface-elevated)] focus-visible:ring-[var(--color-autara-purple)]/25",
+    "bg-transparent text-[var(--text-muted)] hover:text-[var(--text-strong)] hover:bg-[var(--surface-elevated)] focus-visible:ring-[var(--accent)]/25",
   "light-secondary":
-    "bg-[var(--surface-elevated)] text-[var(--text-strong)] hover:-translate-y-0.5 hover:bg-[rgba(78,27,189,0.06)] active:translate-y-0 focus-visible:ring-[var(--color-autara-purple)]/30",
+    "bg-[var(--surface-elevated)] text-[var(--text-strong)] hover:-translate-y-0.5 hover:bg-[var(--accent-tint)] active:translate-y-0 focus-visible:ring-[var(--accent)]/30",
   "light-destructive":
     "bg-rose-600 text-white hover:-translate-y-0.5 hover:bg-rose-700 active:translate-y-0 focus-visible:ring-rose-500/35",
   "light-link":
-    "text-[var(--color-autara-purple)] underline-offset-4 hover:underline bg-transparent focus-visible:ring-[var(--color-autara-purple)]/30",
+    "text-[var(--accent)] underline-offset-4 hover:underline bg-transparent focus-visible:ring-[var(--accent)]/30",
   light:
-    "border border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-strong)] hover:-translate-y-0.5 hover:border-[rgba(78,27,189,0.35)] hover:bg-[var(--surface-elevated)] active:translate-y-0 focus-visible:ring-[var(--color-autara-purple)]/30",
+    "border border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-strong)] hover:-translate-y-0.5 hover:border-[var(--border-hover)] hover:bg-[var(--surface-elevated)] active:translate-y-0 focus-visible:ring-[var(--accent)]/30",
 };
 
 export interface ButtonProps

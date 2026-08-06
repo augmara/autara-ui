@@ -106,13 +106,13 @@ const badgeVariants = cva(
                 'light-default':
                     'border border-[var(--border-subtle)] bg-[var(--surface-elevated)] text-[var(--text-muted)] px-3 py-1 text-xs',
                 'light-primary':
-                    'border border-[rgba(78,27,189,0.22)] bg-[rgba(78,27,189,0.08)] text-[var(--color-autara-purple)] px-3 py-1 text-xs',
+                    'border border-[var(--accent-border-soft)] bg-[var(--accent-tint)] text-[var(--accent)] px-3 py-1 text-xs',
                 'light-success':
-                    'border border-[rgba(183,225,73,0.55)] bg-[rgba(183,225,73,0.18)] text-[#3a6b14] px-3 py-1 text-xs',
+                    'border border-[rgba(183,225,73,0.55)] bg-[rgba(183,225,73,0.18)] text-[var(--intent-success-text)] px-3 py-1 text-xs',
                 'light-warning':
-                    'border border-[rgba(245,166,35,0.35)] bg-[rgba(245,166,35,0.12)] text-[var(--color-autara-warning-text)] px-3 py-1 text-xs',
+                    'border border-[rgba(245,166,35,0.35)] bg-[rgba(245,166,35,0.12)] text-[var(--intent-warning-text)] px-3 py-1 text-xs',
                 'light-destructive':
-                    'border border-[rgba(221,56,56,0.28)] bg-[rgba(221,56,56,0.1)] text-[var(--color-autara-error)] px-3 py-1 text-xs',
+                    'border border-[rgba(221,56,56,0.28)] bg-[rgba(221,56,56,0.1)] text-[var(--intent-error-text)] px-3 py-1 text-xs',
             },
             shape: {
                 // Rounded capsule — still available, opt in with

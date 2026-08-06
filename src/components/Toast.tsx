@@ -210,20 +210,24 @@ function ToastProvider({
 // Accent colours for each variant — light versions are slightly
 // darker so they keep ≥ 4.5:1 against the cream / white surface.
 
+// AUTM-734: the `dark` variant is the inverse capsule — dark in light
+// theme, light in dark theme — so its accents ride the `--inverse-accent-*`
+// tokens, which flip OPPOSITE to the normal intent ramp. The `light`
+// variant sits on `--surface` and uses the text-grade intent tokens.
 const ACCENT: Record<ToastVariant, Record<Exclude<ToastType, 'default'>, string>> = {
     dark: {
-        loading: 'var(--color-autara-lime-bright)',
-        success: 'var(--color-autara-lime-bright)',
-        error: '#ff8a73',
-        warning: '#ffc864',
-        info: 'var(--color-autara-sky-aqua)',
+        loading: 'var(--inverse-accent-loading)',
+        success: 'var(--inverse-accent-success)',
+        error: 'var(--inverse-accent-error)',
+        warning: 'var(--inverse-accent-warning)',
+        info: 'var(--inverse-accent-info)',
     },
     light: {
-        loading: '#4a7a14',
-        success: '#3a6b14',
-        error: 'var(--color-autara-error)',
-        warning: 'var(--color-autara-warning-text)',
-        info: '#0d4f8c',
+        loading: 'var(--intent-success-text)',
+        success: 'var(--intent-success-text)',
+        error: 'var(--intent-error-text)',
+        warning: 'var(--intent-warning-text)',
+        info: 'var(--intent-info-text)',
     },
 }
 
@@ -468,7 +472,7 @@ function ToastItem({
     // cream-canvas companion (white surface + ink text + hairline).
     const isDark = variant === 'dark'
     const variantCls = isDark
-        ? 'bg-[#0E0A1A] text-white'
+        ? 'bg-[var(--surface-inverse)] text-[var(--text-on-inverse)]'
         : 'bg-[var(--surface)] text-[var(--text-strong)] ring-1 ring-inset ring-[var(--border-subtle)]'
 
     return (
@@ -499,8 +503,8 @@ function ToastItem({
                     className={cn(
                         'ml-1 shrink-0 rounded-full px-2.5 py-1 text-[11px] uppercase tracking-[0.12em] transition-colors',
                         isDark
-                            ? 'bg-white/10 text-white hover:bg-white/20'
-                            : 'bg-[var(--surface-elevated)] text-[var(--text-strong)] hover:bg-[rgba(78,27,189,0.08)]'
+                            ? 'bg-[var(--text-on-inverse)]/10 text-[var(--text-on-inverse)] hover:bg-[var(--text-on-inverse)]/20'
+                            : 'bg-[var(--surface-elevated)] text-[var(--text-strong)] hover:bg-[var(--accent-tint)]'
                     )}
                 >
                     {t.action.label}
@@ -511,7 +515,7 @@ function ToastItem({
                 className={cn(
                     'ml-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full transition-colors',
                     isDark
-                        ? 'text-white/45 hover:bg-white/10 hover:text-white'
+                        ? 'text-[var(--text-on-inverse)]/45 hover:bg-[var(--text-on-inverse)]/10 hover:text-[var(--text-on-inverse)]'
                         : 'text-[var(--text-subtle)] hover:bg-[var(--surface-elevated)] hover:text-[var(--text-strong)]'
                 )}
                 aria-label="Dismiss notification"

@@ -29,9 +29,9 @@ const TONES: Record<Tone, string> = {
   neutral:
     "bg-[var(--surface-elevated)] text-[var(--text-strong)] ring-1 ring-inset ring-[var(--border-subtle)]",
   success:
-    "bg-[rgba(183,225,73,0.18)] text-[#2f5a10] ring-1 ring-inset ring-[rgba(183,225,73,0.6)]",
+    "bg-[rgba(183,225,73,0.18)] text-[var(--intent-success-text)] ring-1 ring-inset ring-[rgba(183,225,73,0.6)]",
   brand:
-    "bg-[rgba(78,27,189,0.08)] text-[var(--color-autara-purple)] ring-1 ring-inset ring-[rgba(78,27,189,0.28)]",
+    "bg-[var(--accent-tint)] text-[var(--accent)] ring-1 ring-inset ring-[var(--accent-border-soft)]",
   muted:
     "bg-[var(--surface-elevated)] text-[var(--text-muted)] ring-1 ring-inset ring-[var(--border-subtle)]",
 };
