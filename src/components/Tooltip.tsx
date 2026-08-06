@@ -37,7 +37,7 @@ const TooltipContent = React.forwardRef<
         className={cn(
             // Capsule grammar — matches the Toast ink pill so floating
             // UI reads as one family.
-            'z-50 max-w-xs rounded-md bg-[#0E0A1A] px-3 py-1.5 text-[12px] font-medium text-white ring-1 ring-inset ring-white/10',
+            'z-50 max-w-xs rounded-md bg-[var(--surface-inverse)] px-3 py-1.5 text-[12px] font-medium text-[var(--text-on-inverse)] ring-1 ring-inset ring-[var(--border-on-inverse)]',
             // Radix transition primitives — origin is side-aware.
             'animate-in fade-in-0 zoom-in-95',
             'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',

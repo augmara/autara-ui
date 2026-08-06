@@ -10,9 +10,44 @@
  * glass.css): NO DROP SHADOWS. Depth comes from border-color shifts on hover.
  * Warm-cream surfaces, never clinical white. Hairline-edged, editorial,
  * solid — never floating-card.
+ *
+ * ─── Theming (AUTM-734) ─────────────────────────────────────────────────
+ *
+ * Two-layer structure: raw themed values live on `:root` (light) with a
+ * `:root[data-theme="dark"]` override block; the `@theme inline` block
+ * below maps the Tailwind-facing names onto those vars. Utilities compile
+ * to `var(--…)` references, so flipping `data-theme` on <html> re-themes
+ * everything at runtime — no per-component dark: classes needed for
+ * token-driven surfaces.
+ *
+ * The dark ladder is the same warm purple-tinted ink family as the brand
+ * ink (#0e0a1a), never neutral gray. Contrast is measured, not eyeballed:
+ *
+ *   text-strong  #f2eff8 vs surface #201a30   14.7:1  (body ≥4.5 ✓)
+ *   text-muted   .72     vs surface            ~8.1:1
+ *   text-subtle  .50     vs surface            ~4.6:1
+ *   accent       #9d75ec vs surface             4.9:1  (link text ✓)
+ *   accent-fill  #6d3dd4 under #fff text        6.4:1  (CTA ✓)
+ *   elevated     #2a2342 vs canvas #14101f      1.26:1
+ *
+ * Note on the AUTM-713 ≥1.3:1 canvas-to-card target: near black the WCAG
+ * +0.05 veiling term dominates, so the same *perceptual* step yields a
+ * smaller *ratio* than on cream. The dark ladder pairs a 1.11–1.26:1
+ * tonal step with hairline borders one notch stronger (0.12 vs 0.08
+ * alpha) — edges stay legible without bleaching the cards pastel.
+ *
+ * Brand purple in dark: #4e1bbd is unreadable on dark surfaces (~1.0:1),
+ * so `--color-autara-purple` resolves through `--accent-fill`, which
+ * lifts one step (#6d3dd4) in dark. Pure-text accents use `--accent`
+ * (#9d75ec dark) which clears 4.5:1. The literal brand hex remains at
+ * `--color-autara-purple-static` for the rare surface that truly wants
+ * it (logos, printed brand marks).
  */
 
-@theme inline {
+:root,
+:host {
+    color-scheme: light;
+
     /* ─── Semantic surface stack — primary API ───────────────────────── */
     /* Warm off-white to keep the brand from feeling clinical. */
     --background: #fbfaf6;
@@ -21,14 +56,114 @@
     --surface-elevated: #f4f2ec;
     --surface-warm: #f7f5ee;
     --border-subtle: rgba(17, 24, 39, 0.08);
+    /* Hover / emphasised control border — one legible step up. */
+    --border-strong: rgba(17, 24, 39, 0.18);
     --border-hover: rgba(78, 27, 189, 0.35);
     --text-strong: #0e0a1a;
     --text-muted: rgba(14, 10, 26, 0.62);
     --text-subtle: rgba(14, 10, 26, 0.42);
+    /* Translucent nav chrome (pairs with backdrop-blur in .nav-glass). */
+    --nav-glass-bg: rgba(255, 255, 255, 0.85);
 
-    /* ─── Brand colors (the inviolable hex set) ──────────────────────── */
-    --color-autara-purple: #4e1bbd;
-    --color-autara-purple-dark: #3d1595;
+    /* True ink — STATIC in both themes. Photo-viewer backdrops, video
+     * chrome: surfaces that should stay dark regardless of theme. */
+    --ink: #0e0a1a;
+
+    /* ─── Accent — brand purple, theme-aware ─────────────────────────── */
+    /* `--accent` is text/border-grade; `--accent-fill` is solid-fill
+     * grade (always keeps ≥4.5:1 under --on-accent text). */
+    --accent: #4e1bbd;
+    --accent-fill: #4e1bbd;
+    --accent-fill-hover: #3d1595;
+    --on-accent: #ffffff;
+    --accent-tint: rgba(78, 27, 189, 0.06);
+    --accent-halo: rgba(78, 27, 189, 0.1);
+    --accent-border-soft: rgba(78, 27, 189, 0.18);
+
+    /* ─── Inverse surface — the Torph ink capsule family ─────────────── */
+    /* Tooltip, dark Toast, MultiSelect chips: "the high-contrast capsule
+     * that pops against the canvas". In dark theme it flips light. */
+    --surface-inverse: #0e0a1a;
+    --surface-inverse-hover: #2a2238;
+    --text-on-inverse: #ffffff;
+    --border-on-inverse: rgba(255, 255, 255, 0.1);
+
+    /* ─── Intent, text-grade ─────────────────────────────────────────── */
+    /* Darker than the fills on light surfaces, lighter on dark — always
+     * ≥4.5:1 against --surface. The FILL-grade intent colors stay static
+     * (solid chips with white/ink text read on any canvas) — see the
+     * @theme block. */
+    --intent-error-text: #c62f2f;
+    --intent-success-text: #3a6b14;
+    --intent-warning-text: #b4760e;
+    --intent-info-text: #0d4f8c;
+    /* Invalid-field wash. */
+    --intent-error-soft: rgba(221, 56, 56, 0.04);
+
+    /* ─── Accents for content sitting ON --surface-inverse ───────────── */
+    /* The capsule is dark in light theme (wants bright accents) and
+     * light in dark theme (wants the deep ones) — i.e. these flip
+     * OPPOSITE to the normal intent ramp. */
+    --inverse-accent-loading: #d4ff4f;
+    --inverse-accent-success: #d4ff4f;
+    --inverse-accent-error: #ff8a73;
+    --inverse-accent-warning: #ffc864;
+    --inverse-accent-info: #4ceaff;
+}
+
+/* ─── Dark theme — set `data-theme="dark"` on <html> ───────────────────
+ * Consumers own the switching logic (system-follow, manual override,
+ * persistence). The package only defines what dark LOOKS like. */
+:root[data-theme="dark"] {
+    color-scheme: dark;
+
+    --background: #14101f;
+    --foreground: #f2eff8;
+    --surface: #201a30;
+    --surface-elevated: #2a2342;
+    --surface-warm: #251e38;
+    --border-subtle: rgba(242, 239, 248, 0.12);
+    --border-strong: rgba(242, 239, 248, 0.24);
+    --border-hover: rgba(157, 117, 236, 0.45);
+    --text-strong: #f2eff8;
+    --text-muted: rgba(242, 239, 248, 0.72);
+    --text-subtle: rgba(242, 239, 248, 0.5);
+    --nav-glass-bg: rgba(32, 26, 48, 0.85);
+
+    --accent: #9d75ec;
+    --accent-fill: #6d3dd4;
+    --accent-fill-hover: #7d4fe0;
+    --on-accent: #ffffff;
+    --accent-tint: rgba(157, 117, 236, 0.12);
+    --accent-halo: rgba(157, 117, 236, 0.18);
+    --accent-border-soft: rgba(157, 117, 236, 0.3);
+
+    --surface-inverse: #f4f1fa;
+    --surface-inverse-hover: #ffffff;
+    --text-on-inverse: #16121f;
+    --border-on-inverse: rgba(22, 18, 31, 0.12);
+
+    --intent-error-text: #ff9a86;
+    --intent-success-text: #b7dd6b;
+    --intent-warning-text: #ffc874;
+    --intent-info-text: #8fc0ff;
+    --intent-error-soft: rgba(242, 118, 107, 0.1);
+
+    --inverse-accent-loading: #4a7a14;
+    --inverse-accent-success: #3a6b14;
+    --inverse-accent-error: #c62f2f;
+    --inverse-accent-warning: #b4760e;
+    --inverse-accent-info: #0d4f8c;
+}
+
+@theme inline {
+    /* ─── Brand colors ───────────────────────────────────────────────── */
+    /* Purple resolves through the accent stack so fills lift a step in
+     * dark (see header comment). The literal hex stays available as
+     * `-static` for brand marks that must never shift. */
+    --color-autara-purple: var(--accent-fill);
+    --color-autara-purple-dark: var(--accent-fill-hover);
+    --color-autara-purple-static: #4e1bbd;
     --color-autara-purple-darker: #2e1070;
     --color-autara-purple-light: #6d3dd4;
     --color-autara-purple-lighter: #8c5fe8;
@@ -65,10 +200,14 @@
     --color-autara-border: var(--border-subtle);
     --color-autara-track: var(--surface-elevated);
 
-    /* ─── Semantic intent colors ─────────────────────────────────────── */
+    /* ─── Semantic intent colors — FILL grade, static ────────────────── */
+    /* Solid chips/fills with white-or-ink text read correctly on both
+     * canvases, so these deliberately do NOT theme. Text-grade intent
+     * color lives on the themed `--intent-*-text` vars above; the one
+     * alias that was always text-grade follows it. */
     --color-autara-error: #dd3838;
     --color-autara-success: #0f9d58;
     --color-autara-warning: #f5a623;
-    --color-autara-warning-text: #b4760e;
+    --color-autara-warning-text: var(--intent-warning-text);
     --color-autara-info: #1f6feb;
 }

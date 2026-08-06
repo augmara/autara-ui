@@ -17,7 +17,9 @@ const Progress = React.forwardRef<
             ref={ref}
             className={cn(
                 'relative h-2 w-full overflow-hidden rounded-full',
-                isDark ? 'bg-white/[0.1]' : 'bg-autara-gray-200',
+                // `dark` here means "on an ink/marketing surface", not the
+                // app theme — the light branch tracks the themed ladder.
+                isDark ? 'bg-white/[0.1]' : 'bg-[var(--surface-elevated)]',
                 className
             )}
             {...props}

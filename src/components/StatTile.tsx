@@ -83,7 +83,7 @@ export function StatTile({
                 {icon ? (
                     <span
                         aria-hidden
-                        className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-[rgba(78,27,189,0.06)] text-[var(--color-autara-purple)]"
+                        className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-[var(--accent-tint)] text-[var(--accent)]"
                     >
                         {icon}
                     </span>

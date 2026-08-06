@@ -12,6 +12,32 @@ import "./storybook.css";
  */
 
 const preview: Preview = {
+  // AUTM-734 — theme toolbar. Stamps `data-theme` on <html>, exactly how
+  // consuming apps switch themes, so every story renders in both modes.
+  decorators: [
+    (Story, context) => {
+      const theme =
+        (context.globals as { theme?: string }).theme === "dark"
+          ? "dark"
+          : "light";
+      document.documentElement.setAttribute("data-theme", theme);
+      return Story();
+    },
+  ],
+  globalTypes: {
+    theme: {
+      description: "Autara color theme",
+      toolbar: {
+        title: "Theme",
+        icon: "mirror",
+        items: ["light", "dark"],
+        dynamicTitle: true,
+      },
+    },
+  },
+  initialGlobals: {
+    theme: "light",
+  },
   parameters: {
     layout: "padded",
     backgrounds: {

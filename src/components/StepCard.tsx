@@ -70,20 +70,20 @@ export function StepCard({
       <div className="relative z-10">
         <div className="mb-10 flex items-baseline justify-between lg:mb-14">
           <span
-            className="inline-block font-bold leading-none tracking-[-0.04em] text-[#111827] transition-colors duration-300 group-hover:text-[var(--color-autara-purple)]"
+            className="inline-block font-bold leading-none tracking-[-0.04em] text-[var(--text-strong)] transition-colors duration-300 group-hover:text-[var(--color-autara-purple)]"
             style={{ fontSize: "clamp(3rem, 5vw, 4rem)" }}
           >
             {String(step).padStart(2, "0")}
           </span>
-          <span className="text-[10px] font-medium uppercase tracking-[0.22em] text-[#111827]/40">
+          <span className="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--text-subtle)]">
             Step {step} / {String(total).padStart(2, "0")}
           </span>
         </div>
 
-        <h3 className="mb-4 text-2xl font-bold tracking-[-0.02em] text-[#111827] lg:text-[1.75rem]">
+        <h3 className="mb-4 text-2xl font-bold tracking-[-0.02em] text-[var(--text-strong)] lg:text-[1.75rem]">
           {title}
         </h3>
-        <p className="max-w-sm text-[15px] leading-[1.65] text-[#111827]/70">
+        <p className="max-w-sm text-[15px] leading-[1.65] text-[var(--text-muted)]">
           {description}
         </p>
 
@@ -94,7 +94,7 @@ export function StepCard({
             {chips.map((chip) => (
               <span
                 key={chip}
-                className="inline-flex items-center gap-1.5 rounded-full bg-[#111827]/[0.05] px-2.5 py-1 text-[11px] font-medium text-[#111827]/75"
+                className="inline-flex items-center gap-1.5 rounded-full bg-[var(--text-strong)]/[0.05] px-2.5 py-1 text-[11px] font-medium text-[var(--text-muted)]"
               >
                 <span
                   aria-hidden="true"

@@ -26,13 +26,13 @@
 }
 
 .glass-card:hover {
-    border-color: rgba(78, 27, 189, 0.18);
+    border-color: var(--accent-border-soft);
 }
 
 /* ─── Nav glass — sticky/floating navigation bar ─────────────────────── */
 
 .nav-glass {
-    background: rgba(255, 255, 255, 0.85);
+    background: var(--nav-glass-bg);
     backdrop-filter: blur(20px) saturate(1.2);
     -webkit-backdrop-filter: blur(20px) saturate(1.2);
     border: 1px solid var(--border-subtle);
@@ -60,5 +60,5 @@
 }
 
 .service-card:hover {
-    border-color: rgba(78, 27, 189, 0.18);
+    border-color: var(--accent-border-soft);
 }

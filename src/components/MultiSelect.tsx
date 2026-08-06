@@ -149,8 +149,8 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                         // Autara focus signature — cream tint + 3px inset
                         // brand-purple bar (matches .field-input / FieldStack).
                         invalid
-                            ? 'border-[var(--color-autara-error)] focus-within:bg-[rgba(221,56,56,0.04)]'
-                            : 'border-[var(--border-subtle)] hover:border-[rgba(17,24,39,0.18)] focus-within:border-[var(--color-autara-purple)] focus-within:bg-[var(--surface-warm)]',
+                            ? 'border-[var(--color-autara-error)] focus-within:bg-[var(--intent-error-soft)]'
+                            : 'border-[var(--border-subtle)] hover:border-[var(--border-strong)] focus-within:border-[var(--accent)] focus-within:bg-[var(--surface-warm)]',
                         disabled &&
                             'cursor-not-allowed bg-[var(--surface-warm)] opacity-70'
                     )}
@@ -163,7 +163,7 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                                ring); replaces the soft purple-tint pill. */
                             className={cn(
                                 'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[12px] font-medium ring-1 ring-inset',
-                                'bg-[#0E0A1A] text-white ring-white/10'
+                                'bg-[var(--surface-inverse)] text-[var(--text-on-inverse)] ring-[var(--border-on-inverse)]'
                             )}
                         >
                             {getLabel(val)}

@@ -48,7 +48,7 @@
     color: var(--text-subtle);
 }
 .field-input:hover:not(:disabled):not(:focus) {
-    border-color: rgba(17, 24, 39, 0.18);
+    border-color: var(--border-strong);
 }
 /* Autara focus signature (v2.4): the field tints warm-cream and its
  * hairline border goes solid brand-purple — a clean, symmetric ring,
@@ -57,7 +57,7 @@
 .field-input:focus-visible {
     outline: none;
     background: var(--surface-warm);
-    border-color: var(--color-autara-purple);
+    border-color: var(--accent);
 }
 .field-input:disabled {
     background: var(--surface-warm);
@@ -69,7 +69,7 @@
 }
 .field-input[aria-invalid="true"]:focus,
 .field-input[aria-invalid="true"]:focus-visible {
-    background: rgba(221, 56, 56, 0.04);
+    background: var(--intent-error-soft);
     border-color: var(--color-autara-error);
 }
 
@@ -130,13 +130,13 @@
     color: var(--text-subtle);
 }
 .field-textarea:hover:not(:disabled):not(:focus) {
-    border-color: rgba(17, 24, 39, 0.18);
+    border-color: var(--border-strong);
 }
 .field-textarea:focus,
 .field-textarea:focus-visible {
     outline: none;
     background: var(--surface-warm);
-    border-color: var(--color-autara-purple);
+    border-color: var(--accent);
 }
 
 /* Force outline-none on inputs that own their focus treatment (matches
@@ -190,7 +190,7 @@
 }
 .field-stack-cell:focus-within {
     background: var(--surface-warm);
-    box-shadow: inset 3px 0 0 var(--color-autara-purple);
+    box-shadow: inset 3px 0 0 var(--accent);
 }
 
 .field-stack-label {
@@ -203,7 +203,7 @@
     transition: color 150ms ease;
 }
 .field-stack-cell:focus-within .field-stack-label {
-    color: var(--color-autara-purple);
+    color: var(--accent);
 }
 
 .field-stack-input {
@@ -237,11 +237,11 @@
  * Declared after :focus-within so the error treatment wins while the
  * field is being corrected. */
 .field-stack-cell:has([aria-invalid='true']) {
-    background: rgba(221, 56, 56, 0.04);
+    background: var(--intent-error-soft);
     box-shadow: inset 3px 0 0 var(--color-autara-error);
 }
 .field-stack-cell:has([aria-invalid='true']) .field-stack-label {
-    color: var(--color-autara-error);
+    color: var(--intent-error-text);
 }
 
 .field-stack-error {
@@ -249,7 +249,7 @@
     margin-top: 4px;
     font-size: 12px;
     line-height: 1.4;
-    color: var(--color-autara-error);
+    color: var(--intent-error-text);
 }
 
 /* ─── Backwards-compat alias ──────────────────────────────────────────
@@ -278,8 +278,8 @@
 .input-light:focus,
 .input-light:focus-visible {
     outline: none;
-    border-color: var(--color-autara-purple);
-    box-shadow: 0 0 0 4px rgba(78, 27, 189, 0.10);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-halo);
 }
 .input-light::placeholder {
     color: var(--text-subtle);
@@ -314,7 +314,7 @@
     transition: border-color 0.3s;
 }
 .merchant-form input:focus {
-    border-color: var(--color-autara-purple);
+    border-color: var(--accent);
 }
 .merchant-form input::placeholder {
     color: rgba(255, 255, 255, 0.25);

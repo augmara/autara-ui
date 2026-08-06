@@ -133,9 +133,22 @@ docs/
   canonical background. If you add a new Storybook chrome surface that
   ignores this, extend the selector list rather than removing the
   `!important`.
-- `@theme inline` (Tailwind v4 native) is the right place for tokens.
-  Don't define tokens in `:root {}` outside of `@theme inline` — they
-  won't be available as Tailwind utilities.
+- Tokens are two-layer since AUTM-734: raw *themed* values live on
+  `:root` / `:root[data-theme="dark"]` blocks in `colors.css`, and the
+  `@theme inline` block maps Tailwind-facing names onto them with
+  `var()` references. Add a themed token to BOTH root blocks; add a
+  Tailwind-utility name only in `@theme inline`. A bare hex directly in
+  `@theme inline` means "static in both themes" (brand hexes, grays,
+  intent fills) — that's a deliberate choice, not an omission.
+- Dark mode keys off `data-theme="dark"` on `<html>` — never
+  `prefers-color-scheme` (the app owns switching/persistence). A
+  `dark` custom variant is declared in `tokens/index.css`; prefer
+  token-driven theming over `dark:` classes. Interactive/text purple
+  must use `var(--accent)` (readable in both themes), solid fills use
+  `var(--accent-fill)`; the `--color-autara-purple` alias resolves to
+  the fill. `#4E1BBD` measures ~1:1 against dark surfaces — never
+  hardcode it for text/borders. The Storybook toolbar has a Theme
+  switcher — check every story in both modes.
 - The Tailwind preset (`src/preset/index.mjs`) maps `bg-autara-purple`
   and friends. Consumers must include the preset in their Tailwind
   config OR import the CSS tokens — pick one consistent path per app.
