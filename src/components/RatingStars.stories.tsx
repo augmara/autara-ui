@@ -25,6 +25,27 @@ export const NoHalf: Story = {
   args: { rating: 3.5, showHalf: false },
 };
 
+/**
+ * Fraction ladder — the boundaries the bucketing logic has to get right.
+ * 4.9 regressed to four stars before AUTM-741; keep an eye on the 0.9 rows,
+ * which must round up rather than drop to the floor.
+ */
+export const FractionLadder: Story = {
+  parameters: { layout: "padded" },
+  render: () => (
+    <div className="space-y-2">
+      {[5, 4.95, 4.9, 4.75, 4.5, 4.4, 4.3, 4, 3.9].map((rating) => (
+        <div key={rating} className="flex items-center gap-3">
+          <span className="w-10 text-xs tabular-nums text-[var(--text-muted)]">
+            {rating.toFixed(2)}
+          </span>
+          <RatingStars rating={rating} />
+        </div>
+      ))}
+    </div>
+  ),
+};
+
 /** Size ladder. */
 export const Sizes: Story = {
   parameters: { layout: "padded" },
