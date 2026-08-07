@@ -39,6 +39,12 @@ export interface StatItem {
     icon?: ReactNode
     /** AUTM-726 — semantic accent tick. See StatTile for the mapping. */
     tone?: StatTone
+    /**
+     * AUTM-713 — promote this one tile to the accent fill. At most ONE per
+     * strip: the point is that a merchant's eye lands on the number that
+     * answers their question, and two heroes is no hero. See StatTile.
+     */
+    hero?: boolean
 }
 
 export interface StatsStripProps {
@@ -74,6 +80,7 @@ export function StatsStrip({
                     caption={s.caption}
                     icon={s.icon}
                     tone={s.tone}
+                    hero={s.hero}
                     loading={loading}
                 />
             ))}
