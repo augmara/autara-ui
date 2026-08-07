@@ -92,3 +92,73 @@ export const InStrip: Story = {
         />
     ),
 }
+
+/**
+ * The rule the variant is easiest to get wrong: a hero is an ANSWER, so a
+ * tile with nothing to say must not wear one. Left is what shipping
+ * `hero: true` unconditionally looked like on Invoices for an all-paid-up
+ * merchant; right is `hero: outstandingCents > 0`.
+ */
+export const HeroOnAnEmptyValue: Story = {
+    name: 'hero — never spend it on nothing',
+    render: () => (
+        <div className="grid max-w-[860px] gap-6 sm:grid-cols-2">
+            <div>
+                <p className="mb-2 text-[0.8125rem] font-medium text-[var(--text-muted)]">
+                    Wrong — the eye lands on the one number that is not news
+                </p>
+                <StatsStrip
+                    columns={2}
+                    stats={[
+                        { label: 'Outstanding', value: '$0', hero: true },
+                        { label: 'Paid this month', value: '$343', tone: 'money-in' },
+                    ]}
+                />
+            </div>
+            <div>
+                <p className="mb-2 text-[0.8125rem] font-medium text-[var(--text-muted)]">
+                    Right — nothing owed is a calm state, so nothing shouts
+                </p>
+                <StatsStrip
+                    columns={2}
+                    stats={[
+                        { label: 'Outstanding', value: '$0', tone: 'money-in' },
+                        { label: 'Paid this month', value: '$343', tone: 'money-in' },
+                    ]}
+                />
+            </div>
+        </div>
+    ),
+}
+
+export const Hero: Story = {
+    name: 'hero — the one that answers the question',
+    args: {
+        label: 'Lifetime',
+        value: '$1,440',
+        caption: 'across 4 customers',
+        hero: true,
+    },
+}
+
+export const HeroInStrip: Story = {
+    name: 'in context — one hero, two supporting',
+    render: () => (
+        <div className="max-w-[720px]">
+            <StatsStrip
+                columns={3}
+                stats={[
+                    { label: 'Total', value: '4', tone: 'brand' },
+                    { label: 'Lifetime', value: '$1,440', hero: true },
+                    { label: 'Avg per customer', value: '$360', tone: 'money-in' },
+                ]}
+            />
+            <p className="mt-4 text-[0.8125rem] text-[var(--text-muted)]">
+                AUTM-713 — the merchant came to ask &ldquo;how is my business
+                doing?&rdquo;, so lifetime takes the fill and the other two
+                support it. Promote a different tile and you have answered a
+                different question; promote two and you have answered none.
+            </p>
+        </div>
+    ),
+}
