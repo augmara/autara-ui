@@ -26,7 +26,10 @@ export interface RatingStarsProps {
   /** 0..5. Values outside this range are clamped. */
   rating: number;
   size?: Size;
-  /** Render half-star when fractional part is in [0.4, 0.9). Default true. */
+  /**
+   * Render a half-star when the fractional part is in [0.4, 0.9). At 0.9 and
+   * above the star rounds up to full instead. Default true.
+   */
   showHalf?: boolean;
   className?: string;
   /** Override the auto-generated screen-reader label. */
@@ -41,8 +44,16 @@ export function RatingStars({
   ariaLabel,
 }: RatingStarsProps) {
   const safe = Math.max(0, Math.min(5, rating));
-  const full = Math.floor(safe);
-  const hasHalf = showHalf && safe - full >= 0.4 && safe - full < 0.9;
+  // Quantise the fraction to 2dp before bucketing it. Comparing the raw
+  // subtraction against 0.9 is representation-dependent: 4.9 - 4 is
+  // 0.9000000000000004 but 3.9 - 3 is 0.8999999999999999, so the same
+  // nominal fraction landed in different buckets (AUTM-741).
+  const frac = Math.round((safe - Math.floor(safe)) * 100) / 100;
+  // A fraction at or above 0.9 rounds the star up rather than dropping it —
+  // without this, 4.9 rendered as four stars, a full star below the rating
+  // the aria-label announces.
+  const full = Math.floor(safe) + (frac >= 0.9 ? 1 : 0);
+  const hasHalf = showHalf && frac >= 0.4 && frac < 0.9;
   return (
     <span
       className={`inline-flex items-center ${GAPS[size]} ${className}`}
