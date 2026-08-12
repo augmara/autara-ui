@@ -13,6 +13,22 @@ export interface StepperProps {
     /** 0-indexed. */
     currentStep: number
     onStepClick?: (index: number) => void
+    /**
+     * 0-indexed furthest step the user has actually REACHED, which can be
+     * ahead of `currentStep` when they have stepped back.
+     *
+     * AUTM-744 — without this, "complete" was derived purely from position
+     * relative to `currentStep`, so the moment someone navigated backwards
+     * every step ahead of them turned into `upcoming` and stopped being
+     * clickable. A merchant on Availability who clicked back to Business Info
+     * to fix a typo had no tab to return by: the wizard offered two clickable
+     * destinations, both backwards, and no way forward. The only escape was
+     * typing the URL.
+     *
+     * Defaults to `currentStep`, so callers that do not track progress keep
+     * exactly the old behaviour.
+     */
+    furthestStep?: number
     /** Disables navigation back to completed steps — e.g. a Review step that shouldn't allow backtracking. */
     locked?: boolean
     className?: string
@@ -42,11 +58,18 @@ const CheckIcon = () => (
  * fill and font-weight, not motion or color-heavy iconography.
  */
 const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(function Stepper(
-    { steps, currentStep, onStepClick, locked = false, className },
+    { steps, currentStep, furthestStep, onStepClick, locked = false, className },
     ref
 ) {
     const total = steps.length
     const clampedStep = Math.min(Math.max(currentStep, 0), Math.max(total - 1, 0))
+    /* AUTM-744 — how far the user has BEEN, not where they are now. Never
+       less than the current step, so a caller passing a stale or smaller
+       value cannot make the current step unreachable. */
+    const clampedFurthest = Math.min(
+        Math.max(furthestStep ?? clampedStep, clampedStep),
+        Math.max(total - 1, 0)
+    )
     const current = steps[clampedStep]
     const progressPercent = total > 0 ? ((clampedStep + 1) / total) * 100 : 0
 
@@ -82,7 +105,13 @@ const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(function Stepper(
                 {steps.map((step, index) => {
                     const status =
                         index < clampedStep ? 'complete' : index === clampedStep ? 'current' : 'upcoming'
-                    const clickable = !locked && status === 'complete' && Boolean(onStepClick)
+                    /* Reachable means "already visited", which includes steps
+                       AHEAD of the current one when the user has stepped back.
+                       Status still reflects position — a step in front stays
+                       visually `upcoming` — but it becomes navigable, so the
+                       way forward exists. */
+                    const clickable =
+                        !locked && index !== clampedStep && index <= clampedFurthest && Boolean(onStepClick)
 
                     const content = (
                         <span className="inline-flex items-center gap-1.5">
