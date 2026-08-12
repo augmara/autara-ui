@@ -145,3 +145,21 @@ export const InContext: Story = {
     </div>
   ),
 };
+
+/**
+ * AUTM-744 — the merchant reached Availability, then stepped back to Business
+ * Info to fix a typo. Availability stays clickable, so there is a way forward.
+ *
+ * Without `furthestStep` every step ahead of the current one goes dead and the
+ * only escape is typing the URL. That is the bug this prop exists for; compare
+ * with the story above.
+ */
+export const SteppedBack: Story = {
+    name: 'Stepped back — the way forward survives',
+    args: {
+        steps: ONBOARDING_STEPS,
+        currentStep: 0,
+        furthestStep: 2,
+        onStepClick: () => {},
+    },
+}
