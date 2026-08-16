@@ -7,23 +7,23 @@ const cardVariants = cva('transition-all duration-[350ms]', {
         variant: {
             // Dark theme cards
             glass: [
-                'rounded-autara-xl bg-white/[0.03] border border-white/[0.06]',
+                'rounded-autara-lg bg-white/[0.03] border border-white/[0.06]',
                 'backdrop-blur-[12px] [-webkit-backdrop-filter:blur(12px)]',
                 'hover:bg-white/[0.06] hover:border-autara-purple/30 hover:translate-y-[-2px]',
             ].join(' '),
             service: [
-                'rounded-autara-xl bg-white/[0.03] border border-white/[0.06] p-6 cursor-pointer',
+                'rounded-autara-lg bg-white/[0.03] border border-white/[0.06] p-6 cursor-pointer',
                 'hover:bg-white/[0.07] hover:border-autara-purple/30 hover:translate-y-[-3px]',
             ].join(' '),
-            outline: 'rounded-autara-xl border border-white/[0.08] bg-transparent',
-            solid: 'rounded-autara-xl bg-white/[0.04] border border-white/[0.06]',
+            outline: 'rounded-autara-lg border border-white/[0.08] bg-transparent',
+            solid: 'rounded-autara-lg bg-white/[0.04] border border-white/[0.06]',
             // Light theme cards — Autara aesthetic ships shadow-free.
             // Depth comes from the 1px hairline border, lift on hover from
             // a border-color shift (purple/30). No box-shadow, no translate
             // — `translateY` on a card-shaped surface reads as "this card
             // is floating" which contradicts the editorial brand.
             light: [
-                'rounded-autara-xl bg-[var(--surface)] p-7 text-[var(--text-strong)]',
+                'rounded-autara-lg bg-[var(--surface)] p-7 text-[var(--text-strong)]',
                 'border border-[var(--border-subtle)]',
                 'hover:border-autara-purple/30',
             ].join(' '),

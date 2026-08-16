@@ -28,7 +28,7 @@
      * change, just unfrozen for accessibility text scaling. */
     height: 2.75rem;
     padding: 0 0.875rem;
-    border-radius: 10px;
+    border-radius: var(--radius-autara-md);
     background: var(--surface);
     /* AUTM-713 — was a hardcoded rgba(17,24,39,0.10) while every other
        bordered control used the 0.08 token, so text fields sat a shade
@@ -76,7 +76,7 @@
 .field-input--lg {
     height: 3rem;
     padding: 0 1rem;
-    border-radius: 12px;
+    border-radius: var(--radius-autara-lg);
     font-size: 1rem;
 }
 
@@ -112,7 +112,7 @@
     width: 100%;
     min-height: 96px;
     padding: 12px 14px;
-    border-radius: 10px;
+    border-radius: var(--radius-autara-md);
     background: var(--surface);
     /* AUTM-713 — was a hardcoded rgba(17,24,39,0.10) while every other
        bordered control used the 0.08 token, so text fields sat a shade
@@ -166,7 +166,7 @@
 .field-stack {
     background: var(--surface);
     border: 1px solid var(--border-subtle);
-    border-radius: 14px;
+    border-radius: var(--radius-autara-lg);
     overflow: hidden;
 }
 .field-stack > * + * {
@@ -260,7 +260,7 @@
     width: 100%;
     height: 44px;
     padding: 0 14px;
-    border-radius: 10px;
+    border-radius: var(--radius-autara-md);
     background: var(--surface);
     /* AUTM-713 — was a hardcoded rgba(17,24,39,0.10) while every other
        bordered control used the 0.08 token, so text fields sat a shade
@@ -290,7 +290,7 @@
 .merchant-form {
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
+    border-radius: var(--radius-autara-lg);
     padding: 32px;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
@@ -306,7 +306,7 @@
     width: 100%;
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
+    border-radius: var(--radius-autara-md);
     padding: 12px 14px;
     color: white;
     font-size: 14px;
@@ -327,7 +327,7 @@
     align-items: center;
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
+    border-radius: var(--radius-autara-md);
     padding: 6px;
     max-width: 640px;
     transition: border-color 0.3s;
@@ -350,7 +350,7 @@
 }
 .search-bar button {
     padding: 12px 24px;
-    border-radius: 8px;
+    border-radius: var(--radius-autara-full);
     background: var(--color-autara-purple);
     color: white;
     font-weight: 500;

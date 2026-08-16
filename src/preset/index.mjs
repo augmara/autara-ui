@@ -12,13 +12,18 @@ export default {
             fontFamily: {
                 brand: ['var(--font-brand-var)', 'system-ui', '-apple-system', 'sans-serif'],
             },
+            // Mirrors src/tokens/radii.css — that file is the source of truth
+            // and carries the rationale. Literals rather than var() because a
+            // consumer may take the preset WITHOUT importing the CSS tokens
+            // (see CLAUDE.md § Known gotchas); a var() here would resolve to
+            // nothing for them. Change both files together.
             borderRadius: {
-                'autara-sm': '6px',
-                autara: '8px',
-                'autara-md': '10px',
-                'autara-lg': '12px',
-                'autara-xl': '16px',
-                'autara-full': '24px',
+                'autara-sm': '8px',
+                autara: '12px',
+                'autara-md': '14px',
+                'autara-lg': '16px',
+                'autara-xl': '24px',
+                'autara-full': '9999px',
             },
             boxShadow: shadows,
             animation: animations,

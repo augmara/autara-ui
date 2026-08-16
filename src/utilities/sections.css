@@ -30,7 +30,7 @@
    which is the documented mechanism. */
 .card-light {
     background: white;
-    border-radius: 12px;
+    border-radius: var(--radius-autara-lg);
     padding: 28px;
     color: #111827;
     border: 1px solid var(--border-subtle);
