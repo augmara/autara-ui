@@ -1,11 +1,25 @@
 /* ─── Autara Border Radius Tokens ─── */
-/* Aligned across web (@autara/ui) + Flutter (AppColors.radius*) */
+/*
+ * THE source of truth for corner radius. `src/preset/index.mjs` mirrors
+ * these literals for consumers who take the Tailwind preset instead of the
+ * CSS tokens — change both together or they drift.
+ *
+ * Rungs are aligned to the Tailwind values already in use across the apps
+ * (8 / 12 / 16 / 24 = rounded-lg / -xl / -2xl / -3xl) so the two ladders
+ * stop competing. `md` at 14px is the one deliberate off-ladder rung: a
+ * field sitting inside a 16px card needs a slightly tighter corner or the
+ * two curves collide.
+ *
+ * Revised 2026-08-16 — the previous ladder (6/8/10/12/16/24) read square
+ * next to the pill Button, and `full` was 24px, which is not a pill at all;
+ * anything reaching for it expecting a capsule got a rounded rectangle.
+ */
 
 @theme inline {
-    --radius-autara-sm: 6px;     /* small buttons, checkboxes, tags */
-    --radius-autara: 8px;        /* default (base) */
-    --radius-autara-md: 10px;    /* buttons, inputs */
-    --radius-autara-lg: 12px;    /* cards, section containers */
-    --radius-autara-xl: 16px;    /* dialogs, sheets, hero images */
-    --radius-autara-full: 24px;  /* badges, pills, avatars */
+    --radius-autara-sm: 8px;        /* chips, tags, checkboxes, controls inside a control */
+    --radius-autara: 12px;          /* default (base) — small surfaces */
+    --radius-autara-md: 14px;       /* inputs + form controls */
+    --radius-autara-lg: 16px;       /* cards, section containers, panels */
+    --radius-autara-xl: 24px;       /* dialogs, sheets, hero images */
+    --radius-autara-full: 9999px;   /* pills, badges, avatars, buttons */
 }

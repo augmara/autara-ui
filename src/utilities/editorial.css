@@ -11,7 +11,7 @@
 .hairline-grid {
     display: grid;
     overflow: hidden;
-    border-radius: 16px;
+    border-radius: var(--radius-autara-lg);
     border: 1px solid var(--border-subtle);
     background: var(--border-subtle);
     gap: 1px;

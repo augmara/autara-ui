@@ -19,7 +19,7 @@
        have moved the edge and left the fill behind. */
     background: var(--surface);
     border: 1px solid var(--border-subtle);
-    border-radius: 16px;
+    border-radius: var(--radius-autara-lg);
     transition: border-color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
         background-color 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     color: var(--text-strong);
@@ -38,7 +38,7 @@
     border: 1px solid var(--border-subtle);
     /* No box-shadow — Autara aesthetic. Lift comes from the 1px
      * hairline border + backdrop-blur. */
-    border-radius: 12px;
+    border-radius: var(--radius-autara-lg);
     will-change: transform;
     transform: translateZ(0);
 }
@@ -51,7 +51,7 @@
        have moved the edge and left the fill behind. */
     background: var(--surface);
     border: 1px solid var(--border-subtle);
-    border-radius: 16px;
+    border-radius: var(--radius-autara-lg);
     padding: 24px;
     transition: border-color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
         background-color 0.35s cubic-bezier(0.16, 1, 0.3, 1);
