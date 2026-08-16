@@ -44,8 +44,23 @@ type Variant =
 
 type Size = "sm" | "md" | "lg" | "icon" | "default";
 
+/**
+ * Fully-rounded, not the 8px `rounded-lg` this used to carry.
+ *
+ * Don, 2026-08-16: the buttons read square and the UI should look smoother.
+ * A pill is the current convention for a primary action across the apps we
+ * benchmark against (Linear, Vercel, Stripe, and iOS 26 system controls), and
+ * it is the one radius that stays correct at every height — sm 36px, md 44px,
+ * lg 48px and the 40px icon button all resolve to a true pill without a
+ * per-size value to keep in sync.
+ *
+ * Deliberately on BASE rather than per-variant: an outline button next to a
+ * filled one with different corners is the thing that actually reads as
+ * unfinished. Consumers that genuinely need a squarer corner can still pass
+ * `className` — `cn()` merges it and the later class wins.
+ */
 const BASE =
-  "inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-lg font-medium transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0";
+  "inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0";
 
 const SIZES: Record<Exclude<Size, "default">, string> = {
   sm: "h-9 px-4 text-[0.8125rem]",
