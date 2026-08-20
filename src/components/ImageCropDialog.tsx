@@ -115,7 +115,27 @@ export function ImageCropDialog({
                     <DialogDescription>{description}</DialogDescription>
                 </DialogHeader>
 
-                <div className="relative mt-2 h-[clamp(220px,42vh,360px)] w-full overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-[var(--ink,#0c0a14)]">
+                {/* AUTM-776 (client, AUT-29) — the stage follows the ASPECT,
+                    it is no longer a fixed-height box.
+
+                    It used to be h-[clamp(220px,42vh,360px)] for every ratio.
+                    react-easy-crop fits the crop window inside that box, so a
+                    wide ratio was limited by width and left large dead bands
+                    above and below: on a phone a 16/9 cover got roughly a
+                    200px-tall window inside a 360px-tall container, while a
+                    4/3 service photo filled it. That is exactly what the
+                    client reported — that cropping a profile or cover photo
+                    felt cramped while the services picker felt fine. Same
+                    dialog, same code; only the ratio differed.
+
+                    Driving height from aspect-ratio gives every ratio the full
+                    width and its natural height, so no ratio is penalised. The
+                    clamp survives as a max-height so a TALL ratio (1/1 avatar,
+                    or anything portrait) cannot push the actions off a short
+                    screen — that was the fixed height's real job. */}
+                <div
+                    style={{ aspectRatio: String(aspect) }}
+                    className="relative mt-2 max-h-[clamp(220px,52vh,420px)] w-full overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-[var(--ink,#0c0a14)]">
                     {src ? (
                         <Cropper
                             image={src}
