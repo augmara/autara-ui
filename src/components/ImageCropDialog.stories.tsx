@@ -128,3 +128,39 @@ export const ProfilePicture: Story = {
 export const CoverBanner: Story = {
     render: () => <Demo aspect={16 / 9} title="Crop your cover photo" />,
 }
+
+/**
+ * AUTM-776 — the three ratios the product actually uses, side by side.
+ *
+ * The client reported that cropping a profile or cover photo felt cramped
+ * while the services picker felt fine. Same dialog, same code — only the
+ * ratio differed. The stage was a fixed-height box, so a wide ratio was
+ * limited by width and left dead bands above and below, while 4/3 filled it.
+ *
+ * Open these three in order. Before the fix the cover window was visibly the
+ * smallest of the three despite being the widest image; now each one gets the
+ * full width and its natural height.
+ */
+export const ServicePhoto: Story = {
+    render: () => <Demo aspect={4 / 3} title="Crop your photo" />,
+}
+
+export const RatioComparison: Story = {
+    name: 'Ratio comparison (AUTM-776)',
+    render: () => (
+        <div className="flex flex-wrap gap-4">
+            <Demo aspect={1} cropShape="round" title="Avatar — 1:1" />
+            <Demo aspect={4 / 3} title="Service — 4:3" />
+            <Demo aspect={16 / 9} title="Cover — 16:9" />
+        </div>
+    ),
+}
+
+/**
+ * A portrait ratio is the case the old fixed height was really protecting:
+ * without a cap, a tall stage pushes Cancel/Save off a short screen. The
+ * max-height clamp still holds that line — check the actions stay reachable.
+ */
+export const TallRatioStaysUsable: Story = {
+    render: () => <Demo aspect={3 / 4} title="Portrait — 3:4" />,
+}
