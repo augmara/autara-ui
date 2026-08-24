@@ -2,12 +2,19 @@ name: Release (UI)
 
 on:
   push:
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.claude/**'
+      - 'LICENSE'
+      - '.gitignore'
     branches: [main]
   workflow_dispatch:
 
 jobs:
   release:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     permissions:
       contents: write
       packages: write
