@@ -112,11 +112,16 @@ export const MerchantCard = forwardRef<HTMLDivElement, MerchantCardProps>(
               loading="lazy"
             />
           ) : (
+            /* v3 no-photo state (Don 2026-08-26). The old treatment was a bare
+               grey slab with one small grey initial - at grid density it read
+               as a wall of broken image loads. A framed monogram tile on the
+               warm surface reads as a deliberate system instead: the card is
+               fine, the merchant just has no photo yet. */
             <div
               aria-hidden
-              className="flex h-full w-full items-center justify-center text-[var(--text-subtle)]"
+              className="flex h-full w-full items-center justify-center"
             >
-              <span className="text-2xl font-semibold">
+              <span className="grid h-14 w-14 place-items-center rounded-xl border border-[var(--border-subtle)] bg-[var(--surface)] text-xl font-bold tracking-[-0.03em] text-[var(--color-autara-purple)]">
                 {name.charAt(0).toUpperCase()}
               </span>
             </div>

@@ -291,3 +291,18 @@ export const SearchResultNew: Story = {
     </div>
   ),
 };
+
+/**
+ * v3 no-photo state (AUTM-837): a framed monogram tile on the warm surface.
+ * At search-grid density a merchant without photos must read as a deliberate
+ * system, not a wall of broken image loads - which is what the old bare
+ * grey-slab-with-initial treatment looked like.
+ */
+export const NoPhoto: Story = {
+  args: {
+    name: "Wish Car Care",
+    heroImageUrl: undefined,
+    primaryService: "Full detail",
+    location: "Pinjarra Hills, QLD",
+  },
+};

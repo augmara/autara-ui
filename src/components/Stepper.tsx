@@ -31,6 +31,18 @@ export interface StepperProps {
     furthestStep?: number
     /** Disables navigation back to completed steps — e.g. a Review step that shouldn't allow backtracking. */
     locked?: boolean
+    /**
+     * Accessible name for the nav landmark. Defaults to "Onboarding progress"
+     * (the original consumer); the customer booking wizard passes
+     * "Booking progress".
+     */
+    ariaLabel?: string
+    /**
+     * Hide the expanded desktop label row and render the track + "Step N of M"
+     * line only — for wizards whose steps are validation-gated and never
+     * clickable.
+     */
+    hideLabels?: boolean
     className?: string
 }
 
@@ -58,7 +70,7 @@ const CheckIcon = () => (
  * fill and font-weight, not motion or color-heavy iconography.
  */
 const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(function Stepper(
-    { steps, currentStep, furthestStep, onStepClick, locked = false, className },
+    { steps, currentStep, furthestStep, onStepClick, locked = false, ariaLabel = 'Onboarding progress', hideLabels = false, className },
     ref
 ) {
     const total = steps.length
@@ -74,7 +86,7 @@ const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(function Stepper(
     const progressPercent = total > 0 ? ((clampedStep + 1) / total) * 100 : 0
 
     return (
-        <nav ref={ref} aria-label="Onboarding progress" className={cn('w-full', className)}>
+        <nav ref={ref} aria-label={ariaLabel} className={cn('w-full', className)}>
             <div
                 className="relative h-[3px] w-full overflow-hidden rounded-full bg-[var(--surface-elevated)]"
                 role="progressbar"
@@ -101,6 +113,7 @@ const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(function Stepper(
             {/* Expanded label row — hidden on mobile (mirrors the retired
                 StepIndicator's mobile behavior), gives clickable back-nav
                 to completed steps on larger screens. */}
+            {hideLabels ? null : (
             <ol className="mt-4 hidden items-center gap-3 sm:flex">
                 {steps.map((step, index) => {
                     const status =
@@ -155,6 +168,7 @@ const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(function Stepper(
                     )
                 })}
             </ol>
+            )}
         </nav>
     )
 })
