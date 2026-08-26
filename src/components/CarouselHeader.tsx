@@ -54,8 +54,8 @@ export function CarouselHeader({
       )}
     >
       <div className="min-w-0">
+        {/* v3: eyebrow with no tick (Don 2026-08-26) */}
         <p className="inline-flex items-center gap-3 text-[11px] font-medium uppercase tracking-[0.22em] text-[var(--text-muted)]">
-          <span aria-hidden className="h-px w-8 bg-[var(--text-subtle)]" />
           {eyebrow}
         </p>
         <h2 className="mt-2 text-[28px] font-bold leading-tight tracking-[-0.025em] text-[var(--text-strong)] sm:text-[34px]">
