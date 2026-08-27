@@ -199,6 +199,9 @@ export { ImageCropDialog, type ImageCropDialogProps } from './ImageCropDialog'
 // ─── Wizard step indicator (AUTM-322) ──────────────────────────────────
 export { Stepper, type StepperProps, type StepperStep } from './Stepper'
 
+// ─── Wizard step header (AUTM-839) ─────────────────────────────────────
+export { StepHeader, type StepHeaderProps } from './StepHeader'
+
 // ─── Address search + map confirm (AUTM-586) ───────────────────────────
 // Provider-agnostic by design — autara-ui ships no maps dependency; the
 // consumer supplies the Places/geocoding glue and the map render prop.
