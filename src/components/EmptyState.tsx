@@ -45,7 +45,7 @@ export function EmptyState({
           {icon}
         </div>
       ) : null}
-      <p className="text-sm font-semibold text-[var(--text-strong)]">{title}</p>
+      <p className="text-sm font-bold text-[var(--text-strong)]">{title}</p>
       {description ? (
         <p className="mt-1.5 max-w-xs text-sm text-[var(--text-muted)]">
           {description}

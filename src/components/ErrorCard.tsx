@@ -76,7 +76,7 @@ export function ErrorCard({
       <div className="flex items-start gap-3">
         {icon ? <span aria-hidden className={cn("shrink-0", t.title)}>{icon}</span> : null}
         <div className="min-w-0 flex-1">
-          <p className={cn("text-sm font-semibold", t.title)}>{title}</p>
+          <p className={cn("text-sm font-bold", t.title)}>{title}</p>
           <p className={cn("mt-0.5 text-sm", t.detail)}>{message}</p>
           {detail ? (
             <p className={cn("mt-1 text-xs", t.detail)}>{detail}</p>
