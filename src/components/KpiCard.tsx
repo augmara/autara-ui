@@ -106,7 +106,7 @@ export function KpiCard({
       )}
     >
       <div className="flex items-start justify-between gap-2">
-        <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wider text-[var(--text-subtle)]">
+        <p className="inline-flex items-center gap-2 text-[10px] font-medium uppercase tracking-wider text-[var(--text-subtle)]">
           {tickColor != null ? (
             <span
               aria-hidden

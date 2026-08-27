@@ -96,7 +96,7 @@ export const ServiceCard = forwardRef<HTMLElement, ServiceCardProps>(
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <h3 className="text-[15px] font-semibold leading-snug text-[var(--text-strong)] sm:text-base">
+              <h3 className="text-[15px] font-bold leading-snug text-[var(--text-strong)] sm:text-base">
                 {name}
               </h3>
               {description ? (
@@ -107,7 +107,7 @@ export const ServiceCard = forwardRef<HTMLElement, ServiceCardProps>(
             </div>
             <div className="flex shrink-0 flex-col items-end gap-1.5">
               {badge}
-              <p className="text-[15px] font-semibold tabular-nums text-[var(--text-strong)] sm:text-base">
+              <p className="text-[15px] font-bold tabular-nums text-[var(--text-strong)] sm:text-base">
                 {pricePrefix ? (
                   <span className="mr-1 text-[11px] font-medium uppercase tracking-wider text-[var(--text-subtle)]">
                     {pricePrefix}

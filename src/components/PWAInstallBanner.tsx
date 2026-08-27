@@ -238,7 +238,7 @@ export function PWAInstallBanner({
                         <SmartphoneIcon />
                     </span>
                     <div className="flex-1 min-w-0">
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--color-autara-purple)]/80 mb-1.5">
+                        <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--color-autara-purple)]/80 mb-1.5">
                             {eyebrow}
                         </p>
                         <h3 className="text-[15px] font-bold text-[var(--text-strong)] tracking-[-0.005em] leading-snug">

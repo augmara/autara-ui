@@ -176,11 +176,11 @@ export const MerchantCard = forwardRef<HTMLDivElement, MerchantCardProps>(
         {/* Content */}
         <div className="p-4">
           <div className="flex items-start justify-between gap-3">
-            <h3 className="truncate text-[15px] font-semibold tracking-[-0.005em] text-[var(--text-strong)]">
+            <h3 className="truncate text-[15px] font-bold tracking-[-0.005em] text-[var(--text-strong)]">
               {name}
             </h3>
             {hasRating ? (
-              <span className="inline-flex shrink-0 items-center gap-1 text-[13px] font-semibold text-[var(--text-strong)]">
+              <span className="inline-flex shrink-0 items-center gap-1 text-[13px] font-bold text-[var(--text-strong)]">
                 <svg
                   viewBox="0 0 24 24"
                   className="h-3.5 w-3.5 text-[var(--color-autara-purple)]"
