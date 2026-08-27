@@ -75,6 +75,8 @@ export {
     ImageCropDialog, type ImageCropDialogProps,
     // Wizard step indicator (AUTM-322)
     Stepper, type StepperProps, type StepperStep,
+    // Wizard step header (AUTM-839)
+    StepHeader, type StepHeaderProps,
     // Address search + map confirm (AUTM-586)
     AddressPickerSheet,
     type AddressPickerSheetProps,
