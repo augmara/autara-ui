@@ -276,7 +276,7 @@ export function PickerSheet<T = unknown>(props: PickerSheetProps<T>) {
                     role="listbox"
                     aria-label={title}
                     aria-multiselectable={mode === 'multi'}
-                    className="-mx-1 flex max-h-[min(60vh,420px)] flex-col gap-1.5 overflow-y-auto px-1 py-0.5"
+                    className="-mx-1 flex max-h-[min(60dvh,420px)] flex-col gap-1.5 overflow-y-auto px-1 py-0.5"
                 >
                     {visible.map((option) => {
                         const hasChildren = !!(option.children || option.loadChildren)
@@ -356,7 +356,7 @@ export function PickerSheet<T = unknown>(props: PickerSheetProps<T>) {
     if (isMobile) {
         return (
             <Sheet open={open} onOpenChange={onOpenChange}>
-                <SheetContent side="bottom" className="flex max-h-[85vh] flex-col gap-3">
+                <SheetContent side="bottom" className="mb-[var(--keyboard-height,0px)] flex max-h-[calc(100vh_-_var(--keyboard-height,0px)_-_4rem)] flex-col gap-3">
                     <SheetHeader>
                         {backButton}
                         <SheetTitle>{title}</SheetTitle>
@@ -370,7 +370,7 @@ export function PickerSheet<T = unknown>(props: PickerSheetProps<T>) {
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="flex max-h-[85vh] max-w-lg flex-col gap-3">
+            <DialogContent className="top-[calc(50%_-_var(--keyboard-height,0px)_*_0.5)] flex max-h-[calc(100vh_-_var(--keyboard-height,0px)_-_2rem)] max-w-lg flex-col gap-3">
                 <DialogHeader>
                     {backButton}
                     <DialogTitle>{title}</DialogTitle>
