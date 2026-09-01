@@ -125,7 +125,12 @@ docs/
   button, which turned into a white slab on dark before this landed).
 - **Satoshi typography** — bundled. Use weights 400 / 500 / 700 only
   (Black mapped to 700). Never 300, 600, 800, 900.
-- **4px brand-purple halo** on focused inputs (`.field-input`) — the
+- **Focus signature (v2.4): warm-cream tint + solid brand-purple border, NO
+  halo** on focused inputs (`.field-input`). Corrected 2026-09-01 — this line
+  used to claim a "4px brand-purple halo", and `src/utilities/forms.css` says
+  in its own rule: "a clean, symmetric ring, no outer halo and no one-sided
+  bar". The stale claim propagated into merchant-mobile's CLAUDE.md and into an
+  agent brief before the code was checked. Read the rule, not the prose.
   signature focus ring
 - **Editorial eyebrow** — uppercase 11px, `letter-spacing: 0.22em`,
   with a hairline tick (`::before`) — anchors every section heading
