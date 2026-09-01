@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Badge } from './Badge'
+import { GradientGround } from './GlassSurface'
 
 /**
  * Badge — inline pill for status, category, and credibility markers.
@@ -28,6 +29,10 @@ const meta = {
             options: [
                 // default
                 'default',
+                // semantic status — AUTM-948
+                'act',
+                'flight',
+                'money',
                 // marker tones — the retired `trending` / `new` /
                 // `new-light` / `featured` names were still listed here
                 // long after v1.2.0 collapsed them into three accents,
@@ -107,7 +112,7 @@ export const ShapeComparison: Story = {
     render: () => (
         <div className="space-y-6 rounded-xl bg-[var(--background)] p-6 ring-1 ring-inset ring-[var(--border-subtle)]">
             <div>
-                <div className="mb-2 text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                <div className="mb-2 text-[0.625rem] uppercase tracking-[0.18em] text-[var(--text-muted)]">
                     pill
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
@@ -117,7 +122,7 @@ export const ShapeComparison: Story = {
                 </div>
             </div>
             <div>
-                <div className="mb-2 text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                <div className="mb-2 text-[0.625rem] uppercase tracking-[0.18em] text-[var(--text-muted)]">
                     parallelogram (marketing default)
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
@@ -242,6 +247,106 @@ export const InCardContext: Story = {
                 <Badge>Interior</Badge>
                 <Badge>Ceramic coating</Badge>
             </div>
+        </div>
+    ),
+}
+
+// ─── AUTM-948 ──────────────────────────────────────────────────────
+/**
+ * **The regression this story exists for.**
+ *
+ * `<Badge>` with no `shape` prop rendered its label SKEWED. The cva
+ * `defaultVariants` applied `skewX(-12deg)` to the wrapper, and the render
+ * branch tested the raw `shape` prop — which is `undefined` when you pass
+ * nothing — so the counter-skew `<span>` was never emitted. Passing
+ * `shape="parallelogram"` explicitly worked; using the documented default did
+ * not.
+ *
+ * Rule 1 of the Autara Glass direction is explicit that the label is
+ * counter-skewed. The geometry was right and the render was not, and it was
+ * invisible in Storybook because `Badge.stories.tsx` pinned
+ * `shape: 'pill'` in its meta args.
+ *
+ * All three below must read upright. If the first one leans, the bug is back.
+ */
+export const DefaultShapeCounterSkew: Story = {
+    name: 'Regression — the default label must sit upright',
+    parameters: { layout: 'padded' },
+    render: () => (
+        <div className="flex max-w-xl flex-wrap items-center gap-3">
+            <Badge variant="success">No shape prop</Badge>
+            <Badge variant="success" shape="parallelogram">
+                shape=&quot;parallelogram&quot;
+            </Badge>
+            <Badge variant="success" shape="pill">
+                shape=&quot;pill&quot;
+            </Badge>
+        </div>
+    ),
+}
+
+/**
+ * The semantic trio — rule 4. **Purple ACTS · aqua IN FLIGHT · lime DONE and
+ * money-in.** One accent per zone; aqua and lime never compete inside the
+ * same block.
+ *
+ * Before this the two of them existed only as 3px dashes above KPI labels —
+ * two of three brand colours were decoration, which is why the product read
+ * as "a purple app" rather than as Autara.
+ *
+ * Solid fills, per rule 3: never a tint, even against glass. Each pairs with
+ * the on-colour its fill guarantees at least 4.5:1 for.
+ */
+export const SemanticTones: Story = {
+    name: 'Semantic — act / flight / money',
+    parameters: { layout: 'padded' },
+    render: () => (
+        <div className="max-w-xl space-y-4">
+            <div className="flex flex-wrap items-center gap-3">
+                <Badge variant="act">Awaiting you</Badge>
+                <Badge variant="flight">On the way</Badge>
+                <Badge variant="money">Paid</Badge>
+            </div>
+            <p className="text-sm text-[var(--text-muted)]">
+                The lifecycle reads left to right: something needs the
+                merchant, then it is running, then the money is in.
+            </p>
+        </div>
+    ),
+}
+
+/**
+ * On the gradient ground, both themes. Status has to stay solid against
+ * glass — a tinted status pill over a bloom picks up whatever colour happens
+ * to be behind it, which is the argument rule 3 is making.
+ */
+export const OnTheGradientGround: Story = {
+    name: 'In context — status on glass, both themes',
+    parameters: { layout: 'fullscreen' },
+    render: () => (
+        <div className="grid sm:grid-cols-2">
+            {(['light', 'dark'] as const).map((theme) => (
+                <div key={theme} data-theme={theme}>
+                    <GradientGround className="min-h-[20rem] p-8">
+                        <p className="mb-4 text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-[var(--text-subtle)]">
+                            {theme}
+                        </p>
+                        <div className="glass-surface p-5">
+                            <div className="flex flex-wrap items-center gap-2">
+                                <Badge variant="act">Awaiting you</Badge>
+                                <Badge variant="flight">On the way</Badge>
+                                <Badge variant="money">Paid</Badge>
+                            </div>
+                            <div className="mt-3 flex flex-wrap items-center gap-2">
+                                <Badge variant="success">Confirmed</Badge>
+                                <Badge variant="warning">Pending</Badge>
+                                <Badge variant="destructive">Cancelled</Badge>
+                                <Badge>Mobile</Badge>
+                            </div>
+                        </div>
+                    </GradientGround>
+                </div>
+            ))}
         </div>
     ),
 }
