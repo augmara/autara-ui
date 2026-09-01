@@ -42,6 +42,10 @@ const KEEPS: Record<string, string> = {
     'Progress.tsx': 'a state bar; the round cap is what makes it read as fill',
     'AsyncSkeleton.tsx': 'shape-matches the avatar it stands in for while loading',
     'Badge.tsx': 'shape="pill" — kept deliberately by Don under AUTM-211 for dense rows where the tilt crowds. A small status object, not an action',
+    // Arrived via AUTM-936, which merged after AUTM-948 was branched — this
+    // guard caught it on the merge rather than after it shipped, which is the
+    // whole reason the list exists.
+    'ErrorCard.tsx': 'the 32px icon medallion — a state light, not the retry button. The retry button itself takes the shared radius',
 }
 
 /**
@@ -165,7 +169,11 @@ describe('round means a person, a state light, or a status marker — never an a
      */
     it('Button size="lg" steps up to the 48px field radius', () => {
         const text = code(readFileSync(join(DIR, 'Button.tsx'), 'utf8'))
-        expect(text).toMatch(/lg:\s*"h-12 rounded-autara-lg/)
+        // `min-h-12`, not `h-12`: AUTM-915 replaced every fixed height so a
+        // label wraps and the box grows at 200% text scale instead of
+        // overflowing. What this test guards is the RADIUS pairing, so it
+        // must not re-pin the height AUTM-915 deliberately removed.
+        expect(text).toMatch(/lg:\s*"min-h-12 rounded-autara-lg/)
     })
 
     /**

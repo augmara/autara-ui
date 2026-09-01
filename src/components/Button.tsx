@@ -80,16 +80,50 @@ type Size = "sm" | "md" | "lg" | "icon" | "default";
  * unfinished. Consumers that genuinely need a different corner can still
  * pass `className` — `cn()` merges it and the later class wins.
  */
+/**
+ * AUTM-915 — `whitespace-nowrap` was in BASE while every size pinned a
+ * fixed `h-*`. The pairing means a label can neither wrap nor grow, so at
+ * a large text scale it simply runs outside its container. Measured on
+ * merchant-web /onboarding/complete at 375px with a 32px root (200% text
+ * scale): "Go to your dashboard" rendered 372px wide inside a 183px
+ * content box — roughly half the label was off screen.
+ *
+ * `min-h-*` + a vertical pad keeps the rendered height identical at normal
+ * scale (a single line of text-sm is 20px, and 20 + py-2 = 36 < 44, so md
+ * still lays out at exactly 44px) while letting the box grow once the
+ * label needs two lines.
+ *
+ * `whitespace-nowrap` is not gone, it is opt-in: pass it via `className`
+ * and tailwind-merge lets it win. Do that for single-word labels in a
+ * fixed-width toolbar, not for sentence CTAs.
+ */
 const BASE =
-  "inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-autara-md font-medium transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0";
+  // AUTM-915 keeps `text-center break-words` and drops `whitespace-nowrap` —
+  // that pair was the 200%-text-scale overflow. AUTM-948 sets the radius:
+  // buttons are not pills, they take the rung `.field-input` uses.
+  "inline-flex select-none items-center justify-center gap-2 text-center break-words rounded-autara-md font-medium transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0";
 
+/*
+ * Horizontal padding is clamped against the viewport as well as the root
+ * font size. Padding in rem doubles along with the text at 200% scale, so
+ * on a 375px screen an un-clamped px-5 eats 80px of a 183px box and the
+ * label wraps into a column one word wide. `min()` picks the rem value at
+ * every normal-scale viewport (at 375px, 6vw = 22.5px > px-5's 20px) and
+ * only yields once the padding would otherwise crowd out the label.
+ *
+ * This is merchant-web's shipped WRAPPING_LABEL workaround, moved into the
+ * primitive. Consumers having to remember an override is the usual sign
+ * the default is wrong.
+ */
 const SIZES: Record<Exclude<Size, "default">, string> = {
-  sm: "h-9 px-4 text-[0.8125rem]",
-  md: "h-11 px-5 text-sm",
-  // 48px, so it pairs with `.field-input--lg` (48px / 16px) rather
+  // min-h + py + clamped px is AUTM-915: the label must WRAP and the box grow,
+  // never overflow, at 200% text scale. A fixed `h-*` reintroduces that bug.
+  sm: "min-h-9 px-[min(1rem,5vw)] py-1.5 text-[0.8125rem]",
+  md: "min-h-11 px-[min(1.25rem,6vw)] py-2 text-sm",
+  // AUTM-948: at 48px this pairs with `.field-input--lg` (48px / 16px) rather
   // than with the 44px field. Same-height elements, same radius.
-  lg: "h-12 rounded-autara-lg px-6 text-[0.9375rem]",
-  icon: "h-10 w-10 p-0",
+  lg: "min-h-12 rounded-autara-lg px-[min(1.5rem,7vw)] py-2.5 text-[0.9375rem]",
+  icon: "h-10 w-10 shrink-0 p-0",
 };
 
 const VARIANT_CLASSES: Record<Variant, string> = {
