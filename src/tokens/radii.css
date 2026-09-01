@@ -13,13 +13,46 @@
  * Revised 2026-08-16 — the previous ladder (6/8/10/12/16/24) read square
  * next to the pill Button, and `full` was 24px, which is not a pill at all;
  * anything reaching for it expecting a capsule got a rounded rectangle.
+ *
+ * ─── THE SHAPE LANGUAGE (Don, 2026-09-01) ───────────────────────────────
+ *
+ * Two families. That is the whole rule, and two is what makes it
+ * enforceable — three families is what nobody could hold in their head.
+ *
+ *   1. SHARED RADIUS — "a surface or a control".
+ *        `md`  14px  input, BUTTON, and any 44px control. The pairing case:
+ *                    a button and its field are ONE control group (type,
+ *                    then act), so they take the same corner. A pill beside
+ *                    a rounded rectangle reads as two unrelated objects that
+ *                    happen to be adjacent.
+ *        `lg`  16px  cards, panels — one step larger. Also the 48px control
+ *                    rung, so `.field-input--lg` and `Button size="lg"`
+ *                    match each other rather than the 44px pair.
+ *        `sm`   8px  chips and controls-inside-controls — one step tighter.
+ *                    Not decoration: at ~26px tall a 14px radius clamps to
+ *                    height/2 and renders as a pill regardless, so the
+ *                    shared token cannot express the rule at chip height.
+ *
+ *   2. ROUNDED PARALLELOGRAM — status, and ONLY status. `skewX(-12deg)` +
+ *      a radius, label counter-skewed. That is `Badge`, and it goes nowhere
+ *      else (rule 1 of the Autara Glass direction).
+ *
+ * `full` is now reserved for AVATARS, INDICATOR DOTS, and the small status
+ * markers Don kept deliberately (`Badge shape="pill"` per AUTM-211,
+ * `.section-pill`). Round therefore means "a person, a state light, or a
+ * status marker" and NEVER "an action". That meaning only exists because
+ * buttons gave it up — do not spend it on anything else.
+ *
+ * This reverses the 2026-08-16 note above for BUTTONS specifically. The
+ * complaint then was that buttons "read square"; the answer was never a
+ * pill, it was the input's own radius.
  */
 
 @theme inline {
     --radius-autara-sm: 8px;        /* chips, tags, checkboxes, controls inside a control */
     --radius-autara: 12px;          /* default (base) — small surfaces */
-    --radius-autara-md: 14px;       /* inputs + form controls */
+    --radius-autara-md: 14px;       /* THE SHARED CONTROL RADIUS — inputs AND buttons */
     --radius-autara-lg: 16px;       /* cards, section containers, panels */
     --radius-autara-xl: 24px;       /* dialogs, sheets, hero images */
-    --radius-autara-full: 9999px;   /* pills, badges, avatars, buttons */
+    --radius-autara-full: 9999px;   /* avatars, indicator dots, status pills — NOT buttons */
 }

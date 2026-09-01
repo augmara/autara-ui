@@ -51,11 +51,17 @@ function hex(h: string): RGB {
 
 /** Pull `--name: rgba(r, g, b, a)` or `--name: #hex` out of a theme block. */
 function token(name: string, theme: 'light' | 'dark'): { rgb: RGB; alpha: number } {
-    // The dark values live under `:root[data-theme="dark"]`; light under the
-    // plain `:root`. Slice at the SELECTOR, not the first mention of the
+    // The dark values live under the `data-theme="dark"` block; light under
+    // the plain `:root`. Slice at the SELECTOR, not the first mention of the
     // string — the header comment names it too, and matching that collapsed
     // the light scope to nothing and failed every light assertion.
-    const split = CSS.indexOf(':root[data-theme="dark"] {')
+    //
+    // AUTM-948 widened that selector to `:root[data-theme="dark"],
+    // [data-theme="dark"] {` so a nested element can scope a dark island.
+    // Anchor on the element-level line at column 0: prose in the comments
+    // mentions the attribute, but only the real selector starts a line and is
+    // followed by ` {`.
+    const split = CSS.search(/^\[data-theme="dark"\] \{/m)
     if (split < 0) throw new Error('dark selector not found — did colors.css move?')
     const scope = theme === 'light' ? CSS.slice(0, split) : CSS.slice(split)
     const rgba = new RegExp(`--${name}:\\s*rgba\\(([^)]+)\\)`).exec(scope)

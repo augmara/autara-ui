@@ -158,7 +158,28 @@
 /* ─── Dark theme — set `data-theme="dark"` on <html> ───────────────────
  * Consumers own the switching logic (system-follow, manual override,
  * persistence). The package only defines what dark LOOKS like. */
-:root[data-theme="dark"] {
+/* ─── AUTM-948: the dark scope is not root-only ──────────────────────────
+ * `:root[data-theme="dark"]` only ever matched <html>. A nested
+ * `<div data-theme="dark">` matched NOTHING, so a side-by-side
+ * light/dark story rendered two identical LIGHT panes — silently, because
+ * the markup looked right. Every "BothThemes" story in the library was
+ * affected, including the one on the in-flight ErrorCard PR (#55).
+ *
+ * The `@custom-variant dark` in tokens/index.css already resolved to
+ * `[data-theme="dark"], [data-theme="dark"] *` — i.e. `dark:` utilities
+ * nested correctly while the TOKENS they were meant to pair with did not.
+ * Adding the element-level selector closes that gap.
+ *
+ * `:root[…]` is kept alongside it so specificity on <html> is unchanged
+ * (0,2,0) — this is purely additive. On a nested element the (0,1,0)
+ * selector beats the inherited `:root` values because a rule that matches
+ * the element wins over inheritance, regardless of specificity.
+ *
+ * Consumers are unaffected: stamping `data-theme` on <html> works exactly
+ * as before. Scoping a dark island now also works, which is what a design
+ * system should have allowed all along. */
+:root[data-theme="dark"],
+[data-theme="dark"] {
     color-scheme: dark;
 
     /* AUTM-734 QA — Don: "the background is a bit purplish, can we make it

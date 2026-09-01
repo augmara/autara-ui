@@ -67,7 +67,9 @@ export function FilterChipRow<V>({
                         aria-selected={active}
                         onClick={() => onChange(o.value)}
                         className={cn(
-                            'shrink-0 rounded-full px-3 py-1.5 text-[12px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-autara-purple)]/35',
+                            /* 8px, same rung as MetaChip — round is avatars and dots only
+                               (Don, 2026-09-01); see MetaChip for the geometry. */
+                            'shrink-0 rounded-autara-sm px-3 py-1.5 text-[12px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-autara-purple)]/35',
                             active
                                 ? 'bg-[var(--surface-inverse)] text-[var(--text-on-inverse)]'
                                 : 'border border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-muted)] hover:text-[var(--text-strong)]',

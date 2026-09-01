@@ -66,6 +66,22 @@ export const colors = {
     border: 'var(--border-subtle)',
     track: 'var(--surface-elevated)',
 
+    /* AUTM-948 — the semantic accent trio and the glass material.
+     * Defined in tokens/glass.css, which is why colors.test.ts scans both
+     * sheets. Pointer layer, same as everything else here: no numbers. */
+    act: 'var(--act)',
+    'act-fill': 'var(--act-fill)',
+    'on-act': 'var(--on-act)',
+    flight: 'var(--flight)',
+    'flight-fill': 'var(--flight-fill)',
+    'on-flight': 'var(--on-flight)',
+    money: 'var(--money)',
+    'money-fill': 'var(--money-fill)',
+    'on-money': 'var(--on-money)',
+    glass: 'var(--glass-fill)',
+    'glass-strong': 'var(--glass-fill-strong)',
+    'glass-edge': 'var(--glass-edge)',
+
     error: 'var(--color-autara-error)',
     success: 'var(--color-autara-success)',
     warning: 'var(--color-autara-warning)',

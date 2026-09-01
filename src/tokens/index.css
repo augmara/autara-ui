@@ -2,6 +2,9 @@
 /* Import this file to get all Autara design tokens */
 
 @import "./colors.css";
+/* AUTM-948 — Autara Glass material + the semantic accent trio. Imported
+ * after colors.css because --act/--flight/--money alias the accent stack. */
+@import "./glass.css";
 @import "./shadows.css";
 @import "./radii.css";
 @import "./typography.css";

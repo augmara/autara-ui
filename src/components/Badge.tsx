@@ -19,8 +19,17 @@ import { cn } from '../lib/cn'
  * AUTM-211 (Don 2026-06-21): parallelogram + solid colour is the house
  * style everywhere — the default flipped from `pill` to `parallelogram`.
  *
- * Variants come in three families, all unified into the single
+ * AUTM-948: the parallelogram is the ONLY place the skew is allowed — rule 1
+ * of the Autara Glass direction. Buttons, nav, cards, chips and avatars keep
+ * normal geometry. A revision that applied it to whole surfaces and to cut
+ * corners was rejected by Don on 2026-09-01; do not reintroduce it.
+ *
+ * Variants come in four families, all unified into the single
  * `variant` prop:
+ *
+ *   - **Semantic status** — `act` / `flight` / `money`. Purple ACTS, aqua is
+ *     IN FLIGHT, lime is DONE and money-in. Themed solid fills; reach for
+ *     these for booking lifecycle state.
  *
  *   - **Marker tones** — `purple` / `aqua` / `lime`. One per Autara
  *     accent. Solid fills, white or ink text. Designed to sit over
@@ -43,6 +52,11 @@ import { cn } from '../lib/cn'
  *     marker family.
  */
 
+/* AUTM-948 — the size ladder moved from `text-[10px]` to `text-[0.625rem]`.
+ * Identical at a 16px root, i.e. zero visual change; the difference is that a
+ * badge now GROWS with OS Dynamic Type instead of staying frozen at 10px
+ * while the copy beside it doubles. Same argument as AUTM-915 made for
+ * Button's fixed heights. Never reintroduce a px font size here. */
 const badgeVariants = cva(
     'inline-flex items-center font-medium transition-colors',
     {
@@ -59,11 +73,33 @@ const badgeVariants = cva(
                 //                             the old trending + new-light
                 //                             pair; lime-drive was dropped)
                 purple:
-                    'bg-autara-purple text-white px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
+                    'bg-autara-purple text-white px-3 py-1 text-[0.625rem] uppercase tracking-[0.16em]',
                 aqua:
-                    'bg-autara-sky-aqua text-[#062436] px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
+                    'bg-autara-sky-aqua text-[#062436] px-3 py-1 text-[0.625rem] uppercase tracking-[0.16em]',
                 lime:
-                    'bg-[var(--color-autara-lime-bright)] text-[#0E0A1A] ring-1 ring-inset ring-[#0E0A1A]/15 px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
+                    'bg-[var(--color-autara-lime-bright)] text-[#0E0A1A] ring-1 ring-inset ring-[#0E0A1A]/15 px-3 py-1 text-[0.625rem] uppercase tracking-[0.16em]',
+
+                // ─── Semantic status — AUTM-948, rule 4 ─────────────────
+                // Purple ACTS · aqua IN FLIGHT · lime DONE and money-in.
+                // One accent per zone; aqua and lime never compete inside
+                // the same block. Before this the two of them existed only
+                // as 3px dashes above KPI labels, which is why the product
+                // read as "a purple app" rather than as Autara.
+                //
+                // Solid fills, per rule 3 — never a tint, even against
+                // glass. Each pairs with the `--on-*` colour its fill
+                // guarantees >=4.5:1 for: act 9.48 (light) / 6.43 (dark),
+                // flight 5.56 / 11.06, money 12.89 in both.
+                //
+                // These theme; the older `info`/`success` tones below are
+                // deliberately static. Use these for booking lifecycle
+                // state, those for generic intent.
+                act:
+                    'bg-[var(--act-fill)] text-[var(--on-act)] px-3 py-1 text-[0.625rem] uppercase tracking-[0.16em]',
+                flight:
+                    'bg-[var(--flight-fill)] text-[var(--on-flight)] px-3 py-1 text-[0.625rem] uppercase tracking-[0.16em]',
+                money:
+                    'bg-[var(--money-fill)] text-[var(--on-money)] px-3 py-1 text-[0.625rem] uppercase tracking-[0.16em]',
 
                 // ─── Status tones — SOLID (AUTM-211) ─────────────────────
                 // Don 2026-06-21: Autara reads as SOLID color, never the
@@ -76,20 +112,33 @@ const badgeVariants = cva(
                 //   warning → solid amber (dark ink) · destructive → solid red ·
                 //   neutral → solid slate
                 info:
-                    'bg-[var(--color-autara-info)] text-white px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
+                    'bg-[var(--color-autara-info)] text-white px-3 py-1 text-[0.625rem] uppercase tracking-[0.16em]',
                 success:
-                    'bg-[var(--color-autara-success)] text-white px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
+                    'bg-[var(--color-autara-success)] text-white px-3 py-1 text-[0.625rem] uppercase tracking-[0.16em]',
                 warning:
-                    'bg-[var(--color-autara-warning)] text-[#3a2a06] px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
+                    'bg-[var(--color-autara-warning)] text-[#3a2a06] px-3 py-1 text-[0.625rem] uppercase tracking-[0.16em]',
                 destructive:
-                    'bg-[var(--color-autara-error)] text-white px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
+                    'bg-[var(--color-autara-error)] text-white px-3 py-1 text-[0.625rem] uppercase tracking-[0.16em]',
                 neutral:
-                    'bg-[#46414f] text-white px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
+                    'bg-[#46414f] text-white px-3 py-1 text-[0.625rem] uppercase tracking-[0.16em]',
+
+                // ─── Default — themed neutral ───────────────────────────
+                // AUTM-934: `default` used to be the legacy DARK treatment
+                // (`text-white/60` on `bg-white/[0.04]`), which measures
+                // 1.03:1 against the warm-cream canvas — a bare `<Badge>`
+                // rendered an invisible label. It survived because every
+                // call site passes an explicit tone, so nobody ever saw the
+                // default twice. It now tracks the token ladder and reads in
+                // both themes. The old classes live on as `dark-default`
+                // for anyone genuinely on an ink surface — same rename
+                // pattern as `aqua` -> `dark-aqua` in v1.2.0.
+                default:
+                    'border border-[var(--border-subtle)] bg-[var(--surface-elevated)] text-[var(--text-muted)] px-3 py-1 text-xs',
 
                 // ─── Legacy dark-theme palette (pre-v1.2.0) ─────────────
                 // Kept for backward compatibility — prefer the marker
                 // and status tones above for new code.
-                default:
+                'dark-default':
                     'border border-white/[0.08] bg-white/[0.04] text-white/60 px-3 py-1 text-xs',
                 primary:
                     'border border-autara-purple/30 bg-autara-purple/10 text-autara-purple-lighter px-3 py-1 text-xs',
@@ -143,24 +192,42 @@ export interface BadgeProps
         VariantProps<typeof badgeVariants> {}
 
 const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
-    ({ className, variant, shape, children, ...props }, ref) => (
-        <div
-            ref={ref}
-            className={cn(badgeVariants({ variant, shape }), className)}
-            {...props}
-        >
-            {shape === 'parallelogram' ? (
-                /* Counter-skew so the label sits upright while the slab
-                   reads as a tilted ribbon. Inline-flex preserves icon
-                   alignment if a consumer passes an icon + label. */
-                <span className="inline-flex items-center gap-1 [transform:skewX(12deg)]">
-                    {children}
-                </span>
-            ) : (
-                children
-            )}
-        </div>
-    )
+    ({ className, variant, shape, children, ...props }, ref) => {
+        /* AUTM-948 — resolve the shape ONCE.
+         *
+         * This branch used to read `shape === 'parallelogram'` off the raw
+         * prop while cva applied its own `defaultVariants.shape`. When a
+         * consumer passed no `shape` — which is the documented, intended way
+         * to get the house silhouette — cva applied `skewX(-12deg)` and this
+         * branch, seeing `undefined`, skipped the counter-skew. The result
+         * was a SLANTED LABEL on every default Badge in the library.
+         *
+         * Rule 1 of the Autara Glass direction is explicit that the label is
+         * counter-skewed; the geometry was right and the render was not.
+         * Deriving both from one value is what stops it recurring. */
+        const resolvedShape = shape ?? 'parallelogram'
+        return (
+            <div
+                ref={ref}
+                className={cn(
+                    badgeVariants({ variant, shape: resolvedShape }),
+                    className
+                )}
+                {...props}
+            >
+                {resolvedShape === 'parallelogram' ? (
+                    /* Counter-skew so the label sits upright while the slab
+                       reads as a tilted ribbon. Inline-flex preserves icon
+                       alignment if a consumer passes an icon + label. */
+                    <span className="inline-flex items-center gap-1 [transform:skewX(12deg)]">
+                        {children}
+                    </span>
+                ) : (
+                    children
+                )}
+            </div>
+        )
+    }
 )
 Badge.displayName = 'Badge'
 
