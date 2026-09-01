@@ -3,10 +3,12 @@
  * Canonical input — Stripe / Linear / Vercel pattern.
  *
  *   Apply `.field-input` to any text-style control on a marketing or
- *   form surface. The focus state uses a solid brand-purple border plus
- *   a soft 4px halo with no offset — they harmonise into a single
- *   coherent ring instead of stacking as a double border (the amateur
- *   giveaway).
+ *   form surface. The focus state (v2.4) tints the field warm-cream and
+ *   turns its hairline border solid brand-purple — a clean symmetric
+ *   ring with NO outer halo. See the rule below; this comment used to
+ *   describe a "soft 4px halo" and contradicted the CSS 30 lines down,
+ *   which is how the stale claim reached two CLAUDE.md files and an
+ *   agent brief (corrected 2026-09-01).
  *
  * v1.0.x shipped `.input-light` with a similar treatment but smaller
  * 3px halo; that class is aliased below for backwards compat and is
