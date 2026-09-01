@@ -98,8 +98,16 @@ export function MetaChip({
   return (
     <span
       /* AUTM-948 — `text-[0.6875rem]` is the old `text-[11px]`, unfrozen so
-         the chip scales with OS Dynamic Type. Identical at a 16px root. */
-      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-[5px] text-[0.6875rem] font-medium uppercase tracking-[0.12em] ${TONES[tone]} ${className}`}
+         the chip scales with OS Dynamic Type. Identical at a 16px root.
+
+         `rounded-autara-sm` (8px), not `rounded-full`: round is reserved for
+         avatars and indicator dots (Don, 2026-09-01). One step tighter than
+         the 14px shared control radius because this chip is ~26px tall — at
+         that height a 14px radius clamps to height/2 and renders as a pill
+         regardless, so the shared token cannot express the rule here. A
+         smaller control inside a larger container is the documented
+         exception. */
+      className={`inline-flex items-center gap-1.5 rounded-autara-sm px-3 py-[5px] text-[0.6875rem] font-medium uppercase tracking-[0.12em] ${TONES[tone]} ${className}`}
     >
       {dot ? (
         <span

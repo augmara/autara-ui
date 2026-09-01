@@ -48,27 +48,47 @@ type Variant =
 type Size = "sm" | "md" | "lg" | "icon" | "default";
 
 /**
- * Fully-rounded, not the 8px `rounded-lg` this used to carry.
+ * The SHARED CONTROL RADIUS — `--radius-autara-md`, 14px. Not a pill.
  *
- * Don, 2026-08-16: the buttons read square and the UI should look smoother.
- * A pill is the current convention for a primary action across the apps we
- * benchmark against (Linear, Vercel, Stripe, and iOS 26 system controls), and
- * it is the one radius that stays correct at every height — sm 36px, md 44px,
- * lg 48px and the 40px icon button all resolve to a true pill without a
- * per-size value to keep in sync.
+ * Don, 2026-09-01: a button and the input beside it are one control group —
+ * type, then act. A pill next to a rounded rectangle reads as two unrelated
+ * objects that happen to be adjacent. Matching the radius makes them read as
+ * a pair. This reverses the 2026-08-16 call that made buttons fully round
+ * ("the buttons read square"); the answer to square was never a pill, it was
+ * the input's own radius.
+ *
+ * The shape language is now two families, which is what makes it enforceable:
+ *
+ *   - SHARED RADIUS — input, button, chip, card, panel. Means "a surface or
+ *     a control". Cards may go one step larger (16px); chips one step
+ *     smaller (8px), because 14px on a 26px-tall chip clamps to height/2 and
+ *     renders as a pill anyway.
+ *   - ROUNDED PARALLELOGRAM — status, and only status. That is Badge.
+ *
+ * What that buys, and what must not be spent: the only fully-round things
+ * left are AVATARS and INDICATOR DOTS, so round now means "a person or a
+ * state light" and never "an action". Do not reach for `rounded-full` on
+ * anything else.
+ *
+ * Same-height elements take the same radius, which is why `lg` overrides to
+ * 16px: `.field-input--lg` is 48px at `--radius-autara-lg`, and the 48px
+ * button sitting next to it has to match. `sm`, `md` and `icon` all pair
+ * with the 44px `.field-input` at 14px.
  *
  * Deliberately on BASE rather than per-variant: an outline button next to a
  * filled one with different corners is the thing that actually reads as
- * unfinished. Consumers that genuinely need a squarer corner can still pass
- * `className` — `cn()` merges it and the later class wins.
+ * unfinished. Consumers that genuinely need a different corner can still
+ * pass `className` — `cn()` merges it and the later class wins.
  */
 const BASE =
-  "inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0";
+  "inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-autara-md font-medium transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0";
 
 const SIZES: Record<Exclude<Size, "default">, string> = {
   sm: "h-9 px-4 text-[0.8125rem]",
   md: "h-11 px-5 text-sm",
-  lg: "h-12 px-6 text-[0.9375rem]",
+  // 48px, so it pairs with `.field-input--lg` (48px / 16px) rather
+  // than with the 44px field. Same-height elements, same radius.
+  lg: "h-12 rounded-autara-lg px-6 text-[0.9375rem]",
   icon: "h-10 w-10 p-0",
 };
 

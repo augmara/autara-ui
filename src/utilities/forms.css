@@ -395,7 +395,9 @@
 }
 .search-bar button {
     padding: 12px 24px;
-    border-radius: var(--radius-autara-full);
+    /* Shared control radius, matching the field it sits beside — Don
+       2026-09-01. Round is avatars, dots and status markers only. */
+    border-radius: var(--radius-autara-md);
     background: var(--color-autara-purple);
     color: white;
     font-weight: 500;

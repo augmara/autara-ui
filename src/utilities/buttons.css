@@ -1,11 +1,23 @@
-/* ─── Autara Button Styles ─── */
+/* ─── Autara Button Styles ────────────────────────────────────────────────
+ *
+ * Don, 2026-09-01: buttons take the SHARED CONTROL RADIUS
+ * (`--radius-autara-md`, 14px) — the same radius as the input beside them,
+ * because a button and its field are one control group and a pill next to a
+ * rounded rectangle reads as two unrelated objects.
+ *
+ * `.section-pill` / `.section-pill-light` keep `--radius-autara-full`. They
+ * are small STATUS/label objects, not actions — the same carve-out Don kept
+ * for `Badge shape="pill"` under AUTM-211. Round now means "a person, a state
+ * light, or a status marker" and never "an action"; do not spend it on
+ * anything else.
+ */
 
 .btn-primary {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     padding: 12px 28px;
-    border-radius: var(--radius-autara-full);
+    border-radius: var(--radius-autara-md);
     background: var(--color-autara-purple);
     color: white;
     font-weight: 500;
@@ -41,7 +53,7 @@
     align-items: center;
     justify-content: center;
     padding: 12px 28px;
-    border-radius: var(--radius-autara-full);
+    border-radius: var(--radius-autara-md);
     border: 1px solid rgba(255, 255, 255, 0.15);
     background: rgba(255, 255, 255, 0.03);
     color: white;
@@ -61,7 +73,7 @@
     align-items: center;
     justify-content: center;
     padding: 12px 28px;
-    border-radius: var(--radius-autara-full);
+    border-radius: var(--radius-autara-md);
     border: 1px solid var(--border-strong);
     background: var(--surface);
     color: var(--text-strong);
