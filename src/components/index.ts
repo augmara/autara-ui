@@ -81,6 +81,26 @@ export {
     DropdownMenuSubContent,
 } from './DropdownMenu'
 
+// AUTM-965 — anchored floating panel for CONTENT. Reach for DropdownMenu
+// when every child is a command; reach for this when they are not, because
+// DropdownMenu gives its children `menuitem` semantics.
+export {
+    Popover,
+    PopoverTrigger,
+    PopoverAnchor,
+    PopoverClose,
+    PopoverPortal,
+    PopoverContent,
+    PopoverHeader,
+    PopoverTitle,
+    PopoverDescription,
+    PopoverBody,
+    PopoverFooter,
+    PopoverSeparator,
+    type PopoverContentProps,
+    type PopoverBodyProps,
+} from './Popover'
+
 export {
     navigationMenuTriggerStyle,
     NavigationMenu,
