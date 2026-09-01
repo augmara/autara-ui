@@ -12,7 +12,7 @@ export {
     BackButton, type BackButtonProps,
     Badge, badgeVariants, type BadgeProps,
     Separator,
-    Skeleton,
+    Skeleton, type SkeletonProps,
     Dialog, DialogPortal, DialogOverlay, DialogClose, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription,
     Sheet, SheetPortal, SheetOverlay, SheetTrigger, SheetClose, SheetContent, SheetHeader, SheetFooter, SheetTitle, SheetDescription,
     PickerSheet, type PickerOption, type PickerRowRender, type PickerSheetProps,

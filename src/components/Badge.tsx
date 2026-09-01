@@ -86,10 +86,23 @@ const badgeVariants = cva(
                 neutral:
                     'bg-[#46414f] text-white px-3 py-1 text-[10px] uppercase tracking-[0.16em]',
 
+                // ─── Default — themed neutral ───────────────────────────
+                // AUTM-934: `default` used to be the legacy DARK treatment
+                // (`text-white/60` on `bg-white/[0.04]`), which measures
+                // 1.03:1 against the warm-cream canvas — a bare `<Badge>`
+                // rendered an invisible label. It survived because every
+                // call site passes an explicit tone, so nobody ever saw the
+                // default twice. It now tracks the token ladder and reads in
+                // both themes. The old classes live on as `dark-default`
+                // for anyone genuinely on an ink surface — same rename
+                // pattern as `aqua` -> `dark-aqua` in v1.2.0.
+                default:
+                    'border border-[var(--border-subtle)] bg-[var(--surface-elevated)] text-[var(--text-muted)] px-3 py-1 text-xs',
+
                 // ─── Legacy dark-theme palette (pre-v1.2.0) ─────────────
                 // Kept for backward compatibility — prefer the marker
                 // and status tones above for new code.
-                default:
+                'dark-default':
                     'border border-white/[0.08] bg-white/[0.04] text-white/60 px-3 py-1 text-xs',
                 primary:
                     'border border-autara-purple/30 bg-autara-purple/10 text-autara-purple-lighter px-3 py-1 text-xs',
