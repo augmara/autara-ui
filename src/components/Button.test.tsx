@@ -103,10 +103,15 @@ describe("Button — variant + size styling", () => {
         expect(new Set(seen).size).toBe(VARIANTS.length);
     });
 
+    /*
+     * AUTM-915 — sizes moved from a fixed `h-*` to `min-h-*` so a label can
+     * wrap instead of overflowing at large text scale. The rendered height
+     * at normal scale is unchanged; only the utility name moved.
+     */
     it.each([
-        ["sm", /\bh-9\b/],
-        ["md", /\bh-11\b/],
-        ["lg", /\bh-12\b/],
+        ["sm", /\bmin-h-9\b/],
+        ["md", /\bmin-h-11\b/],
+        ["lg", /\bmin-h-12\b/],
         ["icon", /\bh-10\b/],
     ] as const)("size=%s applies the right height utility", (size, pattern) => {
         render(<Button size={size}>X</Button>);
@@ -115,7 +120,7 @@ describe("Button — variant + size styling", () => {
 
     it("size='default' resolves to size='md' (legacy alias)", () => {
         render(<Button size="default">X</Button>);
-        expect(screen.getByRole("button").className).toMatch(/\bh-11\b/);
+        expect(screen.getByRole("button").className).toMatch(/\bmin-h-11\b/);
     });
 
     it.each([
@@ -190,22 +195,66 @@ describe("Button — asChild polymorphism (Radix Slot)", () => {
     });
 });
 
+/**
+ * AUTM-915 — the label has to be able to wrap. These pin the class-level
+ * contract, since jsdom has no layout and cannot measure the overflow that
+ * was actually reported.
+ */
+describe("Button — long labels at large text scale", () => {
+    it("does not pin whitespace-nowrap, so a long label can wrap", () => {
+        render(<Button>Go to your dashboard</Button>);
+        expect(screen.getByRole("button").className).not.toMatch(
+            /\bwhitespace-nowrap\b/,
+        );
+    });
+
+    it("lets a consumer opt back into nowrap via className", () => {
+        render(<Button className="whitespace-nowrap">Save</Button>);
+        expect(screen.getByRole("button").className).toMatch(
+            /\bwhitespace-nowrap\b/,
+        );
+    });
+
+    it.each(["sm", "md", "lg"] as const)(
+        "size=%s grows rather than clipping — min-h, never a fixed h",
+        (size) => {
+            const cls = buttonVariants({ size });
+            expect(cls).toMatch(/\bmin-h-\d+\b/);
+            // A bare `h-N` alongside `min-h-N` would re-freeze the box.
+            expect(cls).not.toMatch(/(?:^|\s)h-\d+(?:\s|$)/);
+        },
+    );
+
+    it("clamps horizontal padding against the viewport, not just the root size", () => {
+        // Padding in rem doubles with the text at 200%; on a narrow screen an
+        // un-clamped px-5 crowds the label out of its own box.
+        expect(buttonVariants({ size: "md" })).toMatch(/px-\[min\(/);
+    });
+
+    it("keeps the icon size square and unshrinkable", () => {
+        const cls = buttonVariants({ size: "icon" });
+        expect(cls).toMatch(/\bh-10\b/);
+        expect(cls).toMatch(/\bw-10\b/);
+        expect(cls).toMatch(/\bshrink-0\b/);
+    });
+});
+
 describe("buttonVariants — legacy CVA helper", () => {
     it("returns the same className as a rendered Button", () => {
         const cls = buttonVariants({ variant: "primary", size: "md" });
         expect(cls).toMatch(/accent-fill/);
-        expect(cls).toMatch(/\bh-11\b/);
+        expect(cls).toMatch(/\bmin-h-11\b/);
     });
 
     it("defaults to primary + md when no opts provided", () => {
         const cls = buttonVariants();
         expect(cls).toMatch(/accent-fill/);
-        expect(cls).toMatch(/\bh-11\b/);
+        expect(cls).toMatch(/\bmin-h-11\b/);
     });
 
     it("resolves size='default' to md", () => {
         const cls = buttonVariants({ size: "default" });
-        expect(cls).toMatch(/\bh-11\b/);
+        expect(cls).toMatch(/\bmin-h-11\b/);
     });
 
     it("appends a custom className", () => {

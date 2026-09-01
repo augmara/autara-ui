@@ -161,3 +161,104 @@ export const Matrix: Story = {
     </div>
   ),
 };
+
+// ─── AUTM-915 ──────────────────────────────────────────────────────
+/**
+ * The regression this size change exists for.
+ *
+ * Both columns are 183px wide — the content box measured on merchant-web
+ * `/onboarding/complete` at a 375px viewport. The left column simulates
+ * 200% text scale by setting the root font size on the container.
+ *
+ * Before AUTM-915, `whitespace-nowrap` in BASE plus a fixed `h-11` meant
+ * "Go to your dashboard" rendered 372px wide inside that 183px box, with
+ * roughly half the label off screen. It now wraps and the box grows.
+ *
+ * Every consumer inherited that defect, and merchant-web had already
+ * shipped an `h-auto min-h-11 whitespace-normal py-1` override at each
+ * call site. Needing an override everywhere is the usual sign the default
+ * is wrong, so the fix moved into the primitive.
+ */
+export const LongLabelAtTextScale: Story = {
+  name: "Edge — long label at 200% text scale",
+  parameters: { layout: "padded" },
+  render: () => (
+    <div className="flex flex-wrap gap-10">
+      {[
+        { label: "200% text scale (32px root)", size: "32px" },
+        { label: "Normal (16px root)", size: "16px" },
+      ].map((col) => (
+        <div key={col.label}>
+          <p className="mb-3 text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+            {col.label}
+          </p>
+          <div
+            style={{ fontSize: col.size, width: "183px" }}
+            className="space-y-3 rounded-autara-lg border border-dashed border-[var(--border-strong)] p-2"
+          >
+            <Button variant="dark" fullWidth>
+              Go to your dashboard
+            </Button>
+            <Button variant="outline" fullWidth size="sm">
+              Contact Autara Support
+            </Button>
+            <Button variant="primary" fullWidth size="lg">
+              Confirm and pay the deposit
+            </Button>
+          </div>
+        </div>
+      ))}
+    </div>
+  ),
+};
+
+/**
+ * Heights are unchanged at normal text scale — that is the constraint the
+ * fix had to hold. `min-h-*` renders identically to the old `h-*` for a
+ * single line: sm 36px, md 44px, lg 48px, icon 40x40.
+ */
+export const HeightParity: Story = {
+  name: "Sizes — unchanged at normal scale",
+  parameters: { layout: "padded" },
+  render: () => (
+    <div className="flex flex-wrap items-center gap-3">
+      <Button size="sm">Small, 36</Button>
+      <Button size="md">Medium, 44</Button>
+      <Button size="lg">Large, 48</Button>
+      <Button size="icon" aria-label="Add a service">
+        <svg
+          aria-hidden
+          viewBox="0 0 24 24"
+          width="18"
+          height="18"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2.4}
+          strokeLinecap="round"
+        >
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+      </Button>
+    </div>
+  ),
+};
+
+/**
+ * Opt back into a single line where you genuinely want one — a short label
+ * in a fixed-width toolbar. `className` wins through tailwind-merge, so no
+ * new prop was needed.
+ */
+export const OptInNowrap: Story = {
+  name: "Edge — opting back into nowrap",
+  parameters: { layout: "padded" },
+  render: () => (
+    <div className="flex w-40 gap-2 rounded-autara-lg border border-dashed border-[var(--border-strong)] p-2">
+      <Button size="sm" variant="outline" className="whitespace-nowrap">
+        Filters
+      </Button>
+      <Button size="sm" variant="dark" className="whitespace-nowrap">
+        Sort
+      </Button>
+    </div>
+  ),
+};
