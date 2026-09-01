@@ -8,6 +8,8 @@ export {
     Label, labelVariants, type LabelProps,
     FormField, type FormFieldProps,
     FieldStack, FieldStackRow, FieldStackField, type FieldStackFieldProps,
+    // AUTM-948 — Autara Glass foundation
+    GlassSurface, GradientGround, type GlassSurfaceProps, type GradientGroundProps,
     Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, cardVariants, type CardProps,
     BackButton, type BackButtonProps,
     Badge, badgeVariants, type BadgeProps,

@@ -18,6 +18,13 @@ export {
     FieldStackField,
     type FieldStackFieldProps,
 } from './FieldStack'
+// AUTM-948 — the one glass material every other surface composes.
+export {
+    GlassSurface,
+    GradientGround,
+    type GlassSurfaceProps,
+    type GradientGroundProps,
+} from './GlassSurface'
 export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, cardVariants, type CardProps } from './Card'
 export { BackButton, type BackButtonProps } from './BackButton'
 export { Badge, badgeVariants, type BadgeProps } from './Badge'
