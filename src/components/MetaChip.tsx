@@ -10,6 +10,10 @@ import type { ReactNode } from "react";
  *   - success  — brand-lime ink, e.g. "Open today"
  *   - brand    — autara purple, e.g. "Highly rated", "Verified"
  *   - muted    — same surface as neutral, dimmer text
+ *   - act      — SOLID purple. Something is waiting on the user (AUTM-948)
+ *   - flight   — SOLID aqua. Confirmed, running, money on its way
+ *   - money    — SOLID lime. Done, paid, money in
+ *   - glass    — translucent, for a chip on the gradient ground
  *
  * Aesthetic refresh:
  *   - Dropped raw tailwind `emerald-50/700/200` in favour of brand-
@@ -23,7 +27,17 @@ import type { ReactNode } from "react";
  * The optional `dot` renders a colored pulse-dot before the label —
  * use it for status indicators ("Open now") not for static labels.
  */
-type Tone = "neutral" | "success" | "brand" | "muted";
+type Tone =
+  | "neutral"
+  | "success"
+  | "brand"
+  | "muted"
+  // AUTM-948 — the semantic trio. Solid, not tinted.
+  | "act"
+  | "flight"
+  | "money"
+  // Glass companion for a chip sitting on the gradient ground.
+  | "glass";
 
 const TONES: Record<Tone, string> = {
   neutral:
@@ -34,6 +48,21 @@ const TONES: Record<Tone, string> = {
     "bg-[var(--accent-tint)] text-[var(--accent)] ring-1 ring-inset ring-[var(--accent-border-soft)]",
   muted:
     "bg-[var(--surface-elevated)] text-[var(--text-muted)] ring-1 ring-inset ring-[var(--border-subtle)]",
+
+  // ─── AUTM-948: purple ACTS · aqua IN FLIGHT · lime DONE / money-in ───
+  // Rule 3 is "solid fills on status, never a tint, even against glass".
+  // `success` and `brand` above are tints and stay only because consumers
+  // pin them; these are what new status code should reach for. One accent
+  // per zone — aqua and lime never compete inside the same block.
+  act: "bg-[var(--act-fill)] text-[var(--on-act)]",
+  flight: "bg-[var(--flight-fill)] text-[var(--on-flight)]",
+  money: "bg-[var(--money-fill)] text-[var(--on-money)]",
+
+  // For a chip sitting directly on the gradient ground rather than on a
+  // card. No backdrop-filter: a chip is small and there are usually several
+  // per row, and each blurring element is its own GPU surface.
+  glass:
+    "bg-[var(--glass-fill)] text-[var(--text-strong)] ring-1 ring-inset ring-[var(--glass-edge)] shadow-[inset_0_1px_0_var(--glass-hi)]",
 };
 
 const DOT_COLORS: Record<Tone, string> = {
@@ -41,6 +70,12 @@ const DOT_COLORS: Record<Tone, string> = {
   success: "bg-[#5d9a1f]",
   brand: "bg-[var(--color-autara-purple)]",
   muted: "bg-[var(--text-subtle)]",
+  // On a solid fill the dot has to read against the FILL, so it takes the
+  // on-colour rather than the accent it is already sitting on.
+  act: "bg-[var(--on-act)]",
+  flight: "bg-[var(--on-flight)]",
+  money: "bg-[var(--on-money)]",
+  glass: "bg-[var(--text-subtle)]",
 };
 
 export interface MetaChipProps {
@@ -62,7 +97,9 @@ export function MetaChip({
 }: MetaChipProps) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-[5px] text-[11px] font-medium uppercase tracking-[0.12em] ${TONES[tone]} ${className}`}
+      /* AUTM-948 — `text-[0.6875rem]` is the old `text-[11px]`, unfrozen so
+         the chip scales with OS Dynamic Type. Identical at a 16px root. */
+      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-[5px] text-[0.6875rem] font-medium uppercase tracking-[0.12em] ${TONES[tone]} ${className}`}
     >
       {dot ? (
         <span

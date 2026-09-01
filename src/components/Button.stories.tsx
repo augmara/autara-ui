@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Button } from "./Button";
+import { GradientGround } from "./GlassSurface";
 
 /**
  * Button — the single canonical Autara CTA primitive. Merges what used
@@ -13,6 +14,8 @@ import { Button } from "./Button";
  *   - `ghost`       transparent, hover bg
  *   - `destructive` rose (cancel / delete)
  *   - `link`        underline text only
+ *   - `glass`       translucent — a secondary action ON the gradient ground
+ *                   or on a glass panel (AUTM-948)
  *
  * Sizes: `sm` (36) → `md`/`default` (44) → `lg` (48) → `icon` (40²).
  *
@@ -144,7 +147,7 @@ export const Matrix: Story = {
         ] as const
       ).map((variant) => (
         <div key={variant} className="flex items-center gap-3">
-          <div className="w-24 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">
+          <div className="w-24 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">
             {variant}
           </div>
           <Button variant={variant} size="sm">
@@ -156,6 +159,56 @@ export const Matrix: Story = {
           <Button variant={variant} size="lg">
             Large
           </Button>
+        </div>
+      ))}
+    </div>
+  ),
+};
+
+// ─── AUTM-948 ──────────────────────────────────────────────────────
+/**
+ * `variant="glass"` — the outline button's translucent twin.
+ *
+ * `outline` paints an OPAQUE `--surface` fill. On a glass panel or over the
+ * gradient ground that punches a white slab through the material, which is
+ * the same failure mode `ErrorCard`'s white retry button had in dark mode
+ * (AUTM-936). The middle button in each pane below is the problem; the right
+ * one is the fix.
+ *
+ * **Buttons keep normal geometry.** Rule 1 puts the skew on pills and status
+ * ONLY — a revision that skewed buttons and cut their corners was rejected by
+ * Don on 2026-09-01. The pill radius stands.
+ *
+ * It does not blur. A button is small and there are usually several per
+ * screen, and each blurring element is its own GPU surface; the panel
+ * underneath supplies the blur.
+ */
+export const GlassOnGround: Story = {
+  name: "Glass — on the gradient ground, both themes",
+  parameters: { layout: "fullscreen" },
+  render: () => (
+    <div className="grid sm:grid-cols-2">
+      {(["light", "dark"] as const).map((theme) => (
+        <div key={theme} data-theme={theme}>
+          <GradientGround className="min-h-[16rem] p-8">
+            <p className="mb-4 text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-[var(--text-subtle)]">
+              {theme}
+            </p>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button>Accept booking</Button>
+              <Button variant="outline">outline (opaque slab)</Button>
+              <Button variant="glass">glass</Button>
+            </div>
+            <div className="glass-surface mt-5 flex flex-wrap items-center gap-3 p-5">
+              <Button size="sm">Accept</Button>
+              <Button variant="glass" size="sm">
+                Decline
+              </Button>
+              <Button variant="ghost" size="sm">
+                Message
+              </Button>
+            </div>
+          </GradientGround>
         </div>
       ))}
     </div>

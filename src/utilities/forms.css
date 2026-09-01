@@ -80,6 +80,51 @@
     font-size: 1rem;
 }
 
+/* ─── Glass field — AUTM-948 ─────────────────────────────────────────────
+ *
+ * For a field sitting DIRECTLY on the gradient ground: a nav search box, a
+ * hero capture form, a filter bar over a bloom. An opaque `--surface` field
+ * there punches a white slab through the material.
+ *
+ * The default `.field-input` stays opaque, deliberately. A field inside a
+ * glass card should NOT itself be glass — two stacked translucencies read as
+ * mud, and the card underneath already supplies the blur. Opt in only where
+ * the field is the outermost surface.
+ *
+ * Focus keeps the house signature (warm tint + solid purple border) rather
+ * than inventing a second one; only the resting fill changes.
+ */
+.field-input--glass,
+.field-textarea--glass {
+    background: var(--glass-fill);
+    /* GPU work — see the note at the top of `utilities/glass.css`. A page
+     * with a dozen glass fields is a dozen compositing surfaces. */
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    -webkit-backdrop-filter: blur(var(--glass-blur))
+        saturate(var(--glass-saturate));
+    border-color: var(--glass-edge);
+    box-shadow: inset 0 1px 0 var(--glass-hi);
+}
+.field-input--glass:hover:not(:disabled):not(:focus),
+.field-textarea--glass:hover:not(:disabled):not(:focus) {
+    border-color: var(--glass-edge-hi);
+}
+.field-input--glass:focus,
+.field-input--glass:focus-visible,
+.field-textarea--glass:focus,
+.field-textarea--glass:focus-visible {
+    background: var(--glass-fill-strong);
+    border-color: var(--accent);
+}
+@media (prefers-reduced-transparency: reduce) {
+    .field-input--glass,
+    .field-textarea--glass {
+        background: var(--surface);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+}
+
 /* Native date / time controls — keep the value vertically centered.
  * WebKit (iOS WKWebView + desktop Chrome/Safari) lays the value out via
  * ::-webkit-date-and-time-value, which floats to the TOP of a fixed-

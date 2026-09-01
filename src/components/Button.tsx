@@ -17,6 +17,8 @@ import { cn } from "../lib/cn";
  *   - `ghost`       transparent, hover bg — inline-like
  *   - `destructive` rose — cancel / delete
  *   - `link`        underline text only — text-like CTAs
+ *   - `glass`       translucent — a secondary action sitting ON the
+ *                   gradient ground or on a glass panel
  *
  * Sizes: `sm` (36) → `md`/`default` (44) → `lg` (48) → `icon` (40²).
  *
@@ -33,6 +35,7 @@ type Variant =
   | "destructive"
   | "link"
   | "acid"
+  | "glass"
   // v1.0.x legacy names — backwards-compat aliases.
   | "light"
   | "light-primary"
@@ -84,6 +87,22 @@ const VARIANT_CLASSES: Record<Variant, string> = {
     "bg-rose-600 text-white hover:-translate-y-0.5 hover:bg-rose-700 active:translate-y-0 focus-visible:ring-rose-500/35",
   link:
     "text-[var(--accent)] underline-offset-4 hover:underline bg-transparent focus-visible:ring-[var(--accent)]/30",
+
+  // ─── Glass — a secondary action on the gradient ground ───────────────
+  // AUTM-948. `outline` paints an OPAQUE `--surface` fill, so on a glass
+  // panel or over the gradient ground it punches a white slab through the
+  // material — the same failure mode ErrorCard's white retry button had in
+  // dark mode (AUTM-936). This is the outline button's translucent twin.
+  //
+  // Buttons keep NORMAL GEOMETRY. Rule 1 puts the skew on pills and status
+  // only; a skewed button was rejected. The pill radius from BASE stands.
+  //
+  // No `backdrop-filter` here on purpose: a button is small, there can be
+  // many per screen, and each blurring element is its own GPU surface. The
+  // fill and the inset highlight carry the material; the panel underneath
+  // supplies the blur.
+  glass:
+    "border border-[var(--glass-edge)] bg-[var(--glass-fill)] text-[var(--text-strong)] shadow-[inset_0_1px_0_var(--glass-hi)] hover:-translate-y-0.5 hover:border-[var(--glass-edge-hi)] hover:bg-[var(--glass-fill-strong)] active:translate-y-0 focus-visible:ring-[var(--accent)]/30",
 
   // ─── Acid lime — high-pop CTA on cream surfaces ──────────────────────
   // Dark-surface companion deferred to a future PR.
