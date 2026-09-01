@@ -77,3 +77,66 @@
         transform: none;
     }
 }
+
+/* ─── Anchored floating panel — Popover (AUTM-965) ───────────────────────
+ *
+ * Written as real CSS rather than as Tailwind `animate-in` / `zoom-in-95`
+ * utility classes, and that is deliberate.
+ *
+ * `Dialog`, `DropdownMenu` and `Tooltip` all carry
+ * `data-[state=open]:animate-in data-[state=open]:zoom-in-95 …`. **Those
+ * classes are not defined anywhere.** `tailwindcss-animate` is not a
+ * dependency of this package, the Tailwind preset declares no such
+ * keyframes, and none of the three consumers (merchant-mobile,
+ * merchant-web, customer-web) install the plugin either. They are inert
+ * strings — the surfaces they sit on simply appear and disappear. Copying
+ * them into a new component would have looked like an animation in review
+ * and shipped as nothing.
+ *
+ * Shipping it here instead means it works off `@augmara/autara-ui/utilities`,
+ * which every consumer already imports, with no Tailwind-plugin dependency.
+ *
+ * `--radix-popover-content-transform-origin` is set by Radix on the content
+ * element and already accounts for the resolved side and align, so a plain
+ * scale reads as "grows out of the trigger" from every direction without a
+ * per-side rule.
+ *
+ * Reduced motion is handled by the global block above, which clamps every
+ * animation to 0.01ms — the panel then appears and unmounts instantly,
+ * which is the correct behaviour, not a missing case.
+ */
+
+.popover-panel {
+    transform-origin: var(--radix-popover-content-transform-origin);
+}
+
+.popover-panel[data-state="open"] {
+    animation: popover-panel-in 160ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Radix keeps the element mounted while this runs, so the exit is real. */
+.popover-panel[data-state="closed"] {
+    animation: popover-panel-out 120ms ease-in;
+}
+
+@keyframes popover-panel-in {
+    from {
+        opacity: 0;
+        transform: scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes popover-panel-out {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.96);
+    }
+}
