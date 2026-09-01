@@ -418,3 +418,48 @@ export const OptInNowrap: Story = {
     </div>
   ),
 };
+
+/**
+ * AUTM-951 — the reported bug, as a story you can look at.
+ *
+ * Don's screenshot: a search field and "New booking" side by side, the
+ * button wrapped to two lines and standing visibly taller than the field
+ * next to it, on a wide screen with room to spare.
+ *
+ * The first row is the layout that broke. The second is the same row at a
+ * width that genuinely cannot fit the phrase — the label SHOULD wrap there,
+ * and the button SHOULD grow; that is AUTM-915 working, not a regression.
+ * Both behaviours come from one declaration, so check both when touching it.
+ */
+export const BesideAField = {
+    render: () => (
+        <div className="flex flex-col gap-8">
+            <div>
+                <p className="mb-2 text-xs uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                    Room to spare — one line, same height as the field
+                </p>
+                <div className="flex items-center gap-3">
+                    <input
+                        className="field-input min-h-11 flex-1"
+                        placeholder="Find a booking"
+                        aria-label="Find a booking"
+                    />
+                    <Button>New booking</Button>
+                </div>
+            </div>
+            <div>
+                <p className="mb-2 text-xs uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                    Genuinely too narrow — wraps and grows, rather than overflowing
+                </p>
+                <div className="flex w-[230px] items-center gap-3">
+                    <input
+                        className="field-input min-h-11 min-w-0 flex-1"
+                        placeholder="Find"
+                        aria-label="Find"
+                    />
+                    <Button>New booking</Button>
+                </div>
+            </div>
+        </div>
+    ),
+}

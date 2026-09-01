@@ -101,8 +101,27 @@ const BASE =
   // AUTM-915 keeps `text-center break-words` and drops `whitespace-nowrap` —
   // that pair was the 200%-text-scale overflow. AUTM-948 sets the radius:
   // buttons are not pills, they take the rung `.field-input` uses.
-  "inline-flex select-none items-center justify-center gap-2 text-center break-words rounded-autara-md font-medium transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0";
+  "inline-flex select-none items-center justify-center gap-2 text-center break-words min-w-fit rounded-autara-md font-medium transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0";
 
+/*
+ * `min-w-fit` is load-bearing, and subtle enough to be deleted by accident.
+ *
+ * AUTM-915 removed `whitespace-nowrap` so a label can wrap instead of
+ * overflowing at 200% text scale. That also dropped the button's min-content
+ * width from the whole phrase to its longest word, and a flex row is free to
+ * shrink an item to its automatic minimum — so "New booking" beside a
+ * flex-1 search input wrapped to two lines and grew taller than the input,
+ * at ordinary text size, with room to spare (AUTM-951).
+ *
+ * `min-width: fit-content` resolves to max-content while the row has space
+ * (the phrase holds one line) and collapses to the available space when it
+ * genuinely does not (the label still wraps rather than overflowing). It
+ * fixes the regression without giving back what AUTM-915 bought.
+ *
+ * `shrink-0` is the tempting one-word alternative. Don't: it would overflow
+ * the row instead of wrapping, and a page that scrolls sideways is a
+ * cross-stack rule violation, not a smaller bug.
+ */
 /*
  * Horizontal padding is clamped against the viewport as well as the root
  * font size. Padding in rem doubles along with the text at 200% scale, so
