@@ -128,6 +128,42 @@
     --money-fill: #b7e149;
     --money-fill-hover: #a6cf3c;
     --on-money: #0e0a1a;
+
+    /* ─── NEUTRAL — the achromatic member of the same family ──────────
+     * Rule 4 says emphasis is carried by a SOLID fill, never a ring and
+     * never a tint. Rule 5 says purple ACTS, aqua is IN FLIGHT, lime is
+     * DONE. Between those two there was a hole: a piece of information
+     * that is not status still has to be solid, and the only solid fills
+     * in the library were the three semantic ones.
+     *
+     * Every neutral chip in the library therefore reached for
+     * `ring-1 ring-inset` over `--surface-elevated` — a fill only 1.05:1
+     * from the card, with the ring doing the work a fill should do. That
+     * is the outlined box Don rejected, and it is the missing token that
+     * caused it, not a per-component slip.
+     *
+     * So: a solid slate that is NOT an accent. Spending purple on
+     * "this booking is mobile" would dilute the meaning rule 5 is trying
+     * to establish — the icon and the word already say which mode it is.
+     *
+     * It is a MATERIAL, not an inversion. `--surface-inverse` flips from
+     * near-black to near-white across themes, which is right for a Torph
+     * capsule and wrong here: at booking-list density it would put a white
+     * slab on every row in dark mode. This slate stays a slate in both
+     * themes — it goes DOWN from a light ground and UP from a dark one,
+     * which is simply the direction each canvas has room in.
+     *
+     * There is deliberately no text-grade `--neutral`: the text ladder
+     * (`--text-strong` / `--text-muted` / `--text-subtle`) already is the
+     * achromatic ink scale, and a fourth name for it would drift.
+     *
+     * Measured (neutral-contrast.test.ts recomputes all of this from this
+     * file): label 10.98:1 on the fill, and the fill is 9.8-11.0:1 from
+     * every ground it can sit on — surface, elevated, canvas, and glass
+     * over each of the three blooms. */
+    --neutral-fill: #3f3950;
+    --neutral-fill-hover: #332d42;
+    --on-neutral: #ffffff;
 }
 
 /* ─── AUTM-948: the dark scope is not root-only ──────────────────────────
@@ -193,6 +229,15 @@
     --money-fill: #b7e149;
     --money-fill-hover: #c8ec66;
     --on-money: #0e0a1a;
+
+    /* NEUTRAL, dark. Lighter than the surface rather than darker — the
+     * same slate material, stepping the way this canvas has room to step.
+     * Measured: label 8.18:1 on the fill; the fill is 1.63-2.09:1 from
+     * every ground, which is a wider tonal step than the card gets from
+     * the canvas (1.12:1), so it reads as a filled object with no edge. */
+    --neutral-fill: #4a4458;
+    --neutral-fill-hover: #514a60;
+    --on-neutral: #f2eff8;
 }
 
 @theme inline {
@@ -215,4 +260,8 @@
     --color-money: var(--money);
     --color-money-fill: var(--money-fill);
     --color-on-money: var(--on-money);
+
+    --color-neutral-fill: var(--neutral-fill);
+    --color-neutral-fill-hover: var(--neutral-fill-hover);
+    --color-on-neutral: var(--on-neutral);
 }
