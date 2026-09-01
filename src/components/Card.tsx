@@ -3,52 +3,95 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '../lib/cn'
 
 /**
- * Card — the hairline-edged panel primitive.
+ * Card — the panel primitive. Glass by default.
  *
- * AUTM-934: `surface` is the default. It used to be `glass`, a dark-only
- * treatment (`bg-white/[0.03]` on `border-white/[0.06]`) that measures
- * 1.001:1 against the warm-cream canvas — i.e. a bare `<Card>` rendered
- * nothing a user could see. Every consumer had already learned to pass
- * `variant="light"` explicitly, which is exactly how a broken default
- * survives: nobody hits it twice, they just never stop working around it.
+ * ─── AUTM-948 reworks AUTM-934 ──────────────────────────────────────────
  *
- * `surface` carries the light treatment WITHOUT padding, so it composes
- * with `CardHeader` / `CardContent` / `CardFooter` (which bring their own
- * `p-6`) instead of double-padding them. `light` is `surface` + `p-7` and
- * is untouched — it is what the consumers pin today.
+ * AUTM-934 measured the `glass` default at **1.001:1** against the canvas —
+ * a bare `<Card>` rendered nothing a user could see — and proposed replacing
+ * it with an opaque surface. The finding stands. The remedy changed on
+ * 2026-09-01 when Don settled the Autara Glass direction: the fix is a
+ * CORRECT glass treatment, not an opaque fallback
+ * (`knowledge/project_ui_direction_2026_09_01.md`).
  *
- * The dark-surface variants (`glass`, `service`, `solid`, `outline`) are
- * kept under their existing names for marketing/photo surfaces. They are
- * now an explicit opt-in rather than something you get by forgetting.
+ * What was actually wrong with the old `glass` was not that it was glass. It
+ * was that it was `bg-white/[0.03]` with no top highlight — white-on-cream at
+ * 3% is invisible, and 3% white over a dark canvas is a grey box, because the
+ * 1px inset highlight that makes glass read as glass was never there. It also
+ * carried no `backdrop-filter` at all after an earlier pass stripped it as a
+ * "smell".
+ *
+ * `glass` now renders `.glass-surface`: themed translucent fill +
+ * `backdrop-filter: blur() saturate()` + the inset top highlight, measured to
+ * keep every text token above 4.5:1 over every gradient bloom in both themes.
+ *
+ * ─── The variants ───────────────────────────────────────────────────────
+ *
+ *   `glass`   (default) — the house material. No padding: composes with
+ *                         CardHeader / CardContent / CardFooter, each of
+ *                         which brings its own `p-6`.
+ *   `surface`           — the opaque twin. Reach for it inside long or
+ *                         virtualised lists, where `backdrop-filter` is
+ *                         per-frame GPU work and the frost is invisible at
+ *                         row density anyway.
+ *   `light`             — `surface` + `p-7`. UNTOUCHED. This is the variant
+ *                         every consumer pins today (6 call sites in
+ *                         merchant-web); it is byte-for-byte what it was.
+ *   `solid` / `outline` / `service` — legacy names, previously static
+ *                         `bg-white/[0.0x]` treatments that measured ~1.00:1
+ *                         on the cream canvas. Zero consumers use them (audited
+ *                         across merchant-web, customer-web, merchant-mobile and
+ *                         admin), so they are moved onto the token ladder rather
+ *                         than left broken under a name someone might reach for.
+ *
+ * Glass is meaningless on a flat canvas — render Cards on `.gradient-ground`.
+ * See `GlassSurface` for the two gotchas that come with `backdrop-filter`
+ * (fixed-position containing block, GPU cost).
  */
 const cardVariants = cva('transition-all duration-[350ms]', {
     variants: {
         variant: {
-            // ─── Themed — track the token ladder in both themes ───────
-            // No padding: compose with CardHeader/Content/Footer.
+            // ─── The house material ──────────────────────────────────
+            // Composes the ONE glass implementation rather than
+            // re-deriving a blur value here. `rounded-autara-lg` and the
+            // fill/edge/highlight all come from `.glass-surface`.
+            glass: 'glass-surface glass-surface--interactive',
+
+            // ─── Opaque twin — same ladder, no GPU cost ──────────────
+            // Also what `.glass-surface` collapses to under
+            // `prefers-reduced-transparency: reduce`, so the two stay
+            // visually consistent by construction.
             surface: [
                 'rounded-autara-lg bg-[var(--surface)] text-[var(--text-strong)]',
-                'border border-[var(--border-subtle)]',
-                'hover:border-[var(--accent-border-soft)]',
+                'border border-[var(--glass-edge)]',
+                'shadow-[inset_0_1px_0_var(--glass-hi)]',
+                'hover:border-[var(--glass-edge-hi)]',
             ].join(' '),
-            // ─── Dark / photo surfaces — explicit opt-in ──────────────
-            // `backdrop-blur` dropped per the house rule: depth comes from
-            // the hairline border, never from blur or a drop shadow.
-            glass: [
-                'rounded-autara-lg bg-white/[0.03] border border-white/[0.06]',
-                'hover:bg-white/[0.06] hover:border-autara-purple/30 hover:translate-y-[-2px]',
+
+            // Glass without the blur — for rows inside a long list. Keeps
+            // the fill, edge and highlight so it reads as the same family.
+            'glass-flat': [
+                'glass-surface glass-surface--flat glass-surface--interactive',
             ].join(' '),
+
+            // ─── Legacy names, moved onto the ladder ─────────────────
+            // No `hover:translate-y` any more: a card-shaped surface that
+            // floats on hover contradicts the brand (buttons may translate,
+            // cards may not).
             service: [
-                'rounded-autara-lg bg-white/[0.03] border border-white/[0.06] p-6 cursor-pointer',
-                'hover:bg-white/[0.07] hover:border-autara-purple/30 hover:translate-y-[-3px]',
+                'glass-surface glass-surface--flat glass-surface--interactive',
+                'p-6 cursor-pointer',
             ].join(' '),
-            outline: 'rounded-autara-lg border border-white/[0.08] bg-transparent',
-            solid: 'rounded-autara-lg bg-white/[0.04] border border-white/[0.06]',
-            // Light theme cards — Autara aesthetic ships shadow-free.
-            // Depth comes from the 1px hairline border, lift on hover from
-            // a border-color shift (purple/30). No box-shadow, no translate
-            // — `translateY` on a card-shaped surface reads as "this card
-            // is floating" which contradicts the editorial brand.
+            outline:
+                'rounded-autara-lg border border-[var(--glass-edge)] bg-transparent text-[var(--text-strong)]',
+            solid: [
+                'rounded-autara-lg bg-[var(--surface-elevated)] text-[var(--text-strong)]',
+                'border border-[var(--glass-edge)]',
+            ].join(' '),
+
+            // ─── UNTOUCHED — what consumers pin ──────────────────────
+            // Autara ships shadow-free. Depth is the hairline border; lift
+            // on hover is a border-colour shift. No box-shadow, no translate.
             light: [
                 'rounded-autara-lg bg-[var(--surface)] p-7 text-[var(--text-strong)]',
                 'border border-[var(--border-subtle)]',
@@ -57,8 +100,9 @@ const cardVariants = cva('transition-all duration-[350ms]', {
         },
     },
     defaultVariants: {
-        // AUTM-934 — was 'glass' (dark-only, 1.001:1 on cream).
-        variant: 'surface',
+        // AUTM-948 — back to 'glass', but glass that actually renders.
+        // AUTM-934 had moved it to 'surface' when glass was 1.001:1.
+        variant: 'glass',
     },
 })
 
