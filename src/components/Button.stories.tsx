@@ -420,7 +420,7 @@ export const OptInNowrap: Story = {
 };
 
 /**
- * AUTM-951 — the reported bug, as a story you can look at.
+ * AUTM-955 — the reported bug, as a story you can look at.
  *
  * Don's screenshot: a search field and "New booking" side by side, the
  * button wrapped to two lines and standing visibly taller than the field

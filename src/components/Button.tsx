@@ -111,7 +111,7 @@ const BASE =
  * width from the whole phrase to its longest word, and a flex row is free to
  * shrink an item to its automatic minimum — so "New booking" beside a
  * flex-1 search input wrapped to two lines and grew taller than the input,
- * at ordinary text size, with room to spare (AUTM-951).
+ * at ordinary text size, with room to spare (AUTM-955).
  *
  * `min-width: fit-content` resolves to max-content while the row has space
  * (the phrase holds one line) and collapses to the available space when it
