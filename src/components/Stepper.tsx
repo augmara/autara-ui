@@ -157,7 +157,10 @@ const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(function Stepper(
                                 <button
                                     type="button"
                                     onClick={() => onStepClick?.(index)}
-                                    className="rounded-sm transition-opacity hover:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-autara-purple/35"
+                                    className={cn(
+                                        'rounded-sm transition-opacity hover:opacity-70',
+                                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]'
+                                    )}
                                 >
                                     {content}
                                 </button>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 
 /**
@@ -346,6 +346,17 @@ const FOCUS_BANDS: [string, string][] = [
     ['Tabs trigger', 'surface-elevated'],
     ['FilterChipRow chip', 'background'],
     ['PickerSheet row', 'surface'],
+    // AUTM-977 — the rest of the library, swept to the same signature.
+    ['Button (BASE, every variant)', 'background'],
+    ['Accordion trigger', 'surface'],
+    ['AddressPickerSheet rows', 'surface'],
+    ['BackButton', 'background'],
+    ['Checkbox', 'background'],
+    ['Dialog close', 'surface'],
+    ['Radio', 'background'],
+    ['Sheet close', 'surface'],
+    ['Stepper step', 'background'],
+    ['Switch', 'background'],
 ]
 
 describe('the focus indicator survives the solid fill', () => {
@@ -358,24 +369,192 @@ describe('the focus indicator survives the solid fill', () => {
             })
         }
     }
+})
 
-    it.each(['Tabs.tsx', 'FilterChipRow.tsx', 'PickerSheet.tsx'])(
-        '%s uses full-strength accent, not the /35 alpha that measures ~1.9:1',
-        (file) => {
-            const s = source(file)
-            expect(s).toContain('focus-visible:ring-[var(--accent)]')
-            expect(s).not.toMatch(/focus-visible:ring-\[var\(--accent\)\]\/\d/)
-            expect(s).not.toMatch(/focus-visible:ring-autara-purple\/\d/)
+/* ─── AUTM-977: the same three assertions, library-wide ──────────────────
+ *
+ * These were an allowlist of the three files the AUTM-974 pass had reached.
+ * An allowlist is the wrong shape for this: a focus ring is not a property of
+ * three components, it is a property of every focusable thing in the library,
+ * and the twenty-four sites swept here were all sitting outside the list
+ * measuring roughly 1.9:1 while the three inside it passed.
+ *
+ * So the scan now walks every component and the list that remains is the
+ * EXCEPTION list, which is short, dated, and has a ticket.
+ */
+
+/** Every component source, comments stripped. */
+function allComponents(): { file: string; text: string }[] {
+    return readdirSync(DIR)
+        .filter(
+            (f) => f.endsWith('.tsx') && !f.includes('.stories.') && !f.includes('.test.')
+        )
+        .map((f) => ({ file: f, text: source(f) }))
+}
+
+/**
+ * No exceptions. There was one — `Button`'s `outline`, `light-outline` and
+ * `light` variants, whose outlined treatment is AUTM-976 and needs a designed
+ * solid `secondary` before it can be replaced. Their RINGS did not need to
+ * wait for that: a focus indicator is a different axis from the fill, and
+ * changing `focus-visible:ring-…` cannot pre-empt how the variant is
+ * eventually redesigned.
+ *
+ * Kept as its own commit so it could be dropped alone if the lead disagreed.
+ * If it is dropped, restore an exemption keyed on the VARIANT NAME rather
+ * than on the class string — keying it on the class would exempt every `/30`
+ * ring in the file, five more variants than intended, and an exception that
+ * hides more than it names is how a guard quietly stops guarding.
+ */
+const EXEMPT_VARIANTS: Record<string, string[]> = {}
+
+/** Every focus-ring utility in a component, minus the exempted variants. */
+function ringsToAudit(file: string, text: string): string[] {
+    let body = text
+    for (const name of EXEMPT_VARIANTS[file] ?? []) {
+        const entry = variantEntry(text, name)
+        // A named variant that stops existing must not silently stop being
+        // audited — the exemption has to keep pointing at something real.
+        expect(entry, `${file}: exempt variant '${name}' no longer exists`).not.toBe('')
+        body = body.split(entry).join(' ')
+    }
+    return body.split(/[\s'"`,]+/).filter((w) => /focus-visible:ring-/.test(w))
+}
+
+describe('every focus ring in the library, not just the swept three', () => {
+    /**
+     * A translucent ring is the defect this ticket is about. `ring-2` and
+     * `ring-offset-2` are widths and carry no colour, so only a `ring-…/NN`
+     * COLOUR token is an offender.
+     */
+    it('no focus ring is drawn at partial alpha', () => {
+        const offenders: string[] = []
+        for (const { file, text } of allComponents()) {
+            for (const cls of ringsToAudit(file, text)) {
+                if (/focus-visible:ring-(?!offset)[^\s]*\/\d/.test(cls)) {
+                    offenders.push(`${file} — ${cls}`)
+                }
+            }
         }
+        expect(
+            offenders,
+            'at 35% over the surface behind it a ring measures ~1.9:1, under the 3:1 of WCAG 2.4.11'
+        ).toEqual([])
+    })
+
+    /**
+     * Tailwind's `--tw-ring-offset-color` falls back to `#fff`, so
+     * `ring-offset-2` with no colour paints a WHITE band — a cream halo
+     * inside a dark surface, which is its own bug rather than a missing
+     * nicety. Any component that draws a ring has to name both.
+     */
+    it('every component that draws a focus ring names its offset surface', () => {
+        const offenders: string[] = []
+        for (const { file, text } of allComponents()) {
+            if (!/focus-visible:ring-2/.test(text)) continue
+            const widths = text.match(/focus-visible:ring-offset-2/g)?.length ?? 0
+            const colours =
+                text.match(/focus-visible:ring-offset-\[var\(--[\w-]+\)\]/g)?.length ?? 0
+            if (widths === 0) offenders.push(`${file} — ring with no offset band at all`)
+            else if (colours < widths)
+                offenders.push(`${file} — ${widths} offset band(s), ${colours} named colour(s)`)
+        }
+        expect(
+            offenders,
+            'ring-offset-color has to be the colour actually behind the control'
+        ).toEqual([])
+    })
+
+    /**
+     * The purple has to be the TEXT-grade `--accent`, never `--accent-fill`
+     * and never the `autara-purple` alias that resolves to the fill. On dark
+     * surfaces the fill grade is a step too dark to read as an indicator, and
+     * `#4E1BBD` measures ~1:1 there.
+     */
+    it('no focus ring reaches for fill-grade purple', () => {
+        const offenders: string[] = []
+        for (const { file, text } of allComponents()) {
+            for (const cls of ringsToAudit(file, text)) {
+                if (/focus-visible:ring-(?:autara-purple|\[var\(--(?:accent-fill|color-autara-purple)\)\])/.test(cls)) {
+                    offenders.push(`${file} — ${cls}`)
+                }
+            }
+        }
+        expect(
+            offenders,
+            'text/border-grade purple is --accent; --accent-fill is for solid fills'
+        ).toEqual([])
+    })
+})
+
+/**
+ * ─── Why AUTM-977 was invisible for so long ─────────────────────────────
+ *
+ * Storybook is where focus states get checked in this repo, and Storybook was
+ * painting its own compliant ring over every component's.
+ *
+ * `.storybook/storybook.css` carried an UNLAYERED
+ * `*:focus-visible { outline: 2px solid … }` immediately after
+ * `@import "tailwindcss"`. Unlayered CSS beats layered CSS regardless of
+ * specificity, and Tailwind v4 puts utilities in `@layer utilities` — so that
+ * rule overrode `focus-visible:outline-none` on every component in the
+ * library. Verified on a focused Button, which computed
+ * `outline: rgb(78, 27, 189) solid 2px` while its own ring sat at 35% alpha
+ * underneath. No consumer ever rendered that outline; `.storybook/` ships
+ * nowhere.
+ *
+ * So every story looked correct while twenty-seven call sites drifted below
+ * the WCAG floor. Same shape as the AUTM-975 blind spot: a check that cannot
+ * see the thing it is supposed to be checking produces no failures and no
+ * bug reports.
+ *
+ * Inside `@layer base` the fallback still gives a genuinely unstyled element
+ * an indicator, and a component that owns its focus treatment now wins.
+ */
+describe('Storybook does not paint over the focus treatment it is meant to show', () => {
+    const STORYBOOK_CSS = readFileSync(
+        resolve(process.cwd(), '.storybook/storybook.css'),
+        'utf8'
     )
 
-    it('every focus ring in the swept set names the surface behind it', () => {
-        const missing = ['Tabs.tsx', 'FilterChipRow.tsx', 'PickerSheet.tsx'].filter(
-            (f) => !/focus-visible:ring-offset-\[var\(--[\w-]+\)\]/.test(source(f))
-        )
+    /**
+     * Comments are stripped FIRST. The prose above this rule in
+     * `storybook.css` explains the fix and therefore contains the literal
+     * text `@layer base` — matching that instead of the real at-rule made an
+     * earlier version of this test pass against a deliberately unlayered
+     * file. A guard that cannot fail is not a guard.
+     */
+    function withoutComments(css: string): string {
+        const out: string[] = []
+        let i = 0
+        while (i < css.length) {
+            const start = css.indexOf('/*', i)
+            if (start < 0) {
+                out.push(css.slice(i))
+                break
+            }
+            out.push(css.slice(i, start))
+            const end = css.indexOf('*/', start + 2)
+            if (end < 0) break
+            i = end + 2
+        }
+        return out.join('')
+    }
+
+    it('the global *:focus-visible fallback is inside a cascade layer', () => {
+        const css = withoutComments(STORYBOOK_CSS)
+        const at = css.indexOf('*:focus-visible')
+        expect(at, 'the fallback rule went missing — has it moved file?').toBeGreaterThan(-1)
+
+        // Walk back to the nearest enclosing block opener. An unlayered rule
+        // sits at the top level; a layered one is inside `@layer … {`.
+        const before = css.slice(0, at)
+        const layerAt = before.lastIndexOf('@layer')
+        const closeAt = before.lastIndexOf('}')
         expect(
-            missing,
-            'ring-offset-color has to be the colour actually behind the control — pointing it at the page canvas draws a cream halo inside a dark track'
-        ).toEqual([])
+            layerAt > closeAt,
+            'unlayered CSS beats every Tailwind utility, so this rule would override ' +
+                'focus-visible:outline-none on every component and hide their real ring'
+        ).toBe(true)
     })
 })

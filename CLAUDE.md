@@ -175,6 +175,20 @@ docs/
 - The Tailwind preset (`src/preset/index.mjs`) maps `bg-autara-purple`
   and friends. Consumers must include the preset in their Tailwind
   config OR import the CSS tokens — pick one consistent path per app.
+- **Storybook can paint over the focus ring you are trying to check.**
+  `.storybook/storybook.css` carries a `*:focus-visible` fallback outline. It
+  used to sit UNLAYERED right after `@import "tailwindcss"`, and unlayered CSS
+  beats layered CSS regardless of specificity — Tailwind v4 puts utilities in
+  `@layer utilities`, so that one rule overrode `focus-visible:outline-none`
+  on every component in the library. A focused `Button` computed
+  `outline: rgb(78, 27, 189) solid 2px` from Storybook while its own ring sat
+  at 35% alpha underneath, and no consumer ever rendered that outline because
+  `.storybook/` ships nowhere. That is how 27 focus rings drifted below the
+  WCAG 2.4.11 floor while every story looked right (AUTM-977). It is now in
+  `@layer base` and `solid-emphasis.test.ts` fails if it leaves the layer.
+  Corollary when measuring anything focus-related: `Button`'s BASE carries
+  `transition-all duration-200`, so screenshotting straight after a `Tab`
+  samples frame 1 and reports a ~0px ring at ~0.004 alpha. Settle first.
 - Components must NOT import `motion/react` for layout-critical
   visuals — `whileInView` + variants are flaky on Next 16 + React 19 +
   motion v12 in customer-web. Use IntersectionObserver or direct

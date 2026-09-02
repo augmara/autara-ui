@@ -463,3 +463,85 @@ export const BesideAField = {
         </div>
     ),
 }
+
+/**
+ * AUTM-977 — one focus signature, inherited from BASE.
+ *
+ * Every variant used to carry its own `focus-visible:ring-<colour>/<alpha>`:
+ * `/35` on primary, dark and destructive, `/30` on outline, secondary, link
+ * and glass, `/25` on ghost, `/55` on acid. Eight rings for one job, and at
+ * 35% over the surface behind the control a ring measures roughly 1.9:1 —
+ * under the 3:1 of WCAG 2.4.11.
+ *
+ * The ring now lives on BASE at full strength, so a variant gets it for free
+ * and cannot forget it. The 2px offset band, painted in `--background`, is
+ * what keeps a purple ring legible on a purple `primary` fill — matching the
+ * ring to the control's own colour is the instinct that produced purple on
+ * purple at 1.0:1 in the merchant-mobile Today pass.
+ *
+ * Forced on statically, because `@storybook/test` is not installed and there
+ * are no play functions to drive real focus. `Foundations/Focus ring → Live`
+ * has the tabbable version.
+ *
+ * `outline`, `light-outline` and `light` are included. Their outlined
+ * TREATMENT is out of scope — that is AUTM-976, it needs a designed solid
+ * `secondary` first, and it is 69 call sites across three repos. Their focus
+ * RING is a different axis: changing it cannot pre-empt how the variant is
+ * eventually redesigned, and leaving the most-used secondary button below the
+ * WCAG floor would have been the odd outcome for an accessibility ticket.
+ * Landed as its own commit so it can be dropped on its own.
+ */
+export const FocusRingPerVariant: Story = {
+    name: "AUTM-977 — the focus ring, every variant, both themes",
+    render: () => (
+        <div className="grid gap-6 lg:grid-cols-2">
+            {[
+                { label: "light", theme: undefined },
+                { label: "dark", theme: "dark" as const },
+            ].map((col) => (
+                <div
+                    key={col.label}
+                    data-theme={col.theme}
+                    className="space-y-3 rounded-autara-lg bg-[var(--background)] p-5"
+                >
+                    <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                        {col.label}
+                    </p>
+                    <div className="flex flex-wrap items-center gap-4">
+                        {(
+                            [
+                                "primary",
+                                "dark",
+                                "secondary",
+                                "ghost",
+                                "destructive",
+                                "link",
+                                "acid",
+                                "outline",
+                            ] as const
+                        ).map((variant) => (
+                            <Button
+                                key={variant}
+                                variant={variant}
+                                className="ring-2 ring-[var(--accent)] ring-offset-2 ring-offset-[var(--background)]"
+                            >
+                                {variant}
+                            </Button>
+                        ))}
+                    </div>
+                    <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                        the same ring on a glass panel, where the ground is not the canvas
+                    </p>
+                    <GradientGround className="rounded-autara-lg p-5">
+                        <Button
+                            variant="glass"
+                            className="ring-2 ring-[var(--accent)] ring-offset-2 ring-offset-[var(--background)]"
+                        >
+                            glass
+                        </Button>
+                    </GradientGround>
+                </div>
+            ))}
+        </div>
+    ),
+}
