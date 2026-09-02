@@ -434,7 +434,7 @@ export function AddressPickerSheet(props: AddressPickerSheetProps) {
                                     'flex min-h-[44px] w-full items-start gap-3 rounded-2xl border px-3 py-2.5 text-left transition-colors',
                                     'border-[var(--border-subtle)] bg-[var(--surface)]',
                                     'hover:border-autara-purple/35',
-                                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-autara-purple/35 focus-visible:ring-offset-2',
+                                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]',
                                 )}
                             >
                                 <span
@@ -470,7 +470,7 @@ export function AddressPickerSheet(props: AddressPickerSheetProps) {
                     'min-h-[44px] w-full rounded-2xl border border-dashed px-4 py-3 text-sm font-medium transition-colors',
                     'border-[var(--border-subtle)] text-[var(--text-muted)]',
                     'hover:border-autara-purple/35 hover:text-[var(--text-strong)]',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-autara-purple/35 focus-visible:ring-offset-2',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]',
                 )}
             >
                 Enter address manually
@@ -596,7 +596,10 @@ export function AddressPickerSheet(props: AddressPickerSheetProps) {
                     setStep('search')
                     setConfirmError(null)
                 }}
-                className="mb-1 inline-flex items-center gap-1 self-start rounded-md text-sm font-medium text-autara-purple focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-autara-purple/35"
+                className={cn(
+                    'mb-1 inline-flex min-h-11 items-center gap-1 self-start rounded-autara-sm text-sm font-medium text-[var(--accent)]',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]'
+                )}
             >
                 <BackGlyph /> {value ? 'Search for a different address' : 'Search again'}
             </button>

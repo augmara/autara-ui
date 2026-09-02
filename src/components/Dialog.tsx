@@ -86,7 +86,7 @@ const DialogContent = React.forwardRef<
                     'absolute right-4 top-4 grid h-7 w-7 place-items-center rounded-full',
                     'text-[var(--text-subtle)] transition-colors',
                     'hover:bg-[var(--surface-elevated)] hover:text-[var(--text-strong)]',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-autara-purple/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]'
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]'
                 )}
             >
                 <svg

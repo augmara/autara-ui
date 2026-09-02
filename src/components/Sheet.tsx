@@ -120,7 +120,7 @@ const SheetContent = React.forwardRef<
                         closeTop,
                         'text-[var(--text-subtle)] transition-colors',
                         'hover:bg-[var(--surface-elevated)] hover:text-[var(--text-strong)]',
-                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-autara-purple/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]'
+                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]'
                     )}
                 >
                     <svg

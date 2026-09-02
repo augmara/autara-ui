@@ -29,7 +29,7 @@ const Switch = React.forwardRef<
     <SwitchPrimitive.Root
         className={cn(
             'peer inline-flex h-[24px] w-[44px] shrink-0 cursor-pointer items-center rounded-full border transition-colors',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-autara-purple/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]',
             'disabled:cursor-not-allowed disabled:opacity-50',
             'border-[var(--border-subtle)] bg-[var(--surface-elevated)]',
             'data-[state=checked]:border-autara-purple data-[state=checked]:bg-autara-purple',

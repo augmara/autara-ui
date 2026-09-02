@@ -97,11 +97,44 @@ type Size = "sm" | "md" | "lg" | "icon" | "default";
  * and tailwind-merge lets it win. Do that for single-word labels in a
  * fixed-width toolbar, not for sentence CTAs.
  */
+/**
+ * AUTM-977 — the focus ring lives on BASE, not per variant.
+ *
+ * Every variant used to carry its own `focus-visible:ring-<colour>/<alpha>` at
+ * 25-55% — eight different rings for one job. At 35% over the surface behind
+ * the control the ring measures roughly 1.9:1, under the 3:1 WCAG 2.4.11 asks
+ * of a focus indicator, and the alpha meant the ring's contrast changed with
+ * whatever the button happened to be sitting on.
+ *
+ * A focus indicator answers one question — "where am I" — so it is one
+ * signature, the same on a rose destructive button and an acid lime one. That
+ * is also how every platform draws it. Matching the ring to the control's own
+ * colour is the instinct that produced purple-on-purple at 1.0:1 in the
+ * merchant-mobile Today pass.
+ *
+ * Three parts, and all three are load-bearing:
+ *
+ *   ring-[var(--accent)]              full strength, the TEXT-grade purple —
+ *                                     9.1:1 light / 5.7:1 dark on the canvas
+ *   ring-offset-2                     a 2px band, which is what keeps the
+ *                                     ring off a solid accent fill
+ *   ring-offset-[var(--background)]   the band is painted in the colour
+ *                                     actually behind the button
+ *
+ * The offset COLOUR is the part that looks optional and is not: Tailwind's
+ * `--tw-ring-offset-color` falls back to `#fff`, so `ring-offset-2` on its own
+ * draws a white band — a cream halo inside a dark surface.
+ *
+ * A variant may still override the ring via `cn()` if it genuinely sits on its
+ * own ground (Tabs does this with `--surface-elevated`). Full strength and a
+ * named offset are not optional; `solid-emphasis.test.ts` enforces both across
+ * the library.
+ */
 const BASE =
   // AUTM-915 keeps `text-center break-words` and drops `whitespace-nowrap` —
   // that pair was the 200%-text-scale overflow. AUTM-948 sets the radius:
   // buttons are not pills, they take the rung `.field-input` uses.
-  "inline-flex select-none items-center justify-center gap-2 text-center break-words min-w-fit rounded-autara-md font-medium transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0";
+  "inline-flex select-none items-center justify-center gap-2 text-center break-words min-w-fit rounded-autara-md font-medium transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0";
 
 /*
  * `min-w-fit` is load-bearing, and subtle enough to be deleted by accident.
@@ -147,19 +180,19 @@ const SIZES: Record<Exclude<Size, "default">, string> = {
 
 const VARIANT_CLASSES: Record<Variant, string> = {
   primary:
-    "bg-[var(--accent-fill)] text-[var(--on-accent)] hover:-translate-y-0.5 hover:bg-[var(--accent-fill-hover)] active:translate-y-0 focus-visible:ring-[var(--accent)]/35",
+    "bg-[var(--accent-fill)] text-[var(--on-accent)] hover:-translate-y-0.5 hover:bg-[var(--accent-fill-hover)] active:translate-y-0",
   dark:
-    "bg-[var(--cta-fill)] text-[var(--on-cta)] hover:-translate-y-0.5 hover:bg-[var(--cta-fill-hover)] active:translate-y-0 focus-visible:ring-[var(--cta-fill)]/35",
+    "bg-[var(--cta-fill)] text-[var(--on-cta)] hover:-translate-y-0.5 hover:bg-[var(--cta-fill-hover)] active:translate-y-0",
   outline:
     "border border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-strong)] hover:-translate-y-0.5 hover:border-[var(--border-hover)] hover:bg-[var(--surface-elevated)] active:translate-y-0 focus-visible:ring-[var(--accent)]/30",
   secondary:
-    "bg-[var(--surface-elevated)] text-[var(--text-strong)] hover:-translate-y-0.5 hover:bg-[var(--accent-tint)] active:translate-y-0 focus-visible:ring-[var(--accent)]/30",
+    "bg-[var(--surface-elevated)] text-[var(--text-strong)] hover:-translate-y-0.5 hover:bg-[var(--accent-tint)] active:translate-y-0",
   ghost:
-    "bg-transparent text-[var(--text-muted)] hover:text-[var(--text-strong)] hover:bg-[var(--surface-elevated)] focus-visible:ring-[var(--accent)]/25",
+    "bg-transparent text-[var(--text-muted)] hover:text-[var(--text-strong)] hover:bg-[var(--surface-elevated)]",
   destructive:
-    "bg-rose-600 text-white hover:-translate-y-0.5 hover:bg-rose-700 active:translate-y-0 focus-visible:ring-rose-500/35",
+    "bg-rose-600 text-white hover:-translate-y-0.5 hover:bg-rose-700 active:translate-y-0",
   link:
-    "text-[var(--accent)] underline-offset-4 hover:underline bg-transparent focus-visible:ring-[var(--accent)]/30",
+    "text-[var(--accent)] underline-offset-4 hover:underline bg-transparent",
 
   // ─── Glass — a secondary action on the gradient ground ───────────────
   // AUTM-948. `outline` paints an OPAQUE `--surface` fill, so on a glass
@@ -175,26 +208,26 @@ const VARIANT_CLASSES: Record<Variant, string> = {
   // fill and the inset highlight carry the material; the panel underneath
   // supplies the blur.
   glass:
-    "border border-[var(--glass-edge)] bg-[var(--glass-fill)] text-[var(--text-strong)] shadow-[inset_0_1px_0_var(--glass-hi)] hover:-translate-y-0.5 hover:border-[var(--glass-edge-hi)] hover:bg-[var(--glass-fill-strong)] active:translate-y-0 focus-visible:ring-[var(--accent)]/30",
+    "border border-[var(--glass-edge)] bg-[var(--glass-fill)] text-[var(--text-strong)] shadow-[inset_0_1px_0_var(--glass-hi)] hover:-translate-y-0.5 hover:border-[var(--glass-edge-hi)] hover:bg-[var(--glass-fill-strong)] active:translate-y-0",
 
   // ─── Acid lime — high-pop CTA on cream surfaces ──────────────────────
   // Dark-surface companion deferred to a future PR.
   acid:
-    "bg-[var(--color-autara-lime-bright)] text-[#0E0A1A] hover:-translate-y-0.5 hover:bg-[#c2ee3a] active:translate-y-0 focus-visible:ring-[var(--color-autara-lime-bright)]/55",
+    "bg-[var(--color-autara-lime-bright)] text-[#0E0A1A] hover:-translate-y-0.5 hover:bg-[#c2ee3a] active:translate-y-0",
 
   // ─── v1.0.x backwards-compat aliases ─────────────────────────────────
   "light-primary":
-    "bg-[var(--accent-fill)] text-[var(--on-accent)] hover:-translate-y-0.5 hover:bg-[var(--accent-fill-hover)] active:translate-y-0 focus-visible:ring-[var(--accent)]/35",
+    "bg-[var(--accent-fill)] text-[var(--on-accent)] hover:-translate-y-0.5 hover:bg-[var(--accent-fill-hover)] active:translate-y-0",
   "light-outline":
     "border border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-strong)] hover:-translate-y-0.5 hover:border-[var(--border-hover)] hover:bg-[var(--surface-elevated)] active:translate-y-0 focus-visible:ring-[var(--accent)]/30",
   "light-ghost":
-    "bg-transparent text-[var(--text-muted)] hover:text-[var(--text-strong)] hover:bg-[var(--surface-elevated)] focus-visible:ring-[var(--accent)]/25",
+    "bg-transparent text-[var(--text-muted)] hover:text-[var(--text-strong)] hover:bg-[var(--surface-elevated)]",
   "light-secondary":
-    "bg-[var(--surface-elevated)] text-[var(--text-strong)] hover:-translate-y-0.5 hover:bg-[var(--accent-tint)] active:translate-y-0 focus-visible:ring-[var(--accent)]/30",
+    "bg-[var(--surface-elevated)] text-[var(--text-strong)] hover:-translate-y-0.5 hover:bg-[var(--accent-tint)] active:translate-y-0",
   "light-destructive":
-    "bg-rose-600 text-white hover:-translate-y-0.5 hover:bg-rose-700 active:translate-y-0 focus-visible:ring-rose-500/35",
+    "bg-rose-600 text-white hover:-translate-y-0.5 hover:bg-rose-700 active:translate-y-0",
   "light-link":
-    "text-[var(--accent)] underline-offset-4 hover:underline bg-transparent focus-visible:ring-[var(--accent)]/30",
+    "text-[var(--accent)] underline-offset-4 hover:underline bg-transparent",
   light:
     "border border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-strong)] hover:-translate-y-0.5 hover:border-[var(--border-hover)] hover:bg-[var(--surface-elevated)] active:translate-y-0 focus-visible:ring-[var(--accent)]/30",
 };
