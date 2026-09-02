@@ -1,0 +1,27 @@
+{
+  "projectId": "ab0a0b26-7c0d-4de1-89f0-47025d33f6b4",
+  "pkg": "@augmara/autara-ui",
+  "shape": "storybook",
+  "storybookConfigDir": ".storybook",
+  "storybookStatic": ".design-sync/sb-reference",
+  "buildCmd": "pnpm run build",
+  "readmeHeader": ".design-sync/conventions.md",
+  "titleMap": {
+    "Radio": "RadioGroup",
+    "Toast": "ToastProvider"
+  },
+  "overrides": {
+    "BrandButton": { "cardMode": "column" },
+    "Button": { "cardMode": "column" },
+    "DropdownMenu": { "cardMode": "column" },
+    "SearchInput": { "cardMode": "column" },
+    "ImageCropDialog": { "cardMode": "column" },
+    "Logo": { "cardMode": "column" },
+    "TrustItem": { "cardMode": "column" },
+    "ListSection": { "cardMode": "column" },
+    "StatsStrip": { "cardMode": "column" },
+    "FilterChipRow": { "cardMode": "column" },
+    "InfoRow": { "cardMode": "column" },
+    "NavSearchPill": { "viewport": "1280x400" }
+  }
+}

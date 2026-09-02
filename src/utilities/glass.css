@@ -145,10 +145,30 @@
         );
 }
 
-/* Keep content above the painted ground when it is used as a wrapper. */
-.gradient-ground > * {
-    position: relative;
-}
+/* AUTM-1017 — REMOVED: `.gradient-ground > * { position: relative }`.
+ *
+ * It claimed to "keep content above the painted ground". It was never needed
+ * for that. The ground is painted entirely as `background-image` on the
+ * element itself, and CSS paints an element's background BELOW its content
+ * unconditionally — no positioning required. The rule bought nothing.
+ *
+ * What it cost: this file is UNLAYERED, and unlayered CSS beats anything in
+ * `@layer utilities` regardless of specificity. So `.gradient-ground > *`
+ * silently defeated Tailwind's `.fixed`, `.absolute` and `.sticky` on any
+ * DIRECT child. A `fixed inset-0` child stopped being fixed and collapsed to
+ * the flow, which is invisible in review because the class is right there in
+ * the markup.
+ *
+ * Three separate discoveries before it was fixed, which is the argument for
+ * removing it rather than documenting it: merchant-mobile hit it in its app
+ * shell and worked around it by abandoning this class for a local
+ * `.app-ground` with inline geometry (the layer had rendered 1194x0 —
+ * present in the DOM, correct background-image, painting nothing); it was
+ * then found again from a Storybook story; and it is filed as AUTM-1017.
+ *
+ * `consent-banner-fixed-child` in `ConsentBanner.test.tsx` and the guard
+ * below pin that a fixed child stays fixed.
+ */
 
 /* App-shell variant: the blooms are anchored to the VIEWPORT, so they stay
  * put while the page scrolls instead of sliding away with the content.
