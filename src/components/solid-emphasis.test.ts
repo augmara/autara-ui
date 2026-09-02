@@ -393,35 +393,20 @@ function allComponents(): { file: string; text: string }[] {
 }
 
 /**
- * The ONE remaining exception, and it is a scheduling boundary rather than a
- * disagreement about the ring.
+ * No exceptions. There was one — `Button`'s `outline`, `light-outline` and
+ * `light` variants, whose outlined treatment is AUTM-976 and needs a designed
+ * solid `secondary` before it can be replaced. Their RINGS did not need to
+ * wait for that: a focus indicator is a different axis from the fill, and
+ * changing `focus-visible:ring-…` cannot pre-empt how the variant is
+ * eventually redesigned.
  *
- * `Button`'s `outline`, `light-outline` and `light` variants are an outlined
- * treatment that rule 4 bans outright, and replacing them needs a designed
- * solid `secondary` first — 69 call sites across three repos, and Don's call
- * to schedule (AUTM-976). Their focus rings are fixed in a SEPARATE commit on
- * this PR precisely so that commit can be dropped on its own without taking
- * the other twenty-four sites with it. When it stays, or when AUTM-976 lands,
- * this entry goes and the scan has no exceptions at all.
- *
- * The exemption is keyed on the VARIANT NAME, not on the class string. Keying
- * it on the class would exempt every `/30` ring in the file — five more
- * variants than intended at the time this was written — and an exception that
+ * Kept as its own commit so it could be dropped alone if the lead disagreed.
+ * If it is dropped, restore an exemption keyed on the VARIANT NAME rather
+ * than on the class string — keying it on the class would exempt every `/30`
+ * ring in the file, five more variants than intended, and an exception that
  * hides more than it names is how a guard quietly stops guarding.
  */
-const EXEMPT_VARIANTS: Record<string, string[]> = {
-    'Button.tsx': ['outline', 'light-outline', 'light'],
-}
-
-/**
- * The class string a named entry of a `Record<Variant, string>` maps to.
- * Deliberately literal: this only has to read the one shape `Button.tsx` uses.
- */
-function variantEntry(text: string, name: string): string {
-    const key = name.includes('-') ? `"${name}"` : name
-    const m = new RegExp(`\\n\\s*${key}:\\s*\\n?\\s*("[^"]*"|'[^']*')`).exec(text)
-    return m ? m[1] : ''
-}
+const EXEMPT_VARIANTS: Record<string, string[]> = {}
 
 /** Every focus-ring utility in a component, minus the exempted variants. */
 function ringsToAudit(file: string, text: string): string[] {

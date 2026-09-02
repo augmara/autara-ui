@@ -483,10 +483,13 @@ export const BesideAField = {
  * are no play functions to drive real focus. `Foundations/Focus ring → Live`
  * has the tabbable version.
  *
- * `outline`, `light-outline` and `light` still carry a `/30` override at the
- * time of writing — see AUTM-976. That is a scheduling boundary, not a
- * disagreement: the outlined treatment needs a designed solid `secondary`
- * before it can be replaced, and it is 69 call sites across three repos.
+ * `outline`, `light-outline` and `light` are included. Their outlined
+ * TREATMENT is out of scope — that is AUTM-976, it needs a designed solid
+ * `secondary` first, and it is 69 call sites across three repos. Their focus
+ * RING is a different axis: changing it cannot pre-empt how the variant is
+ * eventually redesigned, and leaving the most-used secondary button below the
+ * WCAG floor would have been the odd outcome for an accessibility ticket.
+ * Landed as its own commit so it can be dropped on its own.
  */
 export const FocusRingPerVariant: Story = {
     name: "AUTM-977 — the focus ring, every variant, both themes",
@@ -514,6 +517,7 @@ export const FocusRingPerVariant: Story = {
                                 "destructive",
                                 "link",
                                 "acid",
+                                "outline",
                             ] as const
                         ).map((variant) => (
                             <Button

@@ -184,7 +184,7 @@ const VARIANT_CLASSES: Record<Variant, string> = {
   dark:
     "bg-[var(--cta-fill)] text-[var(--on-cta)] hover:-translate-y-0.5 hover:bg-[var(--cta-fill-hover)] active:translate-y-0",
   outline:
-    "border border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-strong)] hover:-translate-y-0.5 hover:border-[var(--border-hover)] hover:bg-[var(--surface-elevated)] active:translate-y-0 focus-visible:ring-[var(--accent)]/30",
+    "border border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-strong)] hover:-translate-y-0.5 hover:border-[var(--border-hover)] hover:bg-[var(--surface-elevated)] active:translate-y-0",
   secondary:
     "bg-[var(--surface-elevated)] text-[var(--text-strong)] hover:-translate-y-0.5 hover:bg-[var(--accent-tint)] active:translate-y-0",
   ghost:
@@ -219,7 +219,7 @@ const VARIANT_CLASSES: Record<Variant, string> = {
   "light-primary":
     "bg-[var(--accent-fill)] text-[var(--on-accent)] hover:-translate-y-0.5 hover:bg-[var(--accent-fill-hover)] active:translate-y-0",
   "light-outline":
-    "border border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-strong)] hover:-translate-y-0.5 hover:border-[var(--border-hover)] hover:bg-[var(--surface-elevated)] active:translate-y-0 focus-visible:ring-[var(--accent)]/30",
+    "border border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-strong)] hover:-translate-y-0.5 hover:border-[var(--border-hover)] hover:bg-[var(--surface-elevated)] active:translate-y-0",
   "light-ghost":
     "bg-transparent text-[var(--text-muted)] hover:text-[var(--text-strong)] hover:bg-[var(--surface-elevated)]",
   "light-secondary":
@@ -229,7 +229,7 @@ const VARIANT_CLASSES: Record<Variant, string> = {
   "light-link":
     "text-[var(--accent)] underline-offset-4 hover:underline bg-transparent",
   light:
-    "border border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-strong)] hover:-translate-y-0.5 hover:border-[var(--border-hover)] hover:bg-[var(--surface-elevated)] active:translate-y-0 focus-visible:ring-[var(--accent)]/30",
+    "border border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-strong)] hover:-translate-y-0.5 hover:border-[var(--border-hover)] hover:bg-[var(--surface-elevated)] active:translate-y-0",
 };
 
 export interface ButtonProps
