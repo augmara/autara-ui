@@ -64,8 +64,8 @@ const badgeVariants = cva(
             variant: {
                 // ─── Marker tones — three Autara accents ─────────────────
                 // Markers sit over hero photos and need to read against
-                // arbitrary imagery — no ring (except lime, which needs
-                // a hairline against light heros), no tonal softness.
+                // arbitrary imagery — solid fill, no ring on any of the
+                // three (AUTM-974), no tonal softness.
                 // Color names only — the label comes from the consumer:
                 //   purple → autara purple   (brand stamp)
                 //   aqua   → sky aqua        (cool / fresh)
@@ -76,8 +76,14 @@ const badgeVariants = cva(
                     'bg-autara-purple text-white px-3 py-1 text-[0.625rem] uppercase tracking-[0.16em]',
                 aqua:
                     'bg-autara-sky-aqua text-[#062436] px-3 py-1 text-[0.625rem] uppercase tracking-[0.16em]',
+                // AUTM-974 dropped the `ring-1 ring-inset ring-[#0E0A1A]/15`
+                // this carried "for a hairline against light heros". Acid
+                // lime at 12.9:1 under its own ink does not need an edge to
+                // be found on a photograph, and rule 4 of the Autara Glass
+                // direction only exempts a hairline that is the material of a
+                // TRANSLUCENT surface. This fill is opaque.
                 lime:
-                    'bg-[var(--color-autara-lime-bright)] text-[#0E0A1A] ring-1 ring-inset ring-[#0E0A1A]/15 px-3 py-1 text-[0.625rem] uppercase tracking-[0.16em]',
+                    'bg-[var(--color-autara-lime-bright)] text-[#0E0A1A] px-3 py-1 text-[0.625rem] uppercase tracking-[0.16em]',
 
                 // ─── Semantic status — AUTM-948, rule 4 ─────────────────
                 // Purple ACTS · aqua IN FLIGHT · lime DONE and money-in.
@@ -132,8 +138,17 @@ const badgeVariants = cva(
                 // both themes. The old classes live on as `dark-default`
                 // for anyone genuinely on an ink surface — same rename
                 // pattern as `aqua` -> `dark-aqua` in v1.2.0.
+                //
+                // AUTM-974 took the second half of that fix. AUTM-934 made
+                // the default READ; it left it as `--surface-elevated` with a
+                // hairline border, which is a fill 1.05:1 from the card with
+                // the border doing the work — the outlined box rule 4 bans,
+                // and the same defect AUTM-969 found on ModeChip. It now
+                // takes `--neutral-fill`, the achromatic solid added for
+                // exactly this, so the default is a solid object in both
+                // themes rather than an outline.
                 default:
-                    'border border-[var(--border-subtle)] bg-[var(--surface-elevated)] text-[var(--text-muted)] px-3 py-1 text-xs',
+                    'bg-[var(--neutral-fill)] text-[var(--on-neutral)] px-3 py-1 text-xs',
 
                 // ─── Legacy dark-theme palette (pre-v1.2.0) ─────────────
                 // Kept for backward compatibility — prefer the marker

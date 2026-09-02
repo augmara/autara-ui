@@ -3,6 +3,39 @@
 import * as React from 'react'
 import { cn } from '../lib/cn'
 
+/**
+ * Table — the dense data surface. Admin's light-mode tables are the hardest
+ * case in the design system, so this is where the rules get tested.
+ *
+ * ─── AUTM-974: the selected row ─────────────────────────────────────────
+ *
+ * `data-[state=selected]` used to paint `bg-autara-purple-50` (#f5f0ff) in
+ * the light theme — a pastel tint of the accent, which is the FIRST thing
+ * rule 4 of the Autara Glass direction bans, and one Don has rejected twice
+ * (AUTM-211 for badges, then again on 2026-09-01 for everything). It measured
+ * 1.05:1 against a white row: on a 12-row table you could not tell which row
+ * you had selected without moving your head.
+ *
+ * A selected row is now a SOLID `--act-fill` with `--on-act` ink, which is
+ * what selection looks like in every native table (Finder, Mail, Excel) and
+ * the only treatment that survives at row density.
+ *
+ * The ink is forced onto the cells rather than left to inherit. `TableCell`
+ * sets its own colour on the `<td>`, so a colour on the `<tr>` alone loses to
+ * it and the row would go solid purple with purple-grade ink on top — the
+ * exact trade the merchant-mobile booking-detail pass nearly shipped, a
+ * banned outline swapped for a 3.40:1 sentence. `[&>td]` beats the cell's own
+ * class on specificity, so the ink moves with the fill.
+ *
+ * The light branch also gave up `autara-gray-200` / `autara-gray-50` /
+ * `autara-purple-50`. Those are Tailwind-shaped ramps that do not track the
+ * theme (AUTM-936's finding on ErrorCard); the semantic tokens do.
+ *
+ * `theme="dark"` stays a STATIC ink treatment — it is the opt-in for a table
+ * on a photo or ink surface, not the dark theme, which the tokens handle on
+ * their own.
+ */
+
 const Table = React.forwardRef<
     HTMLTableElement,
     React.HTMLAttributes<HTMLTableElement>
@@ -54,8 +87,13 @@ const TableRow = React.forwardRef<
         className={cn(
             'border-b transition-colors',
             theme === 'dark'
-                ? 'border-white/[0.06] hover:bg-white/[0.02] data-[state=selected]:bg-white/[0.04]'
-                : 'border-autara-gray-200 hover:bg-autara-gray-50 data-[state=selected]:bg-autara-purple-50',
+                ? 'border-white/[0.06] hover:bg-white/[0.02]'
+                : 'border-[var(--border-subtle)] hover:bg-[var(--surface-elevated)]',
+            // Solid, and the same in both treatments — selection is not a
+            // tone of the surface, it is its own object. See the header.
+            'data-[state=selected]:bg-[var(--act-fill)]',
+            'data-[state=selected]:[&>td]:text-[var(--on-act)]',
+            'data-[state=selected]:[&>th]:text-[var(--on-act)]',
             className
         )}
         {...props}

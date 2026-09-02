@@ -6,14 +6,44 @@ import type { ReactNode } from "react";
  * X services, Comes to you · 10km, Highly rated, etc.).
  *
  * Tones:
- *   - neutral  — plain surface, ink text
- *   - success  — brand-lime ink, e.g. "Open today"
- *   - brand    — autara purple, e.g. "Highly rated", "Verified"
- *   - muted    — same surface as neutral, dimmer text
+ *   - neutral  — SOLID achromatic slate. The default (AUTM-974)
+ *   - muted    — no chrome at all: muted ink, no fill. De-emphasis
+ *   - success  — SOLID lime. Alias of `money`, kept for pinned consumers
+ *   - brand    — SOLID purple. Alias of `act`, kept for pinned consumers
  *   - act      — SOLID purple. Something is waiting on the user (AUTM-948)
  *   - flight   — SOLID aqua. Confirmed, running, money on its way
  *   - money    — SOLID lime. Done, paid, money in
  *   - glass    — translucent, for a chip on the gradient ground
+ *
+ * ─── AUTM-974: every tone is now solid ──────────────────────────────────
+ *
+ * Four of the eight were outlined boxes. `neutral` and `muted` were
+ * `--surface-elevated` with `ring-1 ring-inset` — a fill 1.05:1 from the card,
+ * so the RING was the chip; `success` and `brand` were a pastel tint PLUS a
+ * ring, which is the pattern Don has now rejected three times (AUTM-211 for
+ * Badge, AUTM-969 for ModeChip, and on 2026-09-01 for the whole product:
+ * "no outline buttons or sections, boxes as we discussed. everything should
+ * be solid").
+ *
+ * What each became, and why:
+ *
+ *   `neutral` takes `--neutral-fill`, the achromatic member of the
+ *   act/flight/money family added in AUTM-969. That token exists precisely
+ *   because there was no non-semantic solid to reach for, which is why every
+ *   neutral chip in the library reached for a ring instead. It is not a slip
+ *   in eight components; it was one missing token.
+ *
+ *   `muted` gets NO fill. De-emphasis has to be less chrome, not a fainter
+ *   box — a dimmer fill under dimmer ink is how you end up measuring 3:1.
+ *   It keeps the chip's type and spacing, so it still reads as a chip.
+ *
+ *   `success` and `brand` were the tinted twins of `money` and `act`. A tint
+ *   is not a variant, so they render as the solid they always meant. They
+ *   stay in the union because consumers pin them by name.
+ *
+ *   `glass` is untouched. Its hairline is the MATERIAL of a translucent
+ *   surface — required by rule 2 alongside the blur and the inset top
+ *   highlight — and rule 4 exempts exactly that.
  *
  * Aesthetic refresh:
  *   - Dropped raw tailwind `emerald-50/700/200` in favour of brand-
@@ -40,20 +70,23 @@ type Tone =
   | "glass";
 
 const TONES: Record<Tone, string> = {
-  neutral:
-    "bg-[var(--surface-elevated)] text-[var(--text-strong)] ring-1 ring-inset ring-[var(--border-subtle)]",
-  success:
-    "bg-[rgba(183,225,73,0.18)] text-[var(--intent-success-text)] ring-1 ring-inset ring-[rgba(183,225,73,0.6)]",
-  brand:
-    "bg-[var(--accent-tint)] text-[var(--accent)] ring-1 ring-inset ring-[var(--accent-border-soft)]",
-  muted:
-    "bg-[var(--surface-elevated)] text-[var(--text-muted)] ring-1 ring-inset ring-[var(--border-subtle)]",
+  // AUTM-974 — solid, and no ring on any of them. See the header.
+  neutral: "bg-[var(--neutral-fill)] text-[var(--on-neutral)]",
+  // Deliberately chrome-less: de-emphasis is less, not fainter.
+  // Keeps the chip's padding so it still lines up with its solid siblings in
+  // a row — the tone strings are concatenated into a template literal, not
+  // merged through `cn()`, so a `px-0` here would fight `px-3` on stylesheet
+  // order rather than class order and win or lose by accident.
+  muted: "bg-transparent text-[var(--text-muted)]",
+  // Aliases of `money` and `act` — the tinted versions of the same idea.
+  success: "bg-[var(--money-fill)] text-[var(--on-money)]",
+  brand: "bg-[var(--act-fill)] text-[var(--on-act)]",
 
   // ─── AUTM-948: purple ACTS · aqua IN FLIGHT · lime DONE / money-in ───
-  // Rule 3 is "solid fills on status, never a tint, even against glass".
-  // `success` and `brand` above are tints and stay only because consumers
-  // pin them; these are what new status code should reach for. One accent
-  // per zone — aqua and lime never compete inside the same block.
+  // Rule 4 is "solid fills on status, never a tint, and never an outline".
+  // `success` and `brand` above now resolve to `money` and `act`; these are
+  // the names new status code should reach for. One accent per zone — aqua
+  // and lime never compete inside the same block.
   act: "bg-[var(--act-fill)] text-[var(--on-act)]",
   flight: "bg-[var(--flight-fill)] text-[var(--on-flight)]",
   money: "bg-[var(--money-fill)] text-[var(--on-money)]",
@@ -66,10 +99,12 @@ const TONES: Record<Tone, string> = {
 };
 
 const DOT_COLORS: Record<Tone, string> = {
-  neutral: "bg-[var(--text-subtle)]",
-  success: "bg-[#5d9a1f]",
-  brand: "bg-[var(--color-autara-purple)]",
-  muted: "bg-[var(--text-subtle)]",
+  // On a solid fill the dot reads against the FILL, so it takes that fill's
+  // on-colour. `muted` has no fill, so it stays on the ink ladder.
+  neutral: "bg-[var(--on-neutral)]",
+  success: "bg-[var(--on-money)]",
+  brand: "bg-[var(--on-act)]",
+  muted: "bg-[var(--text-muted)]",
   // On a solid fill the dot has to read against the FILL, so it takes the
   // on-colour rather than the accent it is already sitting on.
   act: "bg-[var(--on-act)]",

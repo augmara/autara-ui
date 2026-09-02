@@ -63,21 +63,24 @@ export const Vocabulary: Story = {
   ),
 };
 
-// ─── AUTM-948 ──────────────────────────────────────────────────────
+// ─── AUTM-948 + AUTM-974 ───────────────────────────────────────────
 /**
- * The semantic trio, solid — rule 3 ("solid fills on status, never a tint,
- * even against glass") and rule 4 ("purple ACTS, aqua IN FLIGHT, lime DONE
- * and money-in").
+ * Every tone, solid — rule 4 of the Autara Glass direction ("solid fills:
+ * never a tint, and never an outline") and rule 5 ("purple ACTS, aqua IN
+ * FLIGHT, lime DONE and money-in").
  *
- * The older `success` and `brand` tones are TINTS and stay only because
- * consumers pin them. New status code should reach for `act` / `flight` /
- * `money`. The top row is the tinted vocabulary, the bottom row the solid
- * one — over a bloom, a tint picks up whatever is behind it and a solid does
- * not, which is the whole argument.
+ * AUTM-948 added `act` / `flight` / `money` as the solid vocabulary but left
+ * `neutral`, `muted`, `success` and `brand` as they were: two outlined boxes
+ * on a 1.05:1 fill, and two pastel tints WITH a ring on top. AUTM-974 finished
+ * it. `success` and `brand` were the tinted twins of `money` and `act`, so
+ * they now render as the solid they always meant; `neutral` takes the
+ * achromatic `--neutral-fill`; `muted` gives up its chrome entirely, because
+ * de-emphasis has to be less, not fainter.
  *
  * `tone="glass"` is the translucent companion, for a chip sitting directly on
- * the ground rather than on a card. It does not blur: chips are small and
- * come several to a row.
+ * the ground rather than on a card. Its hairline is the MATERIAL of a
+ * translucent surface — the one thing rule 4 exempts — so it keeps it. It
+ * does not blur: chips are small and come several to a row.
  */
 export const SolidSemanticTones: Story = {
   name: "Semantic — solid tones on the gradient ground",
@@ -86,18 +89,18 @@ export const SolidSemanticTones: Story = {
     <div className="grid sm:grid-cols-2">
       {(["light", "dark"] as const).map((theme) => (
         <div key={theme} data-theme={theme}>
-          <GradientGround className="min-h-[20rem] p-8">
+          <GradientGround className="min-h-[22rem] p-8">
             <p className="mb-3 text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-[var(--text-subtle)]">
-              {theme} · tinted (legacy)
+              {theme} · metadata
             </p>
             <div className="flex flex-wrap items-center gap-2">
-              <MetaChip tone="success">Open today · 9–17</MetaChip>
-              <MetaChip tone="brand">Highly rated</MetaChip>
               <MetaChip tone="neutral">Comes to you · 10km</MetaChip>
+              <MetaChip tone="muted">15+ years</MetaChip>
+              <MetaChip tone="glass">4 services</MetaChip>
             </div>
 
             <p className="mt-6 mb-3 text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-[var(--text-subtle)]">
-              solid (AUTM-948)
+              status
             </p>
             <div className="flex flex-wrap items-center gap-2">
               <MetaChip tone="act">Awaiting you</MetaChip>
@@ -105,9 +108,71 @@ export const SolidSemanticTones: Story = {
                 On the way
               </MetaChip>
               <MetaChip tone="money">Paid $612</MetaChip>
-              <MetaChip tone="glass">Comes to you · 10km</MetaChip>
+            </div>
+
+            <p className="mt-6 mb-3 text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-[var(--text-subtle)]">
+              pinned aliases · success = money, brand = act
+            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <MetaChip tone="success" dot>
+                Open today · 9–17
+              </MetaChip>
+              <MetaChip tone="brand">Highly rated</MetaChip>
             </div>
           </GradientGround>
+        </div>
+      ))}
+    </div>
+  ),
+};
+
+/**
+ * The tones on an ordinary card, which is where most of them actually live —
+ * `GradientGround` flatters a chip and a merchant profile does not.
+ *
+ * Worth knowing while reading this one: `money` is brand lime, and lime on
+ * cream is a 1.35:1 LUMINANCE step. It is unmistakable anyway because what
+ * separates it is hue (ΔE 73), but it is the one fill in the set whose shape
+ * is carried by chroma rather than by tone. `solid-emphasis.test.ts` measures
+ * both and accepts either.
+ */
+export const BothThemesOnACard: Story = {
+  name: "In context — light and dark card",
+  parameters: { layout: "padded" },
+  render: () => (
+    <div className="grid gap-6 lg:grid-cols-2">
+      {[
+        { label: "light", theme: undefined },
+        { label: "dark", theme: "dark" as const },
+      ].map((col) => (
+        <div
+          key={col.label}
+          data-theme={col.theme}
+          className="space-y-4 rounded-autara-lg bg-[var(--background)] p-5"
+        >
+          <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+            {col.label}
+          </p>
+          <div className="rounded-autara-lg bg-[var(--surface)] p-5">
+            <h3 className="mb-1 text-base font-medium text-[var(--text-strong)]">
+              Autobahn Auto Spa
+            </h3>
+            <p className="mb-3 text-sm text-[var(--text-muted)]">
+              Surry Hills · mobile detailing
+            </p>
+            {/* Rule 5 — one accent per zone. Lime for "open", purple for
+                the thing the customer is meant to act on, and nothing else
+                competing. `flight` belongs to a booking block, not to a
+                merchant card, so it is not in this row. */}
+            <div className="flex flex-wrap gap-1.5">
+              <MetaChip tone="success" dot>
+                Open today · 9–17
+              </MetaChip>
+              <MetaChip>4 services</MetaChip>
+              <MetaChip tone="brand">Highly rated</MetaChip>
+              <MetaChip tone="muted">15+ years</MetaChip>
+            </div>
+          </div>
         </div>
       ))}
     </div>

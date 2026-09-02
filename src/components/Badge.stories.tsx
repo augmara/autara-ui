@@ -183,7 +183,7 @@ export const LightVocabulary: Story = {
     ),
 }
 
-// ─── The bare default (AUTM-934) ───────────────────────────────────
+// ─── The bare default (AUTM-934, finished in AUTM-974) ─────────────
 /**
  * `<Badge>` with no `variant`. This is the story that did not exist,
  * which is how the default went unnoticed: the meta `args` pinned
@@ -191,8 +191,12 @@ export const LightVocabulary: Story = {
  * nobody was actually getting by accident.
  *
  * Until AUTM-934 this measured 1.03:1 against the cream canvas —
- * `text-white/60` on `bg-white/[0.04]`. Flip the Storybook theme
- * toolbar: it now reads in both.
+ * `text-white/60` on `bg-white/[0.04]`. That fix made it READ; it left it
+ * as `--surface-elevated` with a hairline border, which is a fill 1.05:1
+ * from the card with the border doing the work. AUTM-974 gave it
+ * `--neutral-fill`, the achromatic solid: 10.98:1 under its label in light,
+ * 8.18:1 in dark, and a 9.8–11.0:1 step from every ground it can sit on.
+ * Flip the Storybook theme toolbar; it is a solid object in both.
  */
 export const BareDefault: Story = {
     name: 'Default — no variant passed',
@@ -345,6 +349,55 @@ export const OnTheGradientGround: Story = {
                             </div>
                         </div>
                     </GradientGround>
+                </div>
+            ))}
+        </div>
+    ),
+}
+
+// ─── AUTM-974 ──────────────────────────────────────────────────────
+/**
+ * The two rings this sweep removed, and the fill that replaced an outline.
+ *
+ * `lime` carried `ring-1 ring-inset ring-[#0E0A1A]/15` "for a hairline
+ * against light heros". Acid lime measures 12.89:1 under its own ink and is
+ * not hard to find on a photograph; rule 4 of the Autara Glass direction only
+ * exempts a hairline that is the material of a TRANSLUCENT surface, and this
+ * fill is opaque. Compare the marker over the pale hero below.
+ *
+ * Both themes at once — the default's fill themes, the marker tones
+ * deliberately do not (they sit over arbitrary imagery, not over a canvas).
+ */
+export const SolidNoRings: Story = {
+    name: 'AUTM-974 — solid markers, no rings, both themes',
+    parameters: { layout: 'padded' },
+    render: () => (
+        <div className="grid gap-6 lg:grid-cols-2">
+            {[
+                { label: 'light', theme: undefined },
+                { label: 'dark', theme: 'dark' as const },
+            ].map((col) => (
+                <div
+                    key={col.label}
+                    data-theme={col.theme}
+                    className="space-y-4 rounded-autara-lg bg-[var(--background)] p-5"
+                >
+                    <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                        {col.label}
+                    </p>
+                    <div className="flex flex-wrap items-center gap-2">
+                        <Badge>Mobile detailing</Badge>
+                        <Badge variant="purple">Featured</Badge>
+                        <Badge variant="aqua">New</Badge>
+                        <Badge variant="lime">Trending</Badge>
+                    </div>
+                    {/* Stands in for the merchant-mobile onboarding hero, which is
+                        the one live call site for the lime marker. */}
+                    <div className="relative h-28 overflow-hidden rounded-autara-lg bg-[linear-gradient(120deg,#e9e4f6,#f7f5ee_60%,#dfeccd)]">
+                        <Badge variant="lime" className="absolute left-3 top-3">
+                            Trending
+                        </Badge>
+                    </div>
                 </div>
             ))}
         </div>
