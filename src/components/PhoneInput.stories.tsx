@@ -145,3 +145,52 @@ export const CustomCountryList: Story = {
         )
     },
 }
+
+/**
+ * The trunk-zero rule, side by side (AUTM-780).
+ *
+ * Type the number the way a local writes it and watch the emitted E.164.
+ * Australia drops the leading 0; Italy keeps it, because there it is part
+ * of the national number rather than a dialling prefix. Getting that
+ * backwards is not a formatting nit — the malformed `+610491570156` was
+ * ACCEPTED by Cognito, created no customer profile, and surfaced to the
+ * customer as a connection error at checkout.
+ */
+export const TrunkPrefixRule: Story = {
+    render: () => {
+        const [au, setAu] = useState('')
+        const [it, setIt] = useState('')
+        const [us, setUs] = useState('')
+        const row = (
+            label: string,
+            hint: string,
+            country: string,
+            value: string,
+            onChange: (v: string) => void
+        ) => (
+            <div className="flex flex-col gap-1.5">
+                <div className="flex items-baseline justify-between gap-4">
+                    <span className="text-sm font-medium">{label}</span>
+                    <span className="text-xs text-[var(--text-muted)]">
+                        {hint}
+                    </span>
+                </div>
+                <PhoneInput
+                    country={country}
+                    value={value}
+                    onChange={onChange}
+                />
+                <code className="text-xs text-[var(--text-muted)]">
+                    emits: {value || '—'}
+                </code>
+            </div>
+        )
+        return (
+            <div className="flex w-[26rem] flex-col gap-6">
+                {row('Australia', 'type 0491 570 156', 'AU', au, setAu)}
+                {row('Italy', 'type 06 1234 5678', 'IT', it, setIt)}
+                {row('United States', 'type 212 555 0123', 'US', us, setUs)}
+            </div>
+        )
+    },
+}
