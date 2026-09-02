@@ -33,13 +33,17 @@ import {
  * The light branch also gave up `autara-gray-200` / `autara-gray-50`, which
  * are Tailwind ramps that do not track the theme (AUTM-936's finding).
  *
- * ─── One thing these stories do NOT hide ────────────────────────────────
+ * ─── AUTM-975: the default no longer needs hiding ───────────────────────
  *
- * Every `theme` prop on this component defaults to `'dark'`, so a bare
- * `<Table>` renders white-on-cream. That is AUTM-975 and it is deliberately
- * not fixed here — changing a public prop default deserves its own revert
- * boundary. `BareDefaultIsBroken` at the bottom shows it rather than quietly
- * passing `theme="light"` everywhere and leaving the next person to find it.
+ * These stories used to pass `theme="light"` on every single cell, because
+ * every `theme` prop DEFAULTED to `'dark'` and a bare `<Table>` rendered
+ * white-on-cream. The story that showed it was called `BareDefaultIsBroken`.
+ *
+ * The default is now the themed branch, so the markup below is what a
+ * consumer would actually write — no prop at all. `InkSurface` at the bottom
+ * is the opt-in that `theme="dark"` still buys you, and `BothThemes` proves
+ * the default renders in dark mode as well as light, which is the part a
+ * hard-coded `theme="light"` could never have shown.
  */
 const meta: Meta<typeof Table> = {
     title: 'Molecules/Table',
@@ -60,26 +64,26 @@ function BookingTable({ selected }: { selected?: string }) {
     return (
         <Table>
             <TableHeader>
-                <TableRow theme="light">
-                    <TableHead theme="light">Booking</TableHead>
-                    <TableHead theme="light">Customer</TableHead>
-                    <TableHead theme="light">Service</TableHead>
-                    <TableHead theme="light">When</TableHead>
-                    <TableHead theme="light">Total</TableHead>
+                <TableRow>
+                    <TableHead>Booking</TableHead>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Service</TableHead>
+                    <TableHead>When</TableHead>
+                    <TableHead>Total</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
                 {BOOKINGS.map((b) => (
                     <TableRow
                         key={b.id}
-                        theme="light"
+                       
                         data-state={b.id === selected ? 'selected' : undefined}
                     >
-                        <TableCell theme="light">{b.id}</TableCell>
-                        <TableCell theme="light">{b.customer}</TableCell>
-                        <TableCell theme="light">{b.service}</TableCell>
-                        <TableCell theme="light">{b.when}</TableCell>
-                        <TableCell theme="light">{b.total}</TableCell>
+                        <TableCell>{b.id}</TableCell>
+                        <TableCell>{b.customer}</TableCell>
+                        <TableCell>{b.service}</TableCell>
+                        <TableCell>{b.when}</TableCell>
+                        <TableCell>{b.total}</TableCell>
                     </TableRow>
                 ))}
             </TableBody>
@@ -135,36 +139,36 @@ export const LongContent: Story = {
     name: 'Edge — long labels, footer and caption',
     render: () => (
         <Table>
-            <TableCaption theme="light">
+            <TableCaption>
                 Bookings for the week beginning 7 September
             </TableCaption>
             <TableHeader>
-                <TableRow theme="light">
-                    <TableHead theme="light">Booking</TableHead>
-                    <TableHead theme="light">Service</TableHead>
-                    <TableHead theme="light">Total</TableHead>
+                <TableRow>
+                    <TableHead>Booking</TableHead>
+                    <TableHead>Service</TableHead>
+                    <TableHead>Total</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
-                <TableRow theme="light" data-state="selected">
-                    <TableCell theme="light">BK-4825</TableCell>
-                    <TableCell theme="light">
+                <TableRow data-state="selected">
+                    <TableCell>BK-4825</TableCell>
+                    <TableCell>
                         Full-body paint protection film with ceramic top-up,
                         headlight restoration and interior deep clean
                     </TableCell>
-                    <TableCell theme="light">$1,980.00</TableCell>
+                    <TableCell>$1,980.00</TableCell>
                 </TableRow>
-                <TableRow theme="light">
-                    <TableCell theme="light">BK-4826</TableCell>
-                    <TableCell theme="light">Express wash</TableCell>
-                    <TableCell theme="light">$65.00</TableCell>
+                <TableRow>
+                    <TableCell>BK-4826</TableCell>
+                    <TableCell>Express wash</TableCell>
+                    <TableCell>$65.00</TableCell>
                 </TableRow>
             </TableBody>
             <TableFooter>
-                <TableRow theme="light">
-                    <TableCell theme="light">Total</TableCell>
-                    <TableCell theme="light" />
-                    <TableCell theme="light">$2,045.00</TableCell>
+                <TableRow>
+                    <TableCell>Total</TableCell>
+                    <TableCell />
+                    <TableCell>$2,045.00</TableCell>
                 </TableRow>
             </TableFooter>
         </Table>
@@ -172,36 +176,96 @@ export const LongContent: Story = {
 }
 
 /**
- * NOT a design choice — a defect, shown on purpose (AUTM-975).
- *
- * Every `theme` prop defaults to `'dark'`, so this is what a consumer gets
- * for writing the obvious thing. On cream the cells are `text-white/70`.
- * `default-variant.test.ts` cannot catch it because that scan reads cva
- * `defaultVariants` and Table's default is a TypeScript parameter default.
+ * The opt-in that `theme="dark"` still buys: a STATIC ink treatment, for a
+ * table sitting on a photo or on a marketing surface. It is not the dark
+ * theme — the tokens handle that on their own, which is what the second
+ * column of `BothThemes` above demonstrates with no prop at all.
  */
-export const BareDefaultIsBroken: Story = {
-    name: 'Known defect — bare <Table> defaults to the ink treatment (AUTM-975)',
+export const InkSurface: Story = {
+    name: 'Opt-in — theme="dark" on an ink ground',
     render: () => (
-        <div className="space-y-3">
-            <p className="text-sm text-[var(--text-muted)]">
-                No `theme` prop passed. The rows below are white-on-cream.
-            </p>
+        <div className="rounded-autara-lg bg-[var(--ink)] p-5">
             <Table>
                 <TableHeader>
-                    <TableRow>
-                        <TableHead>Booking</TableHead>
-                        <TableHead>Customer</TableHead>
+                    <TableRow theme="dark">
+                        <TableHead theme="dark">Booking</TableHead>
+                        <TableHead theme="dark">Customer</TableHead>
+                        <TableHead theme="dark">Total</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {BOOKINGS.slice(0, 2).map((b) => (
-                        <TableRow key={b.id}>
-                            <TableCell>{b.id}</TableCell>
-                            <TableCell>{b.customer}</TableCell>
+                    {BOOKINGS.slice(0, 3).map((b) => (
+                        <TableRow key={b.id} theme="dark">
+                            <TableCell theme="dark">{b.id}</TableCell>
+                            <TableCell theme="dark">{b.customer}</TableCell>
+                            <TableCell theme="dark">{b.total}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
             </Table>
+        </div>
+    ),
+}
+
+/**
+ * The regression this ticket closes, kept as a story so it stays visible.
+ *
+ * Left: a bare `<Table>` — no `theme` prop anywhere, which is what a consumer
+ * writes first. It used to render `text-white/70` cells on the cream canvas.
+ * Right: the same markup with the ink treatment forced on, on the cream
+ * canvas, which is what the old default silently produced.
+ *
+ * `default-variant.test.ts` could not catch the old default: that scan reads
+ * cva `defaultVariants`, and Table's default was a TypeScript parameter
+ * default. It resolves parameter defaults now, and Avatar and Progress had
+ * the same shape.
+ */
+export const DefaultVsInkOnCream: Story = {
+    name: 'AUTM-975 — the bare default, beside what it used to do',
+    render: () => (
+        <div className="grid gap-6 xl:grid-cols-2">
+            <div className="space-y-2">
+                <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                    Now — no theme prop
+                </p>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Booking</TableHead>
+                            <TableHead>Customer</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {BOOKINGS.slice(0, 2).map((b) => (
+                            <TableRow key={b.id}>
+                                <TableCell>{b.id}</TableCell>
+                                <TableCell>{b.customer}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </div>
+            <div className="space-y-2">
+                <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                    Before — the ink treatment, on cream
+                </p>
+                <Table>
+                    <TableHeader>
+                        <TableRow theme="dark">
+                            <TableHead theme="dark">Booking</TableHead>
+                            <TableHead theme="dark">Customer</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {BOOKINGS.slice(0, 2).map((b) => (
+                            <TableRow key={b.id} theme="dark">
+                                <TableCell theme="dark">{b.id}</TableCell>
+                                <TableCell theme="dark">{b.customer}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </div>
         </div>
     ),
 }
