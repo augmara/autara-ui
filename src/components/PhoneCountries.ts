@@ -24,14 +24,37 @@ export interface PhoneCountry {
     dial: string
     /** Unicode flag emoji — zero asset cost on the web. */
     flag: string
+    /**
+     * National trunk prefix to strip before building E.164, when the
+     * country has one. `'0'` for most of Europe and Oceania.
+     *
+     * DELIBERATELY OPT-IN. Leaving it undefined means "do not strip",
+     * which is the historical behaviour, so adding this field cannot
+     * regress a country nobody has checked. The rule is genuinely not
+     * universal and guessing it wrong breaks sign-up for that market:
+     *
+     *   - Italy KEEPS its leading zero — it is part of the national
+     *     significant number for landlines (+39 06… is Rome), so IT must
+     *     never declare one.
+     *   - NANP countries (US, CA) have no trunk prefix at all.
+     *   - Hong Kong and Singapore dial 8 digits with no prefix.
+     *
+     * Only declared where it is unambiguous AND Autara operates or is
+     * committed to operating, which today is AU plus the near-term
+     * rollout markets. Everywhere else stays undefined until someone
+     * verifies it against that country's numbering plan — an unstripped
+     * number is a number a human can still read and repair, whereas a
+     * wrongly-stripped one is silently corrupt.
+     */
+    trunkPrefix?: string
 }
 
 export const DEFAULT_COUNTRIES: PhoneCountry[] = [
     // Autara launch + near-term rollout
-    { iso: 'AU', name: 'Australia', dial: '+61', flag: '🇦🇺' },
-    { iso: 'NZ', name: 'New Zealand', dial: '+64', flag: '🇳🇿' },
-    { iso: 'GB', name: 'United Kingdom', dial: '+44', flag: '🇬🇧' },
-    { iso: 'IE', name: 'Ireland', dial: '+353', flag: '🇮🇪' },
+    { iso: 'AU', name: 'Australia', dial: '+61', flag: '🇦🇺' , trunkPrefix: '0' },
+    { iso: 'NZ', name: 'New Zealand', dial: '+64', flag: '🇳🇿' , trunkPrefix: '0' },
+    { iso: 'GB', name: 'United Kingdom', dial: '+44', flag: '🇬🇧' , trunkPrefix: '0' },
+    { iso: 'IE', name: 'Ireland', dial: '+353', flag: '🇮🇪' , trunkPrefix: '0' },
     { iso: 'CA', name: 'Canada', dial: '+1', flag: '🇨🇦' },
     { iso: 'US', name: 'United States', dial: '+1', flag: '🇺🇸' },
 

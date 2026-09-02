@@ -97,13 +97,59 @@ const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
         const [internalDigits, setInternalDigits] = React.useState(
             defaultValue ?? ''
         )
-        const activeDigits = isControlledValue
-            ? stripDial(value!, activeCountry.dial).replace(/\D/g, '')
-            : internalDigits
+
+        /**
+         * Drop the national trunk prefix before building E.164.
+         *
+         * Australians type their mobile as `0491 570 156`; the E.164 form
+         * is `+61491570156`, NOT `+610491570156`. Concatenating the dial
+         * code onto the typed digits produced the latter, and the damage
+         * was not a rejected form — Cognito ACCEPTED the malformed number,
+         * no customer profile was created against it, and checkout then
+         * reported the failure as the customer's connection. A wrong
+         * number that is accepted is far worse than one that is refused.
+         *
+         * Only strips when the country declares a prefix (see
+         * PhoneCountry.trunkPrefix) — Italy's leading zero is part of the
+         * number and must survive, and NANP has none to remove.
+         */
+        const toE164 = (c: PhoneCountry, digits: string) => {
+            const p = c.trunkPrefix
+            const national =
+                p && digits.startsWith(p) ? digits.slice(p.length) : digits
+            return `${c.dial}${national}`
+        }
+
+        /**
+         * What the input SHOWS, which is not always what we emit.
+         *
+         * `internalDigits` is the user's literal keystrokes so a typed
+         * trunk zero stays visible; `onChange` still emits the stripped
+         * E.164. Deriving the display straight from `value` instead would
+         * make the leading 0 vanish under the cursor the instant it was
+         * typed — correct output, but it reads as the field eating input.
+         *
+         * In controlled mode we resync from `value` only when the parent
+         * has moved it somewhere our own buffer would not produce (a
+         * programmatic set, a reset, a prefill). When the parent is simply
+         * echoing what we just emitted, the buffer is left alone — that
+         * comparison is what distinguishes "the parent changed this" from
+         * "the parent agreed with us".
+         */
+        React.useEffect(() => {
+            if (!isControlledValue) return
+            if (toE164(activeCountry, internalDigits) === value) return
+            setInternalDigits(
+                stripDial(value!, activeCountry.dial).replace(/\D/g, '')
+            )
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [value, activeCountryIso, isControlledValue])
+
+        const activeDigits = internalDigits
 
         const emit = (iso: string, digits: string) => {
             const c = findCountryByIso(iso, countries) ?? countries[0]
-            onChange?.(`${c.dial}${digits}`)
+            onChange?.(toE164(c, digits))
         }
 
         const handleCountryChange = (iso: string) => {
@@ -116,7 +162,7 @@ const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
             e: React.ChangeEvent<HTMLInputElement>
         ) => {
             const next = e.target.value.replace(/\D/g, '')
-            if (!isControlledValue) setInternalDigits(next)
+            setInternalDigits(next)
             emit(activeCountryIso, next)
         }
 
