@@ -69,7 +69,12 @@ const NavigationMenuContent = React.forwardRef<
     <NavigationMenuPrimitive.Content
         ref={ref}
         className={cn(
-            'left-0 top-0 w-full data-[motion^=from-]:animate-in data-[motion^=to-]:animate-out data-[motion^=from-]:fade-in data-[motion^=to-]:fade-out data-[motion=from-end]:slide-in-from-right-52 data-[motion=from-start]:slide-in-from-left-52 data-[motion=to-end]:slide-out-to-right-52 data-[motion=to-start]:slide-out-to-left-52 md:absolute md:w-auto',
+            // AUTM-967 — this line used to carry eight `data-[motion…]`
+            // variants of `animate-in` / `slide-in-from-*-52`, none of which
+            // existed. `.nav-menu-content` is the real CSS and keeps the same
+            // 13rem travel those classes named.
+            'left-0 top-0 w-full md:absolute md:w-auto',
+            'nav-menu-content',
             className
         )}
         {...props}
@@ -86,7 +91,12 @@ const NavigationMenuViewport = React.forwardRef<
     <div className={cn('absolute left-0 top-full flex justify-center')}>
         <NavigationMenuPrimitive.Viewport
             className={cn(
-                'origin-top-center relative mt-2 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-xl border border-white/[0.08] bg-[#0c0614]/95 backdrop-blur-xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 md:w-[var(--radix-navigation-menu-viewport-width)]',
+                // `origin-top`, not `origin-top-center` — that was a THIRD
+                // dead class on this line and not a Tailwind utility at all,
+                // so the viewport was scaling about its centre while the
+                // source said it grew downward from the trigger.
+                'origin-top relative mt-2 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-xl border border-white/[0.08] bg-[#0c0614]/95 backdrop-blur-xl md:w-[var(--radix-navigation-menu-viewport-width)]',
+                'nav-menu-viewport',
                 className
             )}
             ref={ref}
@@ -103,7 +113,8 @@ const NavigationMenuIndicator = React.forwardRef<
     <NavigationMenuPrimitive.Indicator
         ref={ref}
         className={cn(
-            'top-full z-[1] flex h-1.5 items-end justify-center overflow-hidden data-[state=visible]:animate-in data-[state=hidden]:animate-out data-[state=hidden]:fade-out data-[state=visible]:fade-in',
+            'top-full z-[1] flex h-1.5 items-end justify-center overflow-hidden',
+            'nav-menu-indicator',
             className
         )}
         {...props}

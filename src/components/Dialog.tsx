@@ -17,6 +17,18 @@ import { cn } from '../lib/cn'
  *
  * The `theme` prop on `DialogContent` is preserved for source-level
  * compatibility but is currently a **no-op**.
+ *
+ * ─── AUTM-967: the dialog now actually animates ─────────────────────────
+ *
+ * It carried `data-[state=open]:animate-in data-[state=open]:zoom-in-95` and
+ * friends. Those are `tailwindcss-animate` utilities and that plugin is not a
+ * dependency of this package or of any of the three consumers, so the classes
+ * emitted NOTHING: every dialog on merchant-mobile, merchant-web and
+ * customer-web appeared and vanished on the same frame it was asked for.
+ *
+ * The enter and exit are `.overlay-scrim` and `.modal-panel`, defined as real
+ * CSS in `utilities/animations.css` — no plugin, no consumer configuration,
+ * and `prefers-reduced-motion: reduce` respected there.
  */
 const Dialog = DialogPrimitive.Root
 const DialogTrigger = DialogPrimitive.Trigger
@@ -31,8 +43,10 @@ const DialogOverlay = React.forwardRef<
         ref={ref}
         className={cn(
             'fixed inset-0 z-50 bg-[#0E0A1A]/55',
-            'data-[state=open]:animate-in data-[state=open]:fade-in-0',
-            'data-[state=closed]:animate-out data-[state=closed]:fade-out-0',
+            // Real CSS, from utilities/animations.css. This used to be
+            // `animate-in fade-in-0`, which resolved to nothing — see the
+            // AUTM-967 note in the component header.
+            'overlay-scrim',
             className
         )}
         {...props}
@@ -57,9 +71,10 @@ const DialogContent = React.forwardRef<
                 // surface the user sees and carries the softest corner.
                 'rounded-autara-xl bg-[var(--surface)] p-6',
                 'ring-1 ring-inset ring-[var(--border-subtle)]',
-                'duration-200',
-                'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
-                'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
+                // `duration-200` went with it: `duration-*` sets
+                // `transition-duration`, never `animation-duration`, so it
+                // was tuning a transition that did not exist either.
+                'modal-panel',
                 className
             )}
             {...props}
