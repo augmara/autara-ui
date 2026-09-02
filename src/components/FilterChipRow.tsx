@@ -7,9 +7,24 @@ import { cn } from '../lib/cn'
  * service status, notification tab).
  *
  * Active chip uses the canonical "Torph ink" capsule treatment
- * (`bg-[var(--surface-inverse)] text-[var(--text-on-inverse)]`); inactive chips are
- * hairline-bordered surface pills. The row scrolls horizontally on
- * narrow surfaces.
+ * (`bg-[var(--surface-inverse)] text-[var(--text-on-inverse)]`); inactive chips
+ * are a quiet `--surface-elevated` ground with muted ink. The row scrolls
+ * horizontally on narrow surfaces.
+ *
+ * ─── AUTM-974: the inactive chip lost its border ────────────────────────
+ *
+ * The active chip was already solid; the inactive ones were
+ * `border border-[var(--border-subtle)]` on `--surface`, i.e. outlined boxes
+ * sitting next to a solid one. Rule 4 of the Autara Glass direction bans
+ * outlines outright, and there was a second reason to go: a row of five
+ * hairline rectangles is five rectangles competing with the one chip that is
+ * meant to stand out. Emphasis reads better when the unemphasised things stop
+ * drawing themselves.
+ *
+ * The focus ring moved with it. `ring-[var(--color-autara-purple)]/35` with no
+ * offset drew a translucent purple line directly against the ink capsule —
+ * 1.8:1, under the 3:1 WCAG 2.4.11 asks of a focus indicator. It is now
+ * full-strength `--accent` with a 2px offset band in the page canvas.
  *
  * Why a single component vs leaving each consumer to roll its own:
  *   - The previous inline pattern was duplicated 4× across
@@ -69,10 +84,11 @@ export function FilterChipRow<V>({
                         className={cn(
                             /* 8px, same rung as MetaChip — round is avatars and dots only
                                (Don, 2026-09-01); see MetaChip for the geometry. */
-                            'shrink-0 rounded-autara-sm px-3 py-1.5 text-[12px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-autara-purple)]/35',
+                            'shrink-0 rounded-autara-sm px-3 py-1.5 text-[12px] font-medium transition-colors',
+                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]',
                             active
                                 ? 'bg-[var(--surface-inverse)] text-[var(--text-on-inverse)]'
-                                : 'border border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-muted)] hover:text-[var(--text-strong)]',
+                                : 'bg-[var(--surface-elevated)] text-[var(--text-muted)] hover:text-[var(--text-strong)]',
                         )}
                     >
                         {o.label}
