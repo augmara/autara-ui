@@ -108,12 +108,16 @@ export const LongInitials: Story = {
  * forces `theme="dark"` on the cream canvas — that is what the old default
  * silently produced everywhere.
  *
- * Known and not fixed here: the themed branch paints `bg-autara-purple-50`
- * with `text-autara-purple`, a static Tailwind ramp plus fill-grade purple as
- * ink. It does not track the theme, so the dark pane below shows a bright pale
- * disc rather than a surface that belongs to the card. Four merchant-mobile
- * call sites already ship that, which is why it is consumer-visible work with
- * its own revert boundary rather than a hunk in this PR.
+ * FIXED in AUTM-936: the themed branch now paints `--accent-fill` with
+ * `--on-accent`, so the disc moves with the theme instead of sitting at a
+ * fixed `autara-purple-50`. It previously used that static Tailwind ramp plus
+ * fill-grade purple as ink, so the dark pane below showed a bright pale disc
+ * rather than a surface belonging to the card, and all four merchant-mobile
+ * call sites shipped it.
+ *
+ * Compare the two panes below — that the disc DIFFERS between them is the
+ * whole fix. Measured: white on `#4e1bbd` is 9.48:1 light, white on `#6d3dd4`
+ * is 6.43:1 dark.
  */
 export const ThemedGround: Story = {
     name: 'In context — the default in both themes, beside the ink opt-in',

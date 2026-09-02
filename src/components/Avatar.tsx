@@ -61,13 +61,22 @@ AvatarImage.displayName = AvatarPrimitive.Image.displayName
  * this flip changes no pixel that ships today — it fixes what a NEW caller
  * gets for writing the obvious thing.
  *
- * Not fixed here, deliberately: the light branch itself paints
- * `bg-autara-purple-50` / `text-autara-purple`. That is a static Tailwind ramp
- * that does not track the theme (AUTM-936's finding) plus fill-grade purple
- * used as ink, so in dark mode it renders a bright pale disc on a near-black
- * card — which those four consumer call sites already ship. That IS
- * consumer-visible, so it gets its own revert boundary rather than riding
- * along with a default flip.
+ * AUTM-936 — the themed branch now paints `--accent-fill` / `--on-accent`.
+ * It previously used `bg-autara-purple-50` / `text-autara-purple`: a static
+ * Tailwind ramp that does not track the theme, plus fill-grade purple used as
+ * ink. In dark mode that rendered a bright pale disc on a near-black card, and
+ * all four merchant-mobile call sites shipped it (TopBar, CustomerCard,
+ * CustomerDetailScreen, MeScreen).
+ *
+ * The replacement is a solid fill with its own ink rather than a tint, which
+ * is rule 4 and matches ModeChip's `--neutral-fill` / `--on-neutral`. Measured
+ * on the token values: white on `#4e1bbd` is 9.48:1 in light, white on
+ * `#6d3dd4` is 6.43:1 in dark — both clear AA, and the disc now moves with the
+ * theme instead of staying a fixed lavender.
+ *
+ * This DOES change shipped pixels on those four call sites: a pale disc with
+ * purple initials becomes a solid purple disc with white initials. That is the
+ * intended correction, not a side effect.
  */
 const AvatarFallback = React.forwardRef<
     React.ComponentRef<typeof AvatarPrimitive.Fallback>,
@@ -79,7 +88,7 @@ const AvatarFallback = React.forwardRef<
             'flex h-full w-full items-center justify-center rounded-full text-sm font-medium',
             theme === 'dark'
                 ? 'bg-autara-purple/20 text-white/70'
-                : 'bg-autara-purple-50 text-autara-purple',
+                : 'bg-[var(--accent-fill)] text-[var(--on-accent)]',
             className
         )}
         {...props}
