@@ -159,6 +159,19 @@ docs/
   the fill. `#4E1BBD` measures ~1:1 against dark surfaces — never
   hardcode it for text/borders. The Storybook toolbar has a Theme
   switcher — check every story in both modes.
+- **A `theme` prop's default may be a TypeScript PARAMETER default, and
+  `default-variant.test.ts`'s cva scan cannot see one.** That scan reads
+  `defaultVariants:` out of a `cva()` call, so `({ theme = 'dark' })` is not
+  merely missed by it — it is unreachable by that technique. Three components
+  defaulted to the static ink treatment for months behind that blind spot
+  (`Table`, `Avatar`'s fallback, `Progress`'s track); a bare `<Table>`
+  measured **1.00:1** on the cream canvas. AUTM-975 extended the test to
+  resolve parameter defaults, including the `const isDark = theme === 'dark'`
+  alias form. Related trap in the naming: on these components `theme="light"`
+  means *"the branch built from semantic tokens"*, i.e. the one that TRACKS
+  the theme in both directions — `theme="dark"` is the static opt-in for a
+  photo or marketing surface, not dark mode. The value names are published
+  API and are not being renamed.
 - The Tailwind preset (`src/preset/index.mjs`) maps `bg-autara-purple`
   and friends. Consumers must include the preset in their Tailwind
   config OR import the CSS tokens — pick one consistent path per app.

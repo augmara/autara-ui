@@ -34,6 +34,24 @@ import { cn } from '../lib/cn'
  * `theme="dark"` stays a STATIC ink treatment — it is the opt-in for a table
  * on a photo or ink surface, not the dark theme, which the tokens handle on
  * their own.
+ *
+ * ─── AUTM-975: which branch you get for passing nothing ─────────────────
+ *
+ * Every `theme` prop here used to DEFAULT to `'dark'`, so a bare `<Table>`
+ * rendered `text-white/70` cells on the cream canvas. Nothing in the library
+ * or in any consumer imports Table, which is the only reason it was never on
+ * screen — a trap everybody routes around files no bug reports.
+ *
+ * The default is now `'light'`, which is a misleading name for what it does:
+ * that branch is built entirely from semantic tokens, so it is the branch
+ * that TRACKS THE THEME and renders correctly in light AND dark. `'dark'` is
+ * the static ink opt-in. The names are kept because renaming a published
+ * prop value is a cross-repo break across three consumers for no behaviour.
+ *
+ * `default-variant.test.ts` could not see this: that scan reads cva
+ * `defaultVariants`, and a TypeScript parameter default is unreachable by
+ * that technique. It now resolves parameter defaults too — Avatar and
+ * Progress had the same shape and the same defect.
  */
 
 const Table = React.forwardRef<
@@ -81,7 +99,7 @@ TableFooter.displayName = 'TableFooter'
 const TableRow = React.forwardRef<
     HTMLTableRowElement,
     React.HTMLAttributes<HTMLTableRowElement> & { theme?: 'dark' | 'light' }
->(({ className, theme = 'dark', ...props }, ref) => (
+>(({ className, theme = 'light', ...props }, ref) => (
     <tr
         ref={ref}
         className={cn(
@@ -104,7 +122,7 @@ TableRow.displayName = 'TableRow'
 const TableHead = React.forwardRef<
     HTMLTableCellElement,
     React.ThHTMLAttributes<HTMLTableCellElement> & { theme?: 'dark' | 'light' }
->(({ className, theme = 'dark', ...props }, ref) => (
+>(({ className, theme = 'light', ...props }, ref) => (
     <th
         ref={ref}
         className={cn(
@@ -120,7 +138,7 @@ TableHead.displayName = 'TableHead'
 const TableCell = React.forwardRef<
     HTMLTableCellElement,
     React.TdHTMLAttributes<HTMLTableCellElement> & { theme?: 'dark' | 'light' }
->(({ className, theme = 'dark', ...props }, ref) => (
+>(({ className, theme = 'light', ...props }, ref) => (
     <td
         ref={ref}
         className={cn(
@@ -136,7 +154,7 @@ TableCell.displayName = 'TableCell'
 const TableCaption = React.forwardRef<
     HTMLTableCaptionElement,
     React.HTMLAttributes<HTMLTableCaptionElement> & { theme?: 'dark' | 'light' }
->(({ className, theme = 'dark', ...props }, ref) => (
+>(({ className, theme = 'light', ...props }, ref) => (
     <caption
         ref={ref}
         className={cn(

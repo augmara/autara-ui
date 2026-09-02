@@ -4,13 +4,32 @@ import * as React from 'react'
 import * as ProgressPrimitive from '@radix-ui/react-progress'
 import { cn } from '../lib/cn'
 
+/**
+ * Progress — a determinate bar: a track plus a filled indicator.
+ *
+ * AUTM-975 — `theme` defaulted to `'dark'`, and the dark branch paints the
+ * track `bg-white/[0.1]`. On the cream canvas that is 10% white over
+ * near-white: the track disappeared entirely and the bar read as a floating
+ * purple stub with no "out of what". The default is now `'light'`, which is
+ * the branch built from semantic tokens and therefore the one that tracks the
+ * theme in both directions; `'dark'` remains the static ink opt-in for a
+ * photo or marketing surface.
+ *
+ * The prop's value names are published API and are kept as they are — see the
+ * same note on `Table` and `Avatar`, which had the identical parameter-default
+ * shape and are guarded together by `default-variant.test.ts`.
+ *
+ * Known and NOT fixed here: `--surface-elevated` is only ~1.06:1 from
+ * `--surface` in light, so the track is faint on a white card even after the
+ * flip. That is a token-ladder question, not a default-selection one.
+ */
 const Progress = React.forwardRef<
     React.ComponentRef<typeof ProgressPrimitive.Root>,
     React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root> & {
         theme?: 'dark' | 'light'
         indicatorClassName?: string
     }
->(({ className, value, theme = 'dark', indicatorClassName, ...props }, ref) => {
+>(({ className, value, theme = 'light', indicatorClassName, ...props }, ref) => {
     const isDark = theme === 'dark'
     return (
         <ProgressPrimitive.Root

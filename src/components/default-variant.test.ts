@@ -107,3 +107,118 @@ describe('default variants render on the cream canvas', () => {
         expect(STATIC_DARK.test(block)).toBe(false)
     })
 })
+
+/**
+ * ─── AUTM-975: the shape the scan above structurally cannot see ─────────
+ *
+ * `Table` rendered white-on-cream for a bare `<Table>` and survived every
+ * check in this file, because its default is not a cva `defaultVariants`
+ * entry — it is a TypeScript PARAMETER default:
+ *
+ *     >(({ className, theme = 'dark', ...props }, ref) => (
+ *
+ * `defaultVariant()` reads `defaultVariants:` out of a `cva()` call, so a
+ * parameter default is not merely missed by it, it is unreachable by that
+ * technique. Two more components had the same shape and the same defect —
+ * `Avatar`'s fallback and `Progress`'s track — so this was a hole in the
+ * guard, not three unlucky components.
+ *
+ * The scan below is deliberately NOT keyed on a prop called `theme`. It
+ * resolves any parameter default to the ternary branch that default selects,
+ * and fails if that branch carries a static dark-only treatment. A component
+ * that invents `surface = 'ink'` tomorrow is caught by the same rule.
+ *
+ * Two forms are resolved, because both are in the codebase:
+ *
+ *     theme === 'dark' ? A : B          // Table, Avatar
+ *     const isDark = theme === 'dark'   // Progress
+ *     isDark ? A : B
+ *
+ * The rule is the same one the cva scan encodes: a dark treatment has to be
+ * opt-in BY NAME. What you get for passing nothing has to work on cream.
+ */
+
+/** `{ name = 'value' }` in a destructuring parameter list — not `const x = 'y'`. */
+const PARAM_DEFAULT = /[{,]\s*([A-Za-z_$][\w$]*)\s*=\s*'([\w-]+)'\s*(?=[,}])/g
+
+/** `const isDark = theme === 'dark'` — a boolean standing in for a comparison. */
+const COMPARISON_ALIAS =
+    /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*([A-Za-z_$][\w$]*)\s*===\s*'([\w-]+)'/g
+
+/** `cond ? 'classes' : 'classes'`, where cond is a comparison or an alias. */
+const STRING_TERNARY =
+    /([A-Za-z_$][\w$]*)(?:\s*===\s*'([\w-]+)')?\s*\?\s*('[^']*'|"[^"]*")\s*:\s*('[^']*'|"[^"]*")/g
+
+/** Collapse to one line so a ternary split across lines still matches. */
+function flatten(lines: string[]): string {
+    return lines.join(' ').split(/\s+/).join(' ')
+}
+
+/**
+ * Every branch a component renders when the caller passes nothing, paired
+ * with the parameter whose default selected it.
+ */
+function defaultBranches(text: string): { param: string; value: string; classes: string }[] {
+    const flat = flatten(code(text))
+
+    const defaults = new Map<string, string>()
+    for (const [, name, value] of flat.matchAll(PARAM_DEFAULT)) defaults.set(name, value)
+    if (defaults.size === 0) return []
+
+    // alias -> the comparison it stands for
+    const aliases = new Map<string, { subject: string; literal: string }>()
+    for (const [, alias, subject, literal] of flat.matchAll(COMPARISON_ALIAS)) {
+        aliases.set(alias, { subject, literal })
+    }
+
+    const taken: { param: string; value: string; classes: string }[] = []
+    for (const [, head, inlineLiteral, whenTrue, whenFalse] of flat.matchAll(STRING_TERNARY)) {
+        const test = inlineLiteral
+            ? { subject: head, literal: inlineLiteral }
+            : aliases.get(head)
+        if (!test) continue
+        const fallback = defaults.get(test.subject)
+        if (fallback === undefined) continue
+        taken.push({
+            param: test.subject,
+            value: fallback,
+            classes: fallback === test.literal ? whenTrue : whenFalse,
+        })
+    }
+    return taken
+}
+
+describe('parameter defaults render on the cream canvas too', () => {
+    it('never resolves a parameter default to a static dark-only treatment', () => {
+        const offenders: string[] = []
+        for (const { file, text } of sources()) {
+            for (const { param, value, classes } of defaultBranches(text)) {
+                const hit = STATIC_DARK.exec(classes)
+                if (hit) {
+                    offenders.push(
+                        `${file} — \`${param} = '${value}'\` selects a branch carrying ${hit[0]}`
+                    )
+                }
+            }
+        }
+        expect(
+            offenders,
+            'a dark treatment must be opt-in by name; passing nothing has to work on #FBFAF6'
+        ).toEqual([])
+    })
+
+    /**
+     * The resolver has to actually resolve something, or the assertion above
+     * passes because it found no branches rather than because they were all
+     * clean. `Table` is the component the ticket is about and it uses the
+     * direct form; `Progress` uses the aliased form.
+     */
+    it.each([
+        ['Table.tsx', 'theme'],
+        ['Progress.tsx', 'theme'],
+        ['Avatar.tsx', 'theme'],
+    ])('%s: the scan reaches the branch `%s` selects', (file, param) => {
+        const branches = defaultBranches(readFileSync(join(DIR, file), 'utf8'))
+        expect(branches.filter((b) => b.param === param).length).toBeGreaterThan(0)
+    })
+})
