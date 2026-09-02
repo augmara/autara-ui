@@ -76,6 +76,23 @@ export interface ModeChipProps {
  * attribute is what pinned the old icon at 12px while the text around it
  * doubled.
  */
+/*
+ * `whitespace-nowrap` and `shrink-0`, and they are not the mistake AUTM-915
+ * corrected — they are its opposite, for a different kind of label.
+ *
+ * "IN-SHOP" contains a hyphen, which is a line-break opportunity. In a booking
+ * row that flexbox is squeezing, the chip took it and rendered as "IN-" over
+ * "SHOP": a two-line status marker beside a one-line price. Reported from a
+ * screenshot.
+ *
+ * AUTM-915 REMOVED `whitespace-nowrap` from Button so a multi-word label could
+ * wrap instead of overflowing at 200% text scale. That was right there and is
+ * wrong here. A Button label is a phrase with real break points; this is a
+ * seven-character single-token status marker whose only break point is inside
+ * the word. Wrapping it is never the better outcome at any scale, so the chip
+ * holds its line and declines to be squeezed. If a row genuinely cannot fit it,
+ * `iconOnly` is the affordance for that — not a broken word.
+ */
 const GLYPH = 'h-[1.15em] w-[1.15em] shrink-0'
 
 const RoutingGlyph = () => (
@@ -139,7 +156,7 @@ export function ModeChip({ mode, size = 'md', iconOnly = false, className }: Mod
              * `src/tokens/neutral-contrast.test.ts`.
              */
             className={cn(
-                'inline-flex items-center rounded-autara-sm bg-[var(--neutral-fill)] font-medium uppercase tracking-[0.08em] text-[var(--on-neutral)]',
+                'inline-flex shrink-0 items-center whitespace-nowrap rounded-autara-sm bg-[var(--neutral-fill)] font-medium uppercase tracking-[0.08em] text-[var(--on-neutral)]',
                 SIZES[size],
                 className,
             )}

@@ -102,3 +102,30 @@ describe('ModeChip is solid and scales', () => {
         expect(code).not.toContain('skew')
     })
 })
+
+/**
+ * AUTM-969 follow-up. Reported from a screenshot: in a squeezed booking row the
+ * chip rendered as "IN-" over "SHOP" — the hyphen in IN-SHOP is a line-break
+ * opportunity and flexbox took it.
+ *
+ * Asserting the classes rather than measured geometry is deliberate: jsdom does
+ * no layout, so a height or line-count assertion here would pass against the
+ * bug. The real geometry check belongs in a Playwright spec; this guards the
+ * declaration that prevents it, which is the thing an editor would remove.
+ */
+describe('AUTM-969: the label never breaks mid-word', () => {
+    it('declines to wrap and declines to be squeezed', () => {
+        const { container } = render(<ModeChip mode="IN_SHOP" />)
+        const chip = container.firstElementChild as HTMLElement
+        expect(chip.className).toContain('whitespace-nowrap')
+        expect(chip.className).toContain('shrink-0')
+    })
+
+    it('holds for every mode, not just the hyphenated one', () => {
+        for (const mode of ['MOBILE', 'IN_SHOP', 'WORKSHOP', 'FIXED_LOCATION'] as const) {
+            const { container } = render(<ModeChip mode={mode} />)
+            const chip = container.firstElementChild as HTMLElement
+            expect(chip.className).toContain('whitespace-nowrap')
+        }
+    })
+})
