@@ -210,6 +210,13 @@ export {
     type CategoryRailItem,
 } from './CategoryRail'
 export { PWAInstallBanner, type PWAInstallBannerProps } from './PWAInstallBanner'
+// AUTM-852 — the consent notice, and the space it reserves for itself.
+export {
+    ConsentBanner,
+    CONSENT_BANNER_HEIGHT_VAR,
+    CONSENT_BANNER_OFFSET,
+    type ConsentBannerProps,
+} from './ConsentBanner'
 export {
     NavSearchPill,
     type NavSearchPillProps,

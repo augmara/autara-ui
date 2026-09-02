@@ -70,6 +70,9 @@ export {
     // v2.1.0 — customer-web marketing harvest (AUTAA-UI-007)
     CategoryRail, type CategoryRailProps, type CategoryRailItem,
     PWAInstallBanner, type PWAInstallBannerProps,
+    // AUTM-852 — the consent notice, and the space it reserves for itself.
+    ConsentBanner, CONSENT_BANNER_HEIGHT_VAR, CONSENT_BANNER_OFFSET,
+    type ConsentBannerProps,
     NavSearchPill, type NavSearchPillProps, type NavSearchPillField,
     CompactSearchPill, type CompactSearchPillProps,
     // chat / conversation primitives (AUTM-159)
