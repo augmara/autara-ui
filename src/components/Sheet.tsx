@@ -10,8 +10,23 @@ import { cn } from '../lib/cn'
  *
  * Same grammar as `Dialog`: `--surface` fill, `--text-strong` ink,
  * `--border-subtle` hairline edge — no drop shadow, no backdrop blur.
- * `side` picks the anchor; the four entrance animations match the
- * anchor direction.
+ * `side` picks the anchor, and the entrance slides from that edge.
+ *
+ * ─── AUTM-967: the four entrance animations were not real ───────────────
+ *
+ * "The four entrance animations match the anchor direction" is what this
+ * comment used to say, and it was describing `slide-in-from-left` and its
+ * siblings — `tailwindcss-animate` utilities, and that plugin is not a
+ * dependency here or in any consumer. Every sheet in the product appeared
+ * fully-formed at its edge with no travel at all.
+ *
+ * A sheet is the case where that costs the most: the slide IS the
+ * affordance. It says which edge the panel came from and therefore where
+ * dismissing it will send it, and a drawer that materialises reads as a
+ * different, heavier kind of surface than one that slides.
+ *
+ * `.sheet-panel` plus a `--side` modifier, real CSS in
+ * `utilities/animations.css`, reduced motion respected there.
  *
  * Dark companion (for sheets over photo / ink contexts) deferred to a
  * future PR.
@@ -29,8 +44,7 @@ const SheetOverlay = React.forwardRef<
         ref={ref}
         className={cn(
             'fixed inset-0 z-50 bg-[#0E0A1A]/55',
-            'data-[state=open]:animate-in data-[state=open]:fade-in-0',
-            'data-[state=closed]:animate-out data-[state=closed]:fade-out-0',
+            'overlay-scrim',
             className
         )}
         {...props}
@@ -41,9 +55,12 @@ SheetOverlay.displayName = DialogPrimitive.Overlay.displayName
 const sheetVariants = cva(
     cn(
         'fixed z-50 flex flex-col bg-[var(--surface)] text-[var(--text-strong)]',
-        'transition ease-in-out',
-        'data-[state=closed]:duration-200 data-[state=open]:duration-300',
-        'data-[state=open]:animate-in data-[state=closed]:animate-out'
+        // `transition ease-in-out` and the two `duration-*` classes went with
+        // the dead animation. `duration-*` sets `transition-duration`, never
+        // `animation-duration`, and `transition: all` on a full-height panel
+        // is a per-property cost for a transition nothing was triggering.
+        // Timing now lives with the keyframes.
+        'sheet-panel'
     ),
     {
         variants: {
@@ -55,16 +72,16 @@ const sheetVariants = cva(
                 // A bottom sheet's top is mid-screen, so it needs no inset.
                 top:
                     'inset-x-0 top-0 border-b border-[var(--border-subtle)] pt-[env(safe-area-inset-top)] ' +
-                    'data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top',
+                    'sheet-panel--top',
                 bottom:
                     'inset-x-0 bottom-0 border-t border-[var(--border-subtle)] ' +
-                    'data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom',
+                    'sheet-panel--bottom',
                 left:
                     'inset-y-0 left-0 h-full w-3/4 border-r border-[var(--border-subtle)] sm:max-w-sm pt-[env(safe-area-inset-top)] ' +
-                    'data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left',
+                    'sheet-panel--left',
                 right:
                     'inset-y-0 right-0 h-full w-3/4 border-l border-[var(--border-subtle)] sm:max-w-sm pt-[env(safe-area-inset-top)] ' +
-                    'data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right',
+                    'sheet-panel--right',
             },
         },
         defaultVariants: {

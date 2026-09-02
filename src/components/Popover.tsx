@@ -213,10 +213,17 @@ const PopoverContent = React.forwardRef<
                     'glass-surface',
                     tone === 'strong' && 'glass-surface--strong',
                     !blur && 'glass-surface--flat',
-                    // Enter/exit. Real CSS, not the `animate-in` classes the
-                    // older Radix wrappers carry — those resolve to nothing
-                    // here. See utilities/animations.css.
-                    'popover-panel',
+                    // Enter/exit. Real CSS — see utilities/animations.css.
+                    //
+                    // AUTM-967 folded this into the shared `.floating-panel`
+                    // used by Tooltip, DropdownMenu, Select and PhoneInput,
+                    // so there is one implementation rather than two that
+                    // drift. `.popover-panel` is still defined there as an
+                    // alias: it shipped in v5.1.0 inside a stylesheet
+                    // consumers import wholesale, so the name has to keep
+                    // working. This component gains the small side-aware
+                    // nudge the shared class carries.
+                    'floating-panel',
                     'z-50 flex flex-col overflow-hidden outline-none',
                     // Never wider than the viewport, and never taller than
                     // the space Radix measured. Both matter most at 200%

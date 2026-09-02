@@ -155,7 +155,16 @@ const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
                         <span className="text-base leading-none" aria-hidden>
                             {activeCountry.flag}
                         </span>
-                        <span className="font-medium tabular-nums text-[var(--color-autara-purple)]">
+                        {/* AUTM-967 — `--color-autara-purple` resolves
+                            through `--accent-fill`, which is FILL grade:
+                            #6d3dd4 on the dark surface measures 2.72:1, so
+                            the dial code failed AA in dark mode. Text-grade
+                            purple is `--accent` (5.16:1 dark, 9.48:1 light).
+                            Caught by the axe pass on the new Motion story;
+                            the border on line 130 is border-grade and stays.
+                            Same defect the AUTM-974 sweep found on
+                            PickerSheet's Back control. */}
+                        <span className="font-medium tabular-nums text-[var(--accent)]">
                             {activeCountry.dial}
                         </span>
                         <SelectPrimitive.Icon asChild>
@@ -182,8 +191,10 @@ const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
                             sideOffset={6}
                             className={cn(
                                 'z-50 max-h-[18rem] min-w-[18rem] overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-[var(--surface)] py-1',
-                                'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
-                                'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95'
+                                // AUTM-967 — was `animate-in zoom-in-95`,
+                                // which resolved to nothing. Real CSS, from
+                                // utilities/animations.css.
+                                'floating-panel'
                             )}
                         >
                             <SelectPrimitive.Viewport>

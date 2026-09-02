@@ -78,65 +78,384 @@
     }
 }
 
-/* ─── Anchored floating panel — Popover (AUTM-965) ───────────────────────
+/* ─── Enter and exit for every floating and overlay surface (AUTM-967) ───
  *
- * Written as real CSS rather than as Tailwind `animate-in` / `zoom-in-95`
- * utility classes, and that is deliberate.
+ * ─── The bug this block exists to fix ───────────────────────────────────
  *
- * `Dialog`, `DropdownMenu` and `Tooltip` all carry
- * `data-[state=open]:animate-in data-[state=open]:zoom-in-95 …`. **Those
- * classes are not defined anywhere.** `tailwindcss-animate` is not a
- * dependency of this package, the Tailwind preset declares no such
- * keyframes, and none of the three consumers (merchant-mobile,
- * merchant-web, customer-web) install the plugin either. They are inert
- * strings — the surfaces they sit on simply appear and disappear. Copying
- * them into a new component would have looked like an animation in review
- * and shipped as nothing.
+ * Seven components styled their transitions with `animate-in`, `fade-in-0`,
+ * `zoom-in-95` and `slide-in-from-*`. **Those classes were not defined
+ * anywhere.** `tailwindcss-animate` is not a dependency of this package, the
+ * Tailwind preset declares only `float`, `gradient-shift` and `scroll-x`, and
+ * none of the three consumers (merchant-mobile, merchant-web, customer-web)
+ * installs the plugin either.
  *
- * Shipping it here instead means it works off `@augmara/autara-ui/utilities`,
- * which every consumer already imports, with no Tailwind-plugin dependency.
+ * So every dialog, sheet, tooltip, dropdown, select, phone-input country list
+ * and nav menu across all three web surfaces appeared and disappeared
+ * instantly. Nothing errored, nothing warned, and the source read as though
+ * the animation was handled — which is exactly why it survived. AUTM-965
+ * found it while building Popover and wrote real CSS for that one component;
+ * this is the same treatment for the rest, factored so there is one
+ * implementation rather than seven.
  *
- * `--radix-popover-content-transform-origin` is set by Radix on the content
- * element and already accounts for the resolved side and align, so a plain
- * scale reads as "grows out of the trigger" from every direction without a
- * per-side rule.
+ * ─── Why not just add `tailwindcss-animate` ─────────────────────────────
  *
- * Reduced motion is handled by the global block above, which clamps every
- * animation to 0.01ms — the panel then appears and unmounts instantly,
- * which is the correct behaviour, not a missing case.
+ * It is the smaller diff and it is the wrong one. The plugin would have to be
+ * installed by every consumer as well as by this package, because Tailwind
+ * generates utilities from the CONSUMER's config — which is precisely the
+ * coupling that produced the bug. Real CSS ships inside
+ * `@augmara/autara-ui/utilities`, which every consumer already imports, and
+ * cannot silently stop existing.
+ *
+ * ─── Reduced motion ─────────────────────────────────────────────────────
+ *
+ * Handled by the global `prefers-reduced-motion: reduce` block above, which
+ * clamps every animation to 0.01ms. A panel then appears and unmounts
+ * instantly, which is the correct behaviour rather than a missing case: Radix
+ * keeps an exiting node mounted until `animationend`, and a 0.01ms animation
+ * still fires it, so unmounting keeps working. The block below re-states the
+ * transform reset for these classes so a clamped animation can never leave a
+ * surface parked off-screen.
+ *
+ * ─── One thing to know before editing ───────────────────────────────────
+ *
+ * Tailwind v4 compiles `translate-x-*` / `translate-y-*` to the standalone
+ * `translate:` property, NOT to `transform:`. That is what makes it safe for
+ * these keyframes to animate `transform` on `DialogContent`
+ * (`-translate-x-1/2 -translate-y-1/2`) and on a popper-positioned
+ * `SelectContent` (`translate-y-1`) without fighting them — the two compose.
+ * Under Tailwind v3 the same keyframes would have thrown a centred dialog
+ * into the bottom-right corner. Verify this still holds before a v5 upgrade.
  */
 
+:root,
+:host {
+    /* Enters are slower than exits on purpose: an opening surface is asking
+     * for attention and a closing one is getting out of the way. */
+    --motion-panel-in: 160ms;
+    --motion-panel-out: 120ms;
+    --motion-modal-in: 200ms;
+    --motion-modal-out: 150ms;
+    --motion-scrim-in: 200ms;
+    --motion-scrim-out: 150ms;
+    --motion-sheet-in: 280ms;
+    --motion-sheet-out: 200ms;
+    --motion-nav-in: 250ms;
+    --motion-nav-out: 200ms;
+
+    /* The house easing — the same curve `.animate-on-scroll` above uses, so
+     * a panel and a reveal feel like one product. */
+    --motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --motion-ease-in: cubic-bezier(0.4, 0, 1, 1);
+}
+
+/* ─── Scrim — the ink behind a Dialog or a Sheet ─────────────────────── */
+
+.overlay-scrim[data-state="open"] {
+    animation: autara-fade-in var(--motion-scrim-in) var(--motion-ease-out);
+}
+
+/* `forwards` on every exit: Radix keeps the node mounted until the animation
+ * ends, so without it the surface snaps back to full opacity for one frame
+ * before unmounting. */
+.overlay-scrim[data-state="closed"] {
+    animation: autara-fade-out var(--motion-scrim-out) var(--motion-ease-in)
+        forwards;
+}
+
+/* ─── Modal panel — a centred Dialog ─────────────────────────────────── */
+
+.modal-panel[data-state="open"] {
+    animation: modal-panel-in var(--motion-modal-in) var(--motion-ease-out);
+}
+
+.modal-panel[data-state="closed"] {
+    animation: modal-panel-out var(--motion-modal-out) var(--motion-ease-in)
+        forwards;
+}
+
+@keyframes modal-panel-in {
+    from {
+        opacity: 0;
+        transform: scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@keyframes modal-panel-out {
+    from {
+        opacity: 1;
+        transform: none;
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.96);
+    }
+}
+
+/* ─── Floating panel — anything anchored to a trigger ─────────────────
+ *
+ * Tooltip, DropdownMenu, Select, PhoneInput's country list and Popover.
+ *
+ * `--radix-popper-transform-origin` is set by Radix on the positioning
+ * wrapper and inherits down, and it already accounts for the resolved side
+ * and align — so a plain scale reads as "grows out of the trigger" from every
+ * direction without a rule per side. The named aliases
+ * (`--radix-popover-content-transform-origin` and friends) resolve to the
+ * same value; the shared name is used so one rule serves every primitive.
+ *
+ * The four-pixel directional nudge is what the dead `slide-in-from-top-1`
+ * classes were reaching for. It is carried in a custom property rather than
+ * in four keyframe pairs, so the movement stays one place.
+ *
+ * `.popover-panel` is kept alongside as an alias. It shipped in v5.1.0 inside
+ * `utilities/animations.css`, which consumers import wholesale, so removing
+ * the name outright would be a silent break for anyone who reached for it.
+ */
+
+.floating-panel,
 .popover-panel {
-    transform-origin: var(--radix-popover-content-transform-origin);
+    transform-origin: var(--radix-popper-transform-origin, center);
+    --panel-dx: 0px;
+    --panel-dy: 0px;
 }
 
-.popover-panel[data-state="open"] {
-    animation: popover-panel-in 160ms cubic-bezier(0.16, 1, 0.3, 1);
+.floating-panel[data-side="bottom"],
+.popover-panel[data-side="bottom"] {
+    --panel-dy: -4px;
+}
+.floating-panel[data-side="top"],
+.popover-panel[data-side="top"] {
+    --panel-dy: 4px;
+}
+.floating-panel[data-side="left"],
+.popover-panel[data-side="left"] {
+    --panel-dx: 4px;
+}
+.floating-panel[data-side="right"],
+.popover-panel[data-side="right"] {
+    --panel-dx: -4px;
 }
 
-/* Radix keeps the element mounted while this runs, so the exit is real. */
+/* `:not([data-state="closed"])` rather than `[data-state="open"]`, because
+ * Tooltip's open states are `delayed-open` and `instant-open`. Matching only
+ * "open" is how a tooltip ends up with an exit animation and no entrance. */
+.floating-panel[data-state]:not([data-state="closed"]),
+.popover-panel[data-state]:not([data-state="closed"]) {
+    animation: floating-panel-in var(--motion-panel-in) var(--motion-ease-out);
+}
+
+.floating-panel[data-state="closed"],
 .popover-panel[data-state="closed"] {
-    animation: popover-panel-out 120ms ease-in;
+    animation: floating-panel-out var(--motion-panel-out) var(--motion-ease-in)
+        forwards;
 }
 
-@keyframes popover-panel-in {
+@keyframes floating-panel-in {
     from {
         opacity: 0;
-        transform: scale(0.96);
+        transform: translate(var(--panel-dx), var(--panel-dy)) scale(0.96);
     }
     to {
         opacity: 1;
-        transform: scale(1);
+        transform: none;
     }
 }
 
-@keyframes popover-panel-out {
+@keyframes floating-panel-out {
     from {
         opacity: 1;
-        transform: scale(1);
+        transform: none;
     }
     to {
         opacity: 0;
         transform: scale(0.96);
+    }
+}
+
+/* ─── Sheet — an edge-anchored drawer ────────────────────────────────
+ *
+ * One keyframe pair; the side supplies its own off-screen position through
+ * `--sheet-from`. A sheet slides rather than scales because it is anchored to
+ * an edge, and the direction is the whole affordance: it says where the thing
+ * came from and where dismissing it will send it.
+ */
+
+.sheet-panel--top {
+    --sheet-from: translateY(-100%);
+}
+.sheet-panel--bottom {
+    --sheet-from: translateY(100%);
+}
+.sheet-panel--left {
+    --sheet-from: translateX(-100%);
+}
+.sheet-panel--right {
+    --sheet-from: translateX(100%);
+}
+
+.sheet-panel[data-state="open"] {
+    animation: sheet-panel-in var(--motion-sheet-in) var(--motion-ease-out);
+}
+
+.sheet-panel[data-state="closed"] {
+    animation: sheet-panel-out var(--motion-sheet-out) var(--motion-ease-in)
+        forwards;
+}
+
+@keyframes sheet-panel-in {
+    from {
+        transform: var(--sheet-from);
+    }
+    to {
+        transform: none;
+    }
+}
+
+@keyframes sheet-panel-out {
+    from {
+        transform: none;
+    }
+    to {
+        transform: var(--sheet-from);
+    }
+}
+
+/* ─── Navigation menu ────────────────────────────────────────────────
+ *
+ * Three moving parts, and Radix drives each with its own attribute:
+ * the CONTENT slides horizontally by `data-motion` when the pointer moves
+ * between two open triggers, the VIEWPORT scales as it opens and resizes, and
+ * the INDICATOR fades.
+ *
+ * The 13rem travel is the value the dead `slide-in-from-left-52` class named
+ * (52 spacing units), kept so the motion is the one that was intended rather
+ * than a new one invented at the fix.
+ */
+
+.nav-menu-content {
+    --nav-dx: 0px;
+}
+.nav-menu-content[data-motion="from-start"],
+.nav-menu-content[data-motion="to-start"] {
+    --nav-dx: -13rem;
+}
+.nav-menu-content[data-motion="from-end"],
+.nav-menu-content[data-motion="to-end"] {
+    --nav-dx: 13rem;
+}
+
+.nav-menu-content[data-motion^="from-"] {
+    animation: nav-menu-content-in var(--motion-nav-in) var(--motion-ease-out);
+}
+
+.nav-menu-content[data-motion^="to-"] {
+    animation: nav-menu-content-out var(--motion-nav-out) var(--motion-ease-in)
+        forwards;
+}
+
+@keyframes nav-menu-content-in {
+    from {
+        opacity: 0;
+        transform: translateX(var(--nav-dx));
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@keyframes nav-menu-content-out {
+    from {
+        opacity: 1;
+        transform: none;
+    }
+    to {
+        opacity: 0;
+        transform: translateX(var(--nav-dx));
+    }
+}
+
+.nav-menu-viewport[data-state="open"] {
+    animation: nav-menu-viewport-in var(--motion-nav-in) var(--motion-ease-out);
+}
+
+.nav-menu-viewport[data-state="closed"] {
+    animation: nav-menu-viewport-out var(--motion-nav-out)
+        var(--motion-ease-in) forwards;
+}
+
+@keyframes nav-menu-viewport-in {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@keyframes nav-menu-viewport-out {
+    from {
+        opacity: 1;
+        transform: none;
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
+.nav-menu-indicator[data-state="visible"] {
+    animation: autara-fade-in var(--motion-nav-in) var(--motion-ease-out);
+}
+
+.nav-menu-indicator[data-state="hidden"] {
+    animation: autara-fade-out var(--motion-nav-out) var(--motion-ease-in)
+        forwards;
+}
+
+/* ─── The two primitives everything above shares ─────────────────────── */
+
+@keyframes autara-fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes autara-fade-out {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+/* Reduced motion, restated for the transform-carrying surfaces.
+ *
+ * The global block above already clamps duration to 0.01ms, which is what
+ * makes this correct rather than merely fast. This exists so that a surface
+ * can never be left parked at its `from` position if a browser honours the
+ * media query but not the clamp — a sheet stuck at `translateX(100%)` is an
+ * invisible modal with a focus trap in it, which is worse than an
+ * unanimated one. */
+@media (prefers-reduced-motion: reduce) {
+    .floating-panel,
+    .popover-panel,
+    .modal-panel,
+    .sheet-panel,
+    .nav-menu-content,
+    .nav-menu-viewport {
+        --panel-dx: 0px;
+        --panel-dy: 0px;
+        --sheet-from: none;
+        --nav-dx: 0px;
     }
 }

@@ -27,12 +27,15 @@ const DropdownMenuPortal = DropdownMenuPrimitive.Portal
 const DropdownMenuSub = DropdownMenuPrimitive.Sub
 
 // Shared surface for Content and SubContent.
+//
+// AUTM-967: the four lines that used to follow the surface classes were
+// `animate-in` / `zoom-in-95` / `slide-in-from-*` — `tailwindcss-animate`
+// utilities, and that plugin is not a dependency of this package or of any
+// consumer, so they emitted nothing and every menu appeared instantly.
+// `.floating-panel` is the real CSS, in `utilities/animations.css`.
 const SURFACE = cn(
     'z-50 min-w-[10rem] overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-[var(--surface)] p-1 text-[var(--text-strong)]',
-    'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
-    'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
-    'data-[side=bottom]:slide-in-from-top-1 data-[side=top]:slide-in-from-bottom-1',
-    'data-[side=left]:slide-in-from-right-1 data-[side=right]:slide-in-from-left-1'
+    'floating-panel'
 )
 
 // Shared item grammar for Item and SubTrigger.
