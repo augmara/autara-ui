@@ -32,7 +32,7 @@ export function TrustItem({ icon, title, description, className }: TrustItemProp
         {icon}
       </span>
       <div className="min-w-0">
-        <p className="text-sm font-semibold text-[var(--text-strong)]">{title}</p>
+        <p className="text-sm font-bold text-[var(--text-strong)]">{title}</p>
         <p className="mt-0.5 text-xs leading-relaxed text-[var(--text-muted)]">
           {description}
         </p>

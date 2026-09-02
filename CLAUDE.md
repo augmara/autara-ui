@@ -125,7 +125,12 @@ docs/
   button, which turned into a white slab on dark before this landed).
 - **Satoshi typography** — bundled. Use weights 400 / 500 / 700 only
   (Black mapped to 700). Never 300, 600, 800, 900.
-- **4px brand-purple halo** on focused inputs (`.field-input`) — the
+- **Focus signature (v2.4): warm-cream tint + solid brand-purple border, NO
+  halo** on focused inputs (`.field-input`). Corrected 2026-09-01 — this line
+  used to claim a "4px brand-purple halo", and `src/utilities/forms.css` says
+  in its own rule: "a clean, symmetric ring, no outer halo and no one-sided
+  bar". The stale claim propagated into merchant-mobile's CLAUDE.md and into an
+  agent brief before the code was checked. Read the rule, not the prose.
   signature focus ring
 - **Editorial eyebrow** — uppercase 11px, `letter-spacing: 0.22em`,
   with a hairline tick (`::before`) — anchors every section heading
@@ -154,9 +159,36 @@ docs/
   the fill. `#4E1BBD` measures ~1:1 against dark surfaces — never
   hardcode it for text/borders. The Storybook toolbar has a Theme
   switcher — check every story in both modes.
+- **A `theme` prop's default may be a TypeScript PARAMETER default, and
+  `default-variant.test.ts`'s cva scan cannot see one.** That scan reads
+  `defaultVariants:` out of a `cva()` call, so `({ theme = 'dark' })` is not
+  merely missed by it — it is unreachable by that technique. Three components
+  defaulted to the static ink treatment for months behind that blind spot
+  (`Table`, `Avatar`'s fallback, `Progress`'s track); a bare `<Table>`
+  measured **1.00:1** on the cream canvas. AUTM-975 extended the test to
+  resolve parameter defaults, including the `const isDark = theme === 'dark'`
+  alias form. Related trap in the naming: on these components `theme="light"`
+  means *"the branch built from semantic tokens"*, i.e. the one that TRACKS
+  the theme in both directions — `theme="dark"` is the static opt-in for a
+  photo or marketing surface, not dark mode. The value names are published
+  API and are not being renamed.
 - The Tailwind preset (`src/preset/index.mjs`) maps `bg-autara-purple`
   and friends. Consumers must include the preset in their Tailwind
   config OR import the CSS tokens — pick one consistent path per app.
+- **Storybook can paint over the focus ring you are trying to check.**
+  `.storybook/storybook.css` carries a `*:focus-visible` fallback outline. It
+  used to sit UNLAYERED right after `@import "tailwindcss"`, and unlayered CSS
+  beats layered CSS regardless of specificity — Tailwind v4 puts utilities in
+  `@layer utilities`, so that one rule overrode `focus-visible:outline-none`
+  on every component in the library. A focused `Button` computed
+  `outline: rgb(78, 27, 189) solid 2px` from Storybook while its own ring sat
+  at 35% alpha underneath, and no consumer ever rendered that outline because
+  `.storybook/` ships nowhere. That is how 27 focus rings drifted below the
+  WCAG 2.4.11 floor while every story looked right (AUTM-977). It is now in
+  `@layer base` and `solid-emphasis.test.ts` fails if it leaves the layer.
+  Corollary when measuring anything focus-related: `Button`'s BASE carries
+  `transition-all duration-200`, so screenshotting straight after a `Tab`
+  samples frame 1 and reports a ~0px ring at ~0.004 alpha. Settle first.
 - Components must NOT import `motion/react` for layout-critical
   visuals — `whileInView` + variants are flaky on Next 16 + React 19 +
   motion v12 in customer-web. Use IntersectionObserver or direct

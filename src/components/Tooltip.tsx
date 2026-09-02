@@ -12,8 +12,15 @@ import { cn } from '../lib/cn'
  *   family.
  * - **No drop shadow** — the dark/light contrast against the cream
  *   canvas does the depth work (Autara house rule).
- * - Keeps the existing Radix `slide-in` / `zoom-in` animations and
- *   side-aware origin.
+ * - AUTM-967: it did NOT keep "the existing Radix slide-in / zoom-in
+ *   animations", which is what this line used to claim. Those were
+ *   `tailwindcss-animate` utilities and the plugin is not a dependency of
+ *   this package or of any consumer, so a tooltip snapped into existence.
+ *   That is the most repeated micro-interaction in the product and the one
+ *   where an instant appearance reads most like a glitch. It is now
+ *   `.floating-panel` — real CSS in `utilities/animations.css`, side-aware
+ *   off `data-side`, origin off Radix's own transform-origin variable,
+ *   reduced motion respected.
  *
  * The `theme` prop is preserved for source-level compatibility but is
  * currently a **no-op** — only the ink variant ships. A light /
@@ -38,13 +45,9 @@ const TooltipContent = React.forwardRef<
             // Capsule grammar — matches the Toast ink pill so floating
             // UI reads as one family.
             'z-50 max-w-xs rounded-md bg-[var(--surface-inverse)] px-3 py-1.5 text-[12px] font-medium text-[var(--text-on-inverse)] ring-1 ring-inset ring-[var(--border-on-inverse)]',
-            // Radix transition primitives — origin is side-aware.
-            'animate-in fade-in-0 zoom-in-95',
-            'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
-            'data-[side=bottom]:slide-in-from-top-1',
-            'data-[side=left]:slide-in-from-right-1',
-            'data-[side=right]:slide-in-from-left-1',
-            'data-[side=top]:slide-in-from-bottom-1',
+            // Enter/exit — side-aware, and the rule matches Tooltip's
+            // `delayed-open` / `instant-open` states, not just `open`.
+            'floating-panel',
             className
         )}
         {...props}

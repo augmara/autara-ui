@@ -23,11 +23,18 @@ export interface SectionHeadingProps {
   /** Eyebrow color tone. Defaults to brand purple. */
   tone?: "brand" | "lime" | "aqua" | "muted";
   /**
-   * Use the "editorial" treatment — hairline tick before the eyebrow,
-   * larger heading, more vertical breathing room. Matches the customer-web
-   * "How it works" + hero patterns.
+   * Use the "editorial" treatment — display-scale heading in a 3/9 grid with
+   * more vertical breathing room. Matches the customer-web "How it works" +
+   * hero patterns. (v3: the eyebrow renders with no tick.)
    */
   editorial?: boolean;
+  /**
+   * Heading register for the STANDARD (non-editorial) variant.
+   * "md" (default) is the compact carousel/list header; "lg" is the middle
+   * register for content-section headings (merchant profile) — between md and
+   * the editorial display clamp.
+   */
+  size?: "md" | "lg";
   className?: string;
 }
 
@@ -48,6 +55,7 @@ export function SectionHeading({
   trailing,
   tone = "brand",
   editorial,
+  size = "md",
   className,
 }: SectionHeadingProps) {
   if (editorial) {
@@ -62,15 +70,7 @@ export function SectionHeading({
                   EYEBROW_TONE[tone],
                 )}
               >
-                <span
-                  aria-hidden
-                  className={cn(
-                    "h-px w-8",
-                    tone === "brand"
-                      ? "bg-[var(--text-subtle)]"
-                      : "bg-[#111827]/40",
-                  )}
-                />
+                {/* v3: no tick - the eyebrow stands alone (Don 2026-08-26) */}
                 {eyebrow}
               </p>
             ) : null}
@@ -101,7 +101,9 @@ export function SectionHeading({
         {eyebrow ? (
           <p
             className={cn(
-              "text-[10px] font-semibold uppercase tracking-[0.18em]",
+              // 500, not 600: Satoshi ships 400/500/700 only - a 600 here
+              // synthesised on every consumer.
+              "text-[10px] font-medium uppercase tracking-[0.18em]",
               EYEBROW_TONE[tone],
             )}
           >
@@ -110,7 +112,12 @@ export function SectionHeading({
         ) : null}
         <h2
           id={id}
-          className="text-lg font-semibold tracking-tight text-[var(--text-strong)] sm:text-xl"
+          className={cn(
+            "tracking-tight text-[var(--text-strong)]",
+            size === "lg"
+              ? "text-2xl font-bold tracking-[-0.02em] sm:text-3xl"
+              : "text-lg font-bold sm:text-xl",
+          )}
         >
           {title}
         </h2>

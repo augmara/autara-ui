@@ -47,7 +47,7 @@ const AccordionTrigger = React.forwardRef<
             className={cn(
                 'group flex flex-1 items-center justify-between gap-4 py-4 text-left text-[15px] font-medium text-[var(--text-strong)] transition-colors',
                 'hover:[&_svg]:text-[var(--text-strong)]',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-autara-purple/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]',
                 'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
                 '[&[data-state=open]>svg]:rotate-180',
                 className

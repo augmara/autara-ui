@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Input } from "./Input";
+import { GradientGround } from "./GlassSurface";
 
 /**
  * Input — Autara's canonical text input. Wraps the `.field-input`
@@ -10,8 +11,8 @@ import { Input } from "./Input";
  * Visual rules:
  *   - 44 × full-width pill on cream surface (`size="md"`, default).
  *   - 48 × full-width on hero / onboarding panels (`size="lg"`).
- *   - 4px brand-purple halo on focus.
- *   - Red border + red halo when `aria-invalid="true"`.
+ *   - Focus: warm-cream tint + solid brand-purple border. No halo (AUT-686).
+ *   - Red border when `aria-invalid="true"`.
  *   - Disabled fills with `--surface-warm` and dims text.
  */
 const meta = {
@@ -20,6 +21,7 @@ const meta = {
   parameters: { layout: "centered" },
   argTypes: {
     size: { control: { type: "select" }, options: ["md", "lg"] },
+    surface: { control: { type: "select" }, options: ["surface", "glass"] },
     disabled: { control: "boolean" },
   },
   args: {
@@ -88,7 +90,7 @@ export const StateMatrix: Story = {
         },
       ].map((row) => (
         <label key={row.eyebrow} className="block">
-          <span className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+          <span className="mb-1.5 block text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
             {row.eyebrow}
           </span>
           <Input {...row.props} />
@@ -105,13 +107,13 @@ export const SizePair: Story = {
   render: () => (
     <div className="max-w-md space-y-4">
       <label className="block">
-        <span className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+        <span className="mb-1.5 block text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
           md — 44 px (default)
         </span>
         <Input placeholder="name@example.com" />
       </label>
       <label className="block">
-        <span className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+        <span className="mb-1.5 block text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
           lg — 48 px (hero / onboarding panels)
         </span>
         <Input size="lg" placeholder="name@example.com" />
@@ -127,7 +129,7 @@ export const InOnboardingForm: Story = {
   render: () => (
     <form className="max-w-md space-y-4 rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)] p-6">
       <div>
-        <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+        <div className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
           Step 1 of 5
         </div>
         <h3 className="mt-1 text-lg font-medium leading-tight text-[var(--text-strong)]">
@@ -135,13 +137,13 @@ export const InOnboardingForm: Story = {
         </h3>
       </div>
       <label className="grid gap-1.5">
-        <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+        <span className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
           Business name
         </span>
         <Input placeholder="Sam's Mobile Detail" autoComplete="organization" />
       </label>
       <label className="grid gap-1.5">
-        <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+        <span className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
           ABN
         </span>
         <Input
@@ -155,11 +157,65 @@ export const InOnboardingForm: Story = {
         </span>
       </label>
       <label className="grid gap-1.5">
-        <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+        <span className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
           Email
         </span>
         <Input type="email" placeholder="sam@example.com" autoComplete="email" />
       </label>
     </form>
+  ),
+};
+
+// ─── AUTM-948 ──────────────────────────────────────────────────────
+/**
+ * `surface="glass"` — for a field sitting **directly on the gradient
+ * ground**: a nav search box, a hero capture form, a filter bar over a bloom.
+ * An opaque field there punches a white slab through the material.
+ *
+ * **A field INSIDE a glass card stays opaque.** That is why this is opt-in
+ * rather than the default: two stacked translucencies read as mud, and the
+ * card underneath already supplies the blur. The lower half of each pane
+ * shows the correct pairing.
+ *
+ * Focus keeps the house signature — warm tint plus a solid purple border.
+ * Only the resting fill changes. Tab through both to check.
+ */
+export const GlassField: Story = {
+  name: "Glass — on the ground vs inside a card",
+  parameters: { layout: "fullscreen" },
+  render: () => (
+    <div className="grid sm:grid-cols-2">
+      {(["light", "dark"] as const).map((theme) => (
+        <div key={theme} data-theme={theme}>
+          <GradientGround className="min-h-[22rem] p-8">
+            <p className="mb-2 text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-[var(--text-subtle)]">
+              {theme} · on the ground → glass
+            </p>
+            <Input
+              surface="glass"
+              placeholder="Search detailers near you"
+              aria-label="Search detailers near you"
+              data-testid="story-input-glass"
+            />
+
+            <p className="mt-6 mb-2 text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-[var(--text-subtle)]">
+              inside a card → stays opaque
+            </p>
+            <div className="glass-surface space-y-3 p-5">
+              <Input
+                placeholder="Business name"
+                aria-label="Business name"
+                data-testid="story-input-in-card"
+              />
+              <Input
+                placeholder="Wrong — glass inside glass"
+                aria-label="Glass inside glass"
+                surface="glass"
+              />
+            </div>
+          </GradientGround>
+        </div>
+      ))}
+    </div>
   ),
 };

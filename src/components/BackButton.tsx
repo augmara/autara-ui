@@ -105,7 +105,7 @@ export const BackButton = forwardRef<HTMLButtonElement, BackButtonProps>(
                 aria-label={label ? undefined : ariaLabel}
                 className={cn(
                     'group inline-flex min-h-11 items-center gap-2.5 rounded-full',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-autara-purple)]/35',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]',
                     className,
                 )}
                 {...(asChild ? rest : { type: 'button' as const, ...rest })}

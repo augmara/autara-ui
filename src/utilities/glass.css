@@ -1,57 +1,246 @@
 /* ─── Autara Card & Glass Effects ────────────────────────────────────────
  *
- * Light-theme canonical defaults from autara-customer-web/globals.css.
+ * ─── REVISED 2026-09-01 (AUTM-948) ──────────────────────────────────────
  *
- *   "AUTARA AESTHETIC: NO DROP SHADOWS. The brand reads as solid,
- *    editorial, hairline-edged — never floating-card. Lift comes from
- *    the 1px hairline border + backdrop-blur alone."
+ * This file used to open with "NO DROP SHADOWS … lift comes from the 1px
+ * hairline border + backdrop-blur alone", and then `.glass-card` carried no
+ * blur at all. Under the Autara Glass direction the rule is sharper and the
+ * implementation now matches it:
  *
- * v1.0.x shipped these with purple-tinted shadows + translateY(-2px)
- * on hover; v1.1.0 brings them in line with the editorial identity.
- * Border-color shift on hover is the only depth signal.
+ *   - Drop shadows are STILL banned. `shadows.css` still evaluates every
+ *     `--shadow-*` to `none`. Nothing here casts one.
+ *   - `backdrop-filter: blur() saturate()` is now REQUIRED on surfaces
+ *     rather than a smell to remove.
+ *   - The 1px INSET top highlight is load-bearing, not decoration. An inset
+ *     highlight is not a drop shadow; it is the specular edge that makes a
+ *     translucent panel read as glass instead of as grey.
+ *
+ * Source of truth for the values: `src/tokens/glass.css`. Source of truth
+ * for the direction: `knowledge/project_ui_direction_2026_09_01.md`.
+ *
+ * ─── TWO GOTCHAS BEFORE YOU USE THIS ────────────────────────────────────
+ *
+ * 1. `backdrop-filter` CREATES A CONTAINING BLOCK for `position: fixed`
+ *    descendants. This is not theoretical here: AUTM-721 is exactly this
+ *    bug — merchant-web's header carried a `backdrop-filter`, so the mobile
+ *    menu's `position: fixed` panel resolved against the header instead of
+ *    the viewport and collapsed to a one-line strip. Portal floating UI to
+ *    `document.body` (dialogs, sheets, toasts and popovers already do) and
+ *    never nest a fixed-position panel inside a glass surface.
+ *
+ * 2. `backdrop-filter` IS GPU WORK, per surface, per frame. A long booking
+ *    list on the iPad Pro 11" is where it drops frames first, and that is a
+ *    real-device test, not a browser one. Every rule below that blurs is
+ *    marked GPU in a comment, and `Storybook → Design System → Glass` lists
+ *    them so the consumer-side device test has a target. Prefer
+ *    `.glass-surface--flat` inside virtualised or long lists: same material
+ *    with the blur removed, and at row density nobody can see the frost.
  */
 
-/* ─── Glass card — generic light surface ─────────────────────────────── */
+/* ─── The glass surface primitive ────────────────────────────────────────
+ *
+ * ONE implementation. Components compose this rather than hand-rolling
+ * `backdrop-filter`, so raising the blur or re-tuning the highlight is a
+ * one-line change instead of a sweep. The React wrapper is `GlassSurface`;
+ * `Card variant="glass"` renders the same material.
+ */
+
+.glass-surface {
+    background: var(--glass-fill);
+    /* GPU — see gotcha 2. */
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    -webkit-backdrop-filter: blur(var(--glass-blur))
+        saturate(var(--glass-saturate));
+    border: 1px solid var(--glass-edge);
+    border-radius: var(--radius-autara-lg);
+    /* Rule 2 — the 1px inset top highlight. INSET, so this is not a drop
+     * shadow. Remove it and the surface reads as a grey box; it is the
+     * single line that carries the whole direction. */
+    box-shadow: inset 0 1px 0 var(--glass-hi);
+    color: var(--text-strong);
+    transition: border-color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+        background-color 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Dense body text — admin tables, long booking lists, anything a user reads
+ * rather than scans. Same material, less of the ground coming through. */
+.glass-surface--strong {
+    background: var(--glass-fill-strong);
+}
+
+/* No blur. Use inside virtualised / very long lists, and as the automatic
+ * fallback below. Still carries the fill, the edge and the highlight, so it
+ * sits in the same family rather than looking like a different component. */
+.glass-surface--flat {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+/* Hover lift is a border-colour shift. Never a translate on a card-shaped
+ * surface — a card that floats on hover contradicts the brand — and never a
+ * shadow. */
+.glass-surface--interactive:hover {
+    border-color: var(--glass-edge-hi);
+    background: var(--glass-fill-strong);
+}
+
+/* Browsers without `backdrop-filter` composite the fill straight onto the
+ * ground. That is legible — every contrast number in `tokens/glass.css` is
+ * measured on the composite, not on the blur — but it loses the frost, so
+ * raise the fill rather than leaving a no-op in the paint path. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .glass-surface {
+        background: var(--glass-fill-strong);
+    }
+}
+
+/* Respect a user who has asked the OS to reduce transparency. Same surface,
+ * opaque, no GPU cost. `--surface` is the opaque twin of `--glass-fill` in
+ * both themes, so nothing shifts but the frost. */
+@media (prefers-reduced-transparency: reduce) {
+    .glass-surface {
+        background: var(--surface);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+}
+
+/* ─── Gradient ground ────────────────────────────────────────────────────
+ *
+ * Three blurred blooms of the core gradient. Glass is meaningless without
+ * one — on a flat canvas a glass panel is just a bordered box, which is why
+ * every story showing a glass surface has to render it on this.
+ *
+ * Brand Guideline Vol.1 p14 defines the core gradient for "hero sections on
+ * web, UI, UX" and restricts it from "small UI elements or body text
+ * backgrounds". Blooms BEHIND glass satisfy that: the gradient is a ground,
+ * never a fill behind text. `--bloom-alpha` is contrast-capped — see
+ * `tokens/glass.css`.
+ *
+ * `radial-gradient` is cheap: one paint, no per-frame work. The ground is
+ * not the performance risk — the blur on top of it is.
+ */
+
+.gradient-ground {
+    position: relative;
+    background-color: var(--background);
+    background-image:
+        radial-gradient(
+            60rem 40rem at 8% -10%,
+            color-mix(in srgb, var(--bloom-act) calc(var(--bloom-alpha) * 100%), transparent)
+                0%,
+            transparent 60%
+        ),
+        radial-gradient(
+            50rem 36rem at 92% 8%,
+            color-mix(in srgb, var(--bloom-flight) calc(var(--bloom-alpha) * 100%), transparent)
+                0%,
+            transparent 62%
+        ),
+        radial-gradient(
+            46rem 34rem at 50% 108%,
+            color-mix(in srgb, var(--bloom-money) calc(var(--bloom-alpha) * 100%), transparent)
+                0%,
+            transparent 62%
+        );
+}
+
+/* Keep content above the painted ground when it is used as a wrapper. */
+.gradient-ground > * {
+    position: relative;
+}
+
+/* App-shell variant: the blooms are anchored to the VIEWPORT, so they stay
+ * put while the page scrolls instead of sliding away with the content.
+ * Deliberately opt-in — `background-attachment: fixed` is a known scroll-perf
+ * cost on mobile Safari, and it is wrong on a bounded element (the element
+ * would show whichever slice of the viewport-sized gradient it happens to
+ * overlap, which for a card-sized box is usually flat colour). */
+.gradient-ground--fixed {
+    background-attachment: fixed;
+}
+
+/* `color-mix()` is Baseline 2023 (Chrome 111, Safari 16.2, Firefox 113) and
+ * every Autara target clears it — merchant-mobile is Capacitor 8 on iOS
+ * 16.4+. Somewhere without it renders the blooms as `transparent`, i.e. the
+ * flat canvas: the surfaces above still read, because every contrast number
+ * is measured on the flat canvas too. Degradation, not breakage. */
+
+/* ─── Glass card — the v1.x name, now genuinely glass ────────────────────
+ *
+ * Kept as an alias so every consumer already writing `.glass-card` picks up
+ * the corrected material without a code change. It was an opaque
+ * `var(--surface)` panel with no blur, under a header comment claiming the
+ * lift came from "the 1px hairline border + backdrop-blur" — a class named
+ * glass-card that was not glass.
+ */
 
 .glass-card {
-    /* AUTM-713 — was a literal #ffffff while the border beside it already
-       read var(--border-subtle): half-tokenised, so a surface change would
-       have moved the edge and left the fill behind. */
-    background: var(--surface);
-    border: 1px solid var(--border-subtle);
+    background: var(--glass-fill);
+    /* GPU — see gotcha 2. */
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    -webkit-backdrop-filter: blur(var(--glass-blur))
+        saturate(var(--glass-saturate));
+    border: 1px solid var(--glass-edge);
     border-radius: var(--radius-autara-lg);
+    box-shadow: inset 0 1px 0 var(--glass-hi);
     transition: border-color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
         background-color 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     color: var(--text-strong);
 }
 
 .glass-card:hover {
-    border-color: var(--accent-border-soft);
+    border-color: var(--glass-edge-hi);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+    .glass-card {
+        background: var(--surface);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
 }
 
 /* ─── Nav glass — sticky/floating navigation bar ─────────────────────── */
 
 .nav-glass {
     background: var(--nav-glass-bg);
-    backdrop-filter: blur(20px) saturate(1.2);
-    -webkit-backdrop-filter: blur(20px) saturate(1.2);
-    border: 1px solid var(--border-subtle);
-    /* No box-shadow — Autara aesthetic. Lift comes from the 1px
-     * hairline border + backdrop-blur. */
+    /* GPU — see gotcha 2. And gotcha 1 applies hardest HERE: this is the
+     * exact element that broke merchant-web's mobile menu (AUTM-721). Any
+     * panel this bar opens must portal to document.body. */
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    -webkit-backdrop-filter: blur(var(--glass-blur))
+        saturate(var(--glass-saturate));
+    border: 1px solid var(--glass-edge);
+    /* No box-shadow beyond the inset highlight — Autara aesthetic. Lift
+     * comes from the blur + the 1px specular edge. */
+    box-shadow: inset 0 1px 0 var(--glass-hi);
     border-radius: var(--radius-autara-lg);
     will-change: transform;
     transform: translateZ(0);
 }
 
+@media (prefers-reduced-transparency: reduce) {
+    .nav-glass {
+        background: var(--surface);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+}
+
 /* ─── Service card — for service catalogue rows ──────────────────────── */
+/*
+ * Deliberately NOT blurred. Service rows appear in long lists, which is the
+ * one place `backdrop-filter` actually costs frames (gotcha 2). It keeps the
+ * glass EDGE and the highlight so it sits in the same family, and skips the
+ * blur.
+ */
 
 .service-card {
-    /* AUTM-713 — was a literal #ffffff while the border beside it already
-       read var(--border-subtle): half-tokenised, so a surface change would
-       have moved the edge and left the fill behind. */
-    background: var(--surface);
-    border: 1px solid var(--border-subtle);
+    background: var(--glass-fill-strong);
+    border: 1px solid var(--glass-edge);
     border-radius: var(--radius-autara-lg);
+    box-shadow: inset 0 1px 0 var(--glass-hi);
     padding: 24px;
     transition: border-color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
         background-color 0.35s cubic-bezier(0.16, 1, 0.3, 1);
@@ -60,5 +249,5 @@
 }
 
 .service-card:hover {
-    border-color: var(--accent-border-soft);
+    border-color: var(--glass-edge-hi);
 }

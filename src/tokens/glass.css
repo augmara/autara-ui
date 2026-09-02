@@ -1,0 +1,267 @@
+/* ─── Autara Glass — surface material + the semantic accent trio ─────────
+ *
+ * AUTM-948. The token layer for the "Autara Glass" direction Don settled on
+ * 2026-09-01 (`knowledge/project_ui_direction_2026_09_01.md`). Read that
+ * before changing anything here — it is the artefact a proposed change has
+ * to argue against, and it exists to stop a sixth UI redesign.
+ *
+ * Six rules; three of them live in this file:
+ *
+ *   2. Glass over gradient — translucent fill + `backdrop-filter: blur()
+ *      saturate()` + a 1px INSET TOP HIGHLIGHT. The highlight is
+ *      load-bearing: without it glass reads as flat grey and the whole
+ *      direction collapses. It is `--glass-hi`.
+ *   4. Purple ACTS · aqua IN FLIGHT · lime DONE and money-in. One accent
+ *      per zone; aqua and lime never compete inside the same block.
+ *   6. Blur carries depth — no drop shadows, no glow, no neon outlines.
+ *      `shadows.css` still evaluates every `--shadow-*` to `none` and that
+ *      does not change. The only `box-shadow` this direction permits is the
+ *      INSET highlight, which is not a drop shadow.
+ *
+ * Two-layer, same as `colors.css` (AUTM-734): raw themed values on `:root`
+ * and `:root[data-theme="dark"]`, Tailwind-facing names in `@theme inline`.
+ * Dark keys off `data-theme`, NEVER `prefers-color-scheme` — the consuming
+ * app owns switching and persistence.
+ *
+ * ─── The fill model, and why it is not symmetric ────────────────────────
+ *
+ * Light glass is WHITE at high alpha; dark glass is `--surface` (#1b1822)
+ * at high alpha. Both dominate the ground and let the bloom tint through,
+ * which is the point — but the naive dark implementation (white at low
+ * alpha, the way the pre-v1.1 `Card variant="glass"` did it) LIFTS the
+ * surface toward whatever is behind it. Measured, over an aqua bloom that
+ * put `--text-muted` at 3.62:1 and `--text-subtle` at 2.73:1, and
+ * `--accent` at 1.79:1. A glass panel has to dim its ground, not join it.
+ *
+ * ─── Measured, not eyeballed ────────────────────────────────────────────
+ *
+ * `glass-contrast.test.ts` reads THIS FILE and recomputes every number
+ * below, so the assertions fail when the stylesheet changes rather than
+ * when someone remembers to update a constant. Worst case in the whole
+ * matrix — every text token, on `--glass-fill`, over every bloom, both
+ * themes:
+ *
+ *   light   text-strong 17.54  text-muted 7.49  text-subtle 4.60   (purple bloom)
+ *   dark    text-strong 13.76  text-muted 7.79  text-subtle 5.02   (aqua bloom)
+ *
+ * The bloom peak alpha (`--bloom-alpha`, 0.28) is NOT a taste value. It is
+ * the cap that keeps the worst cell above the 4.5:1 floor. Raising it to
+ * 0.55 — which looks better in a static mockup — drops dark `--text-subtle`
+ * over an aqua bloom to 3.99:1. If a designer wants louder blooms, the
+ * text ladder has to move first.
+ */
+
+:root,
+:host {
+    /* ─── Glass material ─────────────────────────────────────────────── */
+    /* The default surface fill. White at 0.80 over the cream canvas is
+     * effectively `--surface` when nothing is behind it, and a tinted
+     * frost when a bloom is. */
+    --glass-fill: rgba(255, 255, 255, 0.8);
+    /* For surfaces carrying DENSE body text — admin tables, long booking
+     * lists, anything where a user reads rather than scans. Admin's dense
+     * light-mode tables are the hardest case in the system; this is the
+     * token that answers them. */
+    --glass-fill-strong: rgba(255, 255, 255, 0.92);
+
+    /* The 1px inset top highlight — rule 2. This is the whole difference
+     * between "glass" and "grey box". Applied as
+     * `box-shadow: inset 0 1px 0 var(--glass-hi)`. */
+    --glass-hi: rgba(255, 255, 255, 0.9);
+
+    /* Hairline edge. One step stronger than `--border-subtle` because a
+     * translucent surface has a weaker tonal step to lean on. */
+    --glass-edge: rgba(17, 24, 39, 0.1);
+    --glass-edge-hi: rgba(17, 24, 39, 0.18);
+
+    /* GPU cost lives here. See the performance note in `utilities/glass.css`
+     * before raising the blur radius. */
+    --glass-blur: 20px;
+    --glass-saturate: 1.4;
+
+    /* ─── Gradient ground — three blurred blooms of the core gradient ──
+     * Brand Guideline Vol.1 p14 defines the core gradient for "hero
+     * sections on web, UI, UX" with one restriction: "avoid using this in
+     * small UI elements or as body text backgrounds". Blurred blooms
+     * BEHIND glass satisfy that — the gradient is a ground, never a fill
+     * behind text. */
+    --bloom-act: #4e1bbd;
+    --bloom-flight: #4ceaff;
+    --bloom-money: #b7e149;
+    /* Peak opacity at a bloom's centre. Contrast-capped — see the header. */
+    --bloom-alpha: 0.28;
+
+    /* ─── Semantic accents — rule 4 ──────────────────────────────────── */
+    /* Each trio is: text/border grade · solid-fill grade · the on-colour
+     * that fill guarantees ≥4.5:1 for. Never use a `-fill` value as ink or
+     * a text value as a fill. */
+
+    /* ACT — purple. Buttons, active nav, focus, anything awaiting the user.
+     * Aliases the existing accent stack rather than duplicating it, so the
+     * two cannot drift. */
+    --act: var(--accent);
+    --act-fill: var(--accent-fill);
+    --act-fill-hover: var(--accent-fill-hover);
+    --on-act: var(--on-accent);
+
+    /* IN FLIGHT — aqua. Confirmed, running, money on its way.
+     *
+     * The raw brand aqua #4ceaff measures 1.45:1 on white. It is a DARK-mode
+     * ink and a fill; it is never light-mode text. The reference mockup
+     * darkened it to #0e7c97, which clears on pure white (4.83:1) and fails
+     * on the two surfaces it actually has to sit on: `--surface-elevated`
+     * 4.31:1 and glass-over-a-purple-bloom 4.36:1. That is the same
+     * one-surface blind spot AUTM-737 corrected for `--text-subtle`.
+     * #0d7288 clears every surface: white 5.56 · cream 5.32 · elevated 4.96
+     * · glass/purple-bloom 5.02. */
+    --flight: #0d7288;
+    --flight-fill: #0d7288;
+    --flight-fill-hover: #0a6072;
+    --on-flight: #ffffff;
+
+    /* DONE / MONEY IN — lime. Raw brand lime #b7e149 is 1.51:1 on white and
+     * is likewise a fill, not light ink. #3a6b14 is the existing
+     * `--intent-success-text` value and measures 6.38 / 6.11 / 5.70 on
+     * white / cream / elevated — reused deliberately so "success" and
+     * "money in" cannot drift apart. */
+    --money: #3a6b14;
+    --money-fill: #b7e149;
+    --money-fill-hover: #a6cf3c;
+    --on-money: #0e0a1a;
+
+    /* ─── NEUTRAL — the achromatic member of the same family ──────────
+     * Rule 4 says emphasis is carried by a SOLID fill, never a ring and
+     * never a tint. Rule 5 says purple ACTS, aqua is IN FLIGHT, lime is
+     * DONE. Between those two there was a hole: a piece of information
+     * that is not status still has to be solid, and the only solid fills
+     * in the library were the three semantic ones.
+     *
+     * Every neutral chip in the library therefore reached for
+     * `ring-1 ring-inset` over `--surface-elevated` — a fill only 1.05:1
+     * from the card, with the ring doing the work a fill should do. That
+     * is the outlined box Don rejected, and it is the missing token that
+     * caused it, not a per-component slip.
+     *
+     * So: a solid slate that is NOT an accent. Spending purple on
+     * "this booking is mobile" would dilute the meaning rule 5 is trying
+     * to establish — the icon and the word already say which mode it is.
+     *
+     * It is a MATERIAL, not an inversion. `--surface-inverse` flips from
+     * near-black to near-white across themes, which is right for a Torph
+     * capsule and wrong here: at booking-list density it would put a white
+     * slab on every row in dark mode. This slate stays a slate in both
+     * themes — it goes DOWN from a light ground and UP from a dark one,
+     * which is simply the direction each canvas has room in.
+     *
+     * There is deliberately no text-grade `--neutral`: the text ladder
+     * (`--text-strong` / `--text-muted` / `--text-subtle`) already is the
+     * achromatic ink scale, and a fourth name for it would drift.
+     *
+     * Measured (neutral-contrast.test.ts recomputes all of this from this
+     * file): label 10.98:1 on the fill, and the fill is 9.8-11.0:1 from
+     * every ground it can sit on — surface, elevated, canvas, and glass
+     * over each of the three blooms. */
+    --neutral-fill: #3f3950;
+    --neutral-fill-hover: #332d42;
+    --on-neutral: #ffffff;
+}
+
+/* ─── AUTM-948: the dark scope is not root-only ──────────────────────────
+ * `:root[data-theme="dark"]` only ever matched <html>. A nested
+ * `<div data-theme="dark">` matched NOTHING, so a side-by-side
+ * light/dark story rendered two identical LIGHT panes — silently, because
+ * the markup looked right. Every "BothThemes" story in the library was
+ * affected, including the one on the in-flight ErrorCard PR (#55).
+ *
+ * The `@custom-variant dark` in tokens/index.css already resolved to
+ * `[data-theme="dark"], [data-theme="dark"] *` — i.e. `dark:` utilities
+ * nested correctly while the TOKENS they were meant to pair with did not.
+ * Adding the element-level selector closes that gap.
+ *
+ * `:root[…]` is kept alongside it so specificity on <html> is unchanged
+ * (0,2,0) — this is purely additive. On a nested element the (0,1,0)
+ * selector beats the inherited `:root` values because a rule that matches
+ * the element wins over inheritance, regardless of specificity.
+ *
+ * Consumers are unaffected: stamping `data-theme` on <html> works exactly
+ * as before. Scoping a dark island now also works, which is what a design
+ * system should have allowed all along. */
+:root[data-theme="dark"],
+[data-theme="dark"] {
+    /* Dark glass DIMS its ground rather than lifting toward it — see the
+     * header. `--surface` at 0.76 keeps every text token above 4.5:1 over
+     * the brightest bloom while still reading as translucent. */
+    --glass-fill: rgba(27, 24, 34, 0.76);
+    --glass-fill-strong: rgba(27, 24, 34, 0.9);
+
+    /* 0.10, not 0.90 — on an ink surface a 90%-white hairline is a scar,
+     * not a highlight. This is the value the direction doc names. */
+    --glass-hi: rgba(255, 255, 255, 0.1);
+
+    --glass-edge: rgba(242, 239, 248, 0.14);
+    --glass-edge-hi: rgba(242, 239, 248, 0.26);
+
+    --glass-blur: 24px;
+    --glass-saturate: 1.5;
+
+    /* Dark is the primary expression, so the blooms carry more of the page.
+     * Same 0.28 cap: it is the contrast bound, not a look. */
+    --bloom-act: #6d3dd4;
+    --bloom-flight: #4ceaff;
+    --bloom-money: #b7e149;
+    --bloom-alpha: 0.28;
+
+    /* ACT tracks the accent stack, which already lifts to #9d75ec / #6d3dd4
+     * in dark (AUTM-734). */
+    --act: var(--accent);
+    --act-fill: var(--accent-fill);
+    --act-fill-hover: var(--accent-fill-hover);
+    --on-act: var(--on-accent);
+
+    /* Aqua and lime come into their own here — this is the canvas they were
+     * drawn for. Both clear 10:1 on every dark glass surface. */
+    --flight: #4ceaff;
+    --flight-fill: #4ceaff;
+    --flight-fill-hover: #7ff1ff;
+    --on-flight: #062436;
+
+    --money: #b7e149;
+    --money-fill: #b7e149;
+    --money-fill-hover: #c8ec66;
+    --on-money: #0e0a1a;
+
+    /* NEUTRAL, dark. Lighter than the surface rather than darker — the
+     * same slate material, stepping the way this canvas has room to step.
+     * Measured: label 8.18:1 on the fill; the fill is 1.63-2.09:1 from
+     * every ground, which is a wider tonal step than the card gets from
+     * the canvas (1.12:1), so it reads as a filled object with no edge. */
+    --neutral-fill: #4a4458;
+    --neutral-fill-hover: #514a60;
+    --on-neutral: #f2eff8;
+}
+
+@theme inline {
+    /* Tailwind-facing names. `bg-glass`, `border-glass-edge`, `text-act`,
+     * `bg-flight-fill`, `text-money` … */
+    --color-glass: var(--glass-fill);
+    --color-glass-strong: var(--glass-fill-strong);
+    --color-glass-hi: var(--glass-hi);
+    --color-glass-edge: var(--glass-edge);
+    --color-glass-edge-hi: var(--glass-edge-hi);
+
+    --color-act: var(--act);
+    --color-act-fill: var(--act-fill);
+    --color-on-act: var(--on-act);
+
+    --color-flight: var(--flight);
+    --color-flight-fill: var(--flight-fill);
+    --color-on-flight: var(--on-flight);
+
+    --color-money: var(--money);
+    --color-money-fill: var(--money-fill);
+    --color-on-money: var(--on-money);
+
+    --color-neutral-fill: var(--neutral-fill);
+    --color-neutral-fill-hover: var(--neutral-fill-hover);
+    --color-on-neutral: var(--on-neutral);
+}

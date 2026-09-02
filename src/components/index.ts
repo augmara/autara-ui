@@ -18,11 +18,18 @@ export {
     FieldStackField,
     type FieldStackFieldProps,
 } from './FieldStack'
+// AUTM-948 — the one glass material every other surface composes.
+export {
+    GlassSurface,
+    GradientGround,
+    type GlassSurfaceProps,
+    type GradientGroundProps,
+} from './GlassSurface'
 export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, cardVariants, type CardProps } from './Card'
 export { BackButton, type BackButtonProps } from './BackButton'
 export { Badge, badgeVariants, type BadgeProps } from './Badge'
 export { Separator } from './Separator'
-export { Skeleton } from './Skeleton'
+export { Skeleton, type SkeletonProps } from './Skeleton'
 
 export {
     Dialog,
@@ -73,6 +80,26 @@ export {
     DropdownMenuSubTrigger,
     DropdownMenuSubContent,
 } from './DropdownMenu'
+
+// AUTM-965 — anchored floating panel for CONTENT. Reach for DropdownMenu
+// when every child is a command; reach for this when they are not, because
+// DropdownMenu gives its children `menuitem` semantics.
+export {
+    Popover,
+    PopoverTrigger,
+    PopoverAnchor,
+    PopoverClose,
+    PopoverPortal,
+    PopoverContent,
+    PopoverHeader,
+    PopoverTitle,
+    PopoverDescription,
+    PopoverBody,
+    PopoverFooter,
+    PopoverSeparator,
+    type PopoverContentProps,
+    type PopoverBodyProps,
+} from './Popover'
 
 export {
     navigationMenuTriggerStyle,
@@ -198,6 +225,9 @@ export { ImageCropDialog, type ImageCropDialogProps } from './ImageCropDialog'
 
 // ─── Wizard step indicator (AUTM-322) ──────────────────────────────────
 export { Stepper, type StepperProps, type StepperStep } from './Stepper'
+
+// ─── Wizard step header (AUTM-839) ─────────────────────────────────────
+export { StepHeader, type StepHeaderProps } from './StepHeader'
 
 // ─── Address search + map confirm (AUTM-586) ───────────────────────────
 // Provider-agnostic by design — autara-ui ships no maps dependency; the

@@ -163,3 +163,29 @@ export const SteppedBack: Story = {
         onStepClick: () => {},
     },
 }
+
+/**
+ * The customer booking wizard's configuration (AUTM-837): steps are
+ * validation-gated so labels never render as navigation - track + "Step N of M"
+ * line only, with its own aria label.
+ */
+export const BookingWizard: Story = {
+  args: {
+    steps: [
+      { id: "service", label: "Service" },
+      { id: "details", label: "Details" },
+      { id: "vehicle", label: "Vehicle" },
+      { id: "when", label: "When" },
+      { id: "where", label: "Where" },
+      { id: "pay", label: "Pay" },
+    ],
+    currentStep: 1,
+    ariaLabel: "Booking progress",
+    hideLabels: true,
+  },
+  render: (args) => (
+    <div style={{ maxWidth: 560 }}>
+      <Stepper {...args} />
+    </div>
+  ),
+};

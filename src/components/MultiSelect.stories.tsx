@@ -5,13 +5,18 @@ import { MultiSelect, type MultiSelectOption } from './MultiSelect'
 /**
  * MultiSelect — token-style multi-value picker on cream.
  *
- * Container shares the `.field-input` grammar (hairline border, 4 px
- * brand-purple halo on focus-within). Chips reuse the brand-tinted
- * MetaChip grammar. Free-text search filters as the user types,
- * Backspace removes the last chip, Enter selects the top result.
+ * Container shares the `.field-input` grammar — a field's own border is what
+ * says "you can type here", so it is not one of the outlines rule 4 removes.
+ * Free-text search filters as the user types, Backspace removes the last
+ * chip, Enter selects the top result.
  *
- * `theme` prop accepted as a no-op for source-level compatibility;
- * dark companion deferred.
+ * AUTM-974: the value chips lost `ring-1 ring-inset ring-[var(--border-on-inverse)]`.
+ * The Torph ink fill is opaque and ~15:1 from the field it sits in, so the
+ * ring was decorating a solid rather than defining an edge. Tooltip and Toast
+ * keep theirs on purpose — those float over arbitrary page content, this one
+ * sits inside a field we control.
+ *
+ * `theme` prop accepted as a no-op for source-level compatibility.
  */
 const meta: Meta<typeof MultiSelect> = {
     title: 'Atoms/MultiSelect',
@@ -192,6 +197,71 @@ export const InOnboardingForm: Story = {
                         </span>
                     </label>
                 </form>
+            )
+        }
+        return <Demo />
+    },
+}
+
+// ─── AUTM-974 — the chips, both themes ─────────────────────────────
+/**
+ * The ink capsule with no ring on it, on both canvases. The field itself
+ * keeps its border; the chips inside it do not have one.
+ */
+export const BothThemes: Story = {
+    name: 'In context — light and dark canvas',
+    render: () => {
+        const Demo = () => {
+            const [light, setLight] = useState<string[]>(['sydney', 'bondi', 'manly'])
+            const [dark, setDark] = useState<string[]>(['sydney', 'bondi', 'manly'])
+            return (
+                <div className="grid gap-6 lg:grid-cols-2">
+                    <div className="space-y-3 rounded-autara-lg bg-[var(--background)] p-5">
+                        <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                            light
+                        </p>
+                        {/* The label is the CONSUMER's job — MultiSelect takes
+                            an `id` and expects a <label htmlFor> or a
+                            FormField around it. A story without one renders a
+                            text input with no accessible name, which axe
+                            flags as critical and which is exactly what a
+                            consumer would ship if the story modelled it. */}
+                        <label
+                            htmlFor="areas-light"
+                            className="block text-sm font-medium text-[var(--text-strong)]"
+                        >
+                            Service areas
+                        </label>
+                        <MultiSelect
+                            id="areas-light"
+                            options={SERVICE_AREAS}
+                            value={light}
+                            onChange={setLight}
+                            placeholder="Add a suburb"
+                        />
+                    </div>
+                    <div
+                        data-theme="dark"
+                        className="space-y-3 rounded-autara-lg bg-[var(--background)] p-5"
+                    >
+                        <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                            dark
+                        </p>
+                        <label
+                            htmlFor="areas-dark"
+                            className="block text-sm font-medium text-[var(--text-strong)]"
+                        >
+                            Service areas
+                        </label>
+                        <MultiSelect
+                            id="areas-dark"
+                            options={SERVICE_AREAS}
+                            value={dark}
+                            onChange={setDark}
+                            placeholder="Add a suburb"
+                        />
+                    </div>
+                </div>
             )
         }
         return <Demo />

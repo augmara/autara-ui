@@ -159,11 +159,21 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                         <span
                             key={val}
                             /* Torph ink capsule — the Autara floating-chip
-                               grammar (ink fill, white text, hairline inset
-                               ring); replaces the soft purple-tint pill. */
+                               grammar: ink fill, inverse text.
+
+                               AUTM-974 dropped the `ring-1 ring-inset` that
+                               used to sit on top of it. The fill is opaque
+                               and 15:1 from the field it sits in, so the ring
+                               was decorating a solid rather than defining an
+                               edge, and rule 4 of the Autara Glass direction
+                               only exempts a hairline that is the MATERIAL of
+                               a translucent surface. Tooltip and Toast keep
+                               theirs deliberately: those float over arbitrary
+                               page content, this one sits inside a field we
+                               control. */
                             className={cn(
-                                'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[12px] font-medium ring-1 ring-inset',
-                                'bg-[var(--surface-inverse)] text-[var(--text-on-inverse)] ring-[var(--border-on-inverse)]'
+                                'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[12px] font-medium',
+                                'bg-[var(--surface-inverse)] text-[var(--text-on-inverse)]'
                             )}
                         >
                             {getLabel(val)}

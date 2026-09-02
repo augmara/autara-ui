@@ -8,17 +8,22 @@ export {
     Label, labelVariants, type LabelProps,
     FormField, type FormFieldProps,
     FieldStack, FieldStackRow, FieldStackField, type FieldStackFieldProps,
+    // AUTM-948 — Autara Glass foundation
+    GlassSurface, GradientGround, type GlassSurfaceProps, type GradientGroundProps,
     Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, cardVariants, type CardProps,
     BackButton, type BackButtonProps,
     Badge, badgeVariants, type BadgeProps,
     Separator,
-    Skeleton,
+    Skeleton, type SkeletonProps,
     Dialog, DialogPortal, DialogOverlay, DialogClose, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription,
     Sheet, SheetPortal, SheetOverlay, SheetTrigger, SheetClose, SheetContent, SheetHeader, SheetFooter, SheetTitle, SheetDescription,
     PickerSheet, type PickerOption, type PickerRowRender, type PickerSheetProps,
     Accordion, AccordionItem, AccordionTrigger, AccordionContent,
     Tabs, TabsList, TabsTrigger, TabsContent,
     DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuGroup, DropdownMenuPortal, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent,
+    // AUTM-965 — anchored floating panel for CONTENT (DropdownMenu gives its
+    // children `menuitem` semantics, which a list of content must not have).
+    Popover, PopoverTrigger, PopoverAnchor, PopoverClose, PopoverPortal, PopoverContent, PopoverHeader, PopoverTitle, PopoverDescription, PopoverBody, PopoverFooter, PopoverSeparator, type PopoverContentProps, type PopoverBodyProps,
     navigationMenuTriggerStyle, NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuContent, NavigationMenuTrigger, NavigationMenuLink, NavigationMenuIndicator, NavigationMenuViewport,
     ScrollReveal, type ScrollRevealProps,
     FadeIn, FadeInView, ScaleIn, StaggerContainer, StaggerItem,
@@ -75,6 +80,8 @@ export {
     ImageCropDialog, type ImageCropDialogProps,
     // Wizard step indicator (AUTM-322)
     Stepper, type StepperProps, type StepperStep,
+    // Wizard step header (AUTM-839)
+    StepHeader, type StepHeaderProps,
     // Address search + map confirm (AUTM-586)
     AddressPickerSheet,
     type AddressPickerSheetProps,

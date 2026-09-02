@@ -142,6 +142,29 @@ interface Level<T> {
  * async folds (loading / error+retry / empty / results). The consumer supplies
  * a `renderRow` for the row body; the row chrome is provided here so every
  * picker stays 44px-min, keyboard-navigable, and on-brand.
+ *
+ * ─── AUTM-974: selection is a solid marker, not a coloured border ────────
+ *
+ * A selected row used to be `border-autara-purple/40` — ONE ALPHA STEP from
+ * its own hover, `border-autara-purple/35`. So the difference between "the
+ * pointer is over this" and "this is your saved choice" was 5% of an alpha
+ * channel, and rule 4 of the Autara Glass direction
+ * (`knowledge/project_ui_direction_2026_09_01.md`) bans carrying emphasis on
+ * a border at all: "no outline buttons or sections … everything should be
+ * solid."
+ *
+ * The rows were also boxes for no reason. Every row was `--surface` on a
+ * sheet that is itself `--surface`, so the hairline WAS the row — the same
+ * 1.0:1-fill-plus-outline defect AUTM-969 found on ModeChip, at row scale.
+ * They are now plain rows: no fill, no edge, hover paints `--surface-elevated`
+ * and selection is a solid `--act-fill` marker on the right, in both single
+ * and multi mode.
+ *
+ * The row is deliberately NOT painted solid when selected. `renderRow` is
+ * consumer content and this component does not own its ink — repainting the
+ * container is how the merchant-mobile booking-detail pass nearly shipped a
+ * status sentence at 3.40:1. The marker is a surface we do own, so its
+ * contrast is ours to guarantee.
  */
 export function PickerSheet<T = unknown>(props: PickerSheetProps<T>) {
     const {
@@ -282,20 +305,33 @@ export function PickerSheet<T = unknown>(props: PickerSheetProps<T>) {
                         const hasChildren = !!(option.children || option.loadChildren)
                         const isSelected = selectedSet.has(option.value)
                         return (
-                            <li key={option.value}>
+                            /* `role="presentation"` — the <li> would
+                               otherwise sit between role="listbox" and
+                               role="option" and break the required ARIA
+                               parent chain, so a screen reader announced the
+                               options as plain list items and not as a
+                               selectable set. axe: aria-required-parent +
+                               aria-required-children, both critical. Caught
+                               by the AUTM-974 sweep; pre-existing. */
+                            <li key={option.value} role="presentation">
                                 <button
                                     type="button"
                                     role="option"
                                     aria-selected={isSelected}
                                     disabled={option.disabled}
                                     onClick={() => handleRow(option)}
+                                    /* AUTM-974 — the row has no box and no
+                                       outline. See the rule-4 note in the
+                                       component header: selection is the
+                                       solid marker on the right, hover is a
+                                       fill, and the row itself is just its
+                                       own content. */
                                     className={cn(
-                                        'flex min-h-[44px] w-full items-center gap-3 rounded-2xl border px-3 py-2 text-left transition-colors',
-                                        'border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-strong)]',
-                                        'hover:border-autara-purple/35',
-                                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-autara-purple/35 focus-visible:ring-offset-2',
+                                        'flex min-h-[44px] w-full items-center gap-3 rounded-autara-md px-3 py-2 text-left transition-colors',
+                                        'bg-transparent text-[var(--text-strong)]',
+                                        'hover:bg-[var(--surface-elevated)]',
+                                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]',
                                         'disabled:cursor-not-allowed disabled:opacity-50',
-                                        isSelected && !hasChildren && 'border-autara-purple/40',
                                     )}
                                 >
                                     <span className="min-w-0 flex-1">
@@ -307,20 +343,34 @@ export function PickerSheet<T = unknown>(props: PickerSheetProps<T>) {
                                             <ChevronRightGlyph />
                                         </span>
                                     ) : mode === 'multi' ? (
+                                        /* The checkbox affordance: an empty
+                                           box has nothing to fill, so its
+                                           hairline is the control itself and
+                                           not an emphasis outline. Matches
+                                           `Checkbox`. */
                                         <span
                                             aria-hidden="true"
                                             className={cn(
-                                                'flex size-5 shrink-0 items-center justify-center rounded-[6px] border',
+                                                'flex size-5 shrink-0 items-center justify-center rounded-autara-sm',
                                                 isSelected
-                                                    ? 'border-autara-purple bg-autara-purple text-white'
-                                                    : 'border-[var(--border-subtle)] bg-[var(--surface)]',
+                                                    ? 'bg-[var(--act-fill)] text-[var(--on-act)]'
+                                                    : 'border border-[var(--border-subtle)] bg-[var(--surface)]',
                                             )}
                                         >
                                             {isSelected ? <CheckGlyph size={14} /> : null}
                                         </span>
                                     ) : isSelected ? (
-                                        <span className="shrink-0 text-autara-purple" aria-hidden="true">
-                                            <CheckGlyph />
+                                        /* Single-select selection is a SOLID
+                                           marker, not a bare tick — it is the
+                                           only thing left carrying "this one"
+                                           now the row border is gone, and the
+                                           two modes should not disagree about
+                                           what chosen looks like. */
+                                        <span
+                                            aria-hidden="true"
+                                            className="flex size-5 shrink-0 items-center justify-center rounded-autara-sm bg-[var(--act-fill)] text-[var(--on-act)]"
+                                        >
+                                            <CheckGlyph size={14} />
                                         </span>
                                     ) : null}
                                 </button>
@@ -347,7 +397,17 @@ export function PickerSheet<T = unknown>(props: PickerSheetProps<T>) {
         <button
             type="button"
             onClick={goBack}
-            className="mb-1 inline-flex items-center gap-1 self-start rounded-md text-sm font-medium text-autara-purple focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-autara-purple/35"
+            /* AUTM-974 — `text-autara-purple` resolves through
+               `--accent-fill`, which is FILL grade: #6d3dd4 on the dark
+               surface measures 2.72:1, so "Back" — the only way out of a
+               drill-down — was under the AA floor in dark mode. Text-grade
+               purple is `--accent` (5.1:1 dark, 8.9:1 light); the package
+               README says so and this line predates it.
+
+               `min-h-11` gives the 44px target the house rule asks for; the
+               ring gains an offset band so it is not drawn straight onto the
+               sheet. */
+            className="mb-1 inline-flex min-h-11 items-center gap-1 self-start rounded-autara-sm text-sm font-medium text-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
         >
             <BackGlyph /> Back
         </button>

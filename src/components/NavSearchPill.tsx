@@ -149,7 +149,7 @@ function PillField({
                 hideOnMobile ? 'hidden sm:flex' : 'flex',
             )}
         >
-            <span className="block text-[9px] font-semibold uppercase tracking-[0.2em] text-[var(--text-subtle)] leading-none">
+            <span className="block text-[9px] font-medium uppercase tracking-[0.2em] text-[var(--text-subtle)] leading-none">
                 {label}
             </span>
             <span

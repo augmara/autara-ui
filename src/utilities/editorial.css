@@ -33,12 +33,9 @@
     text-transform: uppercase;
     color: var(--text-muted);
 }
-.editorial-eyebrow::before {
-    content: "";
-    width: 2rem;
-    height: 1px;
-    background: var(--text-subtle);
-}
+/* v3 (Don 2026-08-26): the hairline tick that used to render before the
+   label is RETIRED platform-wide - eyebrows are plain uppercase tracked
+   labels. Do not reintroduce a ::before rule here. */
 
 /* ─── Editorial typography utilities ─────────────────────────────────── */
 

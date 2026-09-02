@@ -101,7 +101,7 @@ export const CategoryRail = React.forwardRef<HTMLElement, CategoryRailProps>(
                     <div className="mb-6 lg:mb-10 flex items-baseline justify-between gap-4">
                         <div>
                             {eyebrow ? (
-                                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--color-autara-purple)]/80 mb-3">
+                                <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--color-autara-purple)]/80 mb-3">
                                     {eyebrow}
                                 </p>
                             ) : null}
@@ -156,7 +156,7 @@ export const CategoryRail = React.forwardRef<HTMLElement, CategoryRailProps>(
                                     </p>
                                     <p
                                         aria-hidden
-                                        className="mt-4 inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--text-subtle)] group-hover:text-[var(--color-autara-purple)] transition-colors"
+                                        className="mt-4 inline-flex items-center gap-1 text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-subtle)] group-hover:text-[var(--color-autara-purple)] transition-colors"
                                     >
                                         {tileFooterLabel}
                                         <ArrowGlyph />
