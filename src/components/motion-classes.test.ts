@@ -150,10 +150,23 @@ describe('every animated surface is wired to a rule that exists', () => {
         expect(classes.filter((c) => !text.includes(`'${c}'`) && !text.includes(`${c}'`))).toEqual([])
     })
 
+    /**
+     * Substring rather than a built regex. The first version escaped `-` in
+     * the class name and nothing else, which CodeQL correctly flags as
+     * incomplete escaping (`js/incomplete-sanitization`) — harmless here,
+     * since the input is a literal in the table above, but a pattern worth
+     * not teaching. A selector ends in one of five characters, so checking
+     * for them directly is both safer and easier to read.
+     */
     it.each([...new Set(WIRING.flatMap(([, cs]) => cs))])(
         '.%s is defined in utilities/animations.css',
         (cls) => {
-            expect(CSS).toMatch(new RegExp(`\\.${cls.replace(/-/g, '\\-')}[\\s,\\[{]`))
+            const defined = [' ', ',', '[', '{', '\n'].some((end) =>
+                CSS.includes(`.${cls}${end}`)
+            )
+            expect(defined, `.${cls} is referenced by a component but has no rule`).toBe(
+                true
+            )
         }
     )
 
