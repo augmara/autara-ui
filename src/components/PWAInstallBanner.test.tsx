@@ -520,11 +520,21 @@ describe('every control clears 44px', () => {
 /**
  * Source scans, for rules that are about what is NOT in the file.
  *
- * COMMENTS ARE STRIPPED FIRST, and that is load-bearing rather than tidiness:
- * the doc comment explains the weight fix in the words "font-medium, not
- * font-bold", so a naive scan matches its own explanation and passes while the
- * component is still wrong. That false pass has already happened in this repo
- * (AUTM-936). The stripper is checked in both directions below.
+ * COMMENTS ARE STRIPPED FIRST, and that is load-bearing rather than tidiness.
+ * The doc comment explains the weight fix in the words "font-medium, not
+ * font-bold", so a scan of the raw file matches its own explanation. Measured
+ * both ways rather than assumed, because the interesting direction is not the
+ * obvious one:
+ *
+ *   - Raw scan, CORRECT component: the weights test fails on the comment. A
+ *     false RED, which is the direction this file actually produces.
+ *   - Raw scan, REVERTED component (eyebrow put back to the fill-grade
+ *     purple): still red. No comment in this file happens to spell a class
+ *     string, so nothing here is masked today.
+ *
+ * The false GREEN is the one that cost something in this repo (AUTM-936), and
+ * it is one careless sentence away — which is why the stripper's own behaviour
+ * is asserted below rather than trusted.
  *
  * Goes red if any `text-[Npx]` is restored — confirmed by putting
  * `text-[15px]` back on the headline: 1 failure. Restoring `font-bold` there
