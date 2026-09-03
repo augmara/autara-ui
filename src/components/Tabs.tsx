@@ -67,7 +67,11 @@ const TabsList = React.forwardRef<
         className={cn(
             // `min-h-10`, not `h-10` — at 200% text scale a fixed height
             // clips the labels instead of growing with them (AUTM-915).
-            'inline-flex min-h-10 items-center justify-center gap-1 rounded-autara-md bg-[var(--surface-elevated)] p-1 text-[var(--text-muted)]',
+            /* AUTM-622 — 3.25rem, not 2.5rem. The list is the trigger's 44px
+             * floor plus its own 0.25rem padding on each side. Sized in rem
+             * and as a MINIMUM for the same reason the old value was: at 200%
+             * text scale a fixed height clips the label. */
+            'inline-flex min-h-[3.25rem] items-center justify-center gap-1 rounded-autara-md bg-[var(--surface-elevated)] p-1 text-[var(--text-muted)]',
             className
         )}
         {...props}
@@ -82,7 +86,12 @@ const TabsTrigger = React.forwardRef<
     <TabsPrimitive.Trigger
         ref={ref}
         className={cn(
-            'inline-flex items-center justify-center whitespace-nowrap rounded-autara-sm px-3 py-1.5 text-sm font-medium transition-colors',
+            /* AUTM-622 — was px-3 py-1.5 with no minimum, which rendered at
+             * 32px on every width, not just phones: the Day/Today/Week/Month
+             * switcher measured 32px tall on phone, tablet AND desktop. The
+             * 44px floor is a cross-stack rule, and a segmented control the
+             * merchant hits constantly is the worst place to be under it. */
+            'inline-flex min-h-11 items-center justify-center whitespace-nowrap rounded-autara-sm px-3 py-1.5 text-sm font-medium transition-colors',
             'text-[var(--text-muted)] hover:text-[var(--text-strong)]',
             // See the focus-ring note in the header — full-strength accent,
             // and the offset band painted in the track that is really behind

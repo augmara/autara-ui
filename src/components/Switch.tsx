@@ -28,7 +28,19 @@ const Switch = React.forwardRef<
 >(({ className, theme: _theme, ...props }, ref) => (
     <SwitchPrimitive.Root
         className={cn(
-            'peer inline-flex h-[24px] w-[44px] shrink-0 cursor-pointer items-center rounded-full border transition-colors',
+            'peer relative inline-flex h-[24px] w-[44px] shrink-0 cursor-pointer items-center rounded-full border transition-colors',
+            /* AUTM-622 — a 44x44 hit area WITHOUT changing the painted
+             * control. A switch is 24px tall by design; that is the shape
+             * people recognise, so growing the box would fix the target and
+             * break the component. The pseudo-element is centred, covers the
+             * 44px floor in both axes, and paints nothing.
+             *
+             * `content-['']` is required — a ::before with no content
+             * generates no box at all and the whole rule silently does
+             * nothing, which is the version of this that measures as fixed
+             * and still misses at 24px. */
+            'before:absolute before:left-1/2 before:top-1/2 before:h-11 before:w-11',
+            "before:-translate-x-1/2 before:-translate-y-1/2 before:content-['']",
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]',
             'disabled:cursor-not-allowed disabled:opacity-50',
             'border-[var(--border-subtle)] bg-[var(--surface-elevated)]',
