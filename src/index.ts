@@ -69,7 +69,9 @@ export {
     FilterChipRow, type FilterChipRowProps, type FilterChipOption,
     // v2.1.0 — customer-web marketing harvest (AUTAA-UI-007)
     CategoryRail, type CategoryRailProps, type CategoryRailItem,
-    PWAInstallBanner, type PWAInstallBannerProps,
+    // AUTM-1018 — reserves its own space, same mechanism as the consent notice.
+    PWAInstallBanner, PWA_INSTALL_BANNER_HEIGHT_VAR, PWA_INSTALL_BANNER_OFFSET,
+    type PWAInstallBannerProps,
     // AUTM-852 — the consent notice, and the space it reserves for itself.
     ConsentBanner, CONSENT_BANNER_HEIGHT_VAR, CONSENT_BANNER_OFFSET,
     type ConsentBannerProps,
@@ -95,3 +97,7 @@ export {
 
 // Utilities
 export { cn } from './lib/cn'
+/* AUTM-1018 — the offset a `position: fixed` element uses to clear EVERY
+ * bottom-anchored banner in the library at once. Clearing only one of them
+ * still leaves the element buried when the other is up. */
+export { BOTTOM_CHROME_OFFSET } from './lib/reserved-bottom-space'
