@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 import { Button } from './Button'
 import { GlassSurface } from './GlassSurface'
 import { cn } from '../lib/cn'
+import { useReservedBottomSpace } from '../lib/reserved-bottom-space'
 
 /**
  * ConsentBanner — the bottom-anchored consent notice, and the space it takes.
@@ -135,65 +136,12 @@ export interface ConsentBannerProps {
     className?: string
 }
 
-/**
- * Publish the element's measured height, and give the space back on unmount.
- *
- * Takes the node itself rather than a ref: the banner is portalled, so it is
- * only in the DOM on a later render than the one that mounts the component,
- * and an effect keyed on a ref object would never re-run to see it. A
- * callback ref makes the element the dependency, which is what it actually is.
- */
-function useReservedSpace(
-    node: HTMLDivElement | null,
-    heightVar: string,
-    reserveBodySpace: boolean
-) {
-    React.useEffect(() => {
-        if (!node || typeof document === 'undefined') return
-
-        const root = document.documentElement
-        const { body } = document
-        /* Remember what the page already had, rather than assuming it was
-         * nothing. Both originals reset this to "" on cleanup, which would
-         * silently delete a padding the app had set for its own reasons. */
-        const previousPadding = body.style.paddingBottom
-
-        const apply = () => {
-            const height = `${node.offsetHeight}px`
-            root.style.setProperty(heightVar, height)
-            if (reserveBodySpace) body.style.paddingBottom = height
-        }
-        apply()
-
-        /* The banner reflows on resize and on text scaling, and
-         * ResizeObserver catches both. Without it the reserved space is
-         * correct only at the width the page happened to load at. Guarded
-         * because it is absent in some SSR/test environments. */
-        const observer =
-            typeof ResizeObserver === 'undefined'
-                ? null
-                : new ResizeObserver(apply)
-        observer?.observe(node)
-
-        /* Belt and braces on top of the observer. ResizeObserver delivers on
-         * the frame loop, so anything that throttles rAF can defer its
-         * callback and leave the reserved space stale after a viewport
-         * change — seen for real while verifying AUTM-787 in a debug browser
-         * pane. `resize` is not throttled that way, and a double apply is
-         * idempotent. */
-        window.addEventListener('resize', apply)
-
-        return () => {
-            observer?.disconnect()
-            window.removeEventListener('resize', apply)
-            /* Give the space straight back the moment consent is answered,
-             * or the page keeps a dead gap at the bottom for the rest of the
-             * session and every fixed bar stays lifted off the edge. */
-            root.style.removeProperty(heightVar)
-            if (reserveBodySpace) body.style.paddingBottom = previousPadding
-        }
-    }, [node, heightVar, reserveBodySpace])
-}
+/* The measurement, the `<html>` custom property and the body padding all live
+ * in `../lib/reserved-bottom-space`. It moved out of this file in AUTM-1018,
+ * when `PWAInstallBanner` needed the same behaviour: `body.style.paddingBottom`
+ * is one slot and both banners can be up at once, so a second private copy of
+ * this effect would have had each one hand back the other's value on unmount.
+ * The hook keeps the padding as the sum of the live reservations. */
 
 export function ConsentBanner({
     open,
@@ -208,7 +156,7 @@ export function ConsentBanner({
     className,
 }: ConsentBannerProps) {
     const [panel, setPanel] = React.useState<HTMLDivElement | null>(null)
-    useReservedSpace(panel, CONSENT_BANNER_HEIGHT_VAR, reserveBodySpace)
+    useReservedBottomSpace(panel, CONSENT_BANNER_HEIGHT_VAR, reserveBodySpace)
 
     /* SSR-safe portal: `document` does not exist on the server, and the
      * banner is client-only anyway (consent lives in browser storage). */

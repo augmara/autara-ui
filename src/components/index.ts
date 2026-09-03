@@ -209,7 +209,13 @@ export {
     type CategoryRailProps,
     type CategoryRailItem,
 } from './CategoryRail'
-export { PWAInstallBanner, type PWAInstallBannerProps } from './PWAInstallBanner'
+// AUTM-1018 — reserves its own space, same mechanism as the consent notice.
+export {
+    PWAInstallBanner,
+    PWA_INSTALL_BANNER_HEIGHT_VAR,
+    PWA_INSTALL_BANNER_OFFSET,
+    type PWAInstallBannerProps,
+} from './PWAInstallBanner'
 // AUTM-852 — the consent notice, and the space it reserves for itself.
 export {
     ConsentBanner,
