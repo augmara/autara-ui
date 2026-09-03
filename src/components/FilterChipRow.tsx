@@ -84,7 +84,19 @@ export function FilterChipRow<V>({
                         className={cn(
                             /* 8px, same rung as MetaChip — round is avatars and dots only
                                (Don, 2026-09-01); see MetaChip for the geometry. */
-                            'shrink-0 rounded-autara-sm px-3 py-1.5 text-[12px] font-medium transition-colors',
+                            /* AUTM-622 — `min-h-11` (44px). This was MISSED by the
+                               first pass at that ticket, which fixed `Switch` and
+                               `Tabs` and shipped in 5.3.1 while the ticket also
+                               names this component. A board audit caught it: the
+                               chips were still `px-3 py-1.5` with no minimum and
+                               rendered at 32px, so anyone closing AUTM-622 on
+                               5.3.1 would have closed it over a live defect.
+
+                               A MINIMUM in rem, not a fixed height, for the same
+                               reason Tabs uses one: at 200% text scale the label
+                               is taller than 44px and the control has to grow
+                               with it rather than clip. */
+                            'shrink-0 min-h-11 rounded-autara-sm px-3 py-1.5 text-[12px] font-medium transition-colors',
                             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]',
                             active
                                 ? 'bg-[var(--surface-inverse)] text-[var(--text-on-inverse)]'

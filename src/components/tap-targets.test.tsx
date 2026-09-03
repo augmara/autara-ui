@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { Switch } from './Switch'
 import { Tabs, TabsList, TabsTrigger } from './Tabs'
+import { FilterChipRow } from './FilterChipRow'
 
 /**
  * AUTM-622 — the 44px floor, on the two components that were under it.
@@ -47,6 +48,27 @@ describe('AUTM-622 — 44px tap targets', () => {
         // 44px trigger + 4px padding each side. A 44px child in a 40px list
         // either overflows or gets squashed, so these two move together.
         expect(screen.getByRole('tablist').className).toContain('min-h-[3.25rem]')
+    })
+
+    it('FilterChipRow clears 44px too — the component the first pass MISSED', () => {
+        // AUTM-622 names FilterChipRow as well as Tabs. The first pass fixed
+        // Switch and Tabs, shipped as 5.3.1, and left this at `px-3 py-1.5`
+        // with no minimum — 32px. A board audit caught it before anyone closed
+        // the ticket on that release. This test exists so the ticket and the
+        // code cannot disagree again.
+        render(
+            <FilterChipRow
+                options={[
+                    { value: 'all', label: 'All' },
+                    { value: 'pending', label: 'Pending' },
+                ]}
+                value="all"
+                onChange={() => {}}
+            />,
+        )
+        for (const chip of screen.getAllByRole('tab')) {
+            expect(chip.className).toContain('min-h-11')
+        }
     })
 
     it('both use MINIMUM heights, so 200% text scale grows them instead of clipping', () => {
