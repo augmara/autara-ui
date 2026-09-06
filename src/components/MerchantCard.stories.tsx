@@ -73,236 +73,142 @@ const SAMPLE: MerchantCardProps[] = [
   },
 ];
 
+/* AUTM-1107: new merchants carry no rating and no invented one. `isNew`
+   renders the lime parallelogram; the body has nothing standing in for
+   stars. This is what a public search result looks like today: no price,
+   no primary service, a suburb, sometimes a mode. */
 const SAMPLE_NEW: MerchantCardProps[] = [
-  { ...SAMPLE[3], name: "Vivid Auto Studio", location: "Marrickville, NSW", priceFromLabel: "$140", rating: 5.0, reviewCount: 7, badge: { tone: "aqua", label: "New" } },
-  { ...SAMPLE[2], name: "Northside Ceramic", location: "Coburg, VIC", priceFromLabel: "$850", rating: 4.8, reviewCount: 12, badge: { tone: "aqua", label: "New" } },
-  { ...SAMPLE[0], name: "River City Tinting", primaryService: "Window tinting", location: "West End, QLD", priceFromLabel: "$320", rating: 4.9, reviewCount: 9, badge: { tone: "aqua", label: "New" } },
-  { ...SAMPLE[3], name: "Halo Mobile Wash", primaryService: "Mobile wash", location: "Bondi, NSW", priceFromLabel: "$85", rating: 4.9, reviewCount: 15, badge: { tone: "aqua", label: "New" } },
+  { name: "Brunswick Mobile Detailing", location: "Brunswick, VIC", mode: "mobile", heroImageUrl: CARS.mobile, isNew: true },
+  { name: "Richmond Ceramic Studio", location: "Richmond, VIC", mode: "workshop", heroImageUrl: CARS.bay, isNew: true },
+  { name: "St Kilda Interior Care", location: "St Kilda, VIC", mode: "both", heroImageUrl: CARS.magenta, isNew: true },
+  { name: "Waverley Wash Co.", location: "Glen Waverley, VIC", mode: "mobile", heroImageUrl: CARS.wrap, isNew: true },
 ];
 
 // ─── Single-card stories ───────────────────────────────────────────────
 
+const One = (args: MerchantCardProps) => (
+  <div className="w-80">
+    <MerchantCard {...args} />
+  </div>
+);
+
+export const Rated: Story = {
+  parameters: { layout: "centered" },
+  args: { ...SAMPLE[0], badge: null, mode: "workshop" },
+  render: One,
+};
+
+export const NewOnAutara: Story = {
+  name: "New on Autara",
+  parameters: { layout: "centered" },
+  args: SAMPLE_NEW[0],
+  render: One,
+};
+
+export const NewButRated: Story = {
+  name: "New, but already rated (rating wins)",
+  parameters: { layout: "centered" },
+  args: { ...SAMPLE[3], isNew: true, badge: null },
+  render: One,
+};
+
 export const Featured: Story = {
   parameters: { layout: "centered" },
   args: SAMPLE[0],
-  render: (args) => (
-    <div className="w-80">
-      <MerchantCard {...args} />
+  render: One,
+};
+
+export const Modes: Story = {
+  parameters: { layout: "padded" },
+  render: () => (
+    <div className="grid max-w-4xl grid-cols-3 gap-4">
+      {(["mobile", "workshop", "both"] as const).map((mode, i) => (
+        <MerchantCard key={mode} {...SAMPLE_NEW[i]} mode={mode} />
+      ))}
     </div>
   ),
 };
 
-export const NewBadge: Story = {
+export const SearchResultBare: Story = {
+  name: "Search result, nothing but a name and a suburb",
   parameters: { layout: "centered" },
-  args: SAMPLE_NEW[0],
-  render: (args) => (
-    <div className="w-80">
-      <MerchantCard {...args} />
-    </div>
-  ),
-};
-
-export const LimeBadge: Story = {
-  parameters: { layout: "centered" },
-  args: { ...SAMPLE[1], badge: { tone: "lime", label: "Trending" } },
-  render: (args) => (
-    <div className="w-80">
-      <MerchantCard {...args} />
-    </div>
-  ),
+  args: { name: "Xotic customs", location: "Dandenong South, VIC", heroImageUrl: CARS.wrap },
+  render: One,
 };
 
 export const WithFavorite: Story = {
   parameters: { layout: "centered" },
-  args: { ...SAMPLE[0], onFavoriteClick: () => {} },
-  render: (args) => (
-    <div className="w-80">
-      <MerchantCard {...args} />
-    </div>
-  ),
+  args: { ...SAMPLE_NEW[1], onFavoriteClick: () => {} },
+  render: One,
 };
 
 export const Favorited: Story = {
   parameters: { layout: "centered" },
-  args: { ...SAMPLE[0], onFavoriteClick: () => {}, isFavorite: true },
-  render: (args) => (
-    <div className="w-80">
-      <MerchantCard {...args} />
-    </div>
-  ),
+  args: { ...SAMPLE_NEW[1], onFavoriteClick: () => {}, isFavorite: true },
+  render: One,
 };
 
-// ─── The canonical homepage carousel — "Top-rated pros near you" ────────
-
-export const TopRatedRail: Story = {
-  parameters: {
-    layout: "fullscreen",
-    docs: {
-      description: {
-        story:
-          "The exact composition used on autara.au — CarouselHeader with editorial eyebrow + bold heading + arrow nav + 'See all' link, above a 4-up MerchantCard rail. Featured badges, brand-purple rating stars, 'FROM $X' pricing.",
-      },
-    },
-  },
-  render: () => (
-    <div className="bg-[var(--background)] px-6 py-12 sm:px-10 lg:px-16">
-      <CarouselHeader
-        eyebrow="Recommended"
-        title="Top-rated pros near you"
-        description="Hand-picked, ABN-verified detailers with the strongest reviews."
-        onPrev={() => {}}
-        onNext={() => {}}
-        prevDisabled
-        seeAll={
-          <a
-            href="#all"
-            className="inline-flex items-center gap-1 text-[var(--text-strong)] hover:text-[var(--color-autara-purple)]"
-          >
-            See all
-            <svg
-              viewBox="0 0 24 24"
-              className="h-3.5 w-3.5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden
-            >
-              <path d="M7 17 17 7M9 7h8v8" />
-            </svg>
-          </a>
-        }
-      />
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {SAMPLE.map((m) => (
-          <MerchantCard
-            key={m.name}
-            {...m}
-            onFavoriteClick={() => {}}
-          />
-        ))}
-      </div>
-    </div>
-  ),
-};
-
-// ─── "Just joined" rail — NEW badge variant on lime-drive ───────────────
-
-export const JustJoinedRail: Story = {
-  parameters: {
-    layout: "fullscreen",
-    docs: {
-      description: {
-        story:
-          "The 'Just joined' rail — NEW badges in autara-lime-drive accent. Same CarouselHeader pattern with a different eyebrow + subhead.",
-      },
-    },
-  },
-  render: () => (
-    <div className="bg-[var(--background)] px-6 py-12 sm:px-10 lg:px-16">
-      <CarouselHeader
-        eyebrow="New on Autara"
-        title="Just joined"
-        description="Fresh faces verified in the last 30 days — be one of their first reviews."
-        onPrev={() => {}}
-        onNext={() => {}}
-        seeAll={
-          <a
-            href="#all"
-            className="inline-flex items-center gap-1 text-[var(--text-strong)] hover:text-[var(--color-autara-purple)]"
-          >
-            See all
-            <svg
-              viewBox="0 0 24 24"
-              className="h-3.5 w-3.5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden
-            >
-              <path d="M7 17 17 7M9 7h8v8" />
-            </svg>
-          </a>
-        }
-      />
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {SAMPLE_NEW.map((m) => (
-          <MerchantCard
-            key={m.name}
-            {...m}
-            onFavoriteClick={() => {}}
-          />
-        ))}
-      </div>
-    </div>
-  ),
-};
-
-/**
- * Search result (rated) — the customer-web /search surface renders merchants
- * from `searchMerchants`, which carries NO primary service and NO price. The
- * card omits both: the meta line shows just the location (no leading
- * separator) and the "FROM" row is dropped. A rated result still shows the
- * brand-purple star.
- */
-export const SearchResultRated: Story = {
-  parameters: { layout: "centered" },
-  args: {
-    name: "Shine Mobile Detailing",
-    location: "Sydney, NSW",
-    rating: 4.8,
-    reviewCount: 24,
-    heroImageUrl:
-      "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=70",
-    primaryService: undefined,
-    priceFromLabel: undefined,
-  },
-  render: (args) => (
-    <div className="w-80">
-      <MerchantCard {...args} />
-    </div>
-  ),
-};
-
-/**
- * Search result (brand-new merchant) — no service, no price, no rating, no
- * hero. Shows the "New on Autara" eyebrow in place of the price row and a
- * monogram tile instead of the photo.
- */
-export const SearchResultNew: Story = {
-  parameters: { layout: "centered" },
-  args: {
-    name: "Wish Auto Detail",
-    location: "Dandenong South, VIC",
-    primaryService: undefined,
-    priceFromLabel: undefined,
-    rating: undefined,
-    reviewCount: undefined,
-    heroImageUrl: null,
-  },
-  render: (args) => (
-    <div className="w-80">
-      <MerchantCard {...args} />
-    </div>
-  ),
-};
-
-/**
- * v3 no-photo state (AUTM-837): a framed monogram tile on the warm surface.
- * At search-grid density a merchant without photos must read as a deliberate
- * system, not a wall of broken image loads - which is what the old bare
- * grey-slab-with-initial treatment looked like.
- */
 export const NoPhoto: Story = {
-  args: {
-    name: "Wish Car Care",
-    heroImageUrl: undefined,
-    primaryService: "Full detail",
-    location: "Pinjarra Hills, QLD",
-  },
+  parameters: { layout: "centered" },
+  args: { ...SAMPLE_NEW[2], heroImageUrl: null },
+  render: One,
+};
+
+export const LongName: Story = {
+  parameters: { layout: "centered" },
+  args: { ...SAMPLE[0], badge: null, name: "Melbourne Premium Mobile Detailing and Paint Correction Specialists" },
+  render: One,
+};
+
+export const TextScale200: Story = {
+  name: "At a 200% root",
+  parameters: { layout: "centered" },
+  args: { ...SAMPLE[0], badge: null, mode: "both", onFavoriteClick: () => {} },
+  render: (args) => (
+    <div className="w-[40rem]" style={{ fontSize: "32px" }}>
+      <MerchantCard {...args} />
+    </div>
+  ),
+};
+
+// ─── In context: the marketplace rail and the directory grid ────────────
+
+export const HomeRail: Story = {
+  name: "In context: the home rail",
+  parameters: { layout: "fullscreen" },
+  render: () => (
+    <div className="gradient-ground min-h-screen py-12">
+      <div className="mx-auto max-w-7xl px-8">
+        <CarouselHeader
+          eyebrow="Now live"
+          title="Verified pros in Melbourne"
+          description="Every pro here is ABN-verified, ID-checked and insured before they can take a booking."
+          onPrev={() => {}}
+          onNext={() => {}}
+          seeAll={<a href="#">See all</a>}
+        />
+        <div className="mt-7 flex gap-5 overflow-x-auto pb-2">
+          {[...SAMPLE_NEW, { ...SAMPLE[0], badge: null, mode: "workshop" as const }].map((m) => (
+            <div key={m.name} className="w-[280px] shrink-0">
+              <MerchantCard {...m} onFavoriteClick={() => {}} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  ),
+};
+
+export const DirectoryGrid: Story = {
+  name: "In context: the directory grid",
+  parameters: { layout: "fullscreen" },
+  render: () => (
+    <div className="gradient-ground min-h-screen py-12">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-5 px-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {[...SAMPLE_NEW, ...SAMPLE.map((m) => ({ ...m, badge: null, priceFromLabel: undefined, primaryService: undefined }))].map((m) => (
+          <MerchantCard key={m.name} {...m} onFavoriteClick={() => {}} />
+        ))}
+      </div>
+    </div>
+  ),
 };

@@ -57,6 +57,11 @@ import { cn } from '../lib/cn'
  * badge now GROWS with OS Dynamic Type instead of staying frozen at 10px
  * while the copy beside it doubles. Same argument as AUTM-915 made for
  * Button's fixed heights. Never reintroduce a px font size here. */
+/* AUTM-1107 (and AUTM-1093). Every tone used to set its label in 10px
+ * letterspaced uppercase. That is the device Don rejected across the site
+ * ("uppercase titles feel like AI slop", 2026-09-03), and a marker on a
+ * photograph does not need it: the solid fill and the skew are the
+ * identity. Labels are now text-xs in the case the consumer passes. */
 const badgeVariants = cva(
     'inline-flex items-center font-medium transition-colors',
     {
@@ -73,9 +78,9 @@ const badgeVariants = cva(
                 //                             the old trending + new-light
                 //                             pair; lime-drive was dropped)
                 purple:
-                    'bg-autara-purple text-white px-3 py-1 text-[0.625rem] uppercase tracking-[0.16em]',
+                    'bg-autara-purple text-white px-3 py-1 text-xs',
                 aqua:
-                    'bg-autara-sky-aqua text-[#062436] px-3 py-1 text-[0.625rem] uppercase tracking-[0.16em]',
+                    'bg-autara-sky-aqua text-[#062436] px-3 py-1 text-xs',
                 // AUTM-974 dropped the `ring-1 ring-inset ring-[#0E0A1A]/15`
                 // this carried "for a hairline against light heros". Acid
                 // lime at 12.9:1 under its own ink does not need an edge to
@@ -83,7 +88,7 @@ const badgeVariants = cva(
                 // direction only exempts a hairline that is the material of a
                 // TRANSLUCENT surface. This fill is opaque.
                 lime:
-                    'bg-[var(--color-autara-lime-bright)] text-[#0E0A1A] px-3 py-1 text-[0.625rem] uppercase tracking-[0.16em]',
+                    'bg-[var(--color-autara-lime-bright)] text-[#0E0A1A] px-3 py-1 text-xs',
 
                 // ─── Semantic status — AUTM-948, rule 4 ─────────────────
                 // Purple ACTS · aqua IN FLIGHT · lime DONE and money-in.
@@ -101,11 +106,11 @@ const badgeVariants = cva(
                 // deliberately static. Use these for booking lifecycle
                 // state, those for generic intent.
                 act:
-                    'bg-[var(--act-fill)] text-[var(--on-act)] px-3 py-1 text-[0.625rem] uppercase tracking-[0.16em]',
+                    'bg-[var(--act-fill)] text-[var(--on-act)] px-3 py-1 text-xs',
                 flight:
-                    'bg-[var(--flight-fill)] text-[var(--on-flight)] px-3 py-1 text-[0.625rem] uppercase tracking-[0.16em]',
+                    'bg-[var(--flight-fill)] text-[var(--on-flight)] px-3 py-1 text-xs',
                 money:
-                    'bg-[var(--money-fill)] text-[var(--on-money)] px-3 py-1 text-[0.625rem] uppercase tracking-[0.16em]',
+                    'bg-[var(--money-fill)] text-[var(--on-money)] px-3 py-1 text-xs',
 
                 // ─── Status tones — SOLID (AUTM-211) ─────────────────────
                 // Don 2026-06-21: Autara reads as SOLID color, never the
@@ -118,15 +123,15 @@ const badgeVariants = cva(
                 //   warning → solid amber (dark ink) · destructive → solid red ·
                 //   neutral → solid slate
                 info:
-                    'bg-[var(--color-autara-info)] text-white px-3 py-1 text-[0.625rem] uppercase tracking-[0.16em]',
+                    'bg-[var(--color-autara-info)] text-white px-3 py-1 text-xs',
                 success:
-                    'bg-[var(--color-autara-success)] text-white px-3 py-1 text-[0.625rem] uppercase tracking-[0.16em]',
+                    'bg-[var(--color-autara-success)] text-white px-3 py-1 text-xs',
                 warning:
-                    'bg-[var(--color-autara-warning)] text-[#3a2a06] px-3 py-1 text-[0.625rem] uppercase tracking-[0.16em]',
+                    'bg-[var(--color-autara-warning)] text-[#3a2a06] px-3 py-1 text-xs',
                 destructive:
-                    'bg-[var(--color-autara-error)] text-white px-3 py-1 text-[0.625rem] uppercase tracking-[0.16em]',
+                    'bg-[var(--color-autara-error)] text-white px-3 py-1 text-xs',
                 neutral:
-                    'bg-[#46414f] text-white px-3 py-1 text-[0.625rem] uppercase tracking-[0.16em]',
+                    'bg-[#46414f] text-white px-3 py-1 text-xs',
 
                 // ─── Default — themed neutral ───────────────────────────
                 // AUTM-934: `default` used to be the legacy DARK treatment
