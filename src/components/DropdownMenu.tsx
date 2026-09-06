@@ -46,11 +46,28 @@ const ITEM = cn(
     'data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
 )
 
+export interface DropdownMenuContentProps
+    extends React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content> {
+    /**
+     * Where the panel is portaled. Defaults to `document.body`, which is right
+     * for an app that stamps `data-theme` on `<html>`.
+     *
+     * AUTM-1127 added it for the case where body is the WRONG parent: a
+     * side-by-side both-themes story scopes `data-theme` to a nested element,
+     * and a panel portaled to body inherits the page theme instead, so the two
+     * panes render identically and the story looks correct while proving
+     * nothing. Same shape as the AUTM-948 bug, one level up.
+     *
+     * Additive and defaulted, so every existing call site is unchanged.
+     */
+    portalContainer?: HTMLElement | null
+}
+
 const DropdownMenuContent = React.forwardRef<
     React.ComponentRef<typeof DropdownMenuPrimitive.Content>,
-    React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>
->(({ className, sideOffset = 6, ...props }, ref) => (
-    <DropdownMenuPrimitive.Portal>
+    DropdownMenuContentProps
+>(({ className, sideOffset = 6, portalContainer, ...props }, ref) => (
+    <DropdownMenuPrimitive.Portal container={portalContainer ?? undefined}>
         <DropdownMenuPrimitive.Content
             ref={ref}
             sideOffset={sideOffset}

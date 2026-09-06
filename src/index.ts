@@ -20,7 +20,7 @@ export {
     PickerSheet, type PickerOption, type PickerRowRender, type PickerSheetProps,
     Accordion, AccordionItem, AccordionTrigger, AccordionContent,
     Tabs, TabsList, TabsTrigger, TabsContent,
-    DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuGroup, DropdownMenuPortal, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent,
+    DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuGroup, DropdownMenuPortal, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent, type DropdownMenuContentProps,
     // AUTM-965 — anchored floating panel for CONTENT (DropdownMenu gives its
     // children `menuitem` semantics, which a list of content must not have).
     Popover, PopoverTrigger, PopoverAnchor, PopoverClose, PopoverPortal, PopoverContent, PopoverHeader, PopoverTitle, PopoverDescription, PopoverBody, PopoverFooter, PopoverSeparator, type PopoverContentProps, type PopoverBodyProps,
@@ -93,6 +93,15 @@ export {
     type AddressSuggestion,
     type ResolvedAddress,
     type AddressMapRenderProps,
+    // AUTM-1127 — the one shared account menu, replacing four hand-rolled ones
+    AccountMenu,
+    type AccountMenuProps,
+    type AccountMenuIdentity,
+    type AccountMenuItemSpec,
+    type AccountMenuSection,
+    type AccountMenuPrimaryAction,
+    type AccountMenuAccent,
+    type AccountMenuTone,
 } from './components'
 
 // Utilities
