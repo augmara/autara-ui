@@ -79,6 +79,7 @@ export {
     DropdownMenuSub,
     DropdownMenuSubTrigger,
     DropdownMenuSubContent,
+    type DropdownMenuContentProps,
 } from './DropdownMenu'
 
 // AUTM-965 — anchored floating panel for CONTENT. Reach for DropdownMenu
@@ -252,3 +253,18 @@ export {
     type ResolvedAddress,
     type AddressMapRenderProps,
 } from './AddressPickerSheet'
+
+// ─── The one shared account menu (AUTM-1127) ───────────────────────────
+// Replaces four hand-rolled menus: customer-web's ProfileMenu,
+// merchant-web's AuthenticatedHeader dropdown, merchant-mobile's
+// MoreMenuSheet, and admin's NavUser.
+export {
+    AccountMenu,
+    type AccountMenuProps,
+    type AccountMenuIdentity,
+    type AccountMenuItemSpec,
+    type AccountMenuSection,
+    type AccountMenuPrimaryAction,
+    type AccountMenuAccent,
+    type AccountMenuTone,
+} from './AccountMenu'

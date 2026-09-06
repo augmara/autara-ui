@@ -357,6 +357,13 @@ const FOCUS_BANDS: [string, string][] = [
     ['Sheet close', 'surface'],
     ['Stepper step', 'background'],
     ['Switch', 'background'],
+    // AUTM-1127 — AccountMenu. The rows and the accent CTA sit on the panel,
+    // the trigger sits on the page, so the two bands differ. Listing them
+    // separately is the point: a single entry would have measured the wrong
+    // ground for one of them.
+    ['AccountMenu row', 'surface'],
+    ['AccountMenu accent row', 'surface'],
+    ['AccountMenu trigger', 'background'],
 ]
 
 describe('the focus indicator survives the solid fill', () => {
