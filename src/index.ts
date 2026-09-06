@@ -44,7 +44,7 @@ export {
     OtpInput, type OtpInputProps,
     RatingStars, type RatingStarsProps,
     EmptyState, type EmptyStateProps,
-    MerchantCard, type MerchantCardProps, type MerchantBadge,
+    MerchantCard, type MerchantCardProps, type MerchantBadge, type MerchantMode,
     SectionHeading, type SectionHeadingProps,
     CarouselHeader, type CarouselHeaderProps,
     ServiceCard, type ServiceCardProps,
