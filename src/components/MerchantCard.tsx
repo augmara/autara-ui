@@ -18,7 +18,8 @@ import { Badge } from "./Badge";
  *      • Marker top-left: the `badge` you pass, or the lime parallelogram
  *        "New on Autara" when `isNew` is set and no badge is passed. A
  *        merchant is either new or rated; the card never says both.
- *      • Save control top-right, 44px, a round glass button. Consumer owns
+ *      • Save control top-right, 44px, a 12px-radius glass button (the
+ *        ladder; nothing on Autara is a circle). Consumer owns
  *        the state and any sign-in gate.
  *   2. Body: name and, when there are reviews, the rating with its count.
  *      Then one meta line: location, and the way the merchant works
@@ -183,7 +184,7 @@ export const MerchantCard = forwardRef<HTMLDivElement, MerchantCardProps>(
               }}
               /* 44px: the a11y floor (AUTM-1039 measured the old one at 32). */
               className={cn(
-                "absolute right-2 top-2 grid h-11 w-11 place-items-center rounded-full bg-[var(--glass-fill-strong)] backdrop-blur-sm transition-colors hover:bg-[var(--surface)]",
+                "absolute right-2 top-2 grid h-11 w-11 place-items-center rounded-xl bg-[var(--glass-fill-strong)] backdrop-blur-sm transition-colors hover:bg-[var(--surface)]",
                 isFavorite ? "text-[var(--accent)]" : "text-[var(--text-muted)] hover:text-[var(--accent)]",
               )}
             >
