@@ -68,7 +68,6 @@ const PENDING: Record<string, string> = {
     'ImageCropDialog.tsx': 'range-slider track — a state bar, likely a keep',
     'MultiSelect.tsx': 'value chips + clear button — chips go to 8px',
     'EmptyState.tsx': 'icon medallion — decorative, likely a keep',
-    'MerchantCard.tsx': 'overlay control — should move',
     'StepCard.tsx': 'step numeral medallion — a numeral in a circle, likely a keep',
     'Stepper.tsx': 'step dots and connectors — indicator dots, likely a keep',
 }
