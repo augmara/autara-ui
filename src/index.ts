@@ -60,7 +60,7 @@ export {
     // v1.4.0 — merchant-mobile harvest (StatsStrip, InfoRow, ListSection, ModeChip, Logo, SearchInput, FilterChipRow)
     StatsStrip, type StatsStripProps, type StatItem,
     // v2.x — AUTM-726: StatsStrip is now a grid of these.
-    StatTile, type StatTileProps, type StatTone,
+    StatTile, type StatTileProps, type StatTone, type StatTrend,
     InfoRow, type InfoRowProps,
     ListSection, ListSectionRow, type ListSectionProps, type ListSectionRowProps,
     ModeChip, type ModeChipProps, type BookingMode,

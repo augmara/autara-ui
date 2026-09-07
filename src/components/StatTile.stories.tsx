@@ -35,9 +35,42 @@ export const Brand: Story = {
     args: { label: 'Customers', value: 48, caption: '6 new this month' },
 }
 
-export const NoTick: Story = {
-    name: 'none — opt out of the tick',
-    args: { label: 'Completed', value: 142, tone: 'none' },
+/**
+ * AUTM-1161 — the caption is the point of the tile now.
+ *
+ * A number with nothing to compare it against cannot be acted on: "$426"
+ * answers "what did I take", which a merchant already feels, and "$426, up
+ * 18% on last Tuesday" answers "is this a good day", which they cannot.
+ * `trend` colours the delta and nothing else.
+ */
+export const WithATrend: Story = {
+    name: 'With a comparison',
+    render: () => (
+        <div className="grid grid-cols-2 gap-3">
+            <StatTile
+                label="Today"
+                value="$426"
+                caption="+18% on last Tuesday"
+                trend="up"
+            />
+            <StatTile
+                label="This month"
+                value="$4,247"
+                caption="-6% on last month to date"
+                trend="down"
+            />
+        </div>
+    ),
+}
+
+/**
+ * `trend` is for a REAL comparison, never to make a flat number look like
+ * good news. A tile with nothing to compare against simply says what it
+ * covers, and that is the correct rendering rather than a missing feature.
+ */
+export const WithoutAComparison: Story = {
+    name: 'No comparison available',
+    args: { label: 'Completed', value: 142, caption: 'All time' },
 }
 
 export const Loading: Story = {
@@ -45,12 +78,21 @@ export const Loading: Story = {
 }
 
 /**
- * The three tones side by side. This is the story to look at when deciding
- * which tone a new stat gets — the mapping is meaning, not palette, so a
- * screen that pairs lime with a payout is a bug even though it renders.
+ * AUTM-1161 — `tone` no longer renders anything.
+ *
+ * It drove a 3px accent tick above the label. `project_ui_direction_2026_09_01`
+ * rule 5 names that exact device as the reason two of three brand colours were
+ * decoration ("aqua and lime existed only as 3px dashes above KPI labels"),
+ * while this component's own docblock used to defend it as the one place the
+ * accent carried meaning. Don settled it on 2026-09-07: the tick goes.
+ *
+ * The prop stays so no consumer breaks and so a call site still documents what
+ * a tile means. This story is kept to show that all four tones now render
+ * identically — if a future change spends the accent here again, this is where
+ * it will show up.
  */
-export const ToneVocabulary: Story = {
-    name: 'Tone vocabulary',
+export const ToneRendersNothing: Story = {
+    name: 'Tone (deprecated, renders nothing)',
     render: () => (
         <div className="grid grid-cols-3 gap-3">
             <StatTile
