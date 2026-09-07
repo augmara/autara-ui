@@ -6,7 +6,7 @@ import { cn } from '../lib/cn'
  * ListSection + ListSectionRow — the canonical Autara
  * settings / account / preferences list pattern.
  *
- *   GROUP TITLE
+ *   Group title
  *   ┌─────────────────────────────────────────────┐
  *   │ [Icon] Row label                  Value  ›  │
  *   │ ────────────────────────────────────────── │
@@ -25,6 +25,23 @@ import { cn } from '../lib/cn'
  * Section title is optional — for a single group of rows without a
  * label (e.g. a sign-out row at the bottom of a settings screen) omit
  * `title`.
+ *
+ * AUTM-1138 — the section title is SENTENCE CASE, not a letterspaced
+ * uppercase eyebrow.
+ *
+ * It shipped as `text-[10px] uppercase tracking-[0.18em]`, which is the
+ * treatment Don has rejected repeatedly across the surfaces. It is also the
+ * loudest possible way to render the least important text on the screen: a
+ * group label is scaffolding, and tracking it out to 0.18em turns four quiet
+ * words into a banner while the rows underneath — the actual content — sit at
+ * a normal weight. Sentence case at `--text-muted` lets the rows lead.
+ *
+ * The type is in `rem`, not `px`. All four sizes here were hardcoded pixels,
+ * so the whole pattern ignored OS Dynamic Type on every surface that uses it —
+ * settings screens being exactly where someone who has scaled their text goes
+ * to change things. The rem values are exact equivalents at a 16px root
+ * (10→0.625 was lifted to 0.75 for the title; 14→0.875; 12→0.75), so nothing
+ * moves at default scale and they only diverge where they should.
  */
 
 export interface ListSectionProps {
@@ -37,7 +54,7 @@ export function ListSection({ title, children, className }: ListSectionProps) {
     return (
         <section className={cn('mt-6 first:mt-0', className)}>
             {title ? (
-                <h2 className="mb-2 px-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--text-subtle)]">
+                <h2 className="mb-2 px-1 text-[0.75rem] font-medium text-[var(--text-muted)]">
                     {title}
                 </h2>
             ) : null}
@@ -98,7 +115,7 @@ export function ListSectionRow({
         <div className="min-w-0 flex-1">
             <p
                 className={cn(
-                    'truncate text-[14px] font-medium',
+                    'truncate text-[0.875rem] font-medium',
                     destructive
                         ? 'text-[var(--color-autara-error)]'
                         : 'text-[var(--text-strong)]',
@@ -107,13 +124,13 @@ export function ListSectionRow({
                 {label}
             </p>
             {description ? (
-                <p className="mt-0.5 truncate text-[12px] text-[var(--text-muted)]">
+                <p className="mt-0.5 truncate text-[0.75rem] text-[var(--text-muted)]">
                     {description}
                 </p>
             ) : null}
         </div>,
         trailing ? (
-            <span className="shrink-0 text-[12px] text-[var(--text-muted)]">
+            <span className="shrink-0 text-[0.75rem] text-[var(--text-muted)]">
                 {trailing}
             </span>
         ) : null,
