@@ -131,7 +131,13 @@ export function TimePicker({
                 // there is no breakpoint to get wrong (AUTM-963 — a media
                 // query would not react to the root font size at all).
                 'grid gap-1.5',
-                'grid-cols-[repeat(auto-fill,minmax(5.25rem,1fr))]',
+                // 5.75rem, not 5.25: measured on the merchant app at iPad
+                // width, a 5.25rem column leaves a 68px content box and
+                // "10:00 am" needs more than that at 15px, so half the grid
+                // wrapped to two lines and the rows came out 44px and 47px
+                // tall. The floor has to clear the WIDEST label, which is a
+                // two-digit hour with a two-digit minute and a suffix.
+                'grid-cols-[repeat(auto-fill,minmax(5.75rem,1fr))]',
                 className,
             )}
         >
@@ -157,7 +163,10 @@ export function TimePicker({
                         }}
                         className={cn(
                             'flex min-h-[2.75rem] items-center justify-center rounded-[12px] border',
-                            'px-2 text-[0.9375rem] tabular-nums transition-colors',
+                            // A time is one token; breaking "10:00 am" across
+                            // two lines makes it read as two values and gives
+                            // the grid ragged row heights.
+                            'whitespace-nowrap px-2 text-[0.9375rem] tabular-nums transition-colors',
                             'focus-visible:outline-none focus-visible:ring-2',
                             'focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2',
                             'focus-visible:ring-offset-[var(--background)]',
