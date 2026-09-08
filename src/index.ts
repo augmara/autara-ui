@@ -110,3 +110,15 @@ export { cn } from './lib/cn'
  * bottom-anchored banner in the library at once. Clearing only one of them
  * still leaves the element buried when the other is up. */
 export { BOTTOM_CHROME_OFFSET } from './lib/reserved-bottom-space'
+
+export { DatePicker, type DatePickerProps, type DayState } from './components/DatePicker'
+export { TimePicker, type TimePickerProps, type SlotState } from './components/TimePicker'
+export {
+    addDays,
+    daysBetween,
+    timeSlots,
+    timeLabel,
+    longDateLabel,
+    isISODate,
+    isISOTime,
+} from './lib/calendar'
