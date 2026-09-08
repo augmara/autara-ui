@@ -204,3 +204,36 @@ export const HeroInStrip: Story = {
         </div>
     ),
 }
+
+/**
+ * AUTM-1161 — a tile with somewhere to go.
+ *
+ * The whole surface is the target rather than a link buried inside it, and
+ * `onClick` keeps the package router-agnostic: merchant-mobile passes
+ * `() => navigate('/earnings')`, a Next.js consumer passes `router.push`.
+ */
+export const Interactive: Story = {
+    name: 'interactive — the whole tile is the control',
+    render: () => (
+        <div className="grid max-w-[560px] grid-cols-2 gap-3">
+            <StatTile
+                label="Today"
+                value="$426"
+                caption="18% on last Tuesday"
+                trend="up"
+                hero
+                testId="today-stat-revenue"
+                onClick={() => alert('navigate to /earnings')}
+            />
+            <StatTile
+                label="Pending payouts"
+                value="$5,454"
+                caption="17 jobs awaiting Stripe"
+                testId="today-stat-pending"
+                onClick={() => alert('navigate to /earnings')}
+            />
+            <StatTile label="This month" value="$6,300" caption="Through Wed, 9 Sept" />
+            <StatTile label="Next payout" value="-" caption="No payout scheduled yet" />
+        </div>
+    ),
+}
