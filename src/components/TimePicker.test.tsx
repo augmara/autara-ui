@@ -113,4 +113,20 @@ describe('TimePicker', () => {
         fireEvent.click(screen.getByTestId('t-slot-09:00'))
         expect(onChange).not.toHaveBeenCalled()
     })
+    it('keeps a time on one line, so the grid rows stay level', () => {
+        // Measured on the merchant app: at a 5.25rem column the content box
+        // was 68px and "10:00 am" wrapped, giving rows of 44px and 47px in
+        // the same grid. jsdom computes no layout, so the guard is the rule
+        // that prevents it rather than the height it produced.
+        render(
+            <TimePicker
+                value=""
+                startTime="10:00"
+                endTime="12:30"
+                onChange={() => {}}
+                testId="t"
+            />,
+        )
+        expect(screen.getByTestId('t-slot-10:00').className).toContain('whitespace-nowrap')
+    })
 })
