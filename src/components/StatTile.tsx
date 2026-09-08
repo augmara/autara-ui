@@ -12,32 +12,52 @@ import { cn } from '../lib/cn'
  * one that happened to be hand-made. Graduating it here means there is one
  * tile, and `StatsStrip` composes it rather than duplicating it.
  *
- * The device: an optional 3px accent tick, an uppercase tracked micro-label,
- * then the number doing the shouting, then a quiet caption. The tick is the
- * only place the accent palette is spent, which is what keeps it reading as
- * meaning rather than decoration.
+ * The device: a quiet sentence-case label, then the number doing the
+ * shouting, then a caption that says what the number is worth NEXT TO
+ * SOMETHING.
  *
- * `tone` is SEMANTIC, not a colour picker:
- *   money-in   lime   — revenue, takings, lifetime earnings
- *   money-out  aqua   — payouts, transfers, anything owed or in flight
- *   brand      purple — counts and non-money stats (customers, services)
- *   none              — no tick at all
+ * ── AUTM-1161: the tick and the uppercase are gone ───────────────────────
  *
- * Keep that mapping. A screen that swaps lime and aqua teaches the merchant
- * the wrong thing at a glance, which is worse than having no tick at all.
+ * This file used to argue that the 3px accent tick was "the only place the
+ * accent palette is spent, which is what keeps it reading as meaning rather
+ * than decoration". `project_ui_direction_2026_09_01.md` says the exact
+ * opposite about the exact same device, under rule 5:
  *
- * `brand` is the DEFAULT, not `none` — a tick-less tile in a row of ticked
- * ones starts its label 24px to the left of its neighbours, because the tick
- * is inline with the text. Defaulting to a tick keeps a mixed strip aligned
- * and matches Today, where every tile has one. Reach for `none` only when the
- * whole surface is tick-free.
+ *   "Before this, aqua and lime existed only as 3px dashes above KPI labels
+ *    — two of three brand colours were decoration, which is why the product
+ *    read as 'a purple app' rather than as Autara."
+ *
+ * Both cannot be true, and the record contradicting itself is why this
+ * survived three passes of polish. Don settled it on 2026-09-07 by choosing
+ * concept E off the stat-tile sheet: the tick goes.
+ *
+ * The direction doc wins on the merits too. A 3px dash cannot carry a
+ * meaning nobody has been taught — no merchant learns "aqua means in
+ * flight" from a hairline above a label — so it was decoration defended as
+ * semantics. Where the accent now earns its place is the caption's delta,
+ * where the colour restates something the words already say.
+ *
+ * The uppercase went with it. Letterspaced uppercase micro-labels are a
+ * machine-written tell Don has rejected by name, and here they also forced
+ * "TODAY'S REVENUE" and "PENDING PAYOUTS" onto two ragged lines, which is
+ * what pushed the day's agenda down the screen.
+ *
+ * `tone` is kept in the props and deliberately unused (`_tone`): every
+ * consumer passing it keeps compiling, the call sites still document what a
+ * tile means, and the hook is there if the accent is ever spent here again.
+ * Deleting it would be a breaking change that buys nothing.
  */
 export type StatTone = 'money-in' | 'money-out' | 'brand' | 'none'
 
-const TICK: Record<Exclude<StatTone, 'none'>, string> = {
-    'money-in': 'var(--color-autara-lime-drive)',
-    'money-out': 'var(--color-autara-sky-aqua)',
-    brand: 'var(--color-autara-purple)',
+/** Direction of a caption's leading delta. Colours it, nothing else. */
+export type StatTrend = 'up' | 'down'
+
+/* Only ever applied to the leading delta in a caption, never to the number.
+ * `--intent-*-text` is the themed, contrast-tuned pair; the raw brand lime
+ * measures far too low on a light surface to carry text. */
+const TREND: Record<StatTrend, string> = {
+    up: 'var(--intent-success-text)',
+    down: 'var(--intent-error-text)',
 }
 
 export interface StatTileProps {
@@ -45,7 +65,19 @@ export interface StatTileProps {
     /** Pre-formatted. `null`/`undefined` renders the skeleton, not a zero. */
     value?: string | number | null
     caption?: string | null
+    /**
+     * @deprecated AUTM-1161 — the 3px tick this drove is gone; see the note
+     * at the top of the file. Still accepted so no consumer breaks, and still
+     * worth passing: it documents what a tile means, and is the hook if the
+     * accent is ever spent here again.
+     */
     tone?: StatTone
+    /**
+     * Colours the leading delta of `caption` when it starts with one, e.g.
+     * "+18% on last Tuesday". Pass it ONLY alongside a real comparison —
+     * never to make a flat number look like good news.
+     */
+    trend?: StatTrend
     /** Optional glyph, rendered top-right. Kept for StatsStrip compatibility. */
     icon?: ReactNode
     /** Force the skeleton even when a value is present. */
@@ -96,7 +128,8 @@ export function StatTile({
     label,
     value,
     caption,
-    tone = 'brand',
+    tone: _tone = 'brand',
+    trend,
     icon,
     loading = false,
     hero = false,
@@ -117,7 +150,7 @@ export function StatTile({
             <div className="flex items-start justify-between gap-2">
                 <p
                     className={cn(
-                        'mb-3.5 inline-flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.14em]',
+                        'mb-3 text-[0.8125rem] font-medium',
                         hero
                             ? // Slightly held back from full on-accent so the
                               // number still out-shouts its own label.
@@ -125,13 +158,6 @@ export function StatTile({
                             : 'text-[var(--text-muted)]',
                     )}
                 >
-                    {!hero && tone !== 'none' ? (
-                        <span
-                            aria-hidden
-                            className="block h-[3px] w-4 shrink-0 rounded-sm"
-                            style={{ background: TICK[tone] }}
-                        />
-                    ) : null}
                     {label}
                 </p>
                 {icon ? (
@@ -174,6 +200,11 @@ export function StatTile({
                         'mt-2 text-[0.875rem]',
                         hero ? 'text-[var(--on-accent)]/75' : 'text-[var(--text-muted)]',
                     )}
+                    /* On a hero the fill already owns the colour, and a green
+                     * delta on brand purple reads as a defect rather than as
+                     * good news. The rest of the caption stays muted either
+                     * way — only the delta is coloured. */
+                    style={trend && !hero ? { color: TREND[trend] } : undefined}
                 >
                     {caption}
                 </p>
