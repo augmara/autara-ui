@@ -121,6 +121,27 @@ export interface StatTileProps {
      * "fix" it by re-adding an invisible tick.
      */
     hero?: boolean
+    /**
+     * Makes the whole tile the control, and the reason it is `onClick` rather
+     * than a `to` or an `href`.
+     *
+     * AUTM-1161 — the tiles were inert everywhere. A merchant reading
+     * "Pending payouts $5,454" has an obvious next question and no way to
+     * ask it, so four numbers become a dead end.
+     *
+     * This package is consumed by two Next.js apps and one react-router app.
+     * A `to` prop would have to reach for a router, coupling every consumer
+     * to whichever one this file happened to pick. The consumer already knows
+     * how it navigates: it passes `() => navigate('/earnings')` or a
+     * `router.push`, and the tile stays router-agnostic.
+     */
+    onClick?: () => void
+    /**
+     * Names the tile for E2E. Not decoration: `autara-web-automation` locates
+     * by `data-testid`, so a shipped one is a public API. Without it a stat
+     * tile's only handle is its label text, which a copy change breaks.
+     */
+    testId?: string
     className?: string
 }
 
@@ -133,20 +154,32 @@ export function StatTile({
     icon,
     loading = false,
     hero = false,
+    onClick,
+    testId,
     className,
 }: StatTileProps) {
-    return (
-        <div
-            className={cn(
-                'rounded-[14px] px-5 py-[18px]',
-                hero
-                    ? // No border: the fill IS the edge. A hairline on a filled
-                      // tile reads as a seam against its own colour.
-                      'bg-[var(--accent-fill)]'
-                    : 'border border-[var(--border-subtle)] bg-[var(--surface)]',
-                className,
-            )}
-        >
+    const interactive = typeof onClick === 'function'
+    const shell = cn(
+        'rounded-[14px] px-5 py-[18px] text-left transition-colors',
+        hero
+            ? // No border: the fill IS the edge. A hairline on a filled
+              // tile reads as a seam against its own colour.
+              'bg-[var(--accent-fill)]'
+            : 'border border-[var(--border-subtle)] bg-[var(--surface)]',
+        // The hover is a border and fill shift, never a translate: a card
+        // that floats on hover contradicts the interactive rule these tokens
+        // already set.
+        interactive &&
+            (hero
+                ? 'hover:bg-[var(--accent-fill-hover)]'
+                : 'hover:border-[var(--border-strong)] hover:bg-[var(--surface-elevated)]'),
+        interactive &&
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]',
+        className,
+    )
+
+    const body = (
+        <>
             <div className="flex items-start justify-between gap-2">
                 <p
                     className={cn(
@@ -209,6 +242,29 @@ export function StatTile({
                     {caption}
                 </p>
             ) : null}
-        </div>
+        </>
+    )
+
+    if (!interactive) {
+        return (
+            <div className={shell} data-testid={testId}>
+                {body}
+            </div>
+        )
+    }
+
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            data-testid={testId}
+            /* The figure is already read out by the text inside; naming the
+             * control "Today $426" would say each of them twice. The label
+             * alone names where it goes. */
+            aria-label={`${label}, open details`}
+            className={cn(shell, 'w-full')}
+        >
+            {body}
+        </button>
     )
 }
