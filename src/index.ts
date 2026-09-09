@@ -102,6 +102,11 @@ export {
     type AccountMenuPrimaryAction,
     type AccountMenuAccent,
     type AccountMenuTone,
+    // AUTM-1185 — the customer-web hardening sweep's four primitives
+    InlineAlert, type InlineAlertProps, type InlineAlertTone,
+    ConfirmDialog, type ConfirmDialogProps,
+    NativeSelect, type NativeSelectProps,
+    MoneyBreakdown, type MoneyBreakdownProps, type MoneyRow,
 } from './components'
 
 // Utilities
