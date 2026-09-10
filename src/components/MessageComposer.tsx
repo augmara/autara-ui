@@ -19,9 +19,11 @@ import { cn } from "../lib/cn";
  *   - Field uses the canonical `.field-textarea` focus signature (warm-cream
  *     tint + solid brand-purple border, no halo) via `Textarea`, forced to a
  *     compact single-row min height that grows to a cap.
- *   - Send is the house primary on a light surface: variant="dark" (Torph
- *     ink), matching the own-message bubble — NOT purple `primary`, which
- *     the aesthetic reserves for dark / photo surfaces.
+ *   - Send is the house primary: `variant="primary"`. AUTM-1221 changed
+ *     this from `variant="dark"` (Torph ink, matching the own-message
+ *     bubble). Glass rule 5 is that purple acts, and send is the one
+ *     action on the composer; the ink treatment left the only control on
+ *     the surface reading as secondary.
  *   - Inline send errors use the brand error token, never raw `rose-*`.
  *   - Respects the iOS bottom safe-area inset.
  */
@@ -90,7 +92,8 @@ export function MessageComposer({
           className="max-h-32 min-h-[44px]! flex-1 resize-none!"
         />
         <Button
-          variant="dark"
+          /* AUTM-1221: the house primary. Rule 5: purple acts. */
+          variant="primary"
           size="md"
           disabled={!canSend}
           onClick={() => canSend && onSend()}

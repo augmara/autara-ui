@@ -25,6 +25,16 @@ export interface AsyncSkeletonProps {
   count?: number;
   /** Tailwind height class for list/card rows (e.g. "h-20", "h-32"). */
   rowHeight?: string;
+  /**
+   * What is loading, e.g. "Loading your bookings". AUTM-1221: without it the
+   * skeleton is `aria-hidden` in every variant, so a screen reader is told
+   * nothing at all while the page stands empty. Given, it renders as a
+   * visible `role="status"` line above the shapes, which is also the honest
+   * thing for a sighted reader on a slow connection.
+   *
+   * Say what is being fetched, not "Loading…".
+   */
+  label?: string;
   className?: string;
 }
 
@@ -32,10 +42,35 @@ export function AsyncSkeleton({
   variant = "list",
   count = 3,
   rowHeight,
+  label,
   className,
 }: AsyncSkeletonProps) {
   const baseRow =
     "animate-pulse rounded-2xl bg-[var(--surface-elevated)]";
+
+  /* The shapes stay `aria-hidden` either way: they carry no information, and
+     announcing a dozen empty boxes is worse than announcing nothing. The one
+     announcement is the label. */
+  const shapes = renderShapes({ variant, count, rowHeight, baseRow, className });
+  if (!label) return shapes;
+  return (
+    <div>
+      <p role="status" className="mb-3 text-sm text-[var(--text-muted)]">
+        {label}
+      </p>
+      {shapes}
+    </div>
+  );
+}
+
+function renderShapes({
+  variant,
+  count,
+  rowHeight,
+  baseRow,
+  className,
+}: Required<Pick<AsyncSkeletonProps, "variant" | "count">> &
+  Pick<AsyncSkeletonProps, "rowHeight" | "className"> & { baseRow: string }) {
 
   if (variant === "card") {
     return (
