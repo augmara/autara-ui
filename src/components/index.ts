@@ -286,3 +286,5 @@ export { InlineAlert, type InlineAlertProps, type InlineAlertTone } from './Inli
 export { ConfirmDialog, type ConfirmDialogProps } from './ConfirmDialog'
 export { NativeSelect, type NativeSelectProps } from './NativeSelect'
 export { MoneyBreakdown, type MoneyBreakdownProps, type MoneyRow } from './MoneyBreakdown'
+// ─── AUTM-1195 — pick one of a few, as cards: a real radio group ────────
+export { ChoiceCard, ChoiceGroup, type ChoiceCardProps, type ChoiceGroupProps } from './ChoiceCard'

@@ -107,6 +107,8 @@ export {
     ConfirmDialog, type ConfirmDialogProps,
     NativeSelect, type NativeSelectProps,
     MoneyBreakdown, type MoneyBreakdownProps, type MoneyRow,
+    // AUTM-1195 — pick one of a few, as cards
+    ChoiceCard, ChoiceGroup, type ChoiceCardProps, type ChoiceGroupProps,
 } from './components'
 
 // Utilities
