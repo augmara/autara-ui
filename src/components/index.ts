@@ -277,5 +277,14 @@ export {
 export { DatePicker, type DatePickerProps, type DayState } from './DatePicker'
 export { TimePicker, type TimePickerProps, type SlotState } from './TimePicker'
 
+// ─── AUTM-1185 — the customer-web hardening sweep's four primitives ──────
+// InlineAlert: one inline "something happened"; ConfirmDialog: the pause
+// before anything irreversible (graduated from merchant-mobile's
+// ConfirmActionDialog); NativeSelect: a real <select> dressed as a field;
+// MoneyBreakdown: lines of money, then the one that matters.
+export { InlineAlert, type InlineAlertProps, type InlineAlertTone } from './InlineAlert'
+export { ConfirmDialog, type ConfirmDialogProps } from './ConfirmDialog'
+export { NativeSelect, type NativeSelectProps } from './NativeSelect'
+export { MoneyBreakdown, type MoneyBreakdownProps, type MoneyRow } from './MoneyBreakdown'
 // ─── AUTM-1195 — pick one of a few, as cards: a real radio group ────────
 export { ChoiceCard, ChoiceGroup, type ChoiceCardProps, type ChoiceGroupProps } from './ChoiceCard'
