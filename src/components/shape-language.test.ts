@@ -46,6 +46,7 @@ const KEEPS: Record<string, string> = {
     // guard caught it on the merge rather than after it shipped, which is the
     // whole reason the list exists.
     'ErrorCard.tsx': 'the 32px icon medallion — a state light, not the retry button. The retry button itself takes the shared radius',
+    'InlineAlert.tsx': 'the 24px intent disc, the same state light as ErrorCard, never a control (AUTM-1185)',
 }
 
 /**
