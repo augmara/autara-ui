@@ -102,6 +102,8 @@ export {
     type AccountMenuPrimaryAction,
     type AccountMenuAccent,
     type AccountMenuTone,
+    // AUTM-1195 — pick one of a few, as cards
+    ChoiceCard, ChoiceGroup, type ChoiceCardProps, type ChoiceGroupProps,
 } from './components'
 
 // Utilities

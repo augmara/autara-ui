@@ -276,3 +276,6 @@ export {
 
 export { DatePicker, type DatePickerProps, type DayState } from './DatePicker'
 export { TimePicker, type TimePickerProps, type SlotState } from './TimePicker'
+
+// ─── AUTM-1195 — pick one of a few, as cards: a real radio group ────────
+export { ChoiceCard, ChoiceGroup, type ChoiceCardProps, type ChoiceGroupProps } from './ChoiceCard'

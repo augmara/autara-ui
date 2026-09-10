@@ -1,0 +1,182 @@
+import * as React from 'react'
+import { cn } from '../lib/cn'
+
+/**
+ * ChoiceCard / ChoiceGroup — pick one of a few, as cards.
+ *
+ * A vehicle type, a saved car, a booking mode, a time slot: a small set of
+ * mutually exclusive options that each deserve a line or two, not a
+ * dropdown. The customer web hand-rolled this shape four times, with four
+ * selected states (AUTM-1195); this is the one.
+ *
+ * Semantics come free: each card is a `<label>` wrapping an sr-only radio,
+ * so the group is a real radio group. Arrow keys move between cards, Space
+ * selects, a screen reader hears the label and the description, and a
+ * spec can `check()` it. The selected card is SOLID purple (the accent
+ * acts; never a tint), on the base radius; the cards are 44px at least.
+ *
+ * `disabledLabel` says why an option cannot be chosen ("Booked", "Not
+ * available today") rather than just dimming it.
+ */
+type GroupContext = {
+    name: string
+    value: string | null
+    onChange: (value: string) => void
+}
+const Ctx = React.createContext<GroupContext | null>(null)
+
+export interface ChoiceGroupProps {
+    name: string
+    value: string | null
+    onChange: (value: string) => void
+    /** Visible group label. */
+    legend?: React.ReactNode
+    /** Keep the legend for assistive tech only. */
+    legendHidden?: boolean
+    /** Field-level error, rendered under the cards. */
+    error?: string
+    /** Grid columns from `sm`; one column below it. Default 2. */
+    columns?: 1 | 2 | 3 | 4
+    testId?: string
+    className?: string
+    children: React.ReactNode
+}
+
+export function ChoiceGroup({
+    name,
+    value,
+    onChange,
+    legend,
+    legendHidden,
+    error,
+    columns = 2,
+    testId,
+    className,
+    children,
+}: ChoiceGroupProps) {
+    const errorId = React.useId()
+    const ctx = React.useMemo(() => ({ name, value, onChange }), [name, value, onChange])
+    return (
+        <Ctx.Provider value={ctx}>
+            <fieldset
+                data-testid={testId}
+                aria-invalid={error ? true : undefined}
+                aria-describedby={error ? errorId : undefined}
+                className={cn('min-w-0', className)}
+            >
+                {legend ? (
+                    <legend
+                        className={cn(
+                            'mb-2 text-sm font-medium text-[var(--text-muted)]',
+                            legendHidden && 'sr-only',
+                        )}
+                    >
+                        {legend}
+                    </legend>
+                ) : null}
+                <div
+                    className={cn(
+                        'grid gap-2',
+                        columns === 1 && 'grid-cols-1',
+                        columns === 2 && 'grid-cols-1 sm:grid-cols-2',
+                        columns === 3 && 'grid-cols-1 sm:grid-cols-3',
+                        columns === 4 && 'grid-cols-2 sm:grid-cols-4',
+                    )}
+                >
+                    {children}
+                </div>
+                {error ? (
+                    <p id={errorId} className="mt-1.5 text-[0.8125rem] text-[var(--intent-error-text)]">
+                        {error}
+                    </p>
+                ) : null}
+            </fieldset>
+        </Ctx.Provider>
+    )
+}
+
+export interface ChoiceCardProps {
+    value: string
+    label: React.ReactNode
+    description?: React.ReactNode
+    /** Leading glyph or thumbnail. */
+    icon?: React.ReactNode
+    disabled?: boolean
+    /** Why it cannot be chosen; shown in place of the description when disabled. */
+    disabledLabel?: string
+    /** `data-testid` on the card (the label element). */
+    testId?: string
+    /** `data-field` on the radio, for focus targeting from a validator. */
+    dataField?: string
+    className?: string
+}
+
+export function ChoiceCard({
+    value,
+    label,
+    description,
+    icon,
+    disabled,
+    disabledLabel,
+    testId,
+    dataField,
+    className,
+}: ChoiceCardProps) {
+    const group = React.useContext(Ctx)
+    if (!group) throw new Error('ChoiceCard must be inside a ChoiceGroup')
+    const selected = group.value === value
+    return (
+        <label
+            data-testid={testId}
+            data-selected={selected || undefined}
+            className={cn(
+                'flex min-h-11 min-w-0 cursor-pointer items-center gap-3 rounded-autara border px-3.5 py-3 text-left transition-colors',
+                'focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[var(--color-autara-purple)]',
+                selected
+                    ? 'border-[var(--color-autara-purple-static)] bg-[var(--color-autara-purple-static)] text-white'
+                    : 'border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-strong)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-elevated)]',
+                disabled && 'cursor-not-allowed opacity-60 hover:border-[var(--border-subtle)] hover:bg-[var(--surface)]',
+                className,
+            )}
+        >
+            <input
+                type="radio"
+                name={group.name}
+                value={value}
+                checked={selected}
+                disabled={disabled}
+                data-field={dataField}
+                onChange={() => group.onChange(value)}
+                className="sr-only"
+            />
+            {icon ? (
+                <span
+                    aria-hidden
+                    className={cn(
+                        'grid h-9 w-9 shrink-0 place-items-center rounded-lg',
+                        selected
+                            ? 'bg-white/15 text-white'
+                            : 'bg-[var(--surface-warm)] text-[var(--color-autara-purple)]',
+                    )}
+                >
+                    {icon}
+                </span>
+            ) : null}
+            <span className="min-w-0 flex-1">
+                <span className="block break-words text-sm font-medium">{label}</span>
+                {disabled && disabledLabel ? (
+                    <span className="mt-0.5 block text-xs">{disabledLabel}</span>
+                ) : description ? (
+                    <span
+                        className={cn(
+                            'mt-0.5 block break-words text-xs',
+                            selected ? 'text-white/85' : 'text-[var(--text-muted)]',
+                        )}
+                    >
+                        {description}
+                    </span>
+                ) : null}
+            </span>
+        </label>
+    )
+}
