@@ -50,27 +50,28 @@ const KEEPS: Record<string, string> = {
 }
 
 /**
- * NOT YET MIGRATED — AUTM-948 moved the five primitives in its scope
- * (Button, Input, MetaChip, FilterChipRow, plus the `.btn-*` CSS classes).
- * These are the rest, listed rather than silently permitted so the remaining
- * sweep is visible and can only shrink.
+ * NOT YET MIGRATED. AUTM-948 moved the five primitives in its scope (Button,
+ * Input, MetaChip, FilterChipRow, plus the `.btn-*` CSS classes). These are
+ * the rest, listed rather than silently permitted so the remaining sweep is
+ * visible and can only shrink.
  *
- * `Toast.tsx` is NOT a simple carry-over: the Torph ink capsule is documented
- * in the `autara-aesthetic` skill as "Always rounded-full. Never rounded-xl
- * for a capsule." A floating status capsule is arguably a status marker and
- * arguably a surface. That one needs Don, not a sweep.
+ * `Toast.tsx` came off this list under AUTM-1221. It was held for Don because
+ * the Torph ink capsule is documented in the `autara-aesthetic` skill as
+ * "Always rounded-full. Never rounded-xl for a capsule", and a floating status
+ * capsule is arguably a status marker and arguably a surface. Don settled it
+ * in the 2026-09-09 customer-web hardening plan, which puts the capsule on the
+ * radius ladder; the skill's line is the one that is now stale.
+ *
+ * `Dialog.tsx`, `EmptyState.tsx` and `Stepper.tsx` also came off under
+ * AUTM-1221 (the close control, the icon tile, the progress track).
  */
 const PENDING: Record<string, string> = {
-    'Toast.tsx': 'Torph ink capsule — conflicts with a documented grammar, needs Don',
-    'BackButton.tsx': 'circular icon button — an action, should move',
-    'CarouselHeader.tsx': 'prev/next icon buttons — actions, should move',
-    'Dialog.tsx': 'close button — an action, should move',
-    'Sheet.tsx': 'close button — an action, should move',
-    'ImageCropDialog.tsx': 'range-slider track — a state bar, likely a keep',
-    'MultiSelect.tsx': 'value chips + clear button — chips go to 8px',
-    'EmptyState.tsx': 'icon medallion — decorative, likely a keep',
-    'StepCard.tsx': 'step numeral medallion — a numeral in a circle, likely a keep',
-    'Stepper.tsx': 'step dots and connectors — indicator dots, likely a keep',
+    'BackButton.tsx': 'circular icon button, an action, should move',
+    'CarouselHeader.tsx': 'prev/next icon buttons, actions, should move',
+    'Sheet.tsx': 'close button, an action, should move',
+    'ImageCropDialog.tsx': 'range-slider track, a state bar, likely a keep',
+    'MultiSelect.tsx': 'value chips + clear button, chips go to 8px',
+    'StepCard.tsx': 'step numeral medallion, a numeral in a circle, likely a keep',
 }
 
 function sources(): { file: string; text: string }[] {

@@ -83,7 +83,10 @@ const DialogContent = React.forwardRef<
             <DialogPrimitive.Close
                 aria-label="Close dialog"
                 className={cn(
-                    'absolute right-4 top-4 grid h-7 w-7 place-items-center rounded-full',
+                    /* AUTM-1221: 44px on the ladder. It was 28px, which is
+                       under the floor on the one control that dismisses a
+                       modal, and a pill besides. */
+                    'absolute right-3 top-3 grid h-11 w-11 place-items-center rounded-autara',
                     'text-[var(--text-subtle)] transition-colors',
                     'hover:bg-[var(--surface-elevated)] hover:text-[var(--text-strong)]',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]'

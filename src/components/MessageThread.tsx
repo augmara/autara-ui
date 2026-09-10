@@ -165,8 +165,13 @@ export function MessageThread({
               date.getTime() - prevDate.getTime() > timestampGapMs);
           return (
             <li key={m.id} className="flex flex-col gap-1">
+              {/* AUTM-1221: the CSS forced uppercase and letterspacing over
+                  whatever `formatTimestamp` returned, so a consumer that
+                  sentence-cased its dates still rendered "TODAY · 9:17 AM"
+                  (found on customer-web's booking chat, AUTM-1205). The
+                  formatter is the source of truth now. */}
               {showStamp && date ? (
-                <p className="mt-3 text-center text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--text-subtle)]">
+                <p className="mt-3 text-center text-xs font-medium text-[var(--text-subtle)]">
                   {formatTimestamp(date)}
                 </p>
               ) : null}

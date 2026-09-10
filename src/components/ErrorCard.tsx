@@ -116,7 +116,9 @@ export function ErrorCard({
         <span
           aria-hidden
           className={cn(
-            "grid h-8 w-8 shrink-0 place-items-center rounded-full text-white",
+            /* AUTM-1221: on the ladder. The solid intent fill stays; it is
+               the shape that was the pill. */
+            "grid h-8 w-8 shrink-0 place-items-center rounded-autara-sm text-white",
             t.fill,
           )}
         >
@@ -137,9 +139,13 @@ export function ErrorCard({
              * nothing. It was also h-9 = 36px, under the 44px minimum, so
              * this is `md`: the one control on the screen is not the place
              * to save 8px.
+             *
+             * AUTM-1221: glass, not outline. Rule 4 of the Autara Glass
+             * direction: a secondary control is a flat glass surface, never
+             * an outline.
              */
             <Button
-              variant="outline"
+              variant="glass"
               size="md"
               onClick={onRetry}
               className="mt-3"

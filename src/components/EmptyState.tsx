@@ -35,12 +35,17 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div
-      className={`flex flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--border-subtle)] bg-[var(--surface-elevated)]/40 px-6 py-10 text-center ${className}`}
+      /* AUTM-1221: a solid hairline on the ladder. The dashed border read
+         as a drop zone, and the panel is not one. */
+      className={`flex flex-col items-center justify-center rounded-autara-lg border border-[var(--border-subtle)] bg-[var(--surface-elevated)] px-6 py-10 text-center ${className}`}
     >
       {icon ? (
         <div
           aria-hidden="true"
-          className="mb-4 grid h-12 w-12 place-items-center rounded-full bg-[rgba(78,27,189,0.08)] text-[var(--color-autara-purple)]"
+          /* AUTM-1221: a solid purple tile on the ladder. Rules 3 and 4:
+             round is for avatars and status dots, and emphasis is a fill,
+             never an 8% tint. */
+          className="mb-4 grid h-12 w-12 place-items-center rounded-autara bg-[var(--color-autara-purple-static)] text-white"
         >
           {icon}
         </div>

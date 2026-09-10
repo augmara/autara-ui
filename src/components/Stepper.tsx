@@ -88,25 +88,33 @@ const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(function Stepper(
     return (
         <nav ref={ref} aria-label={ariaLabel} className={cn('w-full', className)}>
             <div
-                className="relative h-[3px] w-full overflow-hidden rounded-full bg-[var(--surface-elevated)]"
+                /* AUTM-1221: the track on the ladder rather than a pill. */
+                className="relative h-[3px] w-full overflow-hidden rounded-autara-sm bg-[var(--surface-elevated)]"
                 role="progressbar"
+                /* AUTM-1213: an accessible name does NOT inherit from the
+                   nav landmark, so the bar announced a value with no subject
+                   ("1 of 4" of what?). The widget carries the same name as
+                   the nav that wraps it. */
+                aria-label={ariaLabel}
                 aria-valuenow={clampedStep + 1}
                 aria-valuemin={1}
                 aria-valuemax={total}
                 aria-valuetext={`Step ${clampedStep + 1} of ${total}: ${current?.label ?? ''}`}
             >
                 <div
-                    className="h-full rounded-full bg-autara-purple transition-all duration-500 ease-out"
+                    className="h-full rounded-autara-sm bg-autara-purple transition-all duration-500 ease-out"
                     style={{ width: `${progressPercent}%` }}
                 />
             </div>
 
-            <p className="editorial-eyebrow mt-3">
+            {/* AUTM-1221: sentence case on the type scale. `editorial-eyebrow`
+                is 11px letterspaced uppercase, which the house rules retired;
+                it also forced the label half to opt back out with
+                `normal-case tracking-normal`. */}
+            <p className="mt-3 text-sm font-medium text-[var(--text-muted)]">
                 Step {clampedStep + 1} of {total}
                 {current ? (
-                    <span className="normal-case tracking-normal text-[var(--text-strong)]">
-                        · {current.label}
-                    </span>
+                    <span className="text-[var(--text-strong)]"> · {current.label}</span>
                 ) : null}
             </p>
 

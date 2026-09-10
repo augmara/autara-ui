@@ -107,6 +107,9 @@ export {
     ConfirmDialog, type ConfirmDialogProps,
     NativeSelect, type NativeSelectProps,
     MoneyBreakdown, type MoneyBreakdownProps, type MoneyRow,
+    // AUTM-1221 — graduated from customer-web (plan item U5)
+    Countdown, remainingLabel, type CountdownProps,
+    PolicyTimeline, type PolicyTimelineProps, type PolicyTimelineStep,
     // AUTM-1195 — pick one of a few, as cards
     ChoiceCard, ChoiceGroup, type ChoiceCardProps, type ChoiceGroupProps,
 } from './components'

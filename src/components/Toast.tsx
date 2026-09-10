@@ -460,8 +460,14 @@ function ToastItem({
         setTimeout(onDismiss, 180)
     }
 
-    // Single-line message — combine legacy title + description.
-    const message = [t.title, t.description].filter(Boolean).join(' — ')
+    /* Single-line message — combine legacy title + description.
+       AUTM-1221: joined with a full stop, not an em dash. The em dash is a
+       machine-written tell and it is out across Autara's copy; it also read
+       as a range ("Saved — 3 items") rather than two sentences. */
+    const message = [t.title, t.description]
+        .filter(Boolean)
+        .map((part) => String(part).trim().replace(/[.\s]+$/, ''))
+        .join('. ')
 
     // Slide IN from above for top-anchored stacks, from below for
     // bottom-anchored ones. Same idle / leaving offsets — the direction
@@ -478,7 +484,10 @@ function ToastItem({
     return (
         <div
             className={cn(
-                'pointer-events-auto inline-flex max-w-[min(560px,calc(100vw-32px))] items-center gap-2.5 rounded-full px-4 py-2 text-[13px] font-medium transition-all duration-[180ms] ease-out',
+                /* AUTM-1221: 12px, on the 8/12/16/24 ladder. Round is
+                   reserved for avatars and status dots (glass rule 3); the
+                   capsule was the last pill in the feedback set. */
+                'pointer-events-auto inline-flex max-w-[min(560px,calc(100vw-32px))] items-center gap-2.5 rounded-autara px-4 py-2 text-[13px] font-medium transition-all duration-[180ms] ease-out',
                 variantCls,
                 isVisible && !isLeaving
                     ? 'translate-y-0 opacity-100'
@@ -501,7 +510,10 @@ function ToastItem({
                 <button
                     onClick={t.action.onClick}
                     className={cn(
-                        'ml-1 shrink-0 rounded-full px-2.5 py-1 text-[11px] uppercase tracking-[0.12em] transition-colors',
+                        /* AUTM-1221: sentence case on the type scale. A
+                           letterspaced uppercase action label is the
+                           treatment the house rules retired. */
+                        'ml-1 shrink-0 rounded-autara-sm px-2.5 py-1 text-xs font-medium transition-colors',
                         isDark
                             ? 'bg-[var(--text-on-inverse)]/10 text-[var(--text-on-inverse)] hover:bg-[var(--text-on-inverse)]/20'
                             : 'bg-[var(--surface-elevated)] text-[var(--text-strong)] hover:bg-[var(--accent-tint)]'
@@ -513,7 +525,10 @@ function ToastItem({
             <button
                 onClick={handleDismiss}
                 className={cn(
-                    'ml-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full transition-colors',
+                    /* AUTM-1221: on the ladder. Dismiss is an action, and
+                       round is reserved for people, state lights and status
+                       markers (see shape-language.test.ts). */
+                    'ml-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-autara-sm transition-colors',
                     isDark
                         ? 'text-[var(--text-on-inverse)]/45 hover:bg-[var(--text-on-inverse)]/10 hover:text-[var(--text-on-inverse)]'
                         : 'text-[var(--text-subtle)] hover:bg-[var(--surface-elevated)] hover:text-[var(--text-strong)]'
