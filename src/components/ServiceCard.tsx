@@ -11,8 +11,17 @@ import { cn } from "../lib/cn";
  * stacked on the right.
  *
  * Polymorphic via `as` prop. When the consumer passes `as={Link}` or
- * an anchor, the whole card becomes interactive (hover lifts the border
- * to brand-purple, the thumbnail scales by 5%).
+ * an anchor, the whole card becomes interactive: the glass-surface
+ * interactive treatment (edge and fill deepen on hover), no lift.
+ *
+ * AUTM-1211 (plan U3): `media` is a slot for the consumer's own image
+ * element, so a Next app can hand in `next/image` instead of rewriting URLs
+ * around a plain <img>. With neither `media` nor `coverImageUrl` the card
+ * renders NO thumbnail: a repeated placeholder glyph on every service of a
+ * merchant with no photos reads as a column of failed images (the customer
+ * profile page decided this under AUTM-649). The meta row and the price
+ * prefix are sentence case on the type scale; the tinted, letterspaced
+ * uppercase treatment is gone with the raw purple rgba.
  */
 export interface ServiceCardProps {
   name: string;
@@ -24,8 +33,13 @@ export interface ServiceCardProps {
   pricePrefix?: string;
   /** Pre-formatted duration, e.g. "45 min". */
   durationLabel?: string | null;
-  /** CDN URL for the cover thumbnail. Falls back to a brand-tinted placeholder. */
+  /** CDN URL for the cover thumbnail, rendered in a plain <img>. Prefer `media`. */
   coverImageUrl?: string | null;
+  /**
+   * The consumer's own image element for the thumbnail slot (e.g. next/image).
+   * Wins over `coverImageUrl`. With neither, no thumbnail is rendered.
+   */
+  media?: ReactNode;
   /** Right-aligned label rendered on the meta row when interactive (e.g. "Book this"). */
   trailingLabel?: string;
   /** Optional hint like "+2 add-ons available". */
@@ -47,6 +61,7 @@ export const ServiceCard = forwardRef<HTMLElement, ServiceCardProps>(
       pricePrefix,
       durationLabel,
       coverImageUrl,
+      media,
       trailingLabel,
       addonsHint,
       badge,
@@ -61,37 +76,27 @@ export const ServiceCard = forwardRef<HTMLElement, ServiceCardProps>(
 
     const body = (
       <div className="flex items-stretch gap-4">
-        {coverImageUrl ? (
-          <div className="relative aspect-square h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-[var(--surface-elevated)] ring-1 ring-[var(--border-subtle)] sm:h-24 sm:w-24">
+        {media ? (
+          <div
+            data-slot="media"
+            className="relative aspect-square h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-[var(--surface-elevated)] ring-1 ring-[var(--border-subtle)] sm:h-24 sm:w-24"
+          >
+            {media}
+          </div>
+        ) : coverImageUrl ? (
+          <div
+            data-slot="media"
+            className="relative aspect-square h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-[var(--surface-elevated)] ring-1 ring-[var(--border-subtle)] sm:h-24 sm:w-24"
+          >
             <img
               src={coverImageUrl}
               alt=""
               aria-hidden="true"
-              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.05]"
+              className="h-full w-full object-cover"
               loading="lazy"
             />
           </div>
-        ) : (
-          <div
-            aria-hidden="true"
-            className="grid h-20 w-20 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-[rgba(78,27,189,0.08)] via-[rgba(78,27,189,0.03)] to-transparent text-[var(--color-autara-purple)] ring-1 ring-inset ring-[rgba(78,27,189,0.12)] sm:h-24 sm:w-24"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              className="h-7 w-7"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M4 13l2-5h12l2 5" />
-              <path d="M2 17h20v-4H2z" />
-              <circle cx="7" cy="17" r="2" fill="currentColor" stroke="none" opacity="0.25" />
-              <circle cx="17" cy="17" r="2" fill="currentColor" stroke="none" opacity="0.25" />
-            </svg>
-          </div>
-        )}
+        ) : null}
 
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex items-start justify-between gap-3">
@@ -109,7 +114,7 @@ export const ServiceCard = forwardRef<HTMLElement, ServiceCardProps>(
               {badge}
               <p className="text-[15px] font-bold tabular-nums text-[var(--text-strong)] sm:text-base">
                 {pricePrefix ? (
-                  <span className="mr-1 text-[11px] font-medium uppercase tracking-wider text-[var(--text-subtle)]">
+                  <span className="mr-1 text-xs font-medium text-[var(--text-subtle)]">
                     {pricePrefix}
                   </span>
                 ) : null}
@@ -118,7 +123,7 @@ export const ServiceCard = forwardRef<HTMLElement, ServiceCardProps>(
             </div>
           </div>
 
-          <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-2 text-[11px] font-medium uppercase tracking-wider text-[var(--text-subtle)]">
+          <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-2 text-xs font-medium text-[var(--text-subtle)]">
             {durationLabel ? (
               <span className="inline-flex items-center gap-1">
                 <ClockIcon />
@@ -132,7 +137,7 @@ export const ServiceCard = forwardRef<HTMLElement, ServiceCardProps>(
               </span>
             ) : null}
             {interactive && trailingLabel ? (
-              <span className="ml-auto inline-flex items-center gap-1 text-[var(--color-autara-purple)] transition-all group-hover:gap-1.5">
+              <span className="ml-auto inline-flex items-center gap-1 text-[var(--color-autara-purple)]">
                 {trailingLabel}
                 <ArrowRightIcon />
               </span>
@@ -143,9 +148,9 @@ export const ServiceCard = forwardRef<HTMLElement, ServiceCardProps>(
     );
 
     const sharedClass = cn(
-      "group block rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)] p-4 transition-all duration-300 sm:p-5",
+      "group block glass-surface glass-surface--flat p-4 sm:p-5",
       interactive &&
-        "cursor-pointer hover:-translate-y-0.5 hover:border-[rgba(78,27,189,0.25)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-autara-purple)]",
+        "glass-surface--interactive cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-autara-purple)]",
       className,
     );
 
@@ -201,7 +206,7 @@ function ArrowRightIcon() {
   return (
     <svg
       viewBox="0 0 24 24"
-      className="h-3 w-3 transition-transform group-hover:translate-x-0.5"
+      className="h-3 w-3"
       fill="none"
       stroke="currentColor"
       strokeWidth="2.25"

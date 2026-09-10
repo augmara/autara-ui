@@ -29,6 +29,31 @@ export const Default: Story = {
   ),
 };
 
+/** AUTM-1211: the consumer's own image element in the thumbnail slot. */
+export const WithMedia: Story = {
+  args: {
+    media: (
+      <img src={SERVICE_PHOTO} alt="" className="h-full w-full object-cover" />
+    ),
+  },
+  render: (args) => (
+    <div className="max-w-2xl">
+      <ServiceCard {...args} />
+    </div>
+  ),
+};
+
+/** AUTM-1211: no photo, no tile. The row simply starts at the name. */
+export const NoImage: Story = {
+  args: { coverImageUrl: null },
+  render: (args) => (
+    <div className="max-w-2xl space-y-3">
+      <ServiceCard {...args} />
+      <ServiceCard {...args} name="Interior detail" priceLabel="$140" durationLabel="2 hr" />
+    </div>
+  ),
+};
+
 export const WithThumbnail: Story = {
   args: { coverImageUrl: SERVICE_PHOTO },
   render: (args) => (
