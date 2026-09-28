@@ -68,7 +68,7 @@ const installable: Decorator = (Story) => {
 function PageBehind({ children }: { children?: React.ReactNode }) {
     return (
         <div className="min-h-[110vh] bg-[var(--background)] px-4 py-6">
-            <p className="text-[0.6875rem] uppercase tracking-[0.22em] text-[var(--text-muted)]">
+            <p className="text-[0.8125rem] font-medium text-[var(--text-muted)]">
                 Page content
             </p>
             <h1 className="mt-2 text-xl font-medium text-[var(--text-strong)]">
@@ -96,6 +96,9 @@ function PageBehind({ children }: { children?: React.ReactNode }) {
 
 /* ── Stories ────────────────────────────────────────────────────────────── */
 
+/** AUTM-1483: the eyebrow reads "Add to home screen" as written, at
+ *  0.8125rem and weight 500 with no letterspacing. It used to render as 10px
+ *  capitals tracked to 0.22em. */
 export const Default: Story = {
     name: 'Chrome path — Install button',
     args: { firstShowDelayMs: 0 },

@@ -112,7 +112,7 @@ export const ShapeComparison: Story = {
     render: () => (
         <div className="space-y-6 rounded-xl bg-[var(--background)] p-6 ring-1 ring-inset ring-[var(--border-subtle)]">
             <div>
-                <div className="mb-2 text-[0.625rem] uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                <div className="mb-2 text-[0.75rem] text-[var(--text-muted)]">
                     pill
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
@@ -122,7 +122,7 @@ export const ShapeComparison: Story = {
                 </div>
             </div>
             <div>
-                <div className="mb-2 text-[0.625rem] uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                <div className="mb-2 text-[0.75rem] text-[var(--text-muted)]">
                     parallelogram (marketing default)
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
@@ -332,8 +332,8 @@ export const OnTheGradientGround: Story = {
             {(['light', 'dark'] as const).map((theme) => (
                 <div key={theme} data-theme={theme}>
                     <GradientGround className="min-h-[20rem] p-8">
-                        <p className="mb-4 text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-[var(--text-subtle)]">
-                            {theme}
+                        <p className="mb-4 text-[0.75rem] font-medium text-[var(--text-subtle)]">
+                            {theme === 'dark' ? 'Dark' : 'Light'}
                         </p>
                         <div className="glass-surface p-5">
                             <div className="flex flex-wrap items-center gap-2">
@@ -374,15 +374,15 @@ export const SolidNoRings: Story = {
     render: () => (
         <div className="grid gap-6 lg:grid-cols-2">
             {[
-                { label: 'light', theme: undefined },
-                { label: 'dark', theme: 'dark' as const },
+                { label: 'Light', theme: undefined },
+                { label: 'Dark', theme: 'dark' as const },
             ].map((col) => (
                 <div
                     key={col.label}
                     data-theme={col.theme}
                     className="space-y-4 rounded-autara-lg bg-[var(--background)] p-5"
                 >
-                    <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                    <p className="text-[0.75rem] font-medium text-[var(--text-muted)]">
                         {col.label}
                     </p>
                     <div className="flex flex-wrap items-center gap-2">

@@ -52,19 +52,19 @@ export const Sizes: Story = {
   render: () => (
     <div className="space-y-3">
       <div className="flex items-center gap-3">
-        <span className="w-12 text-xs uppercase tracking-wider text-[var(--text-muted)]">
+        <span className="w-12 text-xs text-[var(--text-muted)]">
           sm
         </span>
         <RatingStars rating={4.5} size="sm" />
       </div>
       <div className="flex items-center gap-3">
-        <span className="w-12 text-xs uppercase tracking-wider text-[var(--text-muted)]">
+        <span className="w-12 text-xs text-[var(--text-muted)]">
           md
         </span>
         <RatingStars rating={4.5} size="md" />
       </div>
       <div className="flex items-center gap-3">
-        <span className="w-12 text-xs uppercase tracking-wider text-[var(--text-muted)]">
+        <span className="w-12 text-xs text-[var(--text-muted)]">
           lg
         </span>
         <RatingStars rating={4.5} size="lg" />

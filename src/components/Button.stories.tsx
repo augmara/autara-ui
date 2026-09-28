@@ -151,7 +151,7 @@ export const Matrix: Story = {
         ] as const
       ).map((variant) => (
         <div key={variant} className="flex items-center gap-3">
-          <div className="w-24 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">
+          <div className="w-24 text-[0.75rem] font-medium text-[var(--text-muted)]">
             {variant}
           </div>
           <Button variant={variant} size="sm">
@@ -195,8 +195,8 @@ export const GlassOnGround: Story = {
       {(["light", "dark"] as const).map((theme) => (
         <div key={theme} data-theme={theme}>
           <GradientGround className="min-h-[16rem] p-8">
-            <p className="mb-4 text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-[var(--text-subtle)]">
-              {theme}
+            <p className="mb-4 text-[0.75rem] font-medium text-[var(--text-subtle)]">
+              {theme === "dark" ? "Dark" : "Light"}
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <Button>Accept booking</Button>
@@ -254,7 +254,7 @@ export const PairedRadius: Story = {
   parameters: { layout: "fullscreen" },
   render: () => (
     <GradientGround className="min-h-[26rem] p-8">
-      <p className="mb-2 text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-[var(--text-subtle)]">
+      <p className="mb-2 text-[0.75rem] font-medium text-[var(--text-subtle)]">
         Before — pill beside a rounded rectangle
       </p>
       <div className="mb-6 flex items-center gap-2">
@@ -272,7 +272,7 @@ export const PairedRadius: Story = {
         </button>
       </div>
 
-      <p className="mb-2 text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-[var(--text-subtle)]">
+      <p className="mb-2 text-[0.75rem] font-medium text-[var(--text-subtle)]">
         After — one control group
       </p>
       <div className="mb-6 flex items-center gap-2">
@@ -285,7 +285,7 @@ export const PairedRadius: Story = {
         <Button data-testid="story-paired-radius-submit">New booking</Button>
       </div>
 
-      <p className="mb-2 text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-[var(--text-subtle)]">
+      <p className="mb-2 text-[0.75rem] font-medium text-[var(--text-subtle)]">
         48px rung — lg button pairs with the lg field
       </p>
       <div className="mb-6 flex items-center gap-2">
@@ -299,7 +299,7 @@ export const PairedRadius: Story = {
         <Button size="lg">Continue</Button>
       </div>
 
-      <p className="mb-2 text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-[var(--text-subtle)]">
+      <p className="mb-2 text-[0.75rem] font-medium text-[var(--text-subtle)]">
         What round still means
       </p>
       <div className="flex flex-wrap items-center gap-3">
@@ -345,7 +345,7 @@ export const LongLabelAtTextScale: Story = {
         { label: "Normal (16px root)", size: "16px" },
       ].map((col) => (
         <div key={col.label}>
-          <p className="mb-3 text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+          <p className="mb-3 text-[0.75rem] font-medium text-[var(--text-muted)]">
             {col.label}
           </p>
           <div
@@ -435,7 +435,7 @@ export const BesideAField = {
     render: () => (
         <div className="flex flex-col gap-8">
             <div>
-                <p className="mb-2 text-xs uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                <p className="mb-2 text-xs text-[var(--text-muted)]">
                     Room to spare — one line, same height as the field
                 </p>
                 <div className="flex items-center gap-3">
@@ -448,7 +448,7 @@ export const BesideAField = {
                 </div>
             </div>
             <div>
-                <p className="mb-2 text-xs uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                <p className="mb-2 text-xs text-[var(--text-muted)]">
                     Genuinely too narrow — wraps and grows, rather than overflowing
                 </p>
                 <div className="flex w-[230px] items-center gap-3">
@@ -496,15 +496,15 @@ export const FocusRingPerVariant: Story = {
     render: () => (
         <div className="grid gap-6 lg:grid-cols-2">
             {[
-                { label: "light", theme: undefined },
-                { label: "dark", theme: "dark" as const },
+                { label: "Light", theme: undefined },
+                { label: "Dark", theme: "dark" as const },
             ].map((col) => (
                 <div
                     key={col.label}
                     data-theme={col.theme}
                     className="space-y-3 rounded-autara-lg bg-[var(--background)] p-5"
                 >
-                    <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                    <p className="text-[0.75rem] font-medium text-[var(--text-muted)]">
                         {col.label}
                     </p>
                     <div className="flex flex-wrap items-center gap-4">
@@ -529,8 +529,8 @@ export const FocusRingPerVariant: Story = {
                             </Button>
                         ))}
                     </div>
-                    <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
-                        the same ring on a glass panel, where the ground is not the canvas
+                    <p className="text-[0.75rem] font-medium text-[var(--text-muted)]">
+                        The same ring on a glass panel, where the ground is not the canvas
                     </p>
                     <GradientGround className="rounded-autara-lg p-5">
                         <Button

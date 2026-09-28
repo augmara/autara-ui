@@ -81,7 +81,7 @@ function Pane({
             data-theme={theme}
             className="space-y-4 rounded-autara-lg bg-[var(--background)] p-5"
         >
-            <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+            <p className="text-[0.75rem] font-medium text-[var(--text-muted)]">
                 {label}
             </p>
             {children}
@@ -101,8 +101,8 @@ export const SideBySide: Story = {
     render: () => (
         <div className="grid gap-6 lg:grid-cols-2">
             {[
-                { label: 'light', theme: undefined },
-                { label: 'dark', theme: 'dark' as const },
+                { label: 'Light', theme: undefined },
+                { label: 'Dark', theme: 'dark' as const },
             ].map((col) => (
                 <Pane key={col.label} label={col.label} theme={col.theme}>
                     {[
@@ -142,8 +142,8 @@ export const Live: Story = {
     render: () => (
         <div className="grid gap-6 lg:grid-cols-2">
             {[
-                { label: 'light', theme: undefined },
-                { label: 'dark', theme: 'dark' as const },
+                { label: 'Light', theme: undefined },
+                { label: 'Dark', theme: 'dark' as const },
             ].map((col) => (
                 <Pane key={col.label} label={col.label} theme={col.theme}>
                     <div className="flex flex-wrap items-center gap-4">

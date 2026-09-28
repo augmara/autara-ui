@@ -199,6 +199,9 @@ export const AccentTones: Story = {
     ),
 }
 
+/** AUTM-1483: the group titles read "Business", "Money" and "Account" as
+ *  written, at 0.75rem and weight 500 with no letterspacing, in both the
+ *  menu and the sheet. They used to render as letterspaced capitals. */
 export const TitledSections: Story = {
     name: 'Titled sections (merchant-mobile IA)',
     render: () => (
@@ -431,7 +434,7 @@ export const Tones: Story = {
  */
 function FakeSolarIcon({ weight = 'unset' }: { weight?: string }) {
     return (
-        <span className="text-[0.5rem] font-medium uppercase tracking-[0.08em]">
+        <span className="text-[0.5rem] font-medium">
             {weight}
         </span>
     )
@@ -672,8 +675,8 @@ function ThemePane({ theme }: { theme: 'light' | 'dark' }) {
             data-theme={theme}
             className="relative min-h-[32rem] bg-[var(--background)] p-6"
         >
-            <p className="mb-4 text-xs uppercase tracking-[0.14em] text-[var(--text-muted)]">
-                {theme}
+            <p className="mb-4 text-xs text-[var(--text-muted)]">
+                {theme === 'dark' ? 'Dark' : 'Light'}
             </p>
             <OpenMenu
                 align="start"

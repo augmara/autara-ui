@@ -13,6 +13,11 @@ import { ModeChip } from './ModeChip'
  * against OS text scaling, and the faintest element on the row. It is now a
  * solid achromatic fill on the 8px chip rung, sized in rem and em.
  *
+ * AUTM-1483: the label is sentence case, "Mobile" and "In-shop", at weight
+ * 500 with no letterspacing. It rendered as letterspaced MOBILE / IN-SHOP
+ * until then. `sm` is 0.75rem and `md` 0.8125rem, one step up from the
+ * capitals, because a lowercase word sets visibly smaller at the same size.
+ *
  * Check every story in BOTH themes with the Storybook toolbar; the
  * side-by-side stories below force both at once for the comparisons that
  * matter.
@@ -143,7 +148,7 @@ function BookingRows({ dense = false }: { dense?: boolean }) {
                     className={`flex items-start gap-4 p-4 ${i === ROWS.length - 1 ? '' : 'border-b border-[var(--border-subtle)]'}`}
                 >
                     <div className="w-20 shrink-0 border-r border-[var(--border-subtle)] pr-4">
-                        <p className="text-[0.625rem] font-medium uppercase tracking-[0.14em] text-[var(--text-subtle)]">
+                        <p className="text-[0.75rem] font-medium text-[var(--text-subtle)]">
                             {r.day}
                         </p>
                         <p className="text-base font-bold tabular-nums text-[var(--text-strong)]">
@@ -189,15 +194,15 @@ export const BothThemes: Story = {
     render: () => (
         <div className="grid gap-6 lg:grid-cols-2">
             {[
-                { label: 'light', theme: undefined },
-                { label: 'dark', theme: 'dark' as const },
+                { label: 'Light', theme: undefined },
+                { label: 'Dark', theme: 'dark' as const },
             ].map((col) => (
                 <div
                     key={col.label}
                     data-theme={col.theme}
                     className="space-y-4 rounded-autara-lg bg-[var(--background)] p-5"
                 >
-                    <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                    <p className="text-[0.75rem] font-medium text-[var(--text-muted)]">
                         {col.label}
                     </p>
                     <div className="flex items-center gap-3">
@@ -220,7 +225,9 @@ export const BothThemes: Story = {
  * scale it stayed 9px while every line around it doubled — the same failure
  * the merchant-mobile pass found eleven times in one afternoon. Everything
  * here is rem (the label, the padding) or em (the glyph), so the whole chip
- * grows together: measured 11px → 22px and 12px → 24px.
+ * grows together: measured 11px → 22px and 12px → 24px under AUTM-969. Since
+ * AUTM-1483 the labels are 0.75rem and 0.8125rem, so a 200% root gives 24px
+ * and 26px (rem arithmetic, not a fresh measurement).
  *
  * This story scales the ROOT font size, not a wrapper. That distinction is
  * the whole point — the first draft of this story set `font-size: 200%` on a
@@ -249,7 +256,7 @@ export const TextScale200: Story = {
     render: () => (
         <RootScaled percent={200}>
             <div className="space-y-5">
-                <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                <p className="text-[0.75rem] font-medium text-[var(--text-muted)]">
                     Root font size 200%
                 </p>
                 <div className="flex flex-wrap items-center gap-3">

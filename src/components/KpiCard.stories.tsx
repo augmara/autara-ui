@@ -11,6 +11,9 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/** AUTM-1483: the label reads "Bookings today" as written, at 0.8125rem and
+ *  weight 500 with no letterspacing (the StatTile label size). It used to
+ *  render as 10px letterspaced capitals. */
 export const Default: Story = {};
 export const StringValue: Story = {
   args: { label: "Earnings this week", value: "$1,240" },

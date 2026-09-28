@@ -14,7 +14,10 @@ import { cn } from "../lib/cn";
  */
 export interface SectionHeadingProps {
   id?: string;
-  /** Uppercase tracked-out label above the title. */
+  /**
+   * Short sentence-case label above the title, rendered as written at
+   * 0.8125rem, weight 500, no letterspacing (AUTM-1483). Pass natural case.
+   */
   eyebrow?: string;
   title: string;
   description?: string;
@@ -66,7 +69,7 @@ export function SectionHeading({
             {eyebrow ? (
               <p
                 className={cn(
-                  "inline-flex items-center gap-3 text-[11px] font-medium uppercase tracking-[0.22em]",
+                  "inline-flex items-center gap-3 text-[0.8125rem] font-medium",
                   EYEBROW_TONE[tone],
                 )}
               >
@@ -102,8 +105,10 @@ export function SectionHeading({
           <p
             className={cn(
               // 500, not 600: Satoshi ships 400/500/700 only - a 600 here
-              // synthesised on every consumer.
-              "text-[10px] font-medium uppercase tracking-[0.18em]",
+              // synthesised on every consumer. AUTM-1483: sentence case at
+              // 0.8125rem with no letterspacing, the same eyebrow as the
+              // editorial variant (it was 10px letterspaced capitals).
+              "text-[0.8125rem] font-medium",
               EYEBROW_TONE[tone],
             )}
           >

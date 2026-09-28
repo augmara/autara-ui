@@ -105,19 +105,19 @@ export const OnSurfaces: Story = {
     render: () => (
         <div className="grid gap-6 lg:grid-cols-3">
             {[
-                { label: 'light', theme: undefined },
-                { label: 'dark', theme: 'dark' as const },
+                { label: 'Light', theme: undefined },
+                { label: 'Dark', theme: 'dark' as const },
             ].map((col) => (
                 <div
                     key={col.label}
                     data-theme={col.theme}
                     className="space-y-4 rounded-autara-lg bg-[var(--background)] p-5"
                 >
-                    <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                    <p className="text-[0.75rem] font-medium text-[var(--text-muted)]">
                         {col.label} · on canvas
                     </p>
                     <Progress value={62} />
-                    <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                    <p className="text-[0.75rem] font-medium text-[var(--text-muted)]">
                         {col.label} · on a card
                     </p>
                     <div className="rounded-autara-lg bg-[var(--surface)] p-4">
@@ -126,12 +126,12 @@ export const OnSurfaces: Story = {
                 </div>
             ))}
             <div className="space-y-4 rounded-autara-lg bg-[var(--ink)] p-5">
-                <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-white/60">
+                <p className="text-[0.75rem] font-medium text-white/60">
                     theme=&quot;dark&quot; · the ink opt-in
                 </p>
                 <Progress value={62} theme="dark" />
-                <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-white/60">
-                    the same opt-in, on cream — the old default
+                <p className="text-[0.75rem] font-medium text-white/60">
+                    The same opt-in, on cream: the old default
                 </p>
                 <div className="rounded-autara-lg bg-[var(--background)] p-4">
                     <Progress value={62} theme="dark" />
@@ -151,9 +151,12 @@ export const OnboardingHeader: Story = {
     render: () => (
         <div className="max-w-md space-y-3 rounded-autara-lg bg-[var(--surface)] p-5">
             <Progress value={57} />
-            <p className="editorial-eyebrow">
+            {/* AUTM-1483: the Stepper counter's own treatment (AUTM-1221),
+                not `.editorial-eyebrow`, which still sets letterspaced
+                capitals and made the second half opt back out. */}
+            <p className="text-sm font-medium text-[var(--text-muted)]">
                 Step 4 of 7
-                <span className="normal-case tracking-normal text-[var(--text-strong)]">
+                <span className="text-[var(--text-strong)]">
                     {' '}
                     · Verification documents
                 </span>

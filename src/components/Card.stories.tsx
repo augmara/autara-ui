@@ -257,8 +257,8 @@ export const OnTheGradientGround: Story = {
       {(["light", "dark"] as const).map((theme) => (
         <div key={theme} data-theme={theme}>
           <GradientGround className="min-h-[28rem] p-8">
-            <p className="mb-4 text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-[var(--text-subtle)]">
-              {theme}
+            <p className="mb-4 text-[0.75rem] font-medium text-[var(--text-subtle)]">
+              {theme === "dark" ? "Dark" : "Light"}
             </p>
             <div className="space-y-4">
               <Card>

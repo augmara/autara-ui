@@ -8,7 +8,8 @@ import { cn } from "../lib/cn";
  *
  * Every step of a multi-step flow (merchant onboarding wizard, customer
  * booking wizard) opens with the same three-line composition: a plain
- * uppercase tracked eyebrow carrying the step context, a display-register
+ * sentence-case eyebrow carrying the step context (0.8125rem, weight 500,
+ * no letterspacing; AUTM-1483), a display-register
  * Satoshi title, and an optional one-sentence dek. Promoted here so both
  * wizards share one header instead of the four different treatments the
  * AUTM-839 audit found across five onboarding steps.
@@ -51,7 +52,7 @@ export function StepHeader({
   return (
     <div className={cn("mb-8", className)}>
       {eyebrow ? (
-        <p className="mb-4 text-[11px] font-medium uppercase tracking-[0.22em] text-[var(--text-muted)]">
+        <p className="mb-4 text-[0.8125rem] font-medium text-[var(--text-muted)]">
           {eyebrow}
         </p>
       ) : null}

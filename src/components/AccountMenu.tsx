@@ -430,8 +430,8 @@ function IdentityAvatar({
 /**
  * Identity header. A plain block, never a menu item: it is not actionable, so
  * it must not be in the roving-focus order, and it must not take
- * DropdownMenuLabel's uppercase eyebrow either. That grammar is right for a
- * section heading and wrong for a person's name.
+ * DropdownMenuLabel's small muted group-title treatment either. That grammar
+ * is right for a section heading and wrong for a person's name.
  */
 function IdentityHeader({
     identity,
@@ -791,21 +791,25 @@ export function AccountMenu({
 
             const body = group.title ? (
                 <>
-                    {/* Uppercase tracked eyebrow, in rem so it scales with the
-                        OS text size. Linked to the group so a screen reader
-                        announces "Money, group" rather than reading a stray
-                        line of text before the rows. */}
+                    {/* Sentence-case group title (AUTM-1483): 0.75rem,
+                        weight 500, no letterspacing, the ListSection title
+                        treatment. In rem so it scales with the OS text size.
+                        The menu host takes weight and colour from
+                        DropdownMenuLabel and the sheet host sets them itself,
+                        so both read alike. Linked to the group so a screen
+                        reader announces "Money, group" rather than reading a
+                        stray line of text before the rows. */}
                     {host === 'menu' ? (
                         <DropdownMenuLabel
                             id={labelId}
-                            className="px-3 pb-1 pt-2 text-[0.6875rem] tracking-[0.14em]"
+                            className="px-3 pb-1 pt-2 text-[0.75rem]"
                         >
                             {group.title}
                         </DropdownMenuLabel>
                     ) : (
                         <p
                             id={labelId}
-                            className="px-3 pb-1 pt-2 text-[0.6875rem] font-medium uppercase tracking-[0.14em] text-[var(--text-muted)]"
+                            className="px-3 pb-1 pt-2 text-[0.75rem] font-medium text-[var(--text-muted)]"
                         >
                             {group.title}
                         </p>

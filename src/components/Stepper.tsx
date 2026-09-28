@@ -59,9 +59,11 @@ const CheckIcon = () => (
 )
 
 /**
- * Slim, static step indicator — a thin progress track + editorial-eyebrow
- * "Step N of M · [current label]" text, with an optional clickable label
- * row on larger screens for navigating back to completed steps.
+ * Slim, static step indicator: a thin progress track + a sentence-case
+ * "Step N of M · [current label]" line (AUTM-1221; this docblock still
+ * called it an editorial eyebrow until AUTM-1483), with an optional
+ * clickable label row on larger screens for navigating back to completed
+ * steps.
  *
  * Deliberately quiet: no icon-per-step glyphs, no pulse/scale animation on
  * the current step. Autara's aesthetic reads as calm and hairline-edged,

@@ -90,7 +90,7 @@ export const StateMatrix: Story = {
         },
       ].map((row) => (
         <label key={row.eyebrow} className="block">
-          <span className="mb-1.5 block text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+          <span className="mb-1.5 block text-[0.75rem] font-medium text-[var(--text-muted)]">
             {row.eyebrow}
           </span>
           <Input {...row.props} />
@@ -107,13 +107,13 @@ export const SizePair: Story = {
   render: () => (
     <div className="max-w-md space-y-4">
       <label className="block">
-        <span className="mb-1.5 block text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+        <span className="mb-1.5 block text-[0.75rem] font-medium text-[var(--text-muted)]">
           md — 44 px (default)
         </span>
         <Input placeholder="name@example.com" />
       </label>
       <label className="block">
-        <span className="mb-1.5 block text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+        <span className="mb-1.5 block text-[0.75rem] font-medium text-[var(--text-muted)]">
           lg — 48 px (hero / onboarding panels)
         </span>
         <Input size="lg" placeholder="name@example.com" />
@@ -129,7 +129,7 @@ export const InOnboardingForm: Story = {
   render: () => (
     <form className="max-w-md space-y-4 rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)] p-6">
       <div>
-        <div className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+        <div className="text-[0.8125rem] font-medium text-[var(--text-muted)]">
           Step 1 of 5
         </div>
         <h3 className="mt-1 text-lg font-medium leading-tight text-[var(--text-strong)]">
@@ -137,13 +137,13 @@ export const InOnboardingForm: Story = {
         </h3>
       </div>
       <label className="grid gap-1.5">
-        <span className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+        <span className="text-[0.8125rem] font-medium text-[var(--text-muted)]">
           Business name
         </span>
         <Input placeholder="Sam's Mobile Detail" autoComplete="organization" />
       </label>
       <label className="grid gap-1.5">
-        <span className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+        <span className="text-[0.8125rem] font-medium text-[var(--text-muted)]">
           ABN
         </span>
         <Input
@@ -157,7 +157,7 @@ export const InOnboardingForm: Story = {
         </span>
       </label>
       <label className="grid gap-1.5">
-        <span className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+        <span className="text-[0.8125rem] font-medium text-[var(--text-muted)]">
           Email
         </span>
         <Input type="email" placeholder="sam@example.com" autoComplete="email" />
@@ -188,8 +188,8 @@ export const GlassField: Story = {
       {(["light", "dark"] as const).map((theme) => (
         <div key={theme} data-theme={theme}>
           <GradientGround className="min-h-[22rem] p-8">
-            <p className="mb-2 text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-[var(--text-subtle)]">
-              {theme} · on the ground → glass
+            <p className="mb-2 text-[0.75rem] font-medium text-[var(--text-subtle)]">
+              {theme === "dark" ? "Dark" : "Light"} · on the ground → glass
             </p>
             <Input
               surface="glass"
@@ -198,8 +198,8 @@ export const GlassField: Story = {
               data-testid="story-input-glass"
             />
 
-            <p className="mt-6 mb-2 text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-[var(--text-subtle)]">
-              inside a card → stays opaque
+            <p className="mt-6 mb-2 text-[0.75rem] font-medium text-[var(--text-subtle)]">
+              Inside a card → stays opaque
             </p>
             <div className="glass-surface space-y-3 p-5">
               <Input

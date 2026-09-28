@@ -78,7 +78,7 @@ export const ConsentBlock: Story = {
             const [c, setC] = useState(false)
             return (
                 <div className="max-w-md space-y-2 rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)] p-5">
-                    <div className="mb-1 text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                    <div className="mb-1 text-[0.75rem] font-medium text-[var(--text-muted)]">
                         Before you finish
                     </div>
                     {[

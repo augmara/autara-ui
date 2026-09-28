@@ -20,6 +20,8 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/** AUTM-1483: the step label reads "Step 1 / 03" at 0.75rem and weight 500
+ *  with no letterspacing. It used to render as 10px letterspaced capitals. */
 export const Single: Story = {
   render: (args) => (
     <div className="max-w-md">

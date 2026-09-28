@@ -123,7 +123,7 @@ export const RichContent: Story = {
                 </Button>
             </TooltipTrigger>
             <TooltipContent className="px-3.5 py-2.5">
-                <div className="text-[12px] font-medium uppercase tracking-[0.12em] text-white/55">
+                <div className="text-[0.75rem] font-medium text-white/55">
                     SLA
                 </div>
                 <div className="mt-1 text-[13px] leading-snug text-white">
@@ -140,7 +140,7 @@ export const InMetricRow: Story = {
     parameters: { layout: 'padded' },
     render: () => (
         <div className="max-w-md space-y-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)] p-5">
-            <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+            <div className="text-[0.75rem] font-medium text-[var(--text-muted)]">
                 This week
             </div>
             {[

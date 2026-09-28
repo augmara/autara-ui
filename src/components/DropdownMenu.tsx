@@ -15,8 +15,9 @@ import { cn } from '../lib/cn'
  * - **Item**: ink text by default; hover/keyboard focus tints to
  *   `--surface-elevated`. Destructive items use
  *   `data-destructive` (caller adds `className="text-[var(--color-autara-error)]"`).
- * - **Label**: editorial uppercase eyebrow (matches Select + the rest
- *   of the design system).
+ * - **Label**: sentence-case group title, 0.75rem at weight 500 in
+ *   `--text-muted` with no letterspacing (matches SelectLabel and the
+ *   ListSection title; AUTM-1483).
  * - **Separator**: hairline `--border-subtle`.
  * - **SubTrigger**: Solar Bold chevron-right, rotates on data state.
  */
@@ -102,8 +103,9 @@ const DropdownMenuLabel = React.forwardRef<
     <DropdownMenuPrimitive.Label
         ref={ref}
         className={cn(
-            // Editorial eyebrow — matches Select label + the rest of the system.
-            'px-3 pb-1 pt-2 text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]',
+            // AUTM-1483: sentence-case group title, matching SelectLabel and
+            // the ListSection title. Rendered as written, in rem so it scales.
+            'px-3 pb-1 pt-2 text-[0.75rem] font-medium text-[var(--text-muted)]',
             inset && 'pl-9',
             className
         )}

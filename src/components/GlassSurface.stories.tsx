@@ -51,7 +51,7 @@ export const Default: Story = {
     render: () => (
         <Ground>
             <GlassSurface className="max-w-md p-7">
-                <p className="text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-[var(--text-subtle)]">
+                <p className="text-[0.8125rem] font-medium text-[var(--text-subtle)]">
                     Next booking
                 </p>
                 <h3 className="mt-2 text-xl font-bold text-[var(--text-strong)]">
@@ -86,7 +86,7 @@ export const Tones: Story = {
                     <p className="mt-2 text-sm text-[var(--text-muted)]">
                         Cards, panels, sheets. Scanned, not read.
                     </p>
-                    <p className="mt-2 text-[0.6875rem] uppercase tracking-[0.18em] text-[var(--text-subtle)]">
+                    <p className="mt-2 text-[0.75rem] text-[var(--text-subtle)]">
                         Smallest ink on the surface
                     </p>
                 </GlassSurface>
@@ -97,7 +97,7 @@ export const Tones: Story = {
                     <p className="mt-2 text-sm text-[var(--text-muted)]">
                         Tables, long lists, dense forms. Read, not scanned.
                     </p>
-                    <p className="mt-2 text-[0.6875rem] uppercase tracking-[0.18em] text-[var(--text-subtle)]">
+                    <p className="mt-2 text-[0.75rem] text-[var(--text-subtle)]">
                         Smallest ink on the surface
                     </p>
                 </GlassSurface>
@@ -191,7 +191,7 @@ export const PerformanceNotes: Story = {
         <Ground>
             <div className="max-w-2xl">
                 <GlassSurface className="p-6">
-                    <p className="text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-[var(--text-subtle)]">
+                    <p className="text-[0.8125rem] font-medium text-[var(--text-subtle)]">
                         Blur inventory
                     </p>
                     <p className="mt-3 text-sm text-[var(--text-muted)]">
@@ -245,8 +245,8 @@ export const BothThemes: Story = {
             {(['light', 'dark'] as const).map((theme) => (
                 <div key={theme} data-theme={theme}>
                     <GradientGround className="min-h-[24rem] p-8">
-                        <p className="mb-4 text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-[var(--text-subtle)]">
-                            {theme}
+                        <p className="mb-4 text-[0.75rem] font-medium text-[var(--text-subtle)]">
+                            {theme === 'dark' ? 'Dark' : 'Light'}
                         </p>
                         <GlassSurface className="p-6">
                             <div className="flex items-start justify-between gap-3">
@@ -259,7 +259,7 @@ export const BothThemes: Story = {
                                 Arriving 10:00. Two-hour minimum, comes to you
                                 across the inner north.
                             </p>
-                            <p className="mt-2 text-[0.6875rem] uppercase tracking-[0.18em] text-[var(--text-subtle)]">
+                            <p className="mt-2 text-[0.75rem] text-[var(--text-subtle)]">
                                 Deposit paid $48.00
                             </p>
                             <div className="mt-5 flex gap-2">
@@ -296,7 +296,7 @@ export const InContextDashboard: Story = {
             <div className="mx-auto max-w-4xl">
                 <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
                     <div>
-                        <p className="text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-[var(--text-subtle)]">
+                        <p className="text-[0.8125rem] font-medium text-[var(--text-subtle)]">
                             Today
                         </p>
                         <h2 className="text-2xl font-bold text-[var(--text-strong)]">
@@ -319,7 +319,7 @@ export const InContextDashboard: Story = {
 
                 <div className="grid gap-4 sm:grid-cols-3">
                     <GlassSurface className="p-5">
-                        <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-subtle)]">
+                        <p className="text-[0.8125rem] font-medium text-[var(--text-subtle)]">
                             Earned today
                         </p>
                         <p className="mt-1 text-2xl font-bold text-[var(--money)]">
@@ -330,7 +330,7 @@ export const InContextDashboard: Story = {
                         </p>
                     </GlassSurface>
                     <GlassSurface className="p-5">
-                        <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-subtle)]">
+                        <p className="text-[0.8125rem] font-medium text-[var(--text-subtle)]">
                             Running now
                         </p>
                         <p className="mt-1 text-2xl font-bold text-[var(--flight)]">
@@ -341,7 +341,7 @@ export const InContextDashboard: Story = {
                         </p>
                     </GlassSurface>
                     <GlassSurface className="p-5">
-                        <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-subtle)]">
+                        <p className="text-[0.8125rem] font-medium text-[var(--text-subtle)]">
                             Waiting on you
                         </p>
                         <p className="mt-1 text-2xl font-bold text-[var(--act)]">
@@ -354,7 +354,7 @@ export const InContextDashboard: Story = {
                 </div>
 
                 <GlassSurface tone="strong" className="mt-4 overflow-hidden">
-                    <p className="border-b border-[var(--glass-edge)] px-5 py-3 text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-subtle)]">
+                    <p className="border-b border-[var(--glass-edge)] px-5 py-3 text-[0.75rem] font-medium text-[var(--text-subtle)]">
                         Schedule
                     </p>
                     {[

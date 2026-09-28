@@ -49,10 +49,12 @@ import type { ReactNode } from "react";
  *   - Dropped raw tailwind `emerald-50/700/200` in favour of brand-
  *     `lime-drive` ink, so every tone now sits on the same colour
  *     vocabulary as the rest of the design system.
- *   - Editorial weight: 11-px uppercase with 0.12em tracking. The
- *     chips read as section markers rather than soft tailwind tags.
- *     Pair with sentence-style copy ("Open today · 9–17") — uppercase
- *     is applied via CSS, so consumers keep authoring in natural case.
+ *   - Type (AUTM-1483): 0.75rem sentence case at weight 500, no
+ *     letterspacing. It was 11px capitals tracked to 0.12em, applied
+ *     through CSS; that grammar is retired (Don, 2026-09-03). The label
+ *     renders exactly as authored, so write it in sentence case
+ *     ("Open today", "Comes to you · 10 km"). The solid fill is what
+ *     reads as a chip.
  *
  * The optional `dot` renders a colored pulse-dot before the label —
  * use it for status indicators ("Open now") not for static labels.
@@ -132,8 +134,10 @@ export function MetaChip({
 }: MetaChipProps) {
   return (
     <span
-      /* AUTM-948 — `text-[0.6875rem]` is the old `text-[11px]`, unfrozen so
-         the chip scales with OS Dynamic Type. Identical at a 16px root.
+      /* AUTM-948 moved the size to rem so the chip scales with OS Dynamic
+         Type. AUTM-1483 took it from 0.6875rem capitals to 0.75rem sentence
+         case with no tracking: a lowercase word at 11px sets visibly smaller
+         than the capitals did, and 0.75rem is the Badge label size.
 
          `rounded-autara-sm` (8px), not `rounded-full`: round is reserved for
          avatars and indicator dots (Don, 2026-09-01). One step tighter than
@@ -142,7 +146,7 @@ export function MetaChip({
          regardless, so the shared token cannot express the rule here. A
          smaller control inside a larger container is the documented
          exception. */
-      className={`inline-flex items-center gap-1.5 rounded-autara-sm px-3 py-[5px] text-[0.6875rem] font-medium uppercase tracking-[0.12em] ${TONES[tone]} ${className}`}
+      className={`inline-flex items-center gap-1.5 rounded-autara-sm px-3 py-[5px] text-[0.75rem] font-medium ${TONES[tone]} ${className}`}
     >
       {dot ? (
         <span

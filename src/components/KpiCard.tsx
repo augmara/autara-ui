@@ -12,7 +12,8 @@ import { cn } from "../lib/cn";
  *     merchant Today screen (every label, every CTA, every check) —
  *     `tone` reserves brand-purple for the brand mark and gives
  *     finance metrics a glanceable lime / sky / amber differentiation.
- *   - Tiny uppercase label
+ *   - Sentence-case label: 0.8125rem, weight 500, no letterspacing, the
+ *     StatTile label size (AUTM-1483; it was 10px letterspaced capitals)
  *   - Big tabular-nums value
  *   - Optional sublabel (single line, muted) — preferred over `trend`
  *     for "Through 30 May" / "Awaiting first booking" copy where a
@@ -106,7 +107,7 @@ export function KpiCard({
       )}
     >
       <div className="flex items-start justify-between gap-2">
-        <p className="inline-flex items-center gap-2 text-[10px] font-medium uppercase tracking-wider text-[var(--text-subtle)]">
+        <p className="inline-flex items-center gap-2 text-[0.8125rem] font-medium text-[var(--text-subtle)]">
           {tickColor != null ? (
             <span
               aria-hidden
@@ -138,13 +139,13 @@ export function KpiCard({
       )}
 
       {sublabel != null && !isLoading ? (
-        <p className="mt-1 text-[12px] text-[var(--text-muted)]">{sublabel}</p>
+        <p className="mt-1 text-[0.75rem] text-[var(--text-muted)]">{sublabel}</p>
       ) : null}
 
       {trend && !isLoading ? (
         <p
           className={cn(
-            "mt-1 inline-flex items-center gap-1 text-[11px] font-medium tabular-nums",
+            "mt-1 inline-flex items-center gap-1 text-[0.6875rem] font-medium tabular-nums",
             trend.direction === "up" && "text-emerald-700",
             trend.direction === "down" && "text-rose-700",
             trend.direction === "flat" && "text-[var(--text-muted)]",

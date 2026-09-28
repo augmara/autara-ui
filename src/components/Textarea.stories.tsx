@@ -82,7 +82,7 @@ export const StateMatrix: Story = {
                 },
             ].map((row) => (
                 <label key={row.eyebrow} className="block">
-                    <span className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                    <span className="mb-1.5 block text-[0.75rem] font-medium text-[var(--text-muted)]">
                         {row.eyebrow}
                     </span>
                     <Textarea {...row.props} />
@@ -99,7 +99,7 @@ export const InServiceEditor: Story = {
     render: () => (
         <div className="max-w-md space-y-4 rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)] p-6">
             <div>
-                <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                <div className="text-[0.8125rem] font-medium text-[var(--text-muted)]">
                     Service detail
                 </div>
                 <h3 className="mt-1 text-lg font-medium leading-tight text-[var(--text-strong)]">
@@ -111,7 +111,7 @@ export const InServiceEditor: Story = {
                 </p>
             </div>
             <label className="grid gap-1.5">
-                <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                <span className="text-[0.8125rem] font-medium text-[var(--text-muted)]">
                     Description
                 </span>
                 <Textarea
