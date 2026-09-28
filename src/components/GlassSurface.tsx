@@ -58,6 +58,14 @@ export interface GlassSurfaceProps extends HTMLAttributes<HTMLDivElement> {
     blur?: boolean
     /** Hover raises the fill and the edge. Never a translate, never a shadow. */
     interactive?: boolean
+    /**
+     * AUTM-1475. The 1px top highlight brightens toward the pointer and a
+     * faint sheen moves inside the panel, driven by `--lx` / `--ly` / `--lo`
+     * that a surrounding `LitGroup` sets from ONE listener. Outside a
+     * `LitGroup` nothing happens and the surface is the plain material.
+     * Nothing leaves the panel (rule 7).
+     */
+    lit?: boolean
     /** Compose onto another element (`<section>`, a framework Link) via Radix Slot. */
     asChild?: boolean
     children?: ReactNode
@@ -69,6 +77,7 @@ export const GlassSurface = forwardRef<HTMLDivElement, GlassSurfaceProps>(
             tone = 'default',
             blur = true,
             interactive,
+            lit,
             asChild,
             className,
             children,
@@ -83,11 +92,14 @@ export const GlassSurface = forwardRef<HTMLDivElement, GlassSurfaceProps>(
                 /* Lets a device test find every blurring surface on a page
                  * without knowing which components produced them. */
                 data-glass={blur ? 'blur' : 'flat'}
+                /* The hook `LitGroup` queries for; absent unless `lit`. */
+                data-lit={lit ? '' : undefined}
                 className={cn(
                     'glass-surface',
                     tone === 'strong' && 'glass-surface--strong',
                     !blur && 'glass-surface--flat',
                     interactive && 'glass-surface--interactive',
+                    lit && 'glass-surface--lit',
                     className
                 )}
                 {...rest}

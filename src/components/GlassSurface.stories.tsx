@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { GlassSurface, GradientGround } from './GlassSurface'
+import { LitGroup } from './LitGroup'
 import { Badge } from './Badge'
 import { Button } from './Button'
 import { Input } from './Input'
@@ -392,6 +393,34 @@ export const InContextDashboard: Story = {
                     ))}
                 </GlassSurface>
             </div>
+        </Ground>
+    ),
+}
+
+/**
+ * **Lit** (AUTM-1475). Inside a `LitGroup`, `lit` surfaces answer the
+ * pointer: the 1px top highlight brightens where it is and a faint sheen
+ * moves inside the panel. One listener for the whole group; nothing leaves
+ * a panel. Move the pointer across the three tiles.
+ */
+export const Lit: Story = {
+    name: 'Lit — answers the pointer',
+    render: () => (
+        <Ground>
+            <LitGroup className="grid max-w-3xl gap-4 sm:grid-cols-3">
+                {[
+                    ['$4,267', 'Paid out this month'],
+                    ['3', 'Jobs in progress'],
+                    ['2', 'Requests waiting'],
+                ].map(([k, l]) => (
+                    <GlassSurface key={l} lit className="p-6">
+                        <p className="text-2xl font-bold tabular-nums tracking-[-0.02em] text-[var(--text-strong)]">
+                            {k}
+                        </p>
+                        <p className="mt-1 text-sm text-[var(--text-muted)]">{l}</p>
+                    </GlassSurface>
+                ))}
+            </LitGroup>
         </Ground>
     ),
 }

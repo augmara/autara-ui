@@ -301,3 +301,8 @@ export {
     type PolicyTimelineStep,
 } from './PolicyTimeline'
 export { DeviceFrame, type DeviceFrameProps, type DeviceKind } from './DeviceFrame'
+// AUTM-1475 — web revamp foundations: the ground alive, glass that answers
+// the pointer, and a reveal that needs no script.
+export { BloomField, type BloomFieldProps } from './BloomField'
+export { LitGroup, type LitGroupProps } from './LitGroup'
+export { Reveal, type RevealProps } from './Reveal'
