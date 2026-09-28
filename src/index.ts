@@ -10,6 +10,10 @@ export {
     FieldStack, FieldStackRow, FieldStackField, type FieldStackFieldProps,
     // AUTM-948 — Autara Glass foundation
     GlassSurface, GradientGround, type GlassSurfaceProps, type GradientGroundProps,
+    // AUTM-1475 — web revamp foundations
+    BloomField, type BloomFieldProps,
+    LitGroup, type LitGroupProps,
+    Reveal, type RevealProps,
     Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, cardVariants, type CardProps,
     BackButton, type BackButtonProps,
     Badge, badgeVariants, type BadgeProps,

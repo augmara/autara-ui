@@ -45,6 +45,31 @@
 }
 .animate-scale.is-visible { opacity: 1; transform: scale(1); }
 
+/* ─── Scroll-driven reveal (AUTM-1475) ───────────────────────────────────
+ *
+ * `Reveal` renders `.reveal-view`. The class does NOTHING by default: server
+ * HTML, an engine without scroll-driven animations, and a reduced-motion
+ * user all get the block at rest. Only inside the two guards below does it
+ * animate, tied to the block's own progress through the viewport, on the
+ * compositor, with no listener. `entry 0%` to `entry 38%`: it has fully
+ * arrived while the block's top third is still crossing the bottom edge.
+ *
+ * `from` is 0.001, not 0: some engines skip painting a fully transparent
+ * layer and then re-rasterise it on the first visible frame. */
+@keyframes autara-reveal {
+    from { opacity: 0.001; transform: translateY(14px); }
+    to { opacity: 1; transform: none; }
+}
+@supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+        .reveal-view {
+            animation: autara-reveal linear both;
+            animation-timeline: view();
+            animation-range: entry 0% entry 38%;
+        }
+    }
+}
+
 /* Keyframe animations */
 @keyframes float {
     0%, 100% { transform: translateY(0px); }

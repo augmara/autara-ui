@@ -137,6 +137,25 @@ docs/
 
 ## Known gotchas
 
+- **`BloomField` is GPU work and belongs on a hero and a footer only**
+  (AUTM-1475, Don 2026-09-28). It is `GradientGround` with a WebGL2 canvas
+  over it; the shader READS the bloom tokens from the element's computed
+  style, so never pass it a colour. Half resolution, 30 fps cap, stops when
+  off-screen, one frame under reduced motion, static ground without WebGL2.
+  Consumer budget is under 2 ms a frame on the iPad Pro 11", measured on the
+  device: over that, ship `GradientGround`. Count live fields on a page with
+  `document.querySelectorAll('[data-ground="live"]')`.
+- **`GlassSurface lit` does nothing outside a `LitGroup`.** The group is the
+  one pointer listener; it sets `--lx` / `--ly` / `--lo` on every `[data-lit]`
+  descendant. Nine tiles, one handler. Touch pointers are ignored, so a
+  phone sees the flat highlight.
+- **`Reveal` (scroll-driven) is not `ScrollReveal` (observer).** `Reveal`
+  is a server component whose class does nothing until `@supports
+  (animation-timeline: view())` and `prefers-reduced-motion: no-preference`
+  both hold, so nothing is ever held at `opacity: 0` waiting for a script.
+  Prefer it for new marketing work; `ScrollReveal` stays for consumers that
+  already use it.
+
 - Storybook 10's default canvas is dark; `storybook.css` forces
   warm-cream via `!important` on `html`, `body`, `#storybook-root`,
   `.docs-story`, `.sb-show-main`, `.sbdocs-*` so stories render in the

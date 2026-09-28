@@ -74,6 +74,15 @@
     --glass-edge: rgba(17, 24, 39, 0.1);
     --glass-edge-hi: rgba(17, 24, 39, 0.18);
 
+    /* AUTM-1475 — the lit surface. `--glass-hi-peak` is what the 1px top
+     * highlight brightens to where the pointer is; `--glass-sheen` is the
+     * faint light that moves inside the panel. Both are clipped to the
+     * surface, so they are the material responding to light, not a glow
+     * (rule 7). Light glass takes a full white peak because its resting
+     * highlight is already 0.9. */
+    --glass-hi-peak: rgba(255, 255, 255, 1);
+    --glass-sheen: rgba(255, 255, 255, 0.55);
+
     /* GPU cost lives here. See the performance note in `utilities/glass.css`
      * before raising the blur radius. */
     --glass-blur: 20px;
@@ -200,6 +209,12 @@
 
     --glass-edge: rgba(242, 239, 248, 0.14);
     --glass-edge-hi: rgba(242, 239, 248, 0.26);
+
+    /* Dark rests at 0.10, so the lit peak is a third of white and the sheen
+     * is barely there: on ink, a bright sheen reads as a reflection of a
+     * lamp, which is a picture of a surface rather than a surface. */
+    --glass-hi-peak: rgba(255, 255, 255, 0.34);
+    --glass-sheen: rgba(255, 255, 255, 0.09);
 
     --glass-blur: 24px;
     --glass-saturate: 1.5;

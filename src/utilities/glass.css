@@ -84,6 +84,79 @@
     background: var(--glass-fill-strong);
 }
 
+/* ─── Lit glass — the material responding to the pointer (AUTM-1475) ──────
+ *
+ * `GlassSurface lit` inside a `LitGroup`. Three custom properties drive it,
+ * set by the group's single pointer listener: `--lx` / `--ly` are the pointer
+ * as percentages of the surface, `--lo` is 1 while the pointer is over the
+ * group and 0 otherwise. At rest (`--lo: 0`) both layers are invisible and
+ * the surface is exactly `.glass-surface`.
+ *
+ * `::before` is a sheen INSIDE the panel; `::after` re-draws the 1px top
+ * highlight with its peak at the pointer. Both are clipped to the surface's
+ * own radius (`border-radius: inherit`), so nothing leaves the panel and
+ * rule 7 holds. `:where()` keeps the positioning at zero specificity, so a
+ * consumer's `absolute` / `fixed` on the surface still wins (the AUTM-1017
+ * lesson: unlayered rules here beat Tailwind, so never assert layout on a
+ * consumer's element with real specificity). */
+:where(.glass-surface--lit) {
+    position: relative;
+}
+.glass-surface--lit {
+    --lx: 50%;
+    --ly: 0%;
+    --lo: 0;
+}
+.glass-surface--lit::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(
+        260px circle at var(--lx) var(--ly),
+        var(--glass-sheen),
+        transparent 62%
+    );
+    opacity: var(--lo);
+    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glass-surface--lit::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, var(--glass-hi-peak) var(--lx), transparent);
+    opacity: var(--lo);
+    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ─── Bloom field — the ground, alive (AUTM-1475) ─────────────────────────
+ *
+ * `BloomField` renders `.bloom-field.gradient-ground`, so the static blooms
+ * are painted by CSS before any script runs, and a WebGL2 canvas paints the
+ * moving field over them once it has a context. `isolation: isolate` gives
+ * the wrapper its own stacking context, so the canvas at `z-index: -1` sits
+ * ABOVE the wrapper's own background (the static ground) and BELOW every
+ * in-flow child, with no rule on the children at all (AUTM-1017). */
+.bloom-field {
+    position: relative;
+    isolation: isolate;
+}
+.bloom-field__canvas {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    display: block;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
 /* Browsers without `backdrop-filter` composite the fill straight onto the
  * ground. That is legible — every contrast number in `tokens/glass.css` is
  * measured on the composite, not on the blur — but it loses the frost, so
