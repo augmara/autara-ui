@@ -170,3 +170,101 @@ describe('DatePicker month sheet navigation (AUTM-1266)', () => {
         expect(screen.queryByRole('button', { name: /next month/i })).toBeNull()
     })
 })
+
+/**
+ * AUTM-1373 — the rail's mouse affordance.
+ *
+ * QA's measurement was 806px of days in a 400px box with the scrollbar
+ * suppressed and no arrows, so 7 of 14 days could not be reached with a mouse
+ * and nothing said they were there. jsdom has no layout, so the geometry is
+ * STATED here rather than measured: that is enough to pin the behaviour, which
+ * is that the arrows appear only when there is somewhere to go, disable
+ * themselves at each end, and never take a tab stop from the radiogroup. The
+ * measurement itself belongs to the InScrollingPanel story.
+ */
+describe('DatePicker rail arrows (AUTM-1373)', () => {
+    /** jsdom reports every box as 0x0; say what the browser would report. */
+    function stateGeometry(
+        rail: HTMLElement,
+        geometry: { scrollWidth: number; clientWidth: number; scrollLeft: number },
+    ) {
+        for (const [key, value] of Object.entries(geometry)) {
+            Object.defineProperty(rail, key, { value, configurable: true })
+        }
+        fireEvent.scroll(rail)
+    }
+
+    it('offers no arrows at all while the whole rail fits', () => {
+        // The default in jsdom is a rail that measures 0 in a box of 0, which
+        // is the "nothing to scroll" case.
+        render(<DatePicker value="" today={TODAY} onChange={() => {}} stripDays={3} testId="d" />)
+        expect(screen.queryByTestId('d-earlier')).toBeNull()
+        expect(screen.queryByTestId('d-later')).toBeNull()
+    })
+
+    it('shows both arrows once the days overflow, with the one that can do nothing disabled', () => {
+        render(<DatePicker value="" today={TODAY} onChange={() => {}} testId="d" />)
+        stateGeometry(screen.getByRole('radiogroup'), {
+            scrollWidth: 806,
+            clientWidth: 400,
+            scrollLeft: 0,
+        })
+        // At the near end: forward is live, back has nowhere to go and says so
+        // rather than looking pressable.
+        expect(screen.getByTestId('d-later')).not.toBeDisabled()
+        expect(screen.getByTestId('d-earlier')).toBeDisabled()
+    })
+
+    it('disables the forward arrow at the far end', () => {
+        render(<DatePicker value="" today={TODAY} onChange={() => {}} testId="d" />)
+        stateGeometry(screen.getByRole('radiogroup'), {
+            scrollWidth: 806,
+            clientWidth: 400,
+            scrollLeft: 406,
+        })
+        expect(screen.getByTestId('d-later')).toBeDisabled()
+        expect(screen.getByTestId('d-earlier')).not.toBeDisabled()
+    })
+
+    it('scrolls the rail forward and back by whole days', () => {
+        render(<DatePicker value="" today={TODAY} onChange={() => {}} testId="d" />)
+        const rail = screen.getByRole('radiogroup')
+        const scrollBy = vi.fn()
+        rail.scrollBy = scrollBy
+        stateGeometry(rail, { scrollWidth: 806, clientWidth: 400, scrollLeft: 200 })
+
+        fireEvent.click(screen.getByTestId('d-later'))
+        // A day pill measures 0 in jsdom, so this is the floor: a third of the
+        // box, three of them.
+        expect(scrollBy).toHaveBeenCalledWith({ left: 399, behavior: 'smooth' })
+        fireEvent.click(screen.getByTestId('d-earlier'))
+        expect(scrollBy).toHaveBeenLastCalledWith({ left: -399, behavior: 'smooth' })
+    })
+
+    it('keeps the radiogroup at one tab stop and stays out of the keyboard path', () => {
+        // The reason the arrows are aria-hidden and tabIndex -1: the rail
+        // already answers to arrow keys, and two more tab stops in a form is a
+        // worse trade than a mouse-only affordance that duplicates nothing.
+        render(<DatePicker value="" today={TODAY} onChange={() => {}} testId="d" />)
+        const rail = screen.getByRole('radiogroup')
+        stateGeometry(rail, { scrollWidth: 806, clientWidth: 400, scrollLeft: 0 })
+        for (const id of ['d-earlier', 'd-later']) {
+            expect(screen.getByTestId(id).getAttribute('tabindex')).toBe('-1')
+            expect(screen.getByTestId(id).getAttribute('aria-hidden')).toBe('true')
+        }
+        expect(rail.querySelectorAll('[role="radio"][tabindex="0"]')).toHaveLength(1)
+    })
+
+    it('never offers an arrow on a disabled picker', () => {
+        render(
+            <DatePicker value="" today={TODAY} onChange={() => {}} disabled testId="d" />,
+        )
+        stateGeometry(screen.getByRole('radiogroup'), {
+            scrollWidth: 806,
+            clientWidth: 400,
+            scrollLeft: 200,
+        })
+        expect(screen.getByTestId('d-earlier')).toBeDisabled()
+        expect(screen.getByTestId('d-later')).toBeDisabled()
+    })
+})
