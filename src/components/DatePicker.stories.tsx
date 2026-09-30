@@ -95,14 +95,36 @@ export const WithVisibleLabel: Story = {
  * AUTM-1373 — in context: a narrow, positioned, vertically scrolling panel,
  * the shape of a dialog body (merchant-mobile's Block time sheet). The rail
  * scrolls; the panel must not gain a horizontal scrollbar.
+ *
+ * This is also the story to judge the arrows in, because it is the only one
+ * narrow enough to overflow. With a mouse they appear at both ends and the one
+ * with nowhere to go is disabled; on a touch screen they are not rendered at
+ * all and the rail is dragged as before.
  */
 export const InScrollingPanel: Story = {
     render: () => (
         <div className="relative max-h-80 w-[448px] overflow-y-auto rounded-xl border border-[var(--border-subtle)] bg-[var(--surface)] p-6">
             <p className="mb-3 text-sm text-[var(--text-muted)]">
-                Fourteen days in a 400px column. Only the rail scrolls sideways.
+                Fourteen days in a 400px column. Only the rail scrolls sideways, and with a mouse
+                the arrows at each end move it three days at a time.
             </p>
             <Controlled stripDays={14} />
+        </div>
+    ),
+}
+
+/**
+ * AUTM-1373 — the other half of the rule: a rail with nowhere to scroll
+ * carries no chrome. Four days in a wide column, so neither arrow is rendered
+ * and the control is exactly what it was before.
+ */
+export const RailThatFits: Story = {
+    render: () => (
+        <div className="w-[448px] rounded-xl border border-[var(--border-subtle)] bg-[var(--surface)] p-6">
+            <p className="mb-3 text-sm text-[var(--text-muted)]">
+                Four days in a 400px column: nothing overflows, so there are no arrows.
+            </p>
+            <Controlled stripDays={4} />
         </div>
     ),
 }
