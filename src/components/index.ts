@@ -305,6 +305,7 @@ export { NativeSelect, type NativeSelectProps } from './NativeSelect'
 export { MoneyBreakdown, type MoneyBreakdownProps, type MoneyRow } from './MoneyBreakdown'
 // ─── AUTM-1195 — pick one of a few, as cards: a real radio group ────────
 export { ChoiceCard, ChoiceGroup, type ChoiceCardProps, type ChoiceGroupProps } from './ChoiceCard'
+export { SwatchRadioGroup, type SwatchRadioGroupProps, type SwatchOption } from './SwatchRadioGroup'
 // ─── AUTM-1221 — graduated from customer-web (plan item U5) ──────────────
 // Countdown: a deadline the server enforces, counted down and announced
 // once a minute; PolicyTimeline: the tiers of a policy with the live one lit.

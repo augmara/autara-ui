@@ -125,6 +125,7 @@ export {
     PolicyTimeline, type PolicyTimelineProps, type PolicyTimelineStep,
     // AUTM-1195 — pick one of a few, as cards
     ChoiceCard, ChoiceGroup, type ChoiceCardProps, type ChoiceGroupProps,
+    SwatchRadioGroup, type SwatchRadioGroupProps, type SwatchOption,
 } from './components'
 export { SocialButton, type SocialButtonProps, type SocialButtonProvider } from './components/SocialButton'
 
