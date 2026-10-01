@@ -9,15 +9,14 @@ import { cn } from '../lib/cn'
  *
  * ─── AUTM-1594: canvas v44 "Segmented" ──────────────────────────────────
  *
- * A band pill track; the tab you are on is a RAISED pill (white in light,
- * #262036 in dark) with its label in Bold, the rest Medium at 72% ink.
- * Purple is no longer the active tab: on the sheet purple means pending or
- * confirmed, and a purple segment beside a purple status read as one.
+ * A band pill track; the tab you are on takes the SELECTED fill (#2e1070
+ * with white in light, #8f6bff with ink in dark) and its label in Bold; the
+ * rest are Medium at 72% ink. Selected is the same fill as the chosen
+ * filter chip, so "selected" reads one way everywhere.
  *
- * Note what this re-admits, measured: raised on band is 1.05:1, the step
- * AUTM-974 (below) called invisible. The sheet carries the state with the
- * Bold weight as well as the fill, and Radix sets `aria-selected`, so it is
- * not colour alone; the concern went to the design session with the number.
+ * The first build drew the active tab raised (white on band, 1.05:1), as v44
+ * did. That was the step AUTM-974 (below) called invisible; the design
+ * session changed it to the Selected fill on canvas v51 (2026-10-01).
  *
  * Drawn at the sheet's size (40px pills in a 48px track) with AUTM-622's
  * 44px floor kept as a hit area: each trigger carries a centred, unpainted
@@ -117,7 +116,7 @@ const TabsTrigger = React.forwardRef<
             // fill.
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--band)]',
             'disabled:pointer-events-none disabled:opacity-50',
-            'data-[state=active]:bg-[var(--raised)] data-[state=active]:font-bold data-[state=active]:text-[var(--text-strong)]',
+            'data-[state=active]:bg-[var(--selected)] data-[state=active]:font-bold data-[state=active]:text-[var(--on-selected)]',
             className
         )}
         {...props}

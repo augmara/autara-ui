@@ -173,14 +173,14 @@ describe('Table is built from tokens', () => {
 
 /** The fills that replaced an outline, and what each has to keep doing. */
 describe('the replacements are actually solid', () => {
-    it('Tabs marks the active trigger with a fill and a weight, not a ring', () => {
-        // AUTM-1594: canvas v44's segmented control. The active tab is a
-        // raised pill on the band track with its label in Bold. The fill
-        // alone is 1.05:1, so the Bold weight is load-bearing and pinned too.
+    it('Tabs marks the active trigger with the Selected fill and a weight, not a ring', () => {
+        // AUTM-1594, canvas v51: the active segment takes the Selected fill
+        // (as the chosen filter chip) with its own ink, and its label Bold.
         const s = source('Tabs.tsx')
-        expect(s).toContain('data-[state=active]:bg-[var(--raised)]')
+        expect(s).toContain('data-[state=active]:bg-[var(--selected)]')
         expect(s).toContain('data-[state=active]:font-bold')
-        expect(s).toContain('data-[state=active]:text-[var(--text-strong)]')
+        expect(s).toContain('data-[state=active]:text-[var(--on-selected)]')
+        expect(s).not.toContain('data-[state=active]:bg-[var(--raised)]')
     })
 
     it('MetaChip neutral is the sheet\'s band with ink', () => {
@@ -298,13 +298,16 @@ function token(name: string, theme: Theme): RGB {
  * Every fill that now carries emphasis, with the ink it has to hold and the
  * grounds it sits on in the components above.
  *
- *   act      Tabs active trigger, Table selected row, PickerSheet marker
+ *   act      Table selected row
+ *   selected Tabs active trigger, FilterChipRow active chip (AUTM-1594)
  *   neutral  MetaChip neutral, Badge default
  *   money    MetaChip success (was a lime tint + ring)
  *   flight   MetaChip flight
  */
 const FILLS: { fill: string; ink: string; grounds: string[] }[] = [
     { fill: 'act-fill', ink: 'on-act', grounds: ['surface', 'surface-elevated', 'background'] },
+    // AUTM-1594: the active segment and the chosen chip, on the band track.
+    { fill: 'selected', ink: 'on-selected', grounds: ['band', 'paper'] },
     { fill: 'neutral-fill', ink: 'on-neutral', grounds: ['surface', 'surface-elevated', 'background'] },
     { fill: 'money-fill', ink: 'on-money', grounds: ['surface', 'surface-elevated', 'background'] },
     { fill: 'flight-fill', ink: 'on-flight', grounds: ['surface', 'surface-elevated', 'background'] },
