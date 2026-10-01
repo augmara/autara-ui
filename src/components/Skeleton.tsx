@@ -34,7 +34,8 @@ function Skeleton({ className, label = 'Loading', ...props }: SkeletonProps) {
     return (
         <div
             className={cn(
-                'animate-pulse rounded-autara bg-[var(--surface-elevated)]',
+                // AUTM-1594 — canvas v44 "Loading": band blocks, 14px radius.
+                'animate-pulse rounded-autara-md bg-[var(--band)]',
                 className
             )}
             {...(silent

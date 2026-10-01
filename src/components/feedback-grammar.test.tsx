@@ -56,16 +56,21 @@ describe('feedback grammar', () => {
         // AUTM-1594: on a band card the action is ink (canvas v44 "Error").
         expect(retry.className).toContain('bg-[var(--strong)]')
         expect(retry.className).not.toContain('border')
-        expect(retry.className).toContain('min-h-12')
+        // The sheet's 44px strong action, across the card.
+        expect(retry.className).toContain('min-h-11')
+        expect(retry.className).toContain('w-full')
     })
 
-    it('EmptyState paints a solid tile on the ladder, not a tint in a dashed box', () => {
+    it('EmptyState is the sheet\'s band card, never a tint in a dashed box', () => {
+        // AUTM-1594 — canvas v44 "Empty": a band card with the icon in a
+        // raised disc. No dashed edge, no tint, no outline.
         const { container } = render(
             <EmptyState icon={<span>·</span>} title="No vehicles saved yet" />,
         )
         expect(container.innerHTML).not.toContain('border-dashed')
         expect(container.innerHTML).not.toContain('rgba(78,27,189')
-        expect(container.innerHTML).toContain('--color-autara-purple-static')
+        expect(container.firstElementChild!.className).toContain('bg-[var(--band)]')
+        expect(container.innerHTML).toContain('bg-[var(--raised)]')
     })
 
     it('AsyncSkeleton says what is loading when it is told, and stays silent when it is not', () => {

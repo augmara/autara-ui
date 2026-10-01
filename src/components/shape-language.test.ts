@@ -53,7 +53,7 @@ const KEEPS: Record<string, string> = {
     // Arrived via AUTM-936, which merged after AUTM-948 was branched — this
     // guard caught it on the merge rather than after it shipped, which is the
     // whole reason the list exists.
-    'ErrorCard.tsx': 'the 32px icon medallion — a state light, not the retry button. The retry button itself takes the shared radius',
+    'ErrorCard.tsx': 'the optional icon disc (AUTM-1594 removed the default medallion); the retry is a pill Button',
     'InlineAlert.tsx': 'the 24px intent disc, the same state light as ErrorCard, never a control (AUTM-1185)',
     'Button.tsx': 'size="icon", the 44px icon disc on canvas v44 (AUTM-1594). Every other size is a pill by its own half-height radius',
     'Tabs.tsx': 'the segmented track and its pills, canvas v44 "Segmented" (AUTM-1594)',
@@ -68,6 +68,8 @@ const KEEPS: Record<string, string> = {
     'Countdown.tsx': 'the countdown is a 32px pill on canvas v44 (AUTM-1594), a status not an action',
     'Dialog.tsx': 'the 44px close disc, an icon disc like IconButton (AUTM-1594)',
     'Toast.tsx': 'the status dot, and the action pill and dismiss disc on the capsule (AUTM-1594)',
+    'EmptyState.tsx': 'the 44px icon disc, canvas v44 "Empty" (AUTM-1594)',
+    'LockedFeature.tsx': 'the optional icon disc (AUTM-1594)',
 }
 
 /**

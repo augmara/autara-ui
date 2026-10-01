@@ -67,28 +67,14 @@ export interface LockedFeatureProps {
    * it is standing in for.
    */
   variant?: "panel" | "inline";
-  /** Defaults to a lock. Pass a Solar icon to match the surrounding screen. */
+  /**
+   * An optional icon in a raised disc. AUTM-1594: canvas v44 draws the locked
+   * card without a glyph (the reason line carries it), so there is no
+   * default lock any more.
+   */
   icon?: ReactNode;
   children?: ReactNode;
   className?: string;
-}
-
-function LockGlyph() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="h-5 w-5"
-      aria-hidden="true"
-    >
-      <rect x="4" y="10" width="16" height="10" rx="2" />
-      <path d="M8 10V7a4 4 0 1 1 8 0v3" />
-    </svg>
-  );
 }
 
 export function LockedFeature({
@@ -103,23 +89,25 @@ export function LockedFeature({
 }: LockedFeatureProps) {
   if (!locked) return <>{children}</>;
 
-  const glyph = (
+  /* AUTM-1594 — canvas v44 "Locked": a band card, 24px radius, 16px in, a
+     16px Bold title over a 14px reason at 72% ink. No outline. */
+  const disc = icon ? (
     <span
       aria-hidden="true"
-      className="grid h-9 w-9 shrink-0 place-items-center rounded-autara bg-[var(--color-autara-purple-static)] text-white"
+      className="grid size-10 shrink-0 place-items-center rounded-full bg-[var(--raised)] text-[var(--accent)]"
     >
-      {icon ?? <LockGlyph />}
+      {icon}
     </span>
-  );
+  ) : null;
 
   if (variant === "inline") {
     return (
       <div
-        className={`flex items-center gap-3 rounded-autara-lg border border-[var(--border-subtle)] bg-[var(--surface-elevated)] px-4 py-3 ${className}`}
+        className={`flex items-center gap-3 rounded-[1.5rem] bg-[var(--band)] p-4 ${className}`}
       >
-        {glyph}
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-bold text-[var(--text-strong)]">
+        {disc}
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <p className="truncate text-base leading-snug font-bold text-[var(--text-strong)]">
             {title}
           </p>
           {description ? (
@@ -138,16 +126,14 @@ export function LockedFeature({
       /* Named by its own title, so a screen reader announces what is locked
          rather than reaching an unlabelled region. */
       aria-label={title}
-      className={`flex flex-col items-center justify-center rounded-autara-lg border border-[var(--border-subtle)] bg-[var(--surface-elevated)] px-6 py-10 text-center ${className}`}
+      className={`flex flex-col gap-1 rounded-[1.5rem] bg-[var(--band)] p-4 ${className}`}
     >
-      <div className="mb-4">{glyph}</div>
-      <p className="text-sm font-bold text-[var(--text-strong)]">{title}</p>
+      {disc ? <div className="mb-2">{disc}</div> : null}
+      <p className="text-base leading-snug font-bold text-[var(--text-strong)]">{title}</p>
       {description ? (
-        <p className="mt-1.5 max-w-xs text-sm text-[var(--text-muted)]">
-          {description}
-        </p>
+        <p className="text-sm leading-normal text-[var(--text-muted)]">{description}</p>
       ) : null}
-      {action ? <div className="mt-5">{action}</div> : null}
+      {action ? <div className="mt-2 flex flex-col">{action}</div> : null}
     </section>
   );
 }
