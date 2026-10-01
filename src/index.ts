@@ -23,6 +23,7 @@ export {
     Dialog, DialogPortal, DialogOverlay, DialogClose, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription,
     Sheet, SheetPortal, SheetOverlay, SheetTrigger, SheetClose, SheetContent, SheetHeader, SheetFooter, SheetTitle, SheetDescription,
     PickerSheet, type PickerOption, type PickerRowRender, type PickerSheetProps,
+    PickerTrigger, type PickerTriggerProps,
     Accordion, AccordionItem, AccordionTrigger, AccordionContent,
     Tabs, TabsList, TabsTrigger, TabsContent,
     DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuGroup, DropdownMenuPortal, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent, type DropdownMenuContentProps,

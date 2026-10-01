@@ -64,6 +64,7 @@ export {
     type PickerRowRender,
     type PickerSheetProps,
 } from './PickerSheet'
+export { PickerTrigger, type PickerTriggerProps } from './PickerTrigger'
 
 export { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from './Accordion'
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './Tabs'
