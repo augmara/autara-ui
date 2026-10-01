@@ -70,6 +70,7 @@ const KEEPS: Record<string, string> = {
     'Toast.tsx': 'the status dot, and the action pill and dismiss disc on the capsule (AUTM-1594)',
     'EmptyState.tsx': 'the 44px icon disc, canvas v44 "Empty" (AUTM-1594)',
     'LockedFeature.tsx': 'the optional icon disc (AUTM-1594)',
+    'SwatchRadioGroup.tsx': 'colour swatches are 44px circles on canvas v50, a choice of colour, not an action (AUTM-1591)',
 }
 
 /**
