@@ -20,7 +20,7 @@ export {
     Badge, badgeVariants, type BadgeProps,
     Separator,
     Skeleton, type SkeletonProps,
-    Dialog, DialogPortal, DialogOverlay, DialogClose, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription,
+    Dialog, DialogPortal, DialogOverlay, DialogClose, DialogTrigger, DialogContent, DialogHeader, DialogBody, DialogFooter, DialogTitle, DialogDescription, type DialogContentProps, type DialogLayout, type DialogSize,
     Sheet, SheetPortal, SheetOverlay, SheetTrigger, SheetClose, SheetContent, SheetHeader, SheetFooter, SheetTitle, SheetDescription,
     PickerSheet, type PickerOption, type PickerRowRender, type PickerSheetProps,
     PickerTrigger, type PickerTriggerProps,

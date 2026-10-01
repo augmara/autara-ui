@@ -135,7 +135,7 @@ describe('every animation the stylesheet names actually exists', () => {
  */
 describe('every animated surface is wired to a rule that exists', () => {
     const WIRING: [string, string[]][] = [
-        ['Dialog.tsx', ['overlay-scrim', 'modal-panel']],
+        ['Dialog.tsx', ['overlay-scrim', 'modal-panel', 'dialog-panel--responsive']],
         ['Sheet.tsx', ['overlay-scrim', 'sheet-panel', 'sheet-panel--top', 'sheet-panel--bottom', 'sheet-panel--left', 'sheet-panel--right']],
         ['Tooltip.tsx', ['floating-panel']],
         ['DropdownMenu.tsx', ['floating-panel']],

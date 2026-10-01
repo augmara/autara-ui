@@ -1,7 +1,9 @@
+import * as React from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Button } from './Button'
 import {
     Dialog,
+    DialogBody,
     DialogContent,
     DialogDescription,
     DialogFooter,
@@ -9,6 +11,9 @@ import {
     DialogTitle,
     DialogTrigger,
 } from './Dialog'
+import { FormField } from './FormField'
+import { Input } from './Input'
+import { InlineAlert } from './InlineAlert'
 
 /**
  * Dialog — Radix dialog on the cream canvas.
@@ -128,7 +133,7 @@ export const LongContent: Story = {
                 </DialogHeader>
                 <div className="space-y-3 text-sm leading-relaxed text-[var(--text-muted)]">
                     {[
-                        'Autara collects a 15% platform fee on every confirmed booking, including Stripe processing.',
+                        'You keep the full price of every booking. The customer pays the booking fee on top.',
                         'Payouts settle weekly to your linked Stripe Connect account.',
                         'Bookings unconfirmed after 30 minutes auto-expire and release the customer hold.',
                         'Disputes opened within 24 hours of completion are reviewed by Autara support; outcomes published within 7 days.',
@@ -148,4 +153,249 @@ export const LongContent: Story = {
             </DialogContent>
         </Dialog>
     ),
+}
+
+/* ─── layout="responsive" (AUTM-1594) ───────────────────────────────────
+ *
+ * A bottom sheet below `sm` and a centred card from `sm`, header and actions
+ * pinned, the body scrolling between them. Switch the Storybook viewport to
+ * iPhone SE (375) and Desktop to see both, and the Theme toolbar for dark.
+ *
+ * These open on load so the layout can be checked without a click, and stay
+ * off the docs page (`!autodocs`), where an open modal would sit over every
+ * other story. `Responsive, from a trigger` is the one to use for the
+ * motion, focus return and Escape.
+ */
+
+function MapPlaceholder() {
+    return (
+        <div
+            aria-hidden
+            className="relative grid h-56 w-full place-items-center overflow-hidden rounded-2xl bg-[var(--band)] sm:h-72"
+        >
+            <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor" className="text-[var(--accent)]">
+                <path d="M12 2a7.5 7.5 0 0 0-7.5 7.5c0 5.25 6.6 11.7 6.9 12a.85.85 0 0 0 1.2 0c.3-.3 6.9-6.75 6.9-12A7.5 7.5 0 0 0 12 2Zm0 10.25a2.75 2.75 0 1 1 0-5.5 2.75 2.75 0 0 1 0 5.5Z" />
+            </svg>
+        </div>
+    )
+}
+
+/** The form in merchant-web's Business address dialog, the reference. */
+function AddressForm({ error }: { error?: string }) {
+    return (
+        <div className="flex flex-col gap-4">
+            <FormField label="Street address">
+                <Input defaultValue="14 Pitt Street" autoComplete="address-line1" />
+            </FormField>
+            <FormField label="Floor or suite (optional)">
+                <Input placeholder="Floor, suite, unit" autoComplete="address-line2" />
+            </FormField>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <FormField label="City">
+                    <Input defaultValue="Sydney" autoComplete="address-level2" />
+                </FormField>
+                <FormField label="Postal code">
+                    <Input defaultValue="2000" inputMode="numeric" autoComplete="postal-code" />
+                </FormField>
+            </div>
+            <div className="flex flex-col gap-2">
+                <p className="m-0 text-[0.9375rem] text-[var(--text-muted)]">
+                    Drag the pin to your entrance, or tap the map to move it.
+                </p>
+                <MapPlaceholder />
+            </div>
+            {error ? <InlineAlert tone="error">{error}</InlineAlert> : null}
+        </div>
+    )
+}
+
+function AddressDialog({
+    defaultOpen = true,
+    error,
+    trigger,
+}: {
+    defaultOpen?: boolean
+    error?: string
+    trigger?: React.ReactNode
+}) {
+    return (
+        <Dialog defaultOpen={defaultOpen}>
+            {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
+            <DialogContent layout="responsive" size="lg" data-testid="story-address-dialog">
+                <DialogHeader>
+                    <DialogTitle>Business address</DialogTitle>
+                    <DialogDescription>
+                        Where customers find you. Only shown once a booking is paid.
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogBody>
+                    <AddressForm error={error} />
+                </DialogBody>
+                <DialogFooter>
+                    <Button variant="quiet">Cancel</Button>
+                    <Button variant="strong">Confirm address</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    )
+}
+
+/**
+ * In context: merchant-web's Business address dialog, the pattern this layout
+ * graduates. A form and a map, taller than a phone. On a phone the body
+ * scrolls under the title and the hairline appears under it once it does.
+ */
+export const Responsive: Story = {
+    name: 'Responsive, Business address in context',
+    tags: ['!autodocs'],
+    parameters: { layout: 'fullscreen' },
+    render: () => <AddressDialog />,
+}
+
+/** The same dialog, from its trigger: the motion, focus return and Escape. */
+export const ResponsiveFromTrigger: Story = {
+    name: 'Responsive, from a trigger',
+    render: () => (
+        <AddressDialog
+            defaultOpen={false}
+            trigger={<Button variant="strong">Edit business address</Button>}
+        />
+    ),
+}
+
+/** Dark theme, stamped on `<html>` the way a consuming app does it. */
+export const ResponsiveDark: Story = {
+    name: 'Responsive, dark',
+    tags: ['!autodocs'],
+    globals: { theme: 'dark' },
+    parameters: { layout: 'fullscreen' },
+    render: () => <AddressDialog error="We couldn't place that address. Check the street and postcode, then try again." />,
+}
+
+/**
+ * A dialog that fits. Short content sizes the panel to itself: no empty
+ * space, and no hairline under the title because nothing scrolls under it.
+ */
+export const ResponsiveShort: Story = {
+    name: 'Responsive, content that fits',
+    tags: ['!autodocs'],
+    parameters: { layout: 'fullscreen' },
+    render: () => (
+        <Dialog defaultOpen>
+            <DialogContent layout="responsive">
+                <DialogHeader>
+                    <DialogTitle>Pause new bookings?</DialogTitle>
+                    <DialogDescription>
+                        Your profile stays up. Customers see you are back from the date you choose.
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogBody>
+                    <FormField label="Back from">
+                        <Input type="date" defaultValue="2026-10-13" />
+                    </FormField>
+                </DialogBody>
+                <DialogFooter>
+                    <Button variant="quiet">Keep taking bookings</Button>
+                    <Button variant="strong">Pause</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    ),
+}
+
+const SUBURBS = [
+    'Alexandria', 'Annandale', 'Balmain', 'Bondi', 'Bronte', 'Camperdown', 'Chippendale',
+    'Coogee', 'Darlinghurst', 'Erskineville', 'Glebe', 'Leichhardt', 'Marrickville',
+    'Newtown', 'Paddington', 'Potts Point', 'Pyrmont', 'Redfern', 'Rozelle', 'Surry Hills',
+    'Waterloo', 'Woollahra', 'Zetland',
+]
+
+/**
+ * Edge: a long list. Only the body scrolls; the title and both actions stay
+ * on screen at every height. Scroll it to see the header's hairline arrive.
+ */
+export const ResponsiveLongList: Story = {
+    name: 'Responsive, long list',
+    tags: ['!autodocs'],
+    parameters: { layout: 'fullscreen' },
+    render: () => (
+        <Dialog defaultOpen>
+            <DialogContent layout="responsive">
+                <DialogHeader>
+                    <DialogTitle>Suburbs you travel to</DialogTitle>
+                    <DialogDescription>Customers in these suburbs can book you to come to them.</DialogDescription>
+                </DialogHeader>
+                <DialogBody>
+                    <ul className="m-0 flex list-none flex-col p-0">
+                        {SUBURBS.map((name, i) => (
+                            <li key={name}>
+                                <label className="flex min-h-11 cursor-pointer items-center justify-between gap-3 border-b border-[var(--hairline)] py-2 text-base">
+                                    {name}
+                                    <input type="checkbox" defaultChecked={i % 3 === 0} className="size-5 accent-[var(--accent-fill)]" />
+                                </label>
+                            </li>
+                        ))}
+                    </ul>
+                </DialogBody>
+                <DialogFooter>
+                    <Button variant="quiet">Clear all</Button>
+                    <Button variant="strong">Save 8 suburbs</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    ),
+}
+
+/**
+ * Edge: a title long enough to wrap, and two long action labels. The title
+ * stays clear of the close control, and when the two actions cannot sit side
+ * by side they stack with the primary on top.
+ */
+export const ResponsiveLongCopy: Story = {
+    name: 'Responsive, long title and labels',
+    tags: ['!autodocs'],
+    parameters: { layout: 'fullscreen' },
+    render: () => (
+        <Dialog defaultOpen>
+            <DialogContent layout="responsive">
+                <DialogHeader>
+                    <DialogTitle>Move every booking on Saturday 11 October to the following week?</DialogTitle>
+                    <DialogDescription>
+                        Each customer is asked to approve the new time. Anyone who declines keeps their original booking.
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogBody>
+                    <p className="m-0 text-[0.9375rem] text-[var(--text-muted)]">
+                        Four bookings are affected. Requests expire after 24 hours.
+                    </p>
+                </DialogBody>
+                <DialogFooter>
+                    <Button variant="quiet">Keep Saturday as it is</Button>
+                    <Button variant="strong">Ask customers to move to the following Saturday</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    ),
+}
+
+/**
+ * Edge: 200% text. Scales the ROOT font size, as OS text scaling does (a
+ * wrapper's font size would scale nothing sized in rem). The panel stays
+ * inside the viewport, the body scrolls, and the actions stack when they no
+ * longer fit side by side.
+ */
+export const ResponsiveText200: Story = {
+    name: 'Responsive, 200% text',
+    tags: ['!autodocs'],
+    parameters: { layout: 'fullscreen' },
+    render: function ResponsiveText200Story() {
+        React.useEffect(() => {
+            const prev = document.documentElement.style.fontSize
+            document.documentElement.style.fontSize = '200%'
+            return () => {
+                document.documentElement.style.fontSize = prev
+            }
+        }, [])
+        return <AddressDialog />
+    },
 }

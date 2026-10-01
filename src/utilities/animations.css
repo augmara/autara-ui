@@ -348,6 +348,42 @@
     }
 }
 
+/* ─── Responsive dialog — a sheet on a phone, a card from sm (AUTM-1594) ─
+ *
+ * `DialogContent layout="responsive"`. One Radix tree at every width, so the
+ * motion switches with the layout in CSS: below `sm` it rises from the foot
+ * on the sheet tokens, as `Sheet side="bottom"` does; from `sm` it scales
+ * from 96% on the modal tokens, as the centred `Dialog` does. The keyframes
+ * are the two pairs above; only the pairing with the breakpoint is new.
+ *
+ * 40rem is Tailwind v4's `sm`, the breakpoint the component's own `sm:`
+ * classes move the panel at, so the motion and the geometry change together.
+ */
+
+.dialog-panel--responsive {
+    --sheet-from: translateY(100%);
+}
+
+.dialog-panel--responsive[data-state="open"] {
+    animation: sheet-panel-in var(--motion-sheet-in) var(--motion-ease-out);
+}
+
+.dialog-panel--responsive[data-state="closed"] {
+    animation: sheet-panel-out var(--motion-sheet-out) var(--motion-ease-in)
+        forwards;
+}
+
+@media (min-width: 40rem) {
+    .dialog-panel--responsive[data-state="open"] {
+        animation: modal-panel-in var(--motion-modal-in) var(--motion-ease-out);
+    }
+
+    .dialog-panel--responsive[data-state="closed"] {
+        animation: modal-panel-out var(--motion-modal-out) var(--motion-ease-in)
+            forwards;
+    }
+}
+
 /* ─── Navigation menu ────────────────────────────────────────────────
  *
  * Three moving parts, and Radix drives each with its own attribute:
@@ -476,6 +512,7 @@
     .popover-panel,
     .modal-panel,
     .sheet-panel,
+    .dialog-panel--responsive,
     .nav-menu-content,
     .nav-menu-viewport {
         --panel-dx: 0px;

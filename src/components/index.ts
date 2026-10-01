@@ -40,9 +40,13 @@ export {
     DialogTrigger,
     DialogContent,
     DialogHeader,
+    DialogBody,
     DialogFooter,
     DialogTitle,
     DialogDescription,
+    type DialogContentProps,
+    type DialogLayout,
+    type DialogSize,
 } from './Dialog'
 
 export {
