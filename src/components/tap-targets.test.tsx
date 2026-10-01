@@ -6,6 +6,14 @@ import { Checkbox } from './Checkbox'
 import { RadioGroup, RadioGroupItem } from './Radio'
 import { FilterChipRow } from './FilterChipRow'
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from './Sheet'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSub,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger,
+} from './DropdownMenu'
 
 /**
  * AUTM-622 — the 44px floor, on the two components that were under it.
@@ -137,5 +145,29 @@ describe('AUTM-1594 — Sheet\'s close control is 44px to touch', () => {
         expect(close.className).toContain("before:content-['']")
         // It is positioned, so the pseudo-element is placed against it.
         expect(close.className).toContain('absolute')
+    })
+})
+
+describe('AUTM-1594 — every DropdownMenu row is 44px', () => {
+    it('plain items and sub-triggers carry a 44px MINIMUM height', () => {
+        render(
+            <DropdownMenu defaultOpen modal={false}>
+                <DropdownMenuTrigger>Booking actions</DropdownMenuTrigger>
+                <DropdownMenuContent>
+                    <DropdownMenuItem>View detail</DropdownMenuItem>
+                    <DropdownMenuItem inset>Copy invoice link</DropdownMenuItem>
+                    <DropdownMenuSub>
+                        <DropdownMenuSubTrigger>Move to</DropdownMenuSubTrigger>
+                    </DropdownMenuSub>
+                </DropdownMenuContent>
+            </DropdownMenu>,
+        )
+        const rows = screen.getAllByRole('menuitem')
+        expect(rows).toHaveLength(3)
+        for (const row of rows) {
+            expect(row.className).toContain('min-h-11')
+            // A minimum, never a fixed height: 200% text grows the row.
+            expect(row.className).not.toMatch(/(^|\s)h-(9|10|11)(\s|$)/)
+        }
     })
 })

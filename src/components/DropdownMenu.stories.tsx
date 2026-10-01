@@ -1,3 +1,4 @@
+import * as React from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Button } from './Button'
 import {
@@ -266,4 +267,76 @@ export const TableRowKebab: Story = {
             ))}
         </div>
     ),
+}
+
+/* ─── AUTM-1594: every row is 44px ──────────────────────────────────────
+ *
+ * Plain rows were `py-2` around a 20px line, 36px to the finger. They now
+ * carry a 44px MINIMUM, so a wrapped label or 200% text grows the row. These
+ * open on load (`modal={false}`, so the canvas is not locked) and stay off
+ * the docs page, where an open menu would sit over the other stories. The
+ * dashed outline in the first one is the row box, drawn for review only.
+ */
+const OpenRows: React.FC<{ outline?: boolean }> = ({ outline = false }) => (
+    <div className="min-h-[20rem]">
+        {outline ? (
+            <style>{'[data-story-rows] [role="menuitem"]{outline:1px dashed var(--accent);outline-offset:-1px}'}</style>
+        ) : null}
+        <DropdownMenu defaultOpen modal={false}>
+            <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                    Booking actions
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="min-w-[14rem] max-w-[18rem]" data-story-rows="">
+                <DropdownMenuItem>
+                    <EyeIcon />
+                    View detail
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                    <PencilIcon />
+                    Reschedule
+                </DropdownMenuItem>
+                <DropdownMenuItem inset>Copy invoice link</DropdownMenuItem>
+                <DropdownMenuItem>
+                    <CopyIcon />
+                    Send the customer a reminder about their deposit
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="text-[var(--color-autara-error)]">
+                    <TrashIcon />
+                    Cancel booking
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    </div>
+)
+
+export const RowsOpen: Story = {
+    name: 'Rows, 44px, open',
+    tags: ['!autodocs'],
+    render: () => <OpenRows outline />,
+}
+
+export const RowsOpenDark: Story = {
+    name: 'Rows, 44px, open, dark',
+    tags: ['!autodocs'],
+    globals: { theme: 'dark' },
+    render: () => <OpenRows />,
+}
+
+/** Scales the ROOT font size, as OS text scaling does. Rows grow, never clip. */
+export const RowsOpenText200: Story = {
+    name: 'Rows, 44px, open, 200% text',
+    tags: ['!autodocs'],
+    render: function RowsOpenText200Story() {
+        React.useEffect(() => {
+            const prev = document.documentElement.style.fontSize
+            document.documentElement.style.fontSize = '200%'
+            return () => {
+                document.documentElement.style.fontSize = prev
+            }
+        }, [])
+        return <OpenRows />
+    },
 }

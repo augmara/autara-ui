@@ -39,8 +39,13 @@ const SURFACE = cn(
 )
 
 // Shared item grammar for Item and SubTrigger.
+//
+// AUTM-1594: `min-h-11`. A plain row was `py-2` around a 20px line, 36px to
+// the finger, under the 44px floor on the control a menu exists to offer. A
+// MINIMUM height, so a row that wraps or meets 200% text grows rather than
+// clips, and `py-2` still pads it when it does.
 const ITEM = cn(
-    'relative flex w-full cursor-pointer select-none items-center gap-2 rounded-md px-3 py-2 text-sm text-[var(--text-strong)] outline-none transition-colors',
+    'relative flex min-h-11 w-full cursor-pointer select-none items-center gap-2 rounded-md px-3 py-2 text-sm text-[var(--text-strong)] outline-none transition-colors',
     'data-[highlighted]:bg-[var(--surface-elevated)]',
     'data-[state=open]:bg-[var(--surface-elevated)]',
     'data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
