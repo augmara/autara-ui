@@ -72,13 +72,40 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Force 16px font-size on form inputs below sm (defeats iOS zoom-on-focus
- * — matters when previewing in mobile viewports). */
-input[type="text"],
-input[type="email"],
-input[type="tel"],
-input[type="number"],
-input[type="password"],
-textarea,
-select {
-    font-size: 16px;
+ * matters when previewing in mobile viewports).
+ *
+ * ─── AUTM-1507: why this is layered, and must stay layered ──────────────
+ *
+ * Found the same way, and for the same reason, as the focus fallback above.
+ * This rule used to sit UNLAYERED, so it beat every layered Tailwind utility
+ * regardless of specificity: `input[type="text"]` is (0,1,1) and even
+ * out-specifies the unlayered `.field-input` at (0,1,0). Every text input in
+ * the library therefore computed a HARD 16px in Storybook, whatever its
+ * component said.
+ *
+ * At a 16px root that is invisible, because 16px is what `text-base` and
+ * `.field-input`'s `font-size: 1rem` resolve to anyway. It stops being
+ * invisible the moment anyone checks TEXT SCALING: at a 32px root the whole
+ * library's inputs stayed at 16px while their labels, placeholders' siblings
+ * and surrounding chrome doubled. So a 200% story could neither prove nor
+ * disprove the thing it exists to check, which is the AUTM-977 shape exactly,
+ * one component family over.
+ *
+ * `.storybook/` ships nowhere (`files` in package.json is dist + tokens +
+ * utilities + preset + fonts), so no consumer ever rendered this and no
+ * consumer's rendering changes. In `@layer base` a genuinely unstyled input
+ * still gets its 16px floor, and a component that states its own size now
+ * wins. Expect a handful of stories to shift by a couple of px: that is them
+ * finally showing the size the real apps already render.
+ */
+@layer base {
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="number"],
+    input[type="password"],
+    textarea,
+    select {
+        font-size: 16px;
+    }
 }
