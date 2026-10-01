@@ -25,18 +25,23 @@ export interface InfoRowProps {
     className?: string
 }
 
+/*
+ * AUTM-1594 — canvas v44 "Info row": 12px in, a hairline above and below,
+ * 15px. A run of rows shares its rules (each draws the one below it, the
+ * first also the one above), so the lines never double.
+ */
 export function InfoRow({ label, value, emphasised = false, className }: InfoRowProps) {
     return (
         <div
             className={cn(
-                'flex items-start justify-between gap-3 py-1.5',
+                'flex items-start justify-between gap-3 border-b border-[var(--hairline)] py-3 first:border-t',
                 className,
             )}
         >
-            <span className="text-sm text-[var(--text-muted)]">{label}</span>
+            <span className="text-[0.9375rem] text-[var(--text-muted)]">{label}</span>
             <span
                 className={cn(
-                    'text-right text-sm tabular-nums text-[var(--text-strong)]',
+                    'text-right text-[0.9375rem] tabular-nums text-[var(--text-strong)]',
                     emphasised ? 'font-bold' : 'font-medium',
                 )}
             >

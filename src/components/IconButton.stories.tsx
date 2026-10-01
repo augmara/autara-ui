@@ -43,7 +43,7 @@ export const WithCount: Story = { args: { icon: Bell, label: "Notifications, 12 
 export const OnBrandDeep: Story = {
   args: { icon: Bell, label: "Notifications", variant: "ondeep" },
   render: (args) => (
-    <div className="rounded-[1.25rem] bg-[var(--brand-deep)] p-3.5">
+    <div className="rounded-[1.25rem] bg-[var(--hero)] p-3.5">
       <IconButton {...args} />
     </div>
   ),

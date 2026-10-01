@@ -61,6 +61,8 @@ const KEEPS: Record<string, string> = {
     'ChoiceCard.tsx': 'the 40px icon disc beside the label, a glyph in a circle like StepCard (AUTM-1594)',
     'MetaChip.tsx': 'meta chips are 28px pills on canvas v44 (AUTM-1594), superseding the 8px chip rung',
     'StatusDot.tsx': 'the 8px state light itself (AUTM-1594), the meaning round was reserved for',
+    'StatTile.tsx': 'the 28px icon disc beside the label (AUTM-1594)',
+    'ListSection.tsx': 'the row icon disc and the 4px accent bar\'s round caps (AUTM-1594)',
 }
 
 /**

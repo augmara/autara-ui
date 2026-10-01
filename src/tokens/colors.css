@@ -187,6 +187,9 @@
     --brand: #4e1bbd;
     --on-brand: #ffffff;
     --brand-deep: #2e1070;
+    /* The hero surface: brand-deep on paper. In dark it lifts to brand,
+     * because #2e1070 on dark paper is 1.32:1 and the hero disappears. */
+    --hero: #2e1070;
     --on-deep: #ffffff;
     --on-deep-muted: rgba(255, 255, 255, 0.78);
     --hairline-deep: rgba(255, 255, 255, 0.14);
@@ -349,8 +352,11 @@
     --brand: #4e1bbd;
     --on-brand: #ffffff;
     --brand-deep: #2e1070;
+    /* UiComponentsDark draws every hero surface (the hero tile and card,
+     * the ondeep button tray) in brand, with its muted ink at 82%. */
+    --hero: #4e1bbd;
     --on-deep: #ffffff;
-    --on-deep-muted: rgba(255, 255, 255, 0.78);
+    --on-deep-muted: rgba(255, 255, 255, 0.82);
     --hairline-deep: rgba(255, 255, 255, 0.14);
     --lime: #d4ff4f;
     --lime-press: #b7e149;
@@ -441,6 +447,7 @@
     --color-brand: var(--brand);
     --color-on-brand: var(--on-brand);
     --color-brand-deep: var(--brand-deep);
+    --color-hero: var(--hero);
     --color-on-deep: var(--on-deep);
     --color-on-deep-muted: var(--on-deep-muted);
     --color-hairline-deep: var(--hairline-deep);

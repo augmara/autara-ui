@@ -91,7 +91,7 @@ export const Disabled: Story = {
 /** On a brand-deep hero, lime leads and the rest are translucent white. */
 export const OnBrandDeep: Story = {
   render: () => (
-    <div className="flex gap-2 rounded-[1.25rem] bg-[var(--brand-deep)] p-3.5">
+    <div className="flex gap-2 rounded-[1.25rem] bg-[var(--hero)] p-3.5">
       <Button>View booking</Button>
       <Button variant="ondeep">Add to calendar</Button>
     </div>
@@ -222,7 +222,7 @@ export const Sheet: Story = {
             <span className="text-sm text-[var(--danger)]">Inside 4 hours the deposit is retained.</span>
           </Specimen>
           <Specimen name="On brand-deep" component="Button variant=ondeep" note="Lime leads; the rest are translucent white.">
-            <div className="flex gap-2 rounded-[1.25rem] bg-[var(--brand-deep)] p-3.5">
+            <div className="flex gap-2 rounded-[1.25rem] bg-[var(--hero)] p-3.5">
               <Button>View booking</Button>
               <Button variant="ondeep">Add to calendar</Button>
             </div>
