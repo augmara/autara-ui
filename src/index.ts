@@ -121,6 +121,7 @@ export {
     // AUTM-1195 — pick one of a few, as cards
     ChoiceCard, ChoiceGroup, type ChoiceCardProps, type ChoiceGroupProps,
 } from './components'
+export { SocialButton, type SocialButtonProps, type SocialButtonProvider } from './components/SocialButton'
 
 // Utilities
 export { cn } from './lib/cn'

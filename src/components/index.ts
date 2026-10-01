@@ -315,3 +315,6 @@ export { DeviceFrame, type DeviceFrameProps, type DeviceKind } from './DeviceFra
 export { BloomField, type BloomFieldProps } from './BloomField'
 export { LitGroup, type LitGroupProps } from './LitGroup'
 export { Reveal, type RevealProps } from './Reveal'
+
+// SocialButton: the one social sign-in button, Google, Apple and mobile (AUTM-1513).
+export { SocialButton, type SocialButtonProps, type SocialButtonProvider } from './SocialButton'
