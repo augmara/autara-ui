@@ -299,6 +299,7 @@ export {
 // ConfirmActionDialog); NativeSelect: a real <select> dressed as a field;
 // MoneyBreakdown: lines of money, then the one that matters.
 export { InlineAlert, type InlineAlertProps, type InlineAlertTone } from './InlineAlert'
+export { Banner, type BannerProps } from './Banner'
 export { ConfirmDialog, type ConfirmDialogProps } from './ConfirmDialog'
 export { NativeSelect, type NativeSelectProps } from './NativeSelect'
 export { MoneyBreakdown, type MoneyBreakdownProps, type MoneyRow } from './MoneyBreakdown'

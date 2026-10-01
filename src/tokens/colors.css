@@ -207,6 +207,8 @@
     --on-danger-fill: #ffffff;
     --alert: #e11d48;
     --on-alert: #ffffff;
+    /* Behind a dialog or a sheet. */
+    --scrim: rgba(14, 10, 26, 0.42);
     --hairline: rgba(17, 24, 39, 0.08);
     /* Inputs, the code boxes and the mobile social button: one legible edge. */
     --field-edge: rgba(14, 10, 26, 0.48);
@@ -372,6 +374,7 @@
     --on-danger-fill: #ffffff;
     --alert: #e11d48;
     --on-alert: #ffffff;
+    --scrim: rgba(0, 0, 0, 0.6);
     --hairline: rgba(255, 255, 255, 0.1);
     --field-edge: rgba(255, 255, 255, 0.48);
 }
@@ -466,5 +469,6 @@
     --color-alert: var(--alert);
     --color-on-alert: var(--on-alert);
     --color-hairline: var(--hairline);
+    --color-scrim: var(--scrim);
     --color-field-edge: var(--field-edge);
 }

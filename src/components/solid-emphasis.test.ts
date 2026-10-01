@@ -190,11 +190,14 @@ describe('the replacements are actually solid', () => {
         )
     })
 
-    it('PickerSheet marks selection with a solid marker in both modes', () => {
+    it('PickerSheet marks selection without an outline in both modes', () => {
+        // AUTM-1594: canvas v44 marks the chosen single-select row Bold with
+        // an ink check; multi-select keeps a filled checkbox in the selected
+        // colour. Neither uses a border as the emphasis.
         const s = source('PickerSheet.tsx')
-        expect(
-            s.match(/bg-\[var\(--act-fill\)\] text-\[var\(--on-act\)\]/g)?.length ?? 0
-        ).toBeGreaterThanOrEqual(2)
+        expect(s).toContain("isSelected ? 'font-bold' : 'font-medium'")
+        expect(s).toContain('bg-[var(--selected)] text-[var(--on-selected)]')
+        expect(s).not.toMatch(/border-autara-purple/)
     })
 })
 
@@ -354,7 +357,7 @@ describe('every emphasis fill defines its own shape — that is what earns dropp
 const FOCUS_BANDS: [string, string][] = [
     ['Tabs trigger', 'band'],
     ['FilterChipRow chip', 'background'],
-    ['PickerSheet row', 'surface'],
+    ['PickerSheet row', 'paper'],
     // AUTM-977 — the rest of the library, swept to the same signature.
     ['Button (BASE, every variant)', 'background'],
     ['Accordion trigger', 'surface'],
@@ -363,7 +366,7 @@ const FOCUS_BANDS: [string, string][] = [
     ['Checkbox', 'background'],
     ['Dialog close', 'surface'],
     ['Radio', 'background'],
-    ['Sheet close', 'surface'],
+    ['Sheet close', 'paper'],
     ['Stepper step', 'background'],
     ['Switch', 'background'],
     // AUTM-1127 — AccountMenu. The rows and the accent CTA sit on the panel,

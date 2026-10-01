@@ -43,7 +43,7 @@ const SheetOverlay = React.forwardRef<
     <DialogPrimitive.Overlay
         ref={ref}
         className={cn(
-            'fixed inset-0 z-50 bg-[#0E0A1A]/55',
+            'fixed inset-0 z-50 bg-[var(--scrim)]',
             'overlay-scrim',
             className
         )}
@@ -54,7 +54,9 @@ SheetOverlay.displayName = DialogPrimitive.Overlay.displayName
 
 const sheetVariants = cva(
     cn(
-        'fixed z-50 flex flex-col bg-[var(--surface)] text-[var(--text-strong)]',
+        // AUTM-1594 — canvas v44 "Bottom sheet": paper; the bottom sheet takes
+        // a 24px top radius and a grabber, and no edges anywhere.
+        'fixed z-50 flex flex-col bg-[var(--paper)] text-[var(--text-strong)]',
         // `transition ease-in-out` and the two `duration-*` classes went with
         // the dead animation. `duration-*` sets `transition-duration`, never
         // `animation-duration`, and `transition: all` on a full-height panel
@@ -71,16 +73,16 @@ const sheetVariants = cva(
                 // `env(safe-area-inset-top)` is 0 on the web — harmless there.
                 // A bottom sheet's top is mid-screen, so it needs no inset.
                 top:
-                    'inset-x-0 top-0 border-b border-[var(--border-subtle)] pt-[env(safe-area-inset-top)] ' +
+                    'inset-x-0 top-0 rounded-b-[1.5rem] pt-[env(safe-area-inset-top)] ' +
                     'sheet-panel--top',
                 bottom:
-                    'inset-x-0 bottom-0 border-t border-[var(--border-subtle)] ' +
+                    'inset-x-0 bottom-0 rounded-t-[1.5rem] pt-2.5 ' +
                     'sheet-panel--bottom',
                 left:
-                    'inset-y-0 left-0 h-full w-3/4 border-r border-[var(--border-subtle)] sm:max-w-sm pt-[env(safe-area-inset-top)] ' +
+                    'inset-y-0 left-0 h-full w-3/4 sm:max-w-sm pt-[env(safe-area-inset-top)] ' +
                     'sheet-panel--left',
                 right:
-                    'inset-y-0 right-0 h-full w-3/4 border-l border-[var(--border-subtle)] sm:max-w-sm pt-[env(safe-area-inset-top)] ' +
+                    'inset-y-0 right-0 h-full w-3/4 sm:max-w-sm pt-[env(safe-area-inset-top)] ' +
                     'sheet-panel--right',
             },
         },
@@ -113,14 +115,22 @@ const SheetContent = React.forwardRef<
                 className={cn(sheetVariants({ side }), className)}
                 {...props}
             >
+                {side === 'bottom' ? (
+                    // The sheet's grabber: 40 x 5, a hairline pill. Decoration;
+                    // the close button and Escape are how it is dismissed.
+                    <span
+                        aria-hidden="true"
+                        className="mx-auto block h-[5px] w-10 shrink-0 rounded-full bg-[var(--hairline)]"
+                    />
+                ) : null}
                 <DialogPrimitive.Close
                     aria-label="Close drawer"
                     className={cn(
                         'absolute right-4 grid h-7 w-7 place-items-center rounded-full',
                         closeTop,
                         'text-[var(--text-subtle)] transition-colors',
-                        'hover:bg-[var(--surface-elevated)] hover:text-[var(--text-strong)]',
-                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]'
+                        'hover:bg-[var(--band)] hover:text-[var(--text-strong)]',
+                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper)]'
                     )}
                 >
                     <svg
@@ -149,7 +159,7 @@ const SheetHeader = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
     <div
         className={cn(
-            'flex flex-col gap-1.5 p-6 pb-4 text-left',
+            'flex flex-col gap-3 px-5 pb-3 pt-3 text-left',
             className
         )}
         {...props}
@@ -163,7 +173,7 @@ const SheetFooter = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
     <div
         className={cn(
-            'mt-auto flex flex-col-reverse gap-2 border-t border-[var(--border-subtle)] p-6 sm:flex-row sm:justify-end',
+            'mt-auto flex flex-col-reverse gap-2.5 px-5 pb-6 pt-3 sm:flex-row sm:justify-end',
             className
         )}
         {...props}
@@ -178,7 +188,7 @@ const SheetTitle = React.forwardRef<
     <DialogPrimitive.Title
         ref={ref}
         className={cn(
-            'text-lg font-medium leading-tight text-[var(--text-strong)]',
+            'text-[1.25rem] font-black leading-tight text-[var(--text-strong)]',
             className
         )}
         {...props}
@@ -193,7 +203,7 @@ const SheetDescription = React.forwardRef<
     <DialogPrimitive.Description
         ref={ref}
         className={cn(
-            'text-sm leading-relaxed text-[var(--text-muted)]',
+            'text-[0.9375rem] leading-normal text-[var(--text-muted)]',
             className
         )}
         {...props}

@@ -66,6 +66,8 @@ const KEEPS: Record<string, string> = {
     'Stepper.tsx': 'the 28px step discs and the bars\' round caps, canvas v44 "Steps and progress" (AUTM-1594)',
     'ProgressSteps.tsx': 'a state bar per step; the round cap is what makes it read as fill, as Progress',
     'Countdown.tsx': 'the countdown is a 32px pill on canvas v44 (AUTM-1594), a status not an action',
+    'Dialog.tsx': 'the 44px close disc, an icon disc like IconButton (AUTM-1594)',
+    'Toast.tsx': 'the status dot, and the action pill and dismiss disc on the capsule (AUTM-1594)',
 }
 
 /**
