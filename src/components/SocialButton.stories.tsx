@@ -83,11 +83,15 @@ export const InContext: Story = {
     ),
 }
 
-/** Large text: the 52px floor grows with the root size and the label wraps instead of overflowing. */
+/**
+ * Large text in a narrow column (the landing panel at a 32px root is about 200px wide):
+ * the label wraps between words and the mark moves above it, never a word broken in two.
+ */
 export const LargeText: Story = {
     render: () => (
-        <div style={{ fontSize: 32, maxWidth: 335 }}>
+        <div style={{ maxWidth: 200 }}>
             <Stack>
+                <SocialButton provider="apple" style={{ fontSize: '2.125rem' }} />
                 <SocialButton provider="google" style={{ fontSize: '2.125rem' }} />
             </Stack>
         </div>
