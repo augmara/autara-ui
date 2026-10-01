@@ -135,6 +135,17 @@ export { cn } from './lib/cn'
  * bottom-anchored banner in the library at once. Clearing only one of them
  * still leaves the element buried when the other is up. */
 export { BOTTOM_CHROME_OFFSET } from './lib/reserved-bottom-space'
+/* AUTM-1594 — the `--motion-*` tokens as typed values for framer-motion and
+ * other JS-driven motion, held equal to utilities/animations.css by
+ * motion-tokens.test.ts. */
+export {
+    motionTokens,
+    motionDurations,
+    motionEasings,
+    motionTransition,
+    type MotionBezier,
+    type MotionDurationName,
+} from './lib/motion-tokens'
 
 export { DatePicker, type DatePickerProps, type DayState } from './components/DatePicker'
 export { TimePicker, type TimePickerProps, type SlotState } from './components/TimePicker'

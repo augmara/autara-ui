@@ -1,5 +1,12 @@
 import * as React from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { AnimatePresence, MotionConfig, motion } from 'motion/react'
+import {
+    motionDurations,
+    motionEasings,
+    motionTransition,
+    type MotionDurationName,
+} from '../lib/motion-tokens'
 import { Button } from './Button'
 import {
     Dialog,
@@ -324,4 +331,90 @@ export const ReducedMotion: Story = {
             </p>
         </div>
     ),
+}
+
+/* ─── AUTM-1594: the same tokens, for motion driven from JavaScript ─────
+ *
+ * `motionTokens`, `motionDurations`, `motionEasings` and `motionTransition`
+ * carry the `--motion-*` values for framer-motion. The table is read from
+ * the JS object and the swatch beside each row from the CSS custom property
+ * on this page, so a mismatch would show here as well as fail
+ * `motion-tokens.test.ts`. The panel below animates with framer-motion on
+ * `motionTransition('sheetIn')` / `('sheetOut')`, beside the CSS sheet.
+ */
+function JsTokenRow({ name }: { name: MotionDurationName }) {
+    const cssName = `--motion-${name.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)}`
+    const [cssValue, setCssValue] = React.useState('')
+    React.useEffect(() => {
+        setCssValue(getComputedStyle(document.documentElement).getPropertyValue(cssName).trim())
+    }, [cssName])
+    const t = motionTransition(name)
+    return (
+        <tr className="border-t border-[var(--hairline)]">
+            <td className="py-2 pr-4 font-mono text-sm">{name}</td>
+            <td className="py-2 pr-4 font-mono text-sm text-[var(--text-muted)]">{cssName}</td>
+            <td className="py-2 pr-4 text-sm">{motionDurations[name]}ms</td>
+            <td className="py-2 pr-4 text-sm text-[var(--text-muted)]">{cssValue || 'not on this page'}</td>
+            <td className="py-2 font-mono text-sm text-[var(--text-muted)]">
+                {`{ duration: ${t.duration}, ease: [${t.ease.join(', ')}] }`}
+            </td>
+        </tr>
+    )
+}
+
+export const JsTokens: Story = {
+    name: 'JS motion tokens (framer-motion)',
+    render: function JsTokensStory() {
+        const [open, setOpen] = React.useState(false)
+        return (
+            <MotionConfig reducedMotion="user">
+                <div className="flex max-w-4xl flex-col gap-6 rounded-autara-lg bg-[var(--surface)] p-6 text-[var(--text-strong)]">
+                    <div className="overflow-x-auto">
+                        <table className="w-full border-collapse text-left">
+                            <thead>
+                                <tr className="text-[0.8125rem] text-[var(--text-muted)]">
+                                    <th className="pb-2 pr-4 font-medium">JS name</th>
+                                    <th className="pb-2 pr-4 font-medium">CSS token</th>
+                                    <th className="pb-2 pr-4 font-medium">JS value</th>
+                                    <th className="pb-2 pr-4 font-medium">CSS on this page</th>
+                                    <th className="pb-2 font-medium">motionTransition()</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {(Object.keys(motionDurations) as MotionDurationName[]).map((name) => (
+                                    <JsTokenRow key={name} name={name} />
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                    <p className="m-0 text-[0.9375rem] text-[var(--text-muted)]">
+                        Enters run on ease-out [{motionEasings.out.join(', ')}], exits on ease-in [
+                        {motionEasings.in.join(', ')}].
+                    </p>
+                    <div className="flex flex-col gap-3">
+                        <div>
+                            <Button variant="strong" onClick={() => setOpen((v) => !v)}>
+                                {open ? 'Hide the panel' : 'Show the panel'}
+                            </Button>
+                        </div>
+                        <div className="relative h-40 overflow-hidden rounded-2xl bg-[var(--band)]">
+                            <AnimatePresence>
+                                {open ? (
+                                    <motion.div
+                                        key="panel"
+                                        initial={{ y: '100%' }}
+                                        animate={{ y: 0, transition: motionTransition('sheetIn') }}
+                                        exit={{ y: '100%', transition: motionTransition('sheetOut') }}
+                                        className="absolute inset-x-0 bottom-0 rounded-t-[1.5rem] bg-[var(--paper)] p-5 text-base"
+                                    >
+                                        Rises on sheetIn, 280ms, and leaves on sheetOut, 200ms.
+                                    </motion.div>
+                                ) : null}
+                            </AnimatePresence>
+                        </div>
+                    </div>
+                </div>
+            </MotionConfig>
+        )
+    },
 }
