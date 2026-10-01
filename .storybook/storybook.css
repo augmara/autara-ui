@@ -12,7 +12,7 @@
 /* ─── Body defaults — match autara-customer-web/globals.css ───────────── */
 
 /* Storybook 10 defaults the docs/canvas iframe to white/dark depending on
- * theme — force the warm-cream Autara surface everywhere so stories render
+ * theme — force the Autara ground (--background) everywhere so stories render
  * against the canonical background instead of Storybook chrome. */
 html,
 body,
@@ -31,12 +31,18 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-brand);
-    font-weight: 700;
-    line-height: 1.1;
-    color: var(--text-strong);
-    letter-spacing: -0.02em;
+/* AUTM-1594: layered for the same reason as the AUTM-977 focus fallback
+ * below. Unlayered, this beat Tailwind's layered utilities, so a heading set
+ * with `text-section` or `text-display` (weight 900) rendered at 700 here and
+ * nowhere else. */
+@layer base {
+    h1, h2, h3, h4, h5, h6 {
+        font-family: var(--font-brand);
+        font-weight: 700;
+        line-height: 1.1;
+        color: var(--text-strong);
+        letter-spacing: -0.02em;
+    }
 }
 
 /* ─── AUTM-977: why this fallback is layered, and must stay layered ──────

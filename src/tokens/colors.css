@@ -59,12 +59,14 @@
     color-scheme: light;
 
     /* ─── Semantic surface stack — primary API ───────────────────────── */
-    /* Warm off-white to keep the brand from feeling clinical. */
-    --background: #fbfaf6;
+    /* AUTM-1594: the ground is paper (#ffffff), as on canvas v44's sheet.
+     * Warmth now comes from band (#f4f2ec) cards on it, not from tinting
+     * the ground; #fbfaf6 read as a third, unnamed surface between the two. */
+    --background: #ffffff;
     --foreground: #0e0a1a;
     --surface: #ffffff;
     --surface-elevated: #f4f2ec;
-    --surface-warm: #f7f5ee;
+    --surface-warm: #f4f2ec;
     --border-subtle: rgba(17, 24, 39, 0.08);
     /* Hover / emphasised control border — one legible step up. */
     --border-strong: rgba(17, 24, 39, 0.18);
@@ -137,12 +139,12 @@
      * ≥4.5:1 against --surface. The FILL-grade intent colors stay static
      * (solid chips with white/ink text read on any canvas) — see the
      * @theme block. */
-    --intent-error-text: #c62f2f;
+    --intent-error-text: #b42318;
     --intent-success-text: #3a6b14;
     --intent-warning-text: #b4760e;
     --intent-info-text: #0d4f8c;
     /* Invalid-field wash. */
-    --intent-error-soft: rgba(221, 56, 56, 0.04);
+    --intent-error-soft: rgba(180, 35, 24, 0.04);
 
     /* ─── Accents for content sitting ON --surface-inverse ───────────── */
     /* The capsule is dark in light theme (wants bright accents) and
@@ -153,6 +155,49 @@
     --inverse-accent-error: #ff8a73;
     --inverse-accent-warning: #ffc864;
     --inverse-accent-info: #4ceaff;
+
+    /* ─── Autara Web palette (AUTM-1594, canvas v44 UiComponents) ────────
+     * The sheet's named colours. The semantic stack above resolves onto the
+     * same values; components drawn from the sheet use these names directly.
+     *
+     *   paper   ground                      band    cards, quiet buttons
+     *   raised  rows on band, dark lift     strong  strong buttons, toasts
+     *   selected switch, check, radio, chosen chip
+     *   brand   pending and confirmed       brand-deep  selected, hero
+     *   lime    primary action, done        aqua    in flight
+     *   amber   awaiting customer           danger  text and field borders ONLY
+     *   positive the open dot
+     *
+     * Rules that ride with them: lime is never placed on band (1.03:1), the
+     * action there is strong; danger is never a fill, so there are no red
+     * buttons; no shadows, depth is the step between paper, band and raised. */
+    --paper: #ffffff;
+    --band: #f4f2ec;
+    --band-press: #e9e6dc;
+    --raised: #ffffff;
+    --strong: #0e0a1a;
+    --strong-hover: #2a2238;
+    --on-strong: #ffffff;
+    --selected: #2e1070;
+    --on-selected: #ffffff;
+    --brand: #4e1bbd;
+    --on-brand: #ffffff;
+    --brand-deep: #2e1070;
+    --on-deep: #ffffff;
+    --on-deep-muted: rgba(255, 255, 255, 0.78);
+    --hairline-deep: rgba(255, 255, 255, 0.14);
+    --lime: #d4ff4f;
+    --lime-press: #b7e149;
+    --on-lime: #0e0a1a;
+    --aqua: #4ceaff;
+    --on-aqua: #0e0a1a;
+    --amber: #7a4b00;
+    --on-amber: #ffffff;
+    --danger: #b42318;
+    --positive: #0f9d58;
+    --hairline: rgba(17, 24, 39, 0.08);
+    /* Inputs, the code boxes and the mobile social button: one legible edge. */
+    --field-edge: rgba(14, 10, 26, 0.48);
 }
 
 /* ─── Dark theme — set `data-theme="dark"` on <html> ───────────────────
@@ -213,16 +258,26 @@
      * Consumers that paint their own canvas (merchant-mobile's
      * --app-canvas) must move with this or the cards stop sitting on
      * anything. */
-    --background: #0f0c14;
-    --foreground: #f2eff8;
-    --surface: #1b1822;
-    --surface-elevated: #282430;
-    --surface-warm: #171420;
-    --border-subtle: rgba(242, 239, 248, 0.12);
-    --border-strong: rgba(242, 239, 248, 0.24);
-    --border-hover: rgba(157, 117, 236, 0.45);
-    --text-strong: #f2eff8;
-    --text-muted: rgba(242, 239, 248, 0.72);
+    /* AUTM-1594: canvas v44's dark sheet replaces this ramp. Paper is the
+     * ground, band the cards, raised the rows on them, so band now sits
+     * BELOW raised in dark exactly as it does in light (#f4f2ec under
+     * #ffffff). The old ramp had elevated above surface, which is why a
+     * card and the row inside it could not be told apart.
+     *
+     * Measured (colors tests): text-strong #ffffff, text-muted .74 (the
+     * dark sheet's value) and text-subtle .58 clear 4.5:1 on all three, the
+     * worst being subtle on raised at 6.17:1. Accent text #c4b1ff is 8.25:1
+     * on raised. */
+    --background: #0e0a1a;
+    --foreground: #ffffff;
+    --surface: #262036;
+    --surface-elevated: #1b1626;
+    --surface-warm: #1b1626;
+    --border-subtle: rgba(255, 255, 255, 0.1);
+    --border-strong: rgba(255, 255, 255, 0.24);
+    --border-hover: rgba(196, 177, 255, 0.45);
+    --text-strong: #ffffff;
+    --text-muted: rgba(255, 255, 255, 0.74);
     /* AUTM-737 — .50 was measured against --surface (#201a30) and cleared
      * it at 4.65:1, but --surface-elevated (#2a2342) is LIGHTER, so light
      * text has LESS contrast on it: 4.38:1, under the floor. The same blind
@@ -231,40 +286,74 @@
      *
      * .54 clears both (5.19:1 / 4.86:1) and keeps a wider muted-to-subtle
      * gap than .58 would (1.58x vs 1.42x), so the hierarchy reads. */
-    --text-subtle: rgba(242, 239, 248, 0.54);
-    /* Tracks --surface (#1b1822) so the blurred nav reads as the same
-     * material as the cards under it. */
-    --nav-glass-bg: rgba(27, 24, 34, 0.85);
+    --text-subtle: rgba(255, 255, 255, 0.58);
+    /* Tracks the paper ground so the blurred nav reads as the page. */
+    --nav-glass-bg: rgba(14, 10, 26, 0.85);
 
-    --accent: #9d75ec;
-    --accent-fill: #6d3dd4;
-    --accent-fill-hover: #7d4fe0;
+    /* Brand stays #4e1bbd as a fill (white on it is 9.5:1 in either theme);
+     * only TEXT-grade accent lifts, to the sheet's #c4b1ff. */
+    --accent: #c4b1ff;
+    --accent-fill: #4e1bbd;
+    --accent-fill-hover: #5a28d0;
     --on-accent: #ffffff;
-    --accent-tint: rgba(157, 117, 236, 0.12);
-    --accent-halo: rgba(157, 117, 236, 0.18);
-    --accent-border-soft: rgba(157, 117, 236, 0.3);
+    --accent-tint: rgba(196, 177, 255, 0.12);
+    --accent-halo: rgba(196, 177, 255, 0.18);
+    --accent-border-soft: rgba(196, 177, 255, 0.3);
 
-    --surface-inverse: #f4f1fa;
-    --surface-inverse-hover: #ffffff;
-    --text-on-inverse: #16121f;
-    --border-on-inverse: rgba(22, 18, 31, 0.12);
+    --surface-inverse: #ffffff;
+    --surface-inverse-hover: #ececec;
+    --text-on-inverse: #0e0a1a;
+    --border-on-inverse: rgba(14, 10, 26, 0.12);
 
-    /* Purple primary on dark surfaces — the brand rule, not an inversion. */
-    --cta-fill: #6d3dd4;
-    --cta-fill-hover: #7d4fe0;
-    --on-cta: #ffffff;
+    /* AUTM-1594: the strong action is white in dark (the sheet's "ink,
+     * white in dark"). This replaces the purple dark CTA from AUTM-734: the
+     * primary action is now lime in both themes, so purple no longer has to
+     * stand in for it, and a purple strong button next to a brand-deep hero
+     * read as the same thing. */
+    --cta-fill: #ffffff;
+    --cta-fill-hover: #ececec;
+    --on-cta: #0e0a1a;
 
-    --intent-error-text: #ff9a86;
+    --intent-error-text: #ff8f86;
     --intent-success-text: #b7dd6b;
     --intent-warning-text: #ffc874;
     --intent-info-text: #8fc0ff;
-    --intent-error-soft: rgba(242, 118, 107, 0.1);
+    --intent-error-soft: rgba(255, 143, 134, 0.1);
 
     --inverse-accent-loading: #4a7a14;
     --inverse-accent-success: #3a6b14;
     --inverse-accent-error: #c62f2f;
     --inverse-accent-warning: #b4760e;
     --inverse-accent-info: #0d4f8c;
+
+    /* ─── Autara Web palette, dark (UiComponentsDark) ────────────────── */
+    --paper: #0e0a1a;
+    --band: #1b1626;
+    --band-press: #262036;
+    --raised: #262036;
+    --strong: #ffffff;
+    --strong-hover: #ececec;
+    --on-strong: #0e0a1a;
+    /* #8f6bff takes ink, not white: white on it is 3.67:1, ink 5.31:1. */
+    --selected: #8f6bff;
+    --on-selected: #0e0a1a;
+    --brand: #4e1bbd;
+    --on-brand: #ffffff;
+    --brand-deep: #2e1070;
+    --on-deep: #ffffff;
+    --on-deep-muted: rgba(255, 255, 255, 0.78);
+    --hairline-deep: rgba(255, 255, 255, 0.14);
+    --lime: #d4ff4f;
+    --lime-press: #b7e149;
+    --on-lime: #0e0a1a;
+    --aqua: #4ceaff;
+    --on-aqua: #0e0a1a;
+    --amber: #7a4b00;
+    --on-amber: #ffffff;
+    --danger: #ff8f86;
+    --positive: #3ddc84;
+    --hairline: rgba(255, 255, 255, 0.1);
+    --field-edge: rgba(255, 255, 255, 0.48);
 }
 
 @theme inline {
@@ -316,9 +405,40 @@
      * canvases, so these deliberately do NOT theme. Text-grade intent
      * color lives on the themed `--intent-*-text` vars above; the one
      * alias that was always text-grade follows it. */
-    --color-autara-error: #dd3838;
+    /* AUTM-1594: error is the sheet's danger, themed, and text and borders
+     * only. #dd3838 was 4.0:1 on white, under the floor for the 12px error
+     * line FormField renders with it. */
+    --color-autara-error: var(--danger);
     --color-autara-success: #0f9d58;
     --color-autara-warning: #f5a623;
     --color-autara-warning-text: var(--intent-warning-text);
     --color-autara-info: #1f6feb;
+
+    /* ─── Autara Web palette as Tailwind names (AUTM-1594) ───────────── */
+    --color-paper: var(--paper);
+    --color-band: var(--band);
+    --color-band-press: var(--band-press);
+    --color-raised: var(--raised);
+    --color-strong: var(--strong);
+    --color-strong-hover: var(--strong-hover);
+    --color-on-strong: var(--on-strong);
+    --color-selected: var(--selected);
+    --color-on-selected: var(--on-selected);
+    --color-brand: var(--brand);
+    --color-on-brand: var(--on-brand);
+    --color-brand-deep: var(--brand-deep);
+    --color-on-deep: var(--on-deep);
+    --color-on-deep-muted: var(--on-deep-muted);
+    --color-hairline-deep: var(--hairline-deep);
+    --color-lime: var(--lime);
+    --color-lime-press: var(--lime-press);
+    --color-on-lime: var(--on-lime);
+    --color-aqua: var(--aqua);
+    --color-on-aqua: var(--on-aqua);
+    --color-amber: var(--amber);
+    --color-on-amber: var(--on-amber);
+    --color-danger: var(--danger);
+    --color-positive: var(--positive);
+    --color-hairline: var(--hairline);
+    --color-field-edge: var(--field-edge);
 }

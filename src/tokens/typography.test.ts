@@ -66,3 +66,29 @@ describe('Satoshi faces (AUTM-1568)', () => {
 		},
 	)
 })
+
+/**
+ * AUTM-1594 — the type scale is canvas v44's, in rem. Pinned here so a step
+ * that drifts from the sheet fails by name.
+ */
+describe('type scale (canvas v44)', () => {
+	const scale: Array<[string, string, string, string?]> = [
+		// step, size, line-height, weight
+		['display', '3.25rem', '1.04', '900'],
+		['section', '1.75rem', '1.04', '900'],
+		['figure', '2.5rem', '1', '900'],
+		['title', '1.0625rem', '1.3', '700'],
+		['body', '1rem', '1.5'],
+		['caption', '0.875rem', '1.4'],
+	]
+	for (const [step, size, lh, weight] of scale) {
+		it(`text-${step} is ${size} at ${lh}${weight ? `, weight ${weight}` : ''}`, () => {
+			expect(CSS).toMatch(new RegExp(`--text-${step}:\\s*${size.replace('.', '\\.')};`))
+			expect(CSS).toMatch(new RegExp(`--text-${step}--line-height:\\s*${lh.replace('.', '\\.')};`))
+			if (weight) expect(CSS).toMatch(new RegExp(`--text-${step}--font-weight:\\s*${weight};`))
+		})
+	}
+	it('no step is set in px', () => {
+		expect(CSS).not.toMatch(/--text-[a-z]+:\s*\d+px/)
+	})
+})
