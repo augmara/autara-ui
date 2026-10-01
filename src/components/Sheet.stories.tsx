@@ -1,3 +1,4 @@
+import * as React from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Button } from './Button'
 import {
@@ -136,4 +137,70 @@ export const SettingsDrawer: Story = {
             </SheetContent>
         </Sheet>
     ),
+}
+
+/* ─── AUTM-1594: the close control is 44px to touch ─────────────────────
+ *
+ * Drawn at 28px, as it was: the sheet's quiet close. The 44px hit area is an
+ * unpainted pseudo-element centred on the disc. The dashed square in the
+ * first story draws that area for review only; no consumer renders it.
+ * These open on load and stay off the docs page.
+ */
+const OpenSheet: React.FC<{ side?: 'right' | 'bottom'; showHitArea?: boolean }> = ({
+    side = 'bottom',
+    showHitArea = false,
+}) => (
+    <Sheet defaultOpen>
+        {showHitArea ? (
+            <style>{'[aria-label="Close drawer"]::before{outline:1px dashed var(--accent);outline-offset:-1px}'}</style>
+        ) : null}
+        <SheetContent side={side}>
+            <SheetHeader>
+                <SheetTitle>Filters</SheetTitle>
+                <SheetDescription>Narrow the bookings list. Changes apply when you tap Show.</SheetDescription>
+            </SheetHeader>
+            <div className="flex-1 px-5 pb-4 text-[0.9375rem] text-[var(--text-muted)]">
+                Mobile and in-shop, every status, this week.
+            </div>
+            <SheetFooter>
+                <Button variant="quiet">Clear all</Button>
+                <Button variant="strong">Show 12 bookings</Button>
+            </SheetFooter>
+        </SheetContent>
+    </Sheet>
+)
+
+export const CloseHitArea: Story = {
+    name: 'Close control, 44px hit area shown',
+    tags: ['!autodocs'],
+    render: () => <OpenSheet showHitArea />,
+}
+
+export const CloseHitAreaRight: Story = {
+    name: 'Close control, right side',
+    tags: ['!autodocs'],
+    render: () => <OpenSheet side="right" showHitArea />,
+}
+
+export const CloseDark: Story = {
+    name: 'Close control, dark',
+    tags: ['!autodocs'],
+    globals: { theme: 'dark' },
+    render: () => <OpenSheet />,
+}
+
+/** Scales the ROOT font size, as OS text scaling does. */
+export const CloseText200: Story = {
+    name: 'Close control, 200% text',
+    tags: ['!autodocs'],
+    render: function CloseText200Story() {
+        React.useEffect(() => {
+            const prev = document.documentElement.style.fontSize
+            document.documentElement.style.fontSize = '200%'
+            return () => {
+                document.documentElement.style.fontSize = prev
+            }
+        }, [])
+        return <OpenSheet />
+    },
 }

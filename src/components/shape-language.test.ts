@@ -67,6 +67,7 @@ const KEEPS: Record<string, string> = {
     'ProgressSteps.tsx': 'a state bar per step; the round cap is what makes it read as fill, as Progress',
     'Countdown.tsx': 'the countdown is a 32px pill on canvas v44 (AUTM-1594), a status not an action',
     'Dialog.tsx': 'the 44px close disc, an icon disc like IconButton (AUTM-1594)',
+    'Sheet.tsx': 'the close disc, drawn at 28px with a 44px hit area, the quiet sibling of Dialog\'s (AUTM-1594); the bottom sheet\'s grabber pill',
     'Toast.tsx': 'the status dot, and the action pill and dismiss disc on the capsule (AUTM-1594)',
     'EmptyState.tsx': 'the 44px icon disc, canvas v44 "Empty" (AUTM-1594)',
     'LockedFeature.tsx': 'the optional icon disc (AUTM-1594)',
@@ -92,7 +93,6 @@ const KEEPS: Record<string, string> = {
 const PENDING: Record<string, string> = {
     'BackButton.tsx': 'circular icon button, an action, should move',
     'CarouselHeader.tsx': 'prev/next icon buttons, actions, should move',
-    'Sheet.tsx': 'close button, an action, should move',
     'ImageCropDialog.tsx': 'range-slider track, a state bar, likely a keep',
     'MultiSelect.tsx': 'value chips + clear button, chips go to 8px',
     'StepCard.tsx': 'step numeral medallion, a numeral in a circle, likely a keep',

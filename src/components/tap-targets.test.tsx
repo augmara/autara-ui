@@ -5,6 +5,7 @@ import { Tabs, TabsList, TabsTrigger } from './Tabs'
 import { Checkbox } from './Checkbox'
 import { RadioGroup, RadioGroupItem } from './Radio'
 import { FilterChipRow } from './FilterChipRow'
+import { Sheet, SheetContent, SheetDescription, SheetTitle } from './Sheet'
 
 /**
  * AUTM-622 — the 44px floor, on the two components that were under it.
@@ -111,5 +112,30 @@ describe('AUTM-1594 — the sheet\'s 24px choice controls keep a 44px hit area',
         expect(el.className).toContain('before:size-11')
         expect(el.className).toContain("before:content-['']")
         expect(el.className).toContain('relative')
+    })
+})
+
+describe('AUTM-1594 — Sheet\'s close control is 44px to touch', () => {
+    it.each(['right', 'left', 'top', 'bottom'] as const)('side="%s": drawn at 28px, 44px hit area', (side) => {
+        render(
+            <Sheet defaultOpen>
+                <SheetContent side={side}>
+                    <SheetTitle>Filters</SheetTitle>
+                    <SheetDescription>Narrow the list.</SheetDescription>
+                </SheetContent>
+            </Sheet>,
+        )
+        const close = screen.getByRole('button', { name: 'Close drawer' })
+        // The drawn disc: unchanged, so the sheet keeps its quiet close.
+        expect(close.className).toContain('h-7')
+        expect(close.className).toContain('w-7')
+        // The hit area: the pseudo-element, centred on the disc.
+        expect(close.className).toContain('before:size-11')
+        expect(close.className).toContain('before:absolute')
+        expect(close.className).toContain('before:-translate-x-1/2')
+        expect(close.className).toContain('before:-translate-y-1/2')
+        expect(close.className).toContain("before:content-['']")
+        // It is positioned, so the pseudo-element is placed against it.
+        expect(close.className).toContain('absolute')
     })
 })
