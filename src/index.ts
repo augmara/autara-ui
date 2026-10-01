@@ -42,6 +42,7 @@ export {
     Avatar, AvatarImage, AvatarFallback, avatarVariants,
     Tooltip, TooltipTrigger, TooltipContent, TooltipProvider,
     Progress,
+    ProgressSteps, type ProgressStepsProps,
     // AUTM-1046 — indeterminate busy indicator for work in progress.
     Spinner, type SpinnerProps, type SpinnerSize, type SpinnerTone,
     MultiSelect, type MultiSelectOption, type MultiSelectProps,

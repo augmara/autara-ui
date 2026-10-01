@@ -63,6 +63,9 @@ const KEEPS: Record<string, string> = {
     'StatusDot.tsx': 'the 8px state light itself (AUTM-1594), the meaning round was reserved for',
     'StatTile.tsx': 'the 28px icon disc beside the label (AUTM-1594)',
     'ListSection.tsx': 'the row icon disc and the 4px accent bar\'s round caps (AUTM-1594)',
+    'Stepper.tsx': 'the 28px step discs and the bars\' round caps, canvas v44 "Steps and progress" (AUTM-1594)',
+    'ProgressSteps.tsx': 'a state bar per step; the round cap is what makes it read as fill, as Progress',
+    'Countdown.tsx': 'the countdown is a 32px pill on canvas v44 (AUTM-1594), a status not an action',
 }
 
 /**
