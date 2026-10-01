@@ -169,10 +169,14 @@ describe('Table is built from tokens', () => {
 
 /** The fills that replaced an outline, and what each has to keep doing. */
 describe('the replacements are actually solid', () => {
-    it('Tabs marks the active trigger with a fill, not a ring', () => {
+    it('Tabs marks the active trigger with a fill and a weight, not a ring', () => {
+        // AUTM-1594: canvas v44's segmented control. The active tab is a
+        // raised pill on the band track with its label in Bold. The fill
+        // alone is 1.05:1, so the Bold weight is load-bearing and pinned too.
         const s = source('Tabs.tsx')
-        expect(s).toContain('data-[state=active]:bg-[var(--act-fill)]')
-        expect(s).toContain('data-[state=active]:text-[var(--on-act)]')
+        expect(s).toContain('data-[state=active]:bg-[var(--raised)]')
+        expect(s).toContain('data-[state=active]:font-bold')
+        expect(s).toContain('data-[state=active]:text-[var(--text-strong)]')
     })
 
     it('MetaChip neutral takes the achromatic solid added for it', () => {
@@ -343,7 +347,7 @@ describe('every emphasis fill defines its own shape — that is what earns dropp
  * component actually names.
  */
 const FOCUS_BANDS: [string, string][] = [
-    ['Tabs trigger', 'surface-elevated'],
+    ['Tabs trigger', 'band'],
     ['FilterChipRow chip', 'background'],
     ['PickerSheet row', 'surface'],
     // AUTM-977 — the rest of the library, swept to the same signature.

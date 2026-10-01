@@ -14,8 +14,13 @@ import { cn } from '../lib/cn'
  * Semantics come free: each card is a `<label>` wrapping an sr-only radio,
  * so the group is a real radio group. Arrow keys move between cards, Space
  * selects, a screen reader hears the label and the description, and a
- * spec can `check()` it. The selected card is SOLID purple (the accent
- * acts; never a tint), on the base radius; the cards are 44px at least.
+ * spec can `check()` it.
+ *
+ * AUTM-1594 — canvas v44 "Choice card": band, a 24px radius, 16px in, a
+ * 16px Bold title over a 14px description at 72% ink. No outline. The sheet
+ * draws a tap-and-move-on choice with no selected state; where the choice
+ * stays on screen (a vehicle type, a slot) the chosen card takes the
+ * selected colour with its own ink. The cards are 44px at least.
  *
  * `disabledLabel` says why an option cannot be chosen ("Booked", "Not
  * available today") rather than just dimming it.
@@ -69,7 +74,7 @@ export function ChoiceGroup({
                 {legend ? (
                     <legend
                         className={cn(
-                            'mb-2 text-sm font-medium text-[var(--text-muted)]',
+                            'mb-2 text-[0.9375rem] font-medium text-[var(--text-strong)]',
                             legendHidden && 'sr-only',
                         )}
                     >
@@ -88,7 +93,7 @@ export function ChoiceGroup({
                     {children}
                 </div>
                 {error ? (
-                    <p id={errorId} className="mt-1.5 text-[0.8125rem] text-[var(--intent-error-text)]">
+                    <p id={errorId} className="mt-2 text-sm text-[var(--danger)]">
                         {error}
                     </p>
                 ) : null}
@@ -132,12 +137,12 @@ export function ChoiceCard({
             data-testid={testId}
             data-selected={selected || undefined}
             className={cn(
-                'flex min-h-11 min-w-0 cursor-pointer items-center gap-3 rounded-autara border px-3.5 py-3 text-left transition-colors',
-                'focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[var(--color-autara-purple)]',
+                'flex min-h-11 min-w-0 cursor-pointer items-center gap-3 rounded-[1.5rem] p-4 text-left transition-colors',
+                'focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[var(--accent)]',
                 selected
-                    ? 'border-[var(--color-autara-purple-static)] bg-[var(--color-autara-purple-static)] text-white'
-                    : 'border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-strong)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-elevated)]',
-                disabled && 'cursor-not-allowed opacity-60 hover:border-[var(--border-subtle)] hover:bg-[var(--surface)]',
+                    ? 'bg-[var(--selected)] text-[var(--on-selected)]'
+                    : 'bg-[var(--band)] text-[var(--text-strong)] hover:bg-[var(--band-press)]',
+                disabled && 'cursor-not-allowed opacity-60 hover:bg-[var(--band)]',
                 className,
             )}
         >
@@ -155,24 +160,24 @@ export function ChoiceCard({
                 <span
                     aria-hidden
                     className={cn(
-                        'grid h-9 w-9 shrink-0 place-items-center rounded-lg',
+                        'grid size-10 shrink-0 place-items-center rounded-full',
                         selected
-                            ? 'bg-white/15 text-white'
-                            : 'bg-[var(--surface-warm)] text-[var(--color-autara-purple)]',
+                            ? 'bg-[var(--on-selected)]/15 text-[var(--on-selected)]'
+                            : 'bg-[var(--raised)] text-[var(--accent)]',
                     )}
                 >
                     {icon}
                 </span>
             ) : null}
-            <span className="min-w-0 flex-1">
-                <span className="block break-words text-sm font-medium">{label}</span>
+            <span className="flex min-w-0 flex-1 flex-col gap-1">
+                <span className="block break-words text-base font-bold">{label}</span>
                 {disabled && disabledLabel ? (
-                    <span className="mt-0.5 block text-xs">{disabledLabel}</span>
+                    <span className="block text-sm leading-normal">{disabledLabel}</span>
                 ) : description ? (
                     <span
                         className={cn(
-                            'mt-0.5 block break-words text-xs',
-                            selected ? 'text-white/85' : 'text-[var(--text-muted)]',
+                            'block break-words text-sm leading-normal',
+                            selected ? 'opacity-80' : 'text-[var(--text-muted)]',
                         )}
                     >
                         {description}

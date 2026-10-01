@@ -56,6 +56,9 @@ const KEEPS: Record<string, string> = {
     'ErrorCard.tsx': 'the 32px icon medallion — a state light, not the retry button. The retry button itself takes the shared radius',
     'InlineAlert.tsx': 'the 24px intent disc, the same state light as ErrorCard, never a control (AUTM-1185)',
     'Button.tsx': 'size="icon", the 44px icon disc on canvas v44 (AUTM-1594). Every other size is a pill by its own half-height radius',
+    'Tabs.tsx': 'the segmented track and its pills, canvas v44 "Segmented" (AUTM-1594)',
+    'FilterChipRow.tsx': 'filter chips are pills on canvas v44 (AUTM-1594), superseding the 8px chip rung',
+    'ChoiceCard.tsx': 'the 40px icon disc beside the label, a glyph in a circle like StepCard (AUTM-1594)',
 }
 
 /**
@@ -161,7 +164,6 @@ describe('round means a person, a state light, or a status marker — never an a
      */
     it.each([
         ['MetaChip.tsx', 'rounded-autara-sm'],
-        ['FilterChipRow.tsx', 'rounded-autara-sm'],
     ])('%s carries %s, and any round left on it is a dot', (file, radius) => {
         const text = readFileSync(join(DIR, file), 'utf8')
         expect(code(text)).toContain(radius)

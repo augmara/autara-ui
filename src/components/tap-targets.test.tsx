@@ -2,6 +2,8 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { Switch } from './Switch'
 import { Tabs, TabsList, TabsTrigger } from './Tabs'
+import { Checkbox } from './Checkbox'
+import { RadioGroup, RadioGroupItem } from './Radio'
 import { FilterChipRow } from './FilterChipRow'
 
 /**
@@ -20,15 +22,16 @@ import { FilterChipRow } from './FilterChipRow'
  * proof and is not.
  */
 describe('AUTM-622 — 44px tap targets', () => {
-    it('Switch keeps its 24px look but carries a 44x44 hit area', () => {
+    it('Switch keeps its drawn 52 x 32 look but carries a 44px-tall hit area', () => {
         render(<Switch aria-label="Toggle Monday" />)
         const el = screen.getByRole('switch')
-        // The painted control is unchanged — that shape is the affordance.
-        expect(el.className).toContain('h-[24px]')
-        expect(el.className).toContain('w-[44px]')
-        // The hit area is the pseudo-element.
+        // The painted control is the sheet's (AUTM-1594) — that shape is the
+        // affordance, so the hit area is added rather than the track grown.
+        expect(el.className).toContain('h-8')
+        expect(el.className).toContain('w-13')
+        // The hit area is the pseudo-element: 44 tall, as wide as the track.
         expect(el.className).toContain('before:h-11')
-        expect(el.className).toContain('before:w-11')
+        expect(el.className).toContain('before:w-13')
         // Without content the pseudo-element generates no box at all and the
         // whole thing silently does nothing.
         expect(el.className).toContain("before:content-['']")
@@ -44,10 +47,15 @@ describe('AUTM-622 — 44px tap targets', () => {
                 </TabsList>
             </Tabs>,
         )
-        expect(screen.getByRole('tab', { name: 'Day' }).className).toContain('min-h-11')
-        // 44px trigger + 4px padding each side. A 44px child in a 40px list
-        // either overflows or gets squashed, so these two move together.
-        expect(screen.getByRole('tablist').className).toContain('min-h-[3.25rem]')
+        // AUTM-1594: drawn at the sheet's 40px in a 48px track; the 44px floor
+        // is the unpainted pseudo-element, which the track's 4px padding holds.
+        const tab = screen.getByRole('tab', { name: 'Day' }).className
+        expect(tab).toContain('min-h-10')
+        expect(tab).toContain('before:h-11')
+        expect(tab).toContain("before:content-['']")
+        expect(tab).toContain('relative')
+        expect(screen.getByRole('tablist').className).toContain('min-h-12')
+        expect(screen.getByRole('tablist').className).toContain('p-1')
     })
 
     it('FilterChipRow clears 44px too — the component the first pass MISSED', () => {
@@ -66,9 +74,16 @@ describe('AUTM-622 — 44px tap targets', () => {
                 onChange={() => {}}
             />,
         )
+        // AUTM-1594: drawn at the sheet's 36px; the 44px floor is the
+        // pseudo-element, and the row's 4px vertical padding keeps the
+        // scroller from clipping it.
         for (const chip of screen.getAllByRole('tab')) {
-            expect(chip.className).toContain('min-h-11')
+            expect(chip.className).toContain('min-h-9')
+            expect(chip.className).toContain('before:h-11')
+            expect(chip.className).toContain('before:min-w-11')
+            expect(chip.className).toContain("before:content-['']")
         }
+        expect(screen.getByRole('tablist').className).toContain('py-1')
     })
 
     it('both use MINIMUM heights, so 200% text scale grows them instead of clipping', () => {
@@ -80,7 +95,21 @@ describe('AUTM-622 — 44px tap targets', () => {
             </Tabs>,
         )
         const trigger = screen.getByRole('tab', { name: 'Day' })
-        expect(trigger.className).not.toMatch(/(^|\s)h-11(\s|$)/)
-        expect(screen.getByRole('tablist').className).not.toMatch(/(^|\s)h-\[3\.25rem\](\s|$)/)
+        expect(trigger.className).not.toMatch(/(^|\s)h-10(\s|$)/)
+        expect(screen.getByRole('tablist').className).not.toMatch(/(^|\s)h-12(\s|$)/)
+    })
+})
+
+describe('AUTM-1594 — the sheet\'s 24px choice controls keep a 44px hit area', () => {
+    it.each([
+        ['Checkbox', () => render(<Checkbox aria-label="I agree" />), 'checkbox'],
+        ['Radio', () => render(<RadioGroup aria-label="Mode"><RadioGroupItem value="a" aria-label="Comes to you" /></RadioGroup>), 'radio'],
+    ] as const)('%s is 24px drawn, 44px to touch', (_name, mount, role) => {
+        mount()
+        const el = screen.getByRole(role)
+        expect(el.className).toContain('size-6')
+        expect(el.className).toContain('before:size-11')
+        expect(el.className).toContain("before:content-['']")
+        expect(el.className).toContain('relative')
     })
 })
