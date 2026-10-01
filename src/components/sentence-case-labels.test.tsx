@@ -142,7 +142,8 @@ describe('AUTM-1483: each label renders in sentence case, on the scale', () => {
             </>,
         )
         expectSentenceCaseLabel(screen.getByText('Bookings today'), '0.8125rem')
-        expectSentenceCaseLabel(screen.getByText('Open now'), '0.75rem')
+        // MetaChip is canvas v44's 13px meta chip since 7.0.0 (AUTM-1594).
+        expectSentenceCaseLabel(screen.getByText('Open now'), '0.8125rem')
     })
 
     it('SectionHeading eyebrows read as written, in both variants', () => {

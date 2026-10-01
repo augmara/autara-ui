@@ -43,8 +43,9 @@ export const WithDot: Story = {
 };
 
 /** All tones rendered together: the canonical chip vocabulary, in sentence
- *  case at 0.75rem and weight 500 with no letterspacing (AUTM-1483). Each
- *  label renders exactly as written here. */
+ *  case at 0.8125rem and weight 500 with no letterspacing (AUTM-1483, at
+ *  canvas v44's size since AUTM-1594). Each label renders exactly as
+ *  written here. */
 export const Vocabulary: Story = {
   parameters: { layout: "padded" },
   render: () => (
