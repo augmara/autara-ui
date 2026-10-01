@@ -279,6 +279,15 @@ export {
 
 export { DatePicker, type DatePickerProps, type DayState } from './DatePicker'
 export { TimePicker, type TimePickerProps, type SlotState } from './TimePicker'
+// AUTM-1507 — duration as a typable field plus a picker, because every
+// duration a merchant thinks in had to be converted to minutes in their head
+// first, and `type="number"`'s spinner reads as a foreign control on dark.
+export {
+    DurationPicker,
+    durationLabel,
+    DEFAULT_MAX_DURATION_MINUTES,
+    type DurationPickerProps,
+} from './DurationPicker'
 
 // ─── AUTM-1185 — the customer-web hardening sweep's four primitives ──────
 // InlineAlert: one inline "something happened"; ConfirmDialog: the pause

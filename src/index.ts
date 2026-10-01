@@ -131,6 +131,15 @@ export { BOTTOM_CHROME_OFFSET } from './lib/reserved-bottom-space'
 
 export { DatePicker, type DatePickerProps, type DayState } from './components/DatePicker'
 export { TimePicker, type TimePickerProps, type SlotState } from './components/TimePicker'
+// AUTM-1507 — duration as a typable field plus a picker, because every
+// duration a merchant thinks in had to be converted to minutes in their head
+// first, and `type="number"`'s spinner reads as a foreign control on dark.
+export {
+    DurationPicker,
+    durationLabel,
+    DEFAULT_MAX_DURATION_MINUTES,
+    type DurationPickerProps,
+} from './components/DurationPicker'
 export {
     addDays,
     daysBetween,
