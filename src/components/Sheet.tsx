@@ -127,6 +127,14 @@ const SheetContent = React.forwardRef<
                     aria-label="Close drawer"
                     className={cn(
                         'absolute right-4 grid h-7 w-7 place-items-center rounded-full',
+                        /* AUTM-1594: drawn at 28px, touched at 44px. The disc is
+                           the sheet's quiet close and stays that size; the
+                           floor is the unpainted pseudo-element, centred on it,
+                           the way Checkbox and Radio carry theirs. At 16px in
+                           from the edge the 44px area still sits inside the
+                           panel. It was 28 x 28 to the finger, which is why
+                           the account menu stayed a dropdown on phones. */
+                        "before:absolute before:left-1/2 before:top-1/2 before:size-11 before:-translate-x-1/2 before:-translate-y-1/2 before:content-['']",
                         closeTop,
                         'text-[var(--text-subtle)] transition-colors',
                         'hover:bg-[var(--band)] hover:text-[var(--text-strong)]',

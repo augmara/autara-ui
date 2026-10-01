@@ -22,6 +22,67 @@ describe('InlineAlert', () => {
     })
 })
 
+/**
+ * AUTM-1472 — exactly one live region, whatever the consumer asks for. A
+ * nested `role="status"` inside a `role="alert"` wrapper is announced twice
+ * by some screen readers; the root is the only region, and `role` picks it.
+ */
+describe('InlineAlert live region', () => {
+    const LIVE = '[role="alert"], [role="status"], [role="log"], [aria-live]'
+
+    it.each([
+        ['default error', { tone: 'error' as const }, 'alert'],
+        ['default warning', { tone: 'warning' as const }, 'status'],
+        ['warning that must interrupt', { tone: 'warning' as const, role: 'alert' as const }, 'alert'],
+        ['error kept polite', { tone: 'error' as const, role: 'status' as const }, 'status'],
+    ])('%s renders one region, role=%s', (_name, props, expected) => {
+        const { container } = render(
+            <InlineAlert {...props} title="This business may already be on Autara" action={<button type="button">Continue</button>}>
+                An account at 14 Pitt Street already exists.
+            </InlineAlert>,
+        )
+        const regions = container.querySelectorAll(LIVE)
+        expect(regions).toHaveLength(1)
+        expect(regions[0]).toBe(container.firstElementChild)
+        expect(regions[0].getAttribute('role')).toBe(expected)
+    })
+
+    it('role="none" renders no region, so a consumer-owned one is the only one', () => {
+        const { container } = render(
+            <div role="alert" data-testid="wrapper">
+                <InlineAlert tone="warning" role="none" testId="inner">
+                    An account at 14 Pitt Street already exists.
+                </InlineAlert>
+            </div>,
+        )
+        expect(container.querySelectorAll('[role="alert"], [role="status"]')).toHaveLength(1)
+        expect(screen.getByTestId('inner').hasAttribute('role')).toBe(false)
+    })
+
+    it('holds two actions side by side', () => {
+        render(
+            <InlineAlert
+                tone="warning"
+                role="alert"
+                testId="dup"
+                action={
+                    <>
+                        <button type="button">Continue</button>
+                        <button type="button">Sign in instead</button>
+                    </>
+                }
+            >
+                An account at 14 Pitt Street already exists.
+            </InlineAlert>,
+        )
+        const slot = screen.getByRole('button', { name: 'Continue' }).parentElement as HTMLElement
+        expect(slot).toBe(screen.getByRole('button', { name: 'Sign in instead' }).parentElement)
+        expect(slot.className).toContain('flex')
+        expect(slot.className).toContain('flex-wrap')
+        expect(slot.className).toContain('gap-2.5')
+    })
+})
+
 describe('NativeSelect', () => {
     it('is a real select with the placeholder as a disabled empty option', () => {
         render(
