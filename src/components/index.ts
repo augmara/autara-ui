@@ -1,5 +1,6 @@
 export { GradientBar } from './GradientBar'
 export { Button, buttonVariants, type ButtonProps } from './Button'
+export { IconButton, type IconButtonProps } from './IconButton'
 export { Input, inputVariants, type InputProps } from './Input'
 export { OtpInput, type OtpInputProps } from './OtpInput'
 export {

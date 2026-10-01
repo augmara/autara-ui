@@ -140,12 +140,12 @@ export function ErrorCard({
              * this is `md`: the one control on the screen is not the place
              * to save 8px.
              *
-             * AUTM-1221: glass, not outline. Rule 4 of the Autara Glass
-             * direction: a secondary control is a flat glass surface, never
-             * an outline.
+             * AUTM-1594: strong, as canvas v44 draws it. The card is band, and
+             * on band the action is ink (lime on band is 1.03:1). It was glass
+             * under AUTM-1221, which the sheet retires.
              */
             <Button
-              variant="glass"
+              variant="strong"
               size="md"
               onClick={onRetry}
               className="mt-3"

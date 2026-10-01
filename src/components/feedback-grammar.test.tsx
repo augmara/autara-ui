@@ -50,12 +50,13 @@ describe('feedback grammar', () => {
         expect(stamp.className).not.toContain('tracking-[0.18em]')
     })
 
-    it('ErrorCard offers its retry on glass, never an outline', () => {
+    it('ErrorCard offers its retry as the strong action, never an outline', () => {
         render(<ErrorCard message="We could not load this." onRetry={() => {}} />)
         const retry = screen.getByRole('button', { name: 'Retry' })
-        // Glass rule 4: a secondary control is a flat glass surface.
-        expect(retry.className).toContain('glass')
-        expect(retry.className).toContain('min-h-11')
+        // AUTM-1594: on a band card the action is ink (canvas v44 "Error").
+        expect(retry.className).toContain('bg-[var(--strong)]')
+        expect(retry.className).not.toContain('border')
+        expect(retry.className).toContain('min-h-12')
     })
 
     it('EmptyState paints a solid tile on the ladder, not a tint in a dashed box', () => {

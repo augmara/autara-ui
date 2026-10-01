@@ -2,6 +2,7 @@
 export {
     GradientBar,
     Button, buttonVariants, type ButtonProps,
+    IconButton, type IconButtonProps,
     Input, inputVariants, type InputProps,
     PhoneInput, DEFAULT_COUNTRIES, findCountryByIso, type PhoneInputProps, type PhoneCountry,
     Textarea, textareaVariants, type TextareaProps,

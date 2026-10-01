@@ -77,21 +77,24 @@ describe("Button — variant + size styling", () => {
      * every variant paints from a custom property (so it themes), and no two
      * variants collapse to the same look.
      */
+    // AUTM-1594: the sheet's variants. Legacy names are covered below.
     const VARIANTS = [
         "primary",
-        "dark",
-        "outline",
-        "secondary",
-        "destructive",
-        "acid",
+        "strong",
+        "quiet",
+        "ondeep",
+        "link",
+        "ghost",
     ] as const;
 
-    it.each(VARIANTS)("variant=%s paints from a theme token", (variant) => {
+    const FILLED = ["primary", "strong", "quiet", "ondeep"] as const;
+
+    it.each(FILLED)("variant=%s paints from a theme token", (variant) => {
         render(<Button variant={variant}>X</Button>);
         // bg-[var(--x)] or a themed palette utility (bg-rose-600) — either
         // way it must not be an ad-hoc literal.
         expect(screen.getByRole("button").className).toMatch(
-            /\bbg-(\[var\(--[a-z-]+\)\]|[a-z]+-\d{2,3})/,
+            /\bbg-\[(var\(--[a-z-]+\)|rgba\(255,255,255,0\.\d+\))\]/,
         );
     });
 
@@ -108,11 +111,12 @@ describe("Button — variant + size styling", () => {
      * wrap instead of overflowing at large text scale. The rendered height
      * at normal scale is unchanged; only the utility name moved.
      */
+    // AUTM-1594, canvas v44: sm 44, md 48, lg 52, icon a 44px disc.
     it.each([
-        ["sm", /\bmin-h-9\b/],
-        ["md", /\bmin-h-11\b/],
-        ["lg", /\bmin-h-12\b/],
-        ["icon", /\bh-10\b/],
+        ["sm", /\bmin-h-11\b/],
+        ["md", /\bmin-h-12\b/],
+        ["lg", /\bmin-h-13\b/],
+        ["icon", /\bsize-11\b/],
     ] as const)("size=%s applies the right height utility", (size, pattern) => {
         render(<Button size={size}>X</Button>);
         expect(screen.getByRole("button").className).toMatch(pattern);
@@ -120,7 +124,47 @@ describe("Button — variant + size styling", () => {
 
     it("size='default' resolves to size='md' (legacy alias)", () => {
         render(<Button size="default">X</Button>);
-        expect(screen.getByRole("button").className).toMatch(/\bmin-h-11\b/);
+        expect(screen.getByRole("button").className).toMatch(/\bmin-h-12\b/);
+    });
+
+    /**
+     * Each legacy name renders exactly as the sheet variant that does its job,
+     * so a consumer bump changes the look and nothing else. `destructive` is
+     * `strong`: the sheet has no red button.
+     */
+    it.each([
+        ["dark", "strong"],
+        ["destructive", "strong"],
+        ["light-destructive", "strong"],
+        ["acid", "primary"],
+        ["light-primary", "primary"],
+        ["outline", "quiet"],
+        ["secondary", "quiet"],
+        ["glass", "quiet"],
+        ["light", "quiet"],
+        ["light-outline", "quiet"],
+        ["light-secondary", "quiet"],
+        ["light-ghost", "ghost"],
+        ["light-link", "link"],
+    ] as const)("legacy variant=%s renders as %s", (legacy, sheet) => {
+        expect(buttonVariants({ variant: legacy })).toBe(buttonVariants({ variant: sheet }));
+    });
+
+    it("no variant paints a red fill", () => {
+        for (const v of ["destructive", "light-destructive"] as const) {
+            expect(buttonVariants({ variant: v })).not.toMatch(/rose|red|danger/);
+        }
+    });
+
+    it("primary is lime with ink, the sheet's one action", () => {
+        expect(buttonVariants()).toMatch(/bg-\[var\(--lime\)\]/);
+        expect(buttonVariants()).toMatch(/text-\[var\(--on-lime\)\]/);
+    });
+
+    it("link has no padding but keeps the 44px floor", () => {
+        const cls = buttonVariants({ variant: "link", size: "sm" });
+        expect(cls).toMatch(/\bpx-0\b/);
+        expect(cls).toMatch(/\bmin-h-11\b/);
     });
 
     it.each([
@@ -231,34 +275,67 @@ describe("Button — long labels at large text scale", () => {
         expect(buttonVariants({ size: "md" })).toMatch(/px-\[min\(/);
     });
 
-    it("keeps the icon size square and unshrinkable", () => {
+    it("keeps the icon disc square and unshrinkable", () => {
         const cls = buttonVariants({ size: "icon" });
-        expect(cls).toMatch(/\bh-10\b/);
-        expect(cls).toMatch(/\bw-10\b/);
+        expect(cls).toMatch(/\bsize-11\b/);
         expect(cls).toMatch(/\bshrink-0\b/);
     });
 });
 
 describe("buttonVariants — legacy CVA helper", () => {
     it("returns the same className as a rendered Button", () => {
-        const cls = buttonVariants({ variant: "primary", size: "md" });
-        expect(cls).toMatch(/accent-fill/);
-        expect(cls).toMatch(/\bmin-h-11\b/);
+        render(<Button variant="strong" size="lg">X</Button>);
+        expect(screen.getByRole("button").className).toBe(
+            buttonVariants({ variant: "strong", size: "lg" }),
+        );
     });
 
     it("defaults to primary + md when no opts provided", () => {
-        const cls = buttonVariants();
-        expect(cls).toMatch(/accent-fill/);
-        expect(cls).toMatch(/\bmin-h-11\b/);
+        expect(buttonVariants()).toBe(buttonVariants({ variant: "primary", size: "md" }));
+        expect(buttonVariants()).toMatch(/\bmin-h-12\b/);
     });
 
     it("resolves size='default' to md", () => {
-        const cls = buttonVariants({ size: "default" });
-        expect(cls).toMatch(/\bmin-h-11\b/);
+        expect(buttonVariants({ size: "default" })).toBe(buttonVariants({ size: "md" }));
     });
 
     it("appends a custom className", () => {
         const cls = buttonVariants({ className: "extra" });
         expect(cls).toMatch(/extra/);
+    });
+});
+
+describe("Button — busy (AUTM-1594)", () => {
+    it("keeps the label, shows a ring, and says it is busy", () => {
+        const { container } = render(<Button busy>Saving</Button>);
+        const btn = screen.getByRole("button", { name: "Saving" });
+        expect(btn).toHaveAttribute("aria-busy", "true");
+        expect(btn).toBeDisabled();
+        expect(container.querySelector(".animate-spin")).not.toBeNull();
+    });
+
+    it("puts the ring where the leading icon was", () => {
+        render(
+            <Button busy leadingIcon={<span data-testid="lead">L</span>}>
+                Save
+            </Button>,
+        );
+        expect(screen.queryByTestId("lead")).not.toBeInTheDocument();
+    });
+
+    it("does not fire onClick while busy", async () => {
+        const onClick = vi.fn();
+        render(
+            <Button busy onClick={onClick}>
+                Save
+            </Button>,
+        );
+        await userEvent.click(screen.getByRole("button"));
+        expect(onClick).not.toHaveBeenCalled();
+    });
+
+    it("stays at full strength rather than the disabled 45%", () => {
+        expect(buttonVariants()).toMatch(/aria-busy:disabled:opacity-100/);
+        expect(buttonVariants()).toMatch(/disabled:opacity-45/);
     });
 });
