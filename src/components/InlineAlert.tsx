@@ -17,9 +17,17 @@ import { cn } from '../lib/cn'
  * else is `role="status"` (polite). A success line must not shout. `role`
  * overrides it (AUTM-1472).
  *
- * `action` is a slot for the one thing the reader can do about it: a retry
- * button, a "sign in with email" switch, a link to the profile. Keep it to
- * one control; two is a decision the alert should not be asking for.
+ * `action` is a slot for what the reader can do about it: a retry button, a
+ * "sign in with email" switch, a link to the profile. Usually one control.
+ * Two when the reader genuinely has two ways forward, as the duplicate
+ * business warning does (AUTM-1253: "Continue" and "Sign in instead"); pass
+ * them in a fragment and they sit side by side, wrapping at large text.
+ * More than two is a decision the alert should not be asking for.
+ *
+ * One live region, never two (AUTM-1472). The root IS the region; nothing
+ * inside it carries a role. A consumer that needs the message assertive
+ * passes `role="alert"` rather than wrapping it in a second region, and one
+ * that already owns a region passes `role="none"`.
  */
 export type InlineAlertTone = 'info' | 'success' | 'warning' | 'error'
 
@@ -29,7 +37,7 @@ export interface InlineAlertProps {
     title?: string
     /** The body copy: specific and recoverable, never "Something went wrong". */
     children: ReactNode
-    /** One control the reader can act with. */
+    /** The control the reader can act with, or two in a fragment. */
     action?: ReactNode
     /** `data-testid` on the root, so a spec can assert the alert itself. */
     testId?: string
@@ -86,7 +94,7 @@ export function InlineAlert({
             >
                 {children}
             </div>
-            {action ? <div className="mt-1.5">{action}</div> : null}
+            {action ? <div className="mt-1.5 flex flex-wrap items-center gap-2.5">{action}</div> : null}
         </div>
     )
 }
