@@ -25,7 +25,7 @@ export const InPaymentSummary: Story = {
     name: 'In context — payment summary card',
     render: () => (
         <div className="w-[420px] rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)] p-5">
-            <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-subtle)]">
+            <p className="text-[0.75rem] font-medium text-[var(--text-subtle)]">
                 Payment
             </p>
             <div className="mt-2 divide-y divide-[var(--border-subtle)]">

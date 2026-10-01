@@ -162,6 +162,48 @@ export const Grouped: Story = {
     ),
 }
 
+/**
+ * AUTM-1483: the group labels on screen without a click. "This booking" and
+ * "Danger zone" render as written, in sentence case at 0.75rem and weight
+ * 500 with no letterspacing (the ListSection title treatment). They used to
+ * render as letterspaced capitals.
+ *
+ * `modal={false}` so the open menu does not lock the canvas, and kept off the
+ * docs page (`!autodocs`), where an open menu would sit over the other stories.
+ */
+export const GroupLabelsOpen: Story = {
+    name: 'Group labels, open (AUTM-1483)',
+    tags: ['!autodocs'],
+    render: () => (
+        <div className="min-h-[18rem]">
+            <DropdownMenu defaultOpen modal={false}>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                        Booking actions
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="min-w-[14rem]">
+                    <DropdownMenuLabel>This booking</DropdownMenuLabel>
+                    <DropdownMenuItem>
+                        <EyeIcon />
+                        View detail
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                        <CopyIcon />
+                        Copy invoice link
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuLabel>Danger zone</DropdownMenuLabel>
+                    <DropdownMenuItem className="text-[var(--color-autara-error)] data-[highlighted]:bg-[rgba(221,56,56,0.08)]">
+                        <TrashIcon />
+                        Cancel booking
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+        </div>
+    ),
+}
+
 // ─── Submenu — nested actions ──────────────────────────────────────
 export const WithSubmenu: Story = {
     name: 'Submenu — nested actions',
@@ -207,7 +249,7 @@ export const TableRowKebab: Story = {
     name: 'In context — table row kebab',
     render: () => (
         <div className="max-w-2xl rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)]">
-            <div className="grid grid-cols-[1fr_120px_120px_40px] items-center gap-4 border-b border-[var(--border-subtle)] px-5 py-3 text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+            <div className="grid grid-cols-[1fr_120px_120px_40px] items-center gap-4 border-b border-[var(--border-subtle)] px-5 py-3 text-[0.75rem] font-medium text-[var(--text-muted)]">
                 <span>Customer</span>
                 <span>Service</span>
                 <span>Time</span>

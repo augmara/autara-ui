@@ -188,7 +188,7 @@ export const MarketingFAQ: Story = {
     render: () => (
         <div className="max-w-3xl space-y-8">
             <div>
-                <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                <div className="text-[0.8125rem] font-medium text-[var(--text-muted)]">
                     Common questions
                 </div>
                 <h2 className="mt-2 text-3xl font-medium leading-tight text-[var(--text-strong)]">

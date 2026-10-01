@@ -77,7 +77,7 @@ export const WithForm: Story = {
                 </DialogHeader>
                 <div className="grid gap-3">
                     <label className="grid gap-1.5">
-                        <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                        <span className="text-[0.8125rem] font-medium text-[var(--text-muted)]">
                             Service name
                         </span>
                         <input
@@ -86,7 +86,7 @@ export const WithForm: Story = {
                         />
                     </label>
                     <label className="grid gap-1.5">
-                        <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                        <span className="text-[0.8125rem] font-medium text-[var(--text-muted)]">
                             Base price (AUD)
                         </span>
                         <input

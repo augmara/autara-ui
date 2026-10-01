@@ -155,6 +155,42 @@ export const Grouped: Story = {
     ),
 }
 
+/**
+ * AUTM-1483: the group labels on screen without a click. "Detail packages"
+ * and "Add-ons" render as written, in sentence case at 0.75rem and weight
+ * 500 with no letterspacing, matching DropdownMenuLabel. They used to render
+ * as letterspaced capitals.
+ *
+ * Kept off the docs page (`!autodocs`): an open Select is modal, so on the
+ * docs page it would block every other story until dismissed.
+ */
+export const GroupLabelsOpen: Story = {
+    name: 'Group labels, open (AUTM-1483)',
+    tags: ['!autodocs'],
+    render: () => (
+        <div className="max-w-sm min-h-[22rem]">
+            <Select defaultOpen>
+                <SelectTrigger>
+                    <SelectValue placeholder="Choose a service" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectGroup>
+                        <SelectLabel>Detail packages</SelectLabel>
+                        <SelectItem value="express">Express, 45 min</SelectItem>
+                        <SelectItem value="standard">Standard, 90 min</SelectItem>
+                    </SelectGroup>
+                    <SelectSeparator />
+                    <SelectGroup>
+                        <SelectLabel>Add-ons</SelectLabel>
+                        <SelectItem value="ceramic">Ceramic top-up</SelectItem>
+                        <SelectItem value="engine">Engine bay tidy</SelectItem>
+                    </SelectGroup>
+                </SelectContent>
+            </Select>
+        </div>
+    ),
+}
+
 // ─── Long list — proves scroll behaviour ───────────────────────────
 export const LongList: Story = {
     render: () => (
@@ -200,7 +236,7 @@ export const InOnboardingForm: Story = {
     render: () => (
         <form className="max-w-md space-y-4 rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)] p-6">
             <div>
-                <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                <div className="text-[0.8125rem] font-medium text-[var(--text-muted)]">
                     Step 2 of 5
                 </div>
                 <h3 className="mt-1 text-lg font-medium leading-tight text-[var(--text-strong)]">
@@ -208,7 +244,7 @@ export const InOnboardingForm: Story = {
                 </h3>
             </div>
             <label className="grid gap-1.5">
-                <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                <span className="text-[0.8125rem] font-medium text-[var(--text-muted)]">
                     State
                 </span>
                 <Select defaultValue="nsw">
@@ -225,7 +261,7 @@ export const InOnboardingForm: Story = {
                 </Select>
             </label>
             <label className="grid gap-1.5">
-                <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                <span className="text-[0.8125rem] font-medium text-[var(--text-muted)]">
                     Primary service area
                 </span>
                 <Select>

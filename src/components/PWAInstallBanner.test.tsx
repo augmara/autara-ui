@@ -580,3 +580,27 @@ describe('it obeys the type rules the library is judged on', () => {
         expect(src).toContain('bg-[var(--color-autara-purple)]')
     })
 })
+
+/**
+ * AUTM-1483. The eyebrow was 10px capitals tracked to 0.22em, the device the
+ * house rules retired (Don, 2026-09-03: "uppercase titles feel like AI
+ * slop"). `text-transform` inherits, so the whole ancestor chain is checked,
+ * not just the element that holds the words.
+ *
+ * Goes red if `uppercase` or a positive tracking class returns to the eyebrow
+ * or to any wrapper above it, or if the eyebrow leaves the 0.8125rem / 500
+ * eyebrow scale.
+ */
+describe('AUTM-1483: the eyebrow is sentence case', () => {
+    it('renders "Add to home screen" as written, on the eyebrow scale', () => {
+        show()
+        const eyebrow = screen.getByText('Add to home screen')
+        expect(eyebrow.className).toContain('text-[0.8125rem]')
+        expect(eyebrow.className).toContain('font-medium')
+        for (let node: HTMLElement | null = eyebrow; node; node = node.parentElement) {
+            const cls = typeof node.className === 'string' ? node.className : ''
+            expect(cls).not.toMatch(/\buppercase\b/)
+            expect(cls).not.toMatch(/\btracking-(?:wide|wider|widest)\b|\btracking-\[(?!-)[^\]]+\]/)
+        }
+    })
+})

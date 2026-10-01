@@ -42,8 +42,10 @@ export const WithDot: Story = {
   args: { tone: "success", dot: true, children: "Open now" },
 };
 
-/** All tones rendered together — the canonical chip vocabulary in the
- *  refreshed editorial weight (uppercase + tracked, brand-aligned ink). */
+/** All tones rendered together: the canonical chip vocabulary, in sentence
+ *  case at 0.8125rem and weight 500 with no letterspacing (AUTM-1483, at
+ *  canvas v44's size since AUTM-1594). Each label renders exactly as
+ *  written here. */
 export const Vocabulary: Story = {
   parameters: { layout: "padded" },
   render: () => (
@@ -90,8 +92,8 @@ export const SolidSemanticTones: Story = {
       {(["light", "dark"] as const).map((theme) => (
         <div key={theme} data-theme={theme}>
           <GradientGround className="min-h-[22rem] p-8">
-            <p className="mb-3 text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-[var(--text-subtle)]">
-              {theme} · metadata
+            <p className="mb-3 text-[0.75rem] font-medium text-[var(--text-subtle)]">
+              {theme === "dark" ? "Dark" : "Light"} · metadata
             </p>
             <div className="flex flex-wrap items-center gap-2">
               <MetaChip tone="neutral">Comes to you · 10km</MetaChip>
@@ -99,8 +101,8 @@ export const SolidSemanticTones: Story = {
               <MetaChip tone="glass">4 services</MetaChip>
             </div>
 
-            <p className="mt-6 mb-3 text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-[var(--text-subtle)]">
-              status
+            <p className="mt-6 mb-3 text-[0.75rem] font-medium text-[var(--text-subtle)]">
+              Status
             </p>
             <div className="flex flex-wrap items-center gap-2">
               <MetaChip tone="act">Awaiting you</MetaChip>
@@ -110,8 +112,8 @@ export const SolidSemanticTones: Story = {
               <MetaChip tone="money">Paid $612</MetaChip>
             </div>
 
-            <p className="mt-6 mb-3 text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-[var(--text-subtle)]">
-              pinned aliases · success = money, brand = act
+            <p className="mt-6 mb-3 text-[0.75rem] font-medium text-[var(--text-subtle)]">
+              Pinned aliases · success = money, brand = act
             </p>
             <div className="flex flex-wrap items-center gap-2">
               <MetaChip tone="success" dot>
@@ -142,15 +144,15 @@ export const BothThemesOnACard: Story = {
   render: () => (
     <div className="grid gap-6 lg:grid-cols-2">
       {[
-        { label: "light", theme: undefined },
-        { label: "dark", theme: "dark" as const },
+        { label: "Light", theme: undefined },
+        { label: "Dark", theme: "dark" as const },
       ].map((col) => (
         <div
           key={col.label}
           data-theme={col.theme}
           className="space-y-4 rounded-autara-lg bg-[var(--background)] p-5"
         >
-          <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+          <p className="text-[0.75rem] font-medium text-[var(--text-muted)]">
             {col.label}
           </p>
           <div className="rounded-autara-lg bg-[var(--surface)] p-5">

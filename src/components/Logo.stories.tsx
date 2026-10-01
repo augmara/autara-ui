@@ -23,7 +23,7 @@ export const InTopBar: Story = {
     render: () => (
         <div className="flex w-[640px] items-center gap-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)] px-4 py-3">
             <Logo className="h-6 w-auto text-[var(--text-strong)]" />
-            <span className="ml-auto text-[11px] uppercase tracking-[0.18em] text-[var(--text-muted)]">
+            <span className="ml-auto text-[0.75rem] text-[var(--text-muted)]">
                 Merchant portal
             </span>
         </div>

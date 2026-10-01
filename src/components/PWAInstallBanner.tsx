@@ -397,8 +397,11 @@ export function PWAInstallBanner({
                                 brand purple. `--color-autara-purple` resolves
                                 through `--accent-fill`, which is #6d3dd4 in
                                 dark and measures ~2.4:1 on `--surface` — the
-                                eyebrow was set in it, at 80% alpha on top. */}
-                            <p className="text-[0.625rem] font-medium uppercase tracking-[0.22em] text-[var(--accent)] mb-1.5">
+                                eyebrow was set in it, at 80% alpha on top.
+                                AUTM-1483: sentence case at 0.8125rem, weight
+                                500, no letterspacing (it was 10px capitals
+                                tracked to 0.22em). */}
+                            <p className="text-[0.8125rem] font-medium text-[var(--accent)] mb-1.5">
                                 {eyebrow}
                             </p>
                             {/* font-medium, not font-bold: Satoshi ships 400 /

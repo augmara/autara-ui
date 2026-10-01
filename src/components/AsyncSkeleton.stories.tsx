@@ -55,25 +55,25 @@ export const Gallery: Story = {
   render: () => (
     <div className="grid max-w-3xl gap-6 lg:grid-cols-2">
       <div>
-        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+        <p className="mb-2 text-[0.75rem] font-medium text-[var(--text-muted)]">
           list (default)
         </p>
         <AsyncSkeleton variant="list" />
       </div>
       <div>
-        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+        <p className="mb-2 text-[0.75rem] font-medium text-[var(--text-muted)]">
           card
         </p>
         <AsyncSkeleton variant="card" />
       </div>
       <div>
-        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+        <p className="mb-2 text-[0.75rem] font-medium text-[var(--text-muted)]">
           row
         </p>
         <AsyncSkeleton variant="row" count={4} />
       </div>
       <div>
-        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+        <p className="mb-2 text-[0.75rem] font-medium text-[var(--text-muted)]">
           text
         </p>
         <AsyncSkeleton variant="text" count={3} />

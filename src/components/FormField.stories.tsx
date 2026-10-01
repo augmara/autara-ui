@@ -187,7 +187,7 @@ export const InContextOnboardingStep: Story = {
             className="max-w-lg space-y-5 rounded-autara-lg border border-[var(--border-subtle)] bg-[var(--surface)] p-6"
             onSubmit={(e) => e.preventDefault()}
         >
-            <p className="text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-[var(--text-muted)]">
+            <p className="text-[0.8125rem] font-medium text-[var(--text-muted)]">
                 Step 2 of 7
             </p>
             <h2 className="text-2xl font-bold tracking-[-0.02em] text-[var(--text-strong)]">

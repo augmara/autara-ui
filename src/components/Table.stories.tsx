@@ -111,15 +111,15 @@ export const BothThemes: Story = {
     render: () => (
         <div className="grid gap-6 xl:grid-cols-2">
             {[
-                { label: 'light', theme: undefined },
-                { label: 'dark', theme: 'dark' as const },
+                { label: 'Light', theme: undefined },
+                { label: 'Dark', theme: 'dark' as const },
             ].map((col) => (
                 <div
                     key={col.label}
                     data-theme={col.theme}
                     className="space-y-3 rounded-autara-lg bg-[var(--background)] p-5"
                 >
-                    <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                    <p className="text-[0.75rem] font-medium text-[var(--text-muted)]">
                         {col.label}
                     </p>
                     <div className="rounded-autara-lg bg-[var(--surface)] p-2">
@@ -225,7 +225,7 @@ export const DefaultVsInkOnCream: Story = {
     render: () => (
         <div className="grid gap-6 xl:grid-cols-2">
             <div className="space-y-2">
-                <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                <p className="text-[0.75rem] font-medium text-[var(--text-muted)]">
                     Now — no theme prop
                 </p>
                 <Table>
@@ -246,7 +246,7 @@ export const DefaultVsInkOnCream: Story = {
                 </Table>
             </div>
             <div className="space-y-2">
-                <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                <p className="text-[0.75rem] font-medium text-[var(--text-muted)]">
                     Before — the ink treatment, on cream
                 </p>
                 <Table>

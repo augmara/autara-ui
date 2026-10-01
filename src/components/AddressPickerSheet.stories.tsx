@@ -256,7 +256,7 @@ export const InMerchantBusinessProfile: Story = {
 
         return (
             <div className="w-full max-w-[420px] rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)] p-5">
-                <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-subtle)]">
+                <p className="text-[0.8125rem] font-medium text-[var(--text-subtle)]">
                     Business profile
                 </p>
                 <h2 className="mt-1.5 text-xl font-bold text-[var(--text-strong)]">

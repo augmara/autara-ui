@@ -390,7 +390,7 @@ export const Tones: Story = {
                             <p className="text-sm leading-relaxed text-[var(--text-muted)]">
                                 Body copy at `--text-muted`.
                             </p>
-                            <p className="mt-2 text-[0.6875rem] uppercase tracking-[0.18em] text-[var(--text-subtle)]">
+                            <p className="mt-2 text-[0.75rem] text-[var(--text-subtle)]">
                                 Smallest ink on the surface
                             </p>
                         </PopoverBody>

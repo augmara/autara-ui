@@ -15,7 +15,8 @@ import { cn } from '../lib/cn'
  *   blur (Autara house rule).
  * - **Item**: muted text → ink on hover/focus; checked item carries a
  *   brand-purple tint + Solar Bold check on the right.
- * - **Label / Separator**: editorial uppercase eyebrow / `--border-subtle`
+ * - **Label / Separator**: sentence-case group title (0.75rem, weight
+ *   500, `--text-muted`, no letterspacing; AUTM-1483) / `--border-subtle`
  *   hairline.
  *
  * The `theme` prop on Trigger and Content is preserved for source-
@@ -161,8 +162,9 @@ const SelectLabel = React.forwardRef<
     <SelectPrimitive.Label
         ref={ref}
         className={cn(
-            // Editorial eyebrow — matches the rest of the design system.
-            'px-3 pb-1 pt-2 text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]',
+            // AUTM-1483: sentence-case group title, matching DropdownMenuLabel
+            // and the ListSection title. Rendered as written, in rem.
+            'px-3 pb-1 pt-2 text-[0.75rem] font-medium text-[var(--text-muted)]',
             className
         )}
         {...props}

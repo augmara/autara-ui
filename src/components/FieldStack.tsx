@@ -11,7 +11,9 @@ import { cn } from '../lib/cn'
  * `.field-input`.
  *
  * Visual rules — see `utilities/forms.css` § Field stack:
- *   - Cell = uppercase eyebrow micro-label + borderless input.
+ *   - Cell = sentence-case micro-label (0.75rem, weight 500, no
+ *     letterspacing; AUTM-1483) + borderless input. The label is styled
+ *     by `.field-stack-label` in forms.css, not by a class here.
  *   - Focus: cell tints warm-cream + 3px inset brand-purple bar
  *     (this grammar's stand-in for the 4px halo, which would clip
  *     against the container's `overflow: hidden`).

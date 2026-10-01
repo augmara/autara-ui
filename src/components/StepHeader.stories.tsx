@@ -11,6 +11,9 @@ export default meta;
 
 type Story = StoryObj<typeof StepHeader>;
 
+/** AUTM-1483: the eyebrow reads "Business details" as written, at 0.8125rem
+ *  and weight 500 with no letterspacing. It used to render as 11px
+ *  letterspaced capitals. */
 export const Default: Story = {
   args: {
     eyebrow: "Business details",

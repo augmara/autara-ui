@@ -43,12 +43,15 @@ function Demo({
     aspect,
     cropShape,
     title,
+    defaultOpen = false,
 }: {
     aspect: number
     cropShape?: 'rect' | 'round'
     title: string
+    /** Open on load, so the dialog's own chrome is visible without a click. */
+    defaultOpen?: boolean
 }) {
-    const [open, setOpen] = React.useState(false)
+    const [open, setOpen] = React.useState(defaultOpen)
     const [src, setSrc] = React.useState<string | null>(SAMPLE_IMAGE)
     const [resultUrl, setResultUrl] = React.useState<string | null>(null)
     const fileRef = React.useRef<HTMLInputElement>(null)
@@ -87,7 +90,7 @@ function Demo({
 
             {resultUrl ? (
                 <figure className="flex flex-col gap-2">
-                    <figcaption className="text-[11px] font-medium uppercase tracking-[0.16em] text-[var(--text-subtle)]">
+                    <figcaption className="text-[0.75rem] font-medium text-[var(--text-subtle)]">
                         Cropped result
                     </figcaption>
                     <img
@@ -127,6 +130,20 @@ export const ProfilePicture: Story = {
 
 export const CoverBanner: Story = {
     render: () => <Demo aspect={16 / 9} title="Crop your cover photo" />,
+}
+
+/**
+ * AUTM-1483: opens on load so the zoom control's label is on screen without a
+ * click. It reads "Zoom" in sentence case at 0.75rem and weight 500, with no
+ * letterspacing; it used to render as letterspaced ZOOM at a fixed 11px.
+ *
+ * Kept off the docs page (`!autodocs`): an open modal there would cover the
+ * page and trap focus in it. Open it from the sidebar, and check both themes.
+ */
+export const OpenZoomLabel: Story = {
+    name: 'Open: the zoom label (AUTM-1483)',
+    tags: ['!autodocs'],
+    render: () => <Demo aspect={4 / 3} title="Crop your photo" defaultOpen />,
 }
 
 /**

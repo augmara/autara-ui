@@ -42,7 +42,7 @@ export const InContext: Story = {
                     <a href="#bookings" />
                 </BackButton>
             </div>
-            <div className="text-micro font-medium uppercase tracking-[0.22em] text-[var(--text-muted)]">
+            <div className="text-[0.8125rem] font-medium text-[var(--text-muted)]">
                 Booking #EF51E4
             </div>
             <h1 className="mt-2 text-3xl font-bold tracking-[-0.03em] text-[var(--text-strong)]">

@@ -8,7 +8,9 @@ import { Button } from "./Button";
  * for marketing / conversion forms (waitlist, lead capture).
  *
  * Visual rules:
- *   - Uppercase eyebrow micro-label + borderless input per cell.
+ *   - Sentence-case micro-label + borderless input per cell. The label
+ *     renders as written, at 0.75rem and weight 500 with no letterspacing
+ *     (AUTM-1483; `.field-stack-label` used to set 11px capitals).
  *   - Focus: warm-cream cell tint + 3px inset brand-purple bar — this
  *     grammar's stand-in for the 4px halo (which would clip against
  *     the container's `overflow: hidden`).
@@ -152,7 +154,7 @@ export const InWaitlistPanel: Story = {
   render: () => (
     <form className="max-w-md space-y-4" noValidate>
       <div>
-        <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+        <div className="text-[0.8125rem] font-medium text-[var(--text-muted)]">
           Launching soon
         </div>
         <h3 className="mt-1 text-lg font-medium leading-tight text-[var(--text-strong)]">

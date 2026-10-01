@@ -32,7 +32,7 @@ type Story = StoryObj
 
 const Panel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <div className="space-y-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)] p-5">
-        <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+        <div className="text-[0.75rem] font-medium text-[var(--text-muted)]">
             Trigger
         </div>
         <div className="flex flex-wrap gap-2">{children}</div>
@@ -194,7 +194,7 @@ const PositionTile: React.FC<{ pos: ToastPosition }> = ({ pos }) => {
     const { addToast } = useToast()
     return (
         <div className="space-y-2 rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)] p-4">
-            <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+            <div className="text-[0.75rem] font-medium text-[var(--text-muted)]">
                 {pos}
             </div>
             <Button
@@ -326,7 +326,7 @@ export const LightVariant: Story = {
     render: () => (
         <ToastProvider variant="light">
             <div className="space-y-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)] p-5">
-                <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                <div className="text-[0.75rem] font-medium text-[var(--text-muted)]">
                     Trigger — provider variant="light"
                 </div>
                 <LightTriggers />

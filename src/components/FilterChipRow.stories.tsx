@@ -101,8 +101,8 @@ export const BothThemes: Story = {
         return (
             <div className="grid gap-6 lg:grid-cols-2">
                 <div className="space-y-3 rounded-autara-lg bg-[var(--background)] p-5">
-                    <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
-                        light
+                    <p className="text-[0.75rem] font-medium text-[var(--text-muted)]">
+                        Light
                     </p>
                     <FilterChipRow options={STATUS_OPTIONS} value={light} onChange={setLight} />
                 </div>
@@ -110,8 +110,8 @@ export const BothThemes: Story = {
                     data-theme="dark"
                     className="space-y-3 rounded-autara-lg bg-[var(--background)] p-5"
                 >
-                    <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
-                        dark
+                    <p className="text-[0.75rem] font-medium text-[var(--text-muted)]">
+                        Dark
                     </p>
                     <FilterChipRow options={STATUS_OPTIONS} value={dark} onChange={setDark} />
                 </div>
@@ -133,7 +133,7 @@ export const FocusRing: Story = {
         const [value, setValue] = useState<string | null>('CONFIRMED')
         return (
             <div className="w-[640px] space-y-3">
-                <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                <p className="text-[0.75rem] font-medium text-[var(--text-muted)]">
                     Tab in, then arrow across
                 </p>
                 <FilterChipRow options={STATUS_OPTIONS} value={value} onChange={setValue} />

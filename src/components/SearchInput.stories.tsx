@@ -51,7 +51,7 @@ export const InToolbar: Story = {
                     value={q}
                     onChange={(e) => setQ(e.target.value)}
                 />
-                <div className="text-[11px] uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                <div className="text-[0.75rem] text-[var(--text-muted)]">
                     {q ? `Filtering by "${q}"` : 'No filter active'}
                 </div>
             </div>

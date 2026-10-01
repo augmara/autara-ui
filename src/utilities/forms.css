@@ -214,8 +214,8 @@
  * The grouped-card form grammar for marketing / conversion forms
  * (waitlist, lead capture): every field lives inside ONE hairline
  * container with internal hairline dividers — the stack IS the card,
- * so never nest it inside another bordered panel. Each cell carries an
- * uppercase eyebrow micro-label + a borderless input.
+ * so never nest it inside another bordered panel. Each cell carries a
+ * sentence-case micro-label + a borderless input.
  *
  * Focus signature: the whole cell tints warm-cream and gets a 3px
  * inset brand-purple bar. (The canonical 4px halo would clip against
@@ -255,12 +255,15 @@
     box-shadow: inset 3px 0 0 var(--accent);
 }
 
+/* AUTM-1483: sentence case, weight 500, no letterspacing, in rem so it
+ * scales with OS text size. It was 11px capitals tracked to 0.14em, which
+ * the house rules retired (Don, 2026-09-03). This rule is where FieldStack's
+ * caps came from: the component sets only the class, so a scan of the
+ * compiled components could never see them. */
 .field-stack-label {
     display: block;
-    font-size: 11px;
+    font-size: 0.75rem;
     font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
     color: var(--text-subtle);
     transition: color 150ms ease;
 }

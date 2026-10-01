@@ -3,7 +3,8 @@ import { SectionHeading } from "./SectionHeading";
 
 /**
  * v3 (AUTM-837): the editorial variant's eyebrow renders with NO hairline
- * tick - eyebrows are plain uppercase tracked labels platform-wide. The new
+ * tick. AUTM-1483: both eyebrows are plain sentence-case labels, rendered as
+ * written at 0.8125rem and weight 500 with no letterspacing. The new
  * `size="lg"` gives content sections (merchant profile) a middle register
  * between the compact default and the editorial display clamp.
  */

@@ -18,7 +18,10 @@ import { cn } from "../lib/cn";
  */
 
 export interface CarouselHeaderProps {
-  /** Uppercase tracked label, e.g. "RECOMMENDED", "NEW ON AUTARA". */
+  /**
+   * Short sentence-case label, rendered as written, e.g. "Recommended",
+   * "New on Autara". Pass natural case: nothing transforms it (AUTM-1483).
+   */
   eyebrow: string;
   title: string;
   description?: string;
@@ -54,15 +57,16 @@ export function CarouselHeader({
       )}
     >
       <div className="min-w-0">
-        {/* v3: eyebrow with no tick (Don 2026-08-26) */}
-        <p className="inline-flex items-center gap-3 text-[11px] font-medium uppercase tracking-[0.22em] text-[var(--text-muted)]">
+        {/* v3: eyebrow with no tick (Don 2026-08-26). AUTM-1483: sentence
+            case at 0.8125rem, weight 500, no letterspacing. */}
+        <p className="inline-flex items-center gap-3 text-[0.8125rem] font-medium text-[var(--text-muted)]">
           {eyebrow}
         </p>
-        <h2 className="mt-2 text-[28px] font-bold leading-tight tracking-[-0.025em] text-[var(--text-strong)] sm:text-[34px]">
+        <h2 className="mt-2 text-[1.75rem] font-bold leading-tight tracking-[-0.025em] text-[var(--text-strong)] sm:text-[2.125rem]">
           {title}
         </h2>
         {description ? (
-          <p className="mt-1.5 max-w-xl text-sm text-[var(--text-muted)] sm:text-[15px]">
+          <p className="mt-1.5 max-w-xl text-sm text-[var(--text-muted)] sm:text-[0.9375rem]">
             {description}
           </p>
         ) : null}
@@ -84,7 +88,7 @@ export function CarouselHeader({
           </div>
         )}
         {seeAll ? (
-          <div className="text-[13px] font-medium text-[var(--text-strong)]">
+          <div className="text-[0.8125rem] font-medium text-[var(--text-strong)]">
             {seeAll}
           </div>
         ) : null}

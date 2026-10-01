@@ -36,16 +36,19 @@ import { cn } from '../lib/cn'
  * COLOUR — `--neutral-fill`, deliberately achromatic. Rule 5 assigns purple
  * to ACTS, aqua to IN FLIGHT and lime to DONE; a delivery mode is none of
  * those, and spending an accent on it would dilute the meaning that rule is
- * establishing. MOBILE and IN-SHOP are also not coloured differently FROM
+ * establishing. Mobile and In-shop are also not coloured differently FROM
  * EACH OTHER on purpose: the glyph and the word already carry it, and a
  * second colour language is a thing the merchant would have to learn for
  * information they can already read.
  *
- * TYPE — uppercase and tracked is kept. That is the house chip grammar
- * (`MetaChip`, the editorial eyebrow), and letterspacing helps rather than
- * hurts uppercase, which has no ascender/descender profile to read by. The
- * legibility fix is the part that was actually broken: size off the pixel
- * floor, weight 500, and a fill measuring ~11:1 under its label.
+ * TYPE: sentence case, weight 500, no letterspacing (AUTM-1483). This note
+ * used to keep uppercase and tracking as "the house chip grammar". The house
+ * retired that grammar (Don, 2026-09-03: "uppercase titles feel like AI
+ * slop"), and Badge, Toast, ListSection and StatTile had already dropped it,
+ * so the chip disagreed with the rest of the library. The label renders as
+ * written, "Mobile" or "In-shop", on the 12px / 13px rem scale those
+ * components use. The legibility work from AUTM-969 stands: rem sizes off the
+ * pixel floor, weight 500, and a fill measuring ~11:1 under its label.
  *
  * Glyphs are inlined Solar Linear-style paths — autara-ui must not depend on
  * `@solar-icons/react`.
@@ -80,10 +83,11 @@ export interface ModeChipProps {
  * `whitespace-nowrap` and `shrink-0`, and they are not the mistake AUTM-915
  * corrected — they are its opposite, for a different kind of label.
  *
- * "IN-SHOP" contains a hyphen, which is a line-break opportunity. In a booking
- * row that flexbox is squeezing, the chip took it and rendered as "IN-" over
- * "SHOP": a two-line status marker beside a one-line price. Reported from a
- * screenshot.
+ * "In-shop" contains a hyphen, which is a line-break opportunity. In a booking
+ * row that flexbox is squeezing, the chip took it and rendered as "In-" over
+ * "shop": a two-line status marker beside a one-line price. Reported from a
+ * screenshot, when the label was still set in capitals. Sentence case does
+ * not change this: the hyphen is still the only break point.
  *
  * AUTM-915 REMOVED `whitespace-nowrap` from Button so a multi-word label could
  * wrap instead of overflowing at 200% text scale. That was right there and is
@@ -124,9 +128,16 @@ const ShopGlyph = () => (
 /** Every spelling of "the customer comes to us" the platform has shipped. */
 const SHOP_MODES = new Set(['IN_SHOP', 'FIXED_LOCATION', 'WORKSHOP', 'SHOP'])
 
+/*
+ * AUTM-1483: one rem step up from the capitals. A sentence-case word at 11px
+ * sets visibly smaller than the same word in capitals, so `sm` moves to
+ * 0.75rem (the size of the status Badge it sits under in a booking row) and
+ * `md` to 0.8125rem. Both are on the 12px / 13px scale ListSection and
+ * StatTile use.
+ */
 const SIZES = {
-    sm: 'gap-1 px-2 py-[0.1875rem] text-[0.6875rem]',
-    md: 'gap-1.5 px-2.5 py-1 text-[0.75rem]',
+    sm: 'gap-1 px-2 py-[0.1875rem] text-[0.75rem]',
+    md: 'gap-1.5 px-2.5 py-1 text-[0.8125rem]',
 } as const
 
 export function ModeChip({ mode, size = 'md', iconOnly = false, className }: ModeChipProps) {
@@ -156,7 +167,7 @@ export function ModeChip({ mode, size = 'md', iconOnly = false, className }: Mod
              * `src/tokens/neutral-contrast.test.ts`.
              */
             className={cn(
-                'inline-flex shrink-0 items-center whitespace-nowrap rounded-autara-sm bg-[var(--neutral-fill)] font-medium uppercase tracking-[0.08em] text-[var(--on-neutral)]',
+                'inline-flex shrink-0 items-center whitespace-nowrap rounded-autara-sm bg-[var(--neutral-fill)] font-medium text-[var(--on-neutral)]',
                 SIZES[size],
                 className,
             )}

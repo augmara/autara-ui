@@ -153,7 +153,10 @@ export function ImageCropDialog({
                 </div>
 
                 <div className="mt-4 flex items-center gap-3">
-                    <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-[var(--text-subtle)]">
+                    {/* AUTM-1483: sentence case at 0.75rem, weight 500, no
+                        letterspacing. It was 11px letterspaced capitals,
+                        pinned in px against OS text scaling. */}
+                    <span className="text-[0.75rem] font-medium text-[var(--text-subtle)]">
                         Zoom
                     </span>
                     <input

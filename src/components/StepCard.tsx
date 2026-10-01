@@ -9,7 +9,8 @@ import { cn } from "../lib/cn";
  *
  * Visual:
  *   - Massive numeral (~4–4.5rem, clamp-scaled) top-left in `text-strong`
- *   - "STEP X / TOTAL" top-right, uppercase tracked-out
+ *   - "Step X / 0N" top-right, sentence case at 0.75rem, weight 500, no
+ *     letterspacing (AUTM-1483; it was 10px letterspaced capitals)
  *   - Heading (24/28px), body copy (15px)
  *   - Bullet chips at the bottom — small purple bullet + label
  *   - Hover: bottom-left purple wash + bottom border sweep + numeral
@@ -23,7 +24,7 @@ import { cn } from "../lib/cn";
 export interface StepCardProps {
   /** 1-based step index (renders as "01", "02", etc.). */
   step: number;
-  /** Total steps (for the "STEP X / TOTAL" eyebrow). Default 3. */
+  /** Total steps (for the "Step X / 0N" label). Default 3. */
   total?: number;
   title: string;
   description: string;
@@ -75,7 +76,7 @@ export function StepCard({
           >
             {String(step).padStart(2, "0")}
           </span>
-          <span className="text-[10px] font-medium uppercase tracking-[0.22em] text-[var(--text-subtle)]">
+          <span className="text-[0.75rem] font-medium text-[var(--text-subtle)]">
             Step {step} / {String(total).padStart(2, "0")}
           </span>
         </div>
@@ -83,7 +84,7 @@ export function StepCard({
         <h3 className="mb-4 text-2xl font-bold tracking-[-0.02em] text-[var(--text-strong)] lg:text-[1.75rem]">
           {title}
         </h3>
-        <p className="max-w-sm text-[15px] leading-[1.65] text-[var(--text-muted)]">
+        <p className="max-w-sm text-[0.9375rem] leading-[1.65] text-[var(--text-muted)]">
           {description}
         </p>
 
@@ -94,7 +95,7 @@ export function StepCard({
             {chips.map((chip) => (
               <span
                 key={chip}
-                className="inline-flex items-center gap-1.5 rounded-full bg-[var(--text-strong)]/[0.05] px-2.5 py-1 text-[11px] font-medium text-[var(--text-muted)]"
+                className="inline-flex items-center gap-1.5 rounded-full bg-[var(--text-strong)]/[0.05] px-2.5 py-1 text-[0.6875rem] font-medium text-[var(--text-muted)]"
               >
                 <span
                   aria-hidden="true"

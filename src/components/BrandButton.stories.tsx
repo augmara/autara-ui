@@ -120,7 +120,7 @@ export const Matrix: Story = {
         ["primary", "outline", "ghost", "secondary", "destructive"] as const
       ).map((variant) => (
         <div key={variant} className="flex items-center gap-3">
-          <div className="w-24 text-xs uppercase tracking-wider text-[var(--text-muted)]">
+          <div className="w-24 text-xs text-[var(--text-muted)]">
             {variant}
           </div>
           <BrandButton variant={variant} size="sm">

@@ -9,7 +9,8 @@ import { StatTile, type StatTone } from './StatTile'
  *
  * Aesthetic:
  *   - Hairline-bordered tiles on the cream canvas
- *   - Tiny uppercase editorial label (`text-[10px] tracking-[0.14em]`)
+ *   - Sentence-case label from `StatTile` (0.8125rem, weight 500, no
+ *     letterspacing since AUTM-1161)
  *   - Bold tabular-nums value
  *   - No drop shadow (Autara house rule)
  *   - 2 columns on phone (always); collapses neatly into 1×N rows on

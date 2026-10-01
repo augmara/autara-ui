@@ -128,7 +128,7 @@ export const InCardSurface: Story = {
     name: 'In context — inside a Card surface',
     render: () => (
         <div className="max-w-xl rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)] p-6">
-            <div className="mb-1 text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+            <div className="mb-1 text-[0.8125rem] font-medium text-[var(--text-muted)]">
                 Merchant detail
             </div>
             <h3 className="mb-4 text-lg font-medium text-[var(--text-strong)]">
@@ -180,7 +180,7 @@ export const FocusOnTheActiveTab: Story = {
     parameters: { layout: 'padded' },
     render: () => (
         <div className="max-w-xl space-y-3">
-            <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+            <p className="text-[0.75rem] font-medium text-[var(--text-muted)]">
                 Tab in, then arrow across
             </p>
             <Tabs defaultValue="today">
@@ -218,15 +218,15 @@ export const BothThemes: Story = {
     render: () => (
         <div className="grid gap-6 lg:grid-cols-2">
             {[
-                { label: 'light', theme: undefined },
-                { label: 'dark', theme: 'dark' as const },
+                { label: 'Light', theme: undefined },
+                { label: 'Dark', theme: 'dark' as const },
             ].map((col) => (
                 <div
                     key={col.label}
                     data-theme={col.theme}
                     className="space-y-4 rounded-autara-lg bg-[var(--background)] p-5"
                 >
-                    <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                    <p className="text-[0.75rem] font-medium text-[var(--text-muted)]">
                         {col.label}
                     </p>
                     <Tabs defaultValue="today">

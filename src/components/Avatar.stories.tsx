@@ -48,7 +48,7 @@ export const Sizes: Story = {
                     <Avatar size={size}>
                         <AvatarFallback>DR</AvatarFallback>
                     </Avatar>
-                    <span className="text-[0.6875rem] uppercase tracking-[0.18em] text-[var(--text-subtle)]">
+                    <span className="text-[0.75rem] text-[var(--text-subtle)]">
                         {size}
                     </span>
                 </div>
@@ -124,8 +124,8 @@ export const ThemedGround: Story = {
     render: () => (
         <div className="grid gap-6 sm:grid-cols-3">
             {[
-                { label: 'default · light', theme: undefined, opt: undefined },
-                { label: 'default · dark', theme: 'dark' as const, opt: undefined },
+                { label: 'Default · light', theme: undefined, opt: undefined },
+                { label: 'Default · dark', theme: 'dark' as const, opt: undefined },
                 { label: 'theme="dark" on cream', theme: undefined, opt: 'dark' as const },
             ].map((col) => (
                 <div
@@ -133,7 +133,7 @@ export const ThemedGround: Story = {
                     data-theme={col.theme}
                     className="space-y-3 rounded-autara-lg bg-[var(--background)] p-5"
                 >
-                    <p className="text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                    <p className="text-[0.75rem] font-medium text-[var(--text-muted)]">
                         {col.label}
                     </p>
                     <div className="flex items-center gap-3 rounded-autara-lg bg-[var(--surface)] p-4">
