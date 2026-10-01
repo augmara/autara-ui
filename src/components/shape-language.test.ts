@@ -59,6 +59,8 @@ const KEEPS: Record<string, string> = {
     'Tabs.tsx': 'the segmented track and its pills, canvas v44 "Segmented" (AUTM-1594)',
     'FilterChipRow.tsx': 'filter chips are pills on canvas v44 (AUTM-1594), superseding the 8px chip rung',
     'ChoiceCard.tsx': 'the 40px icon disc beside the label, a glyph in a circle like StepCard (AUTM-1594)',
+    'MetaChip.tsx': 'meta chips are 28px pills on canvas v44 (AUTM-1594), superseding the 8px chip rung',
+    'StatusDot.tsx': 'the 8px state light itself (AUTM-1594), the meaning round was reserved for',
 }
 
 /**
@@ -162,13 +164,13 @@ describe('round means a person, a state light, or a status marker — never an a
      * thing Don flagged: a fully-round purple button sitting next to a
      * rounded-rectangle input.
      */
-    it.each([
-        ['MetaChip.tsx', 'rounded-autara-sm'],
-    ])('%s carries %s, and any round left on it is a dot', (file, radius) => {
+    /* AUTM-1594: MetaChip and FilterChipRow, the last two on this list, are
+     * pills on canvas v44 and are now in KEEPS with that reason. The list
+     * is empty rather than deleted so the next family that pins a corner
+     * here has the shape to follow. */
+    it.each([] as Array<[string, string]>)('%s carries %s, and any round left on it is a dot', (file, radius) => {
         const text = readFileSync(join(DIR, file), 'utf8')
         expect(code(text)).toContain(radius)
-        // MetaChip keeps a round STATUS DOT, and should — that is the
-        // reserved meaning, not a leftover. The container is what had to move.
         expect(roundNonDots(text)).toEqual([])
     })
 

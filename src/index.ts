@@ -49,6 +49,7 @@ export {
     // v1.1.0 — promoted from autara-customer-web
     BrandButton, brandButtonVariants, type BrandButtonProps,
     MetaChip, type MetaChipProps,
+    StatusDot, type StatusDotProps, type StatusDotTone,
     OtpInput, type OtpInputProps,
     RatingStars, type RatingStarsProps,
     EmptyState, type EmptyStateProps,

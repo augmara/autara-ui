@@ -70,6 +70,8 @@ describe('Autara Web palette', () => {
             ['on-aqua', 'aqua'],
             ['on-amber', 'amber'],
             ['on-selected', 'selected'],
+            ['on-danger-fill', 'danger-fill'],
+            ['on-alert', 'alert'],
         ]
         for (const [label, fill] of labels) {
             it(`${theme}: --${label} reads on --${fill}`, () => {
@@ -79,6 +81,7 @@ describe('Autara Web palette', () => {
 
         it(`${theme}: the open dot and the field edge are visible on paper`, () => {
             expect(ratio('positive', 'paper', theme)).toBeGreaterThanOrEqual(NON_TEXT)
+            expect(ratio('caution', 'paper', theme)).toBeGreaterThanOrEqual(NON_TEXT)
             expect(ratio('field-edge', 'paper', theme)).toBeGreaterThanOrEqual(NON_TEXT)
         })
 

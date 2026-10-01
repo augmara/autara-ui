@@ -165,12 +165,16 @@
      *   selected switch, check, radio, chosen chip
      *   brand   pending and confirmed       brand-deep  selected, hero
      *   lime    primary action, done        aqua    in flight
-     *   amber   awaiting customer           danger  text and field borders ONLY
-     *   positive the open dot
+     *   amber   awaiting customer           danger  text and field borders
+     *   positive the open dot               caution the closing-soon dot
+     *   danger-fill  the merchant's Cancelled status pill, the one red fill
+     *   alert   the count on the bell and the dock
      *
      * Rules that ride with them: lime is never placed on band (1.03:1), the
      * action there is strong; danger is never a fill, so there are no red
-     * buttons; no shadows, depth is the step between paper, band and raised. */
+     * buttons (the merchant's Cancelled pill is a status, not an action, and
+     * is the one place --danger-fill appears); no shadows, depth is the step
+     * between paper, band and raised. */
     --paper: #ffffff;
     --band: #f4f2ec;
     --band-press: #e9e6dc;
@@ -195,6 +199,11 @@
     --on-amber: #ffffff;
     --danger: #b42318;
     --positive: #0f9d58;
+    --caution: #b4760e;
+    --danger-fill: #b42318;
+    --on-danger-fill: #ffffff;
+    --alert: #e11d48;
+    --on-alert: #ffffff;
     --hairline: rgba(17, 24, 39, 0.08);
     /* Inputs, the code boxes and the mobile social button: one legible edge. */
     --field-edge: rgba(14, 10, 26, 0.48);
@@ -352,6 +361,11 @@
     --on-amber: #ffffff;
     --danger: #ff8f86;
     --positive: #3ddc84;
+    --caution: #b4760e;
+    --danger-fill: #b42318;
+    --on-danger-fill: #ffffff;
+    --alert: #e11d48;
+    --on-alert: #ffffff;
     --hairline: rgba(255, 255, 255, 0.1);
     --field-edge: rgba(255, 255, 255, 0.48);
 }
@@ -439,6 +453,11 @@
     --color-on-amber: var(--on-amber);
     --color-danger: var(--danger);
     --color-positive: var(--positive);
+    --color-caution: var(--caution);
+    --color-danger-fill: var(--danger-fill);
+    --color-on-danger-fill: var(--on-danger-fill);
+    --color-alert: var(--alert);
+    --color-on-alert: var(--on-alert);
     --color-hairline: var(--hairline);
     --color-field-edge: var(--field-edge);
 }

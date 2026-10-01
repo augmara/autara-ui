@@ -156,6 +156,7 @@ export {
 // ─── v1.1.0 promotions from autara-customer-web ──────────────────────────
 export { BrandButton, brandButtonVariants, type BrandButtonProps } from './BrandButton'
 export { MetaChip, type MetaChipProps } from './MetaChip'
+export { StatusDot, type StatusDotProps, type StatusDotTone } from './StatusDot'
 export { RatingStars, type RatingStarsProps } from './RatingStars'
 export { EmptyState, type EmptyStateProps } from './EmptyState'
 export { LockedFeature, type LockedFeatureProps } from './LockedFeature'

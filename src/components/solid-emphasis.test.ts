@@ -137,10 +137,14 @@ describe('the specific outlines this sweep removed stay removed', () => {
     })
 
     it('Badge default is a solid fill, not a hairline box', () => {
+        // AUTM-1594: the default tone is the sheet's band; every tone is
+        // declared in one TONES table, and none carries a border or ring.
         const s = source('Badge.tsx')
-        const def = /\n\s*default:\s*\n?\s*'([^']*)'/.exec(s)?.[1] ?? ''
-        expect(def).toContain('--neutral-fill')
-        expect(def).not.toMatch(/\bborder\b|\bring-/)
+        expect(s).toMatch(/defaultVariants:\s*{\s*variant:\s*'band'/)
+        expect(s).toContain("band: `${PILL} bg-[var(--band)] text-[var(--text-strong)]`")
+        const tones = /const TONES[\s\S]*?\n}/.exec(s)?.[0] ?? ''
+        expect(tones).not.toBe('')
+        expect(tones).not.toMatch(/\bborder\b|\bring-/)
     })
 })
 
@@ -179,9 +183,10 @@ describe('the replacements are actually solid', () => {
         expect(s).toContain('data-[state=active]:text-[var(--text-strong)]')
     })
 
-    it('MetaChip neutral takes the achromatic solid added for it', () => {
+    it('MetaChip neutral is the sheet\'s band with ink', () => {
+        // AUTM-1594: canvas v44 "Default and meta" draws meta chips on band.
         expect(source('MetaChip.tsx')).toContain(
-            'neutral: "bg-[var(--neutral-fill)] text-[var(--on-neutral)]"'
+            'neutral: "bg-[var(--band)] text-[var(--text-strong)]"'
         )
     })
 
