@@ -3,6 +3,10 @@ import { FormField } from './FormField'
 import { Input } from './Input'
 import { Textarea } from './Textarea'
 import { Button } from './Button'
+import { OtpInput } from './OtpInput'
+import { PickerTrigger } from './PickerTrigger'
+import { DurationPicker } from './DurationPicker'
+import type { ReactNode } from 'react'
 
 /**
  * FormField — label + control + description + error, wired together.
@@ -217,5 +221,84 @@ export const InContextOnboardingStep: Story = {
                 Continue
             </Button>
         </form>
+    ),
+}
+
+function Specimen({ name, component, note, children }: { name: string; component: string; note?: string; children: ReactNode }) {
+    return (
+        <div className="flex min-w-0 flex-col gap-2.5">
+            <div className="flex items-baseline justify-between gap-3">
+                <span className="text-[0.9375rem] leading-[normal] font-bold">{name}</span>
+                <code className="font-mono text-xs text-[var(--text-subtle)]">{component}</code>
+            </div>
+            <div className="flex flex-wrap items-center gap-2.5">{children}</div>
+            {note && <span className="text-[0.8125rem] leading-[1.45] text-[var(--text-subtle)]">{note}</span>}
+        </div>
+    )
+}
+
+/**
+ * AUTM-1594 — the sheet's Fields section, laid out at its geometry (1440,
+ * 80px gutters, three columns) so it can be overlaid on UiComponents and
+ * UiComponentsDark. The Focus specimen is focused on mount.
+ */
+export const Sheet: Story = {
+    parameters: { layout: 'fullscreen' },
+    render: () => (
+        <div style={{ padding: '72px 80px', background: 'var(--paper)', color: 'var(--text-strong)' }}>
+            <section className="flex flex-col gap-5 border-t border-[var(--hairline)] py-10">
+                <div className="flex flex-col gap-1.5">
+                    <h2 className="text-section m-0">Fields</h2>
+                    <p className="text-body m-0 text-[var(--text-muted)]">
+                        One field family: 52px, 14px radius, 1px field border. Focus is a 2px accent ring; errors are a danger border plus a message under the field. Pickers open a sheet, never a native dropdown, in the merchant app.
+                    </p>
+                </div>
+                <div className="grid grid-cols-3 gap-x-10 gap-y-8">
+                    <Specimen name="Text field" component="Input + FormField">
+                        <FormField label="Service name" className="w-full">
+                            <Input defaultValue="Ceramic Coating" />
+                        </FormField>
+                    </Specimen>
+                    <Specimen name="Focus" component="Input :focus-visible">
+                        <FormField label="Price (AUD)" className="w-full">
+                            <Input defaultValue="1,290" autoFocus />
+                        </FormField>
+                    </Specimen>
+                    <Specimen name="Error" component="FormField error">
+                        <FormField label="Phone" error="Enter a full mobile number, like 0412 345 678." className="w-full">
+                            <Input defaultValue="0412" />
+                        </FormField>
+                    </Specimen>
+                    <Specimen name="Hint and placeholder" component="FormField hint">
+                        <FormField label="Reason (optional)" description="Customers see this on your profile." className="w-full">
+                            <Input placeholder="e.g. Out sick today, back tomorrow" />
+                        </FormField>
+                    </Specimen>
+                    <Specimen name="Multiline" component="Textarea">
+                        <FormField label="Description" className="w-full">
+                            <Textarea defaultValue="Decontamination, one-step polish and a 3-year ceramic coating." />
+                        </FormField>
+                    </Specimen>
+                    <Specimen name="Disabled" component="Input disabled">
+                        <FormField label="Email" className="w-full">
+                            <Input defaultValue="jordan@example.com" disabled />
+                        </FormField>
+                    </Specimen>
+                    <Specimen name="Picker trigger" component="PickerSheet trigger (replaces Select)">
+                        <FormField label="Category" className="w-full">
+                            <PickerTrigger value="Paint protection" />
+                        </FormField>
+                    </Specimen>
+                    <Specimen name="Duration" component="DurationPicker (AUTM-1507)" note="Working days only for workshop merchants (AUTM-1575).">
+                        <div className="w-[15rem]">
+                            <DurationPicker value="150" onChange={() => {}} />
+                        </div>
+                    </Specimen>
+                    <Specimen name="Code" component="OtpInput">
+                        <OtpInput value="4821" onChange={() => {}} />
+                    </Specimen>
+                </div>
+            </section>
+        </div>
     ),
 }

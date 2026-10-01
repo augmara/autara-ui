@@ -35,17 +35,18 @@ const Progress = React.forwardRef<
         <ProgressPrimitive.Root
             ref={ref}
             className={cn(
-                'relative h-2 w-full overflow-hidden rounded-full',
+                // AUTM-1594 — canvas v44 "Checklist": a 6px band track.
+                'relative h-1.5 w-full overflow-hidden rounded-full',
                 // `dark` here means "on an ink/marketing surface", not the
                 // app theme — the light branch tracks the themed ladder.
-                isDark ? 'bg-white/[0.1]' : 'bg-[var(--surface-elevated)]',
+                isDark ? 'bg-white/[0.1]' : 'bg-[var(--band)]',
                 className
             )}
             {...props}
         >
             <ProgressPrimitive.Indicator
                 className={cn(
-                    'h-full w-full flex-1 rounded-full bg-autara-purple transition-all duration-500 ease-out',
+                    'h-full w-full flex-1 rounded-full bg-[var(--brand)] transition-all duration-500 ease-out',
                     indicatorClassName
                 )}
                 style={{ transform: `translateX(-${100 - (value || 0)}%)` }}

@@ -1,5 +1,6 @@
 export { GradientBar } from './GradientBar'
 export { Button, buttonVariants, type ButtonProps } from './Button'
+export { IconButton, type IconButtonProps } from './IconButton'
 export { Input, inputVariants, type InputProps } from './Input'
 export { OtpInput, type OtpInputProps } from './OtpInput'
 export {
@@ -63,6 +64,7 @@ export {
     type PickerRowRender,
     type PickerSheetProps,
 } from './PickerSheet'
+export { PickerTrigger, type PickerTriggerProps } from './PickerTrigger'
 
 export { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from './Accordion'
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './Tabs'
@@ -136,6 +138,7 @@ export { RadioGroup, RadioGroupItem } from './Radio'
 export { Avatar, AvatarImage, AvatarFallback, avatarVariants } from './Avatar'
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './Tooltip'
 export { Progress } from './Progress'
+export { ProgressSteps, type ProgressStepsProps } from './ProgressSteps'
 // AUTM-1046 — indeterminate busy indicator for work in progress (uploads, saves).
 export { Spinner, type SpinnerProps, type SpinnerSize, type SpinnerTone } from './Spinner'
 export { MultiSelect, type MultiSelectOption, type MultiSelectProps } from './MultiSelect'
@@ -154,6 +157,7 @@ export {
 // ─── v1.1.0 promotions from autara-customer-web ──────────────────────────
 export { BrandButton, brandButtonVariants, type BrandButtonProps } from './BrandButton'
 export { MetaChip, type MetaChipProps } from './MetaChip'
+export { StatusDot, type StatusDotProps, type StatusDotTone } from './StatusDot'
 export { RatingStars, type RatingStarsProps } from './RatingStars'
 export { EmptyState, type EmptyStateProps } from './EmptyState'
 export { LockedFeature, type LockedFeatureProps } from './LockedFeature'
@@ -279,6 +283,15 @@ export {
 
 export { DatePicker, type DatePickerProps, type DayState } from './DatePicker'
 export { TimePicker, type TimePickerProps, type SlotState } from './TimePicker'
+// AUTM-1507 — duration as a typable field plus a picker, because every
+// duration a merchant thinks in had to be converted to minutes in their head
+// first, and `type="number"`'s spinner reads as a foreign control on dark.
+export {
+    DurationPicker,
+    durationLabel,
+    DEFAULT_MAX_DURATION_MINUTES,
+    type DurationPickerProps,
+} from './DurationPicker'
 
 // ─── AUTM-1185 — the customer-web hardening sweep's four primitives ──────
 // InlineAlert: one inline "something happened"; ConfirmDialog: the pause
@@ -286,11 +299,13 @@ export { TimePicker, type TimePickerProps, type SlotState } from './TimePicker'
 // ConfirmActionDialog); NativeSelect: a real <select> dressed as a field;
 // MoneyBreakdown: lines of money, then the one that matters.
 export { InlineAlert, type InlineAlertProps, type InlineAlertTone } from './InlineAlert'
+export { Banner, type BannerProps } from './Banner'
 export { ConfirmDialog, type ConfirmDialogProps } from './ConfirmDialog'
 export { NativeSelect, type NativeSelectProps } from './NativeSelect'
 export { MoneyBreakdown, type MoneyBreakdownProps, type MoneyRow } from './MoneyBreakdown'
 // ─── AUTM-1195 — pick one of a few, as cards: a real radio group ────────
 export { ChoiceCard, ChoiceGroup, type ChoiceCardProps, type ChoiceGroupProps } from './ChoiceCard'
+export { SwatchRadioGroup, type SwatchRadioGroupProps, type SwatchOption } from './SwatchRadioGroup'
 // ─── AUTM-1221 — graduated from customer-web (plan item U5) ──────────────
 // Countdown: a deadline the server enforces, counted down and announced
 // once a minute; PolicyTimeline: the tiers of a policy with the live one lit.
@@ -306,3 +321,6 @@ export { DeviceFrame, type DeviceFrameProps, type DeviceKind } from './DeviceFra
 export { BloomField, type BloomFieldProps } from './BloomField'
 export { LitGroup, type LitGroupProps } from './LitGroup'
 export { Reveal, type RevealProps } from './Reveal'
+
+// SocialButton: the one social sign-in button, Google, Apple and mobile (AUTM-1513).
+export { SocialButton, type SocialButtonProps, type SocialButtonProvider } from './SocialButton'

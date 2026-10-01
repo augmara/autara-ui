@@ -1,30 +1,22 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { ReactNode } from "react";
 import { Button } from "./Button";
-import { GradientGround } from "./GlassSurface";
-import { Input } from "./Input";
-import { Badge } from "./Badge";
-import { MetaChip } from "./MetaChip";
-import { Avatar, AvatarFallback } from "./Avatar";
+import { IconButton } from "./IconButton";
 
 /**
- * Button — the single canonical Autara CTA primitive. Merges what used
- * to be split as `Button` + `BrandButton` into one component.
+ * Button — canvas v44's "Buttons" (AUTM-1594).
  *
- * Variants:
- *   - `primary`     brand purple (on dark/photo surfaces)
- *   - `dark`        solid black (PRIMARY action on cream — the most-used)
- *   - `outline`     hairline border on white
- *   - `secondary`   surface-elevated fill
- *   - `ghost`       transparent, hover bg
- *   - `destructive` rose (cancel / delete)
- *   - `link`        underline text only
- *   - `glass`       translucent — a secondary action ON the gradient ground
- *                   or on a glass panel (AUTM-948)
+ *   - `primary`  lime with ink: the one action, on paper only
+ *   - `strong`   ink (white in dark): the action on band, in sheets and
+ *                dialogs, and the destructive action (no red buttons)
+ *   - `quiet`    band: secondary choices
+ *   - `ondeep`   translucent white on a brand-deep hero
+ *   - `link`     brand text, 44px tall
+ *   - `ghost`    no fill, for toolbars (not on the sheet)
  *
- * Sizes: `sm` (36) → `md`/`default` (44) → `lg` (48) → `icon` (40²).
- *
- * Polymorphic via `asChild` (Radix Slot). Compose with your framework's
- * Link by wrapping a single anchor child.
+ * Sizes: `sm` 44, `md` 48, `lg` 52; `icon` is a 44px disc (use IconButton).
+ * Pills, by a radius of half each size's height. Legacy variant names still
+ * render as their sheet equivalent. Flip the Theme toolbar for the dark sheet.
  */
 const meta = {
   title: "Atoms/Button",
@@ -33,95 +25,93 @@ const meta = {
   argTypes: {
     variant: {
       control: { type: "select" },
-      options: [
-        "primary",
-        "dark",
-        "outline",
-        "secondary",
-        "ghost",
-        "destructive",
-        "link",
-        "acid",
-      ],
+      options: ["primary", "strong", "quiet", "ondeep", "link", "ghost"],
     },
-    size: {
-      control: { type: "select" },
-      options: ["sm", "md", "lg", "icon"],
-    },
+    size: { control: { type: "select" }, options: ["sm", "md", "lg"] },
     disabled: { control: "boolean" },
+    busy: { control: "boolean" },
     fullWidth: { control: "boolean" },
   },
-  args: {
-    children: "Book now",
-    variant: "primary",
-    size: "md",
-    disabled: false,
-  },
+  args: { children: "Continue", variant: "primary", size: "md", disabled: false, busy: false },
 } satisfies Meta<typeof Button>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Primary: Story = {};
+/* The sheet's own glyphs, 18px at a 1.8 stroke. */
+const Glyph = ({ children, size = 18 }: { children: ReactNode; size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    {children}
+  </svg>
+);
+const Calendar = () => (
+  <Glyph>
+    <rect x="4" y="5" width="16" height="15" rx="3" />
+    <path d="M4 10h16" />
+    <path d="M9 3v4" />
+    <path d="M15 3v4" />
+  </Glyph>
+);
+const Tag = () => (
+  <Glyph>
+    <path d="M4 12.5V5h7.5L20 13.5 13.5 20z" />
+    <circle cx="8.5" cy="9" r="1.4" />
+  </Glyph>
+);
+const Doc = () => (
+  <Glyph>
+    <path d="M7 3.5h7l4 4v13H7z" />
+    <path d="M14 3.5v4h4" />
+    <path d="M10 13h5M10 16.5h5" />
+  </Glyph>
+);
+const Bell = () => (
+  <Glyph size={20}>
+    <path d="M6.5 16.5V11a5.5 5.5 0 0 1 11 0v5.5l1.5 2h-14z" />
+    <path d="M10 20.5h4" />
+  </Glyph>
+);
+/* Stand-in for Badge variant="count" until the status family lands. */
+const Count = ({ n }: { n: number }) => (
+  <span className="inline-flex h-[1.375rem] min-w-[1.375rem] items-center justify-center rounded-full bg-[#e11d48] px-[0.4375rem] text-xs font-bold text-white">
+    {n}
+  </span>
+);
 
-export const Dark: Story = {
-  args: { variant: "dark", children: "Continue" },
-};
-
-export const Outline: Story = { args: { variant: "outline" } };
-export const Secondary: Story = { args: { variant: "secondary" } };
+export const Primary: Story = { args: { leadingIcon: <Calendar />, children: "New booking", size: "lg" } };
+export const Strong: Story = { args: { variant: "strong", children: "Confirm" } };
+export const Quiet: Story = { args: { variant: "quiet", children: "Add service", leadingIcon: <Tag /> } };
+export const Link: Story = { args: { variant: "link", size: "sm", children: "View all bookings" } };
 export const Ghost: Story = { args: { variant: "ghost", children: "Skip" } };
-export const Destructive: Story = {
-  args: { variant: "destructive", children: "Cancel booking" },
-};
-export const Link: Story = { args: { variant: "link", children: "View terms" } };
-
-export const Acid: Story = {
-  name: "Acid — high-pop CTA on cream",
-  args: { variant: "acid", children: "Try it free" },
+export const Busy: Story = { args: { busy: true, children: "Saving…" } };
+export const Disabled: Story = {
+  args: { disabled: true, children: "New booking", title: "Finish your profile to take bookings" },
 };
 
-export const Small: Story = { args: { size: "sm" } };
-export const Large: Story = { args: { size: "lg", children: "Get started" } };
-
-export const FullWidth: Story = {
-  parameters: { layout: "padded" },
-  args: { fullWidth: true, variant: "dark" },
-  render: (args) => (
-    <div className="max-w-sm">
-      <Button {...args} />
+/** On a brand-deep hero, lime leads and the rest are translucent white. */
+export const OnBrandDeep: Story = {
+  render: () => (
+    <div className="flex gap-2 rounded-[1.25rem] bg-[var(--hero)] p-3.5">
+      <Button>View booking</Button>
+      <Button variant="ondeep">Add to calendar</Button>
     </div>
   ),
 };
 
-export const WithLeadingIcon: Story = {
-  args: {
-    leadingIcon: (
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-        <path d="M15 18l-6-6 6-6" />
-      </svg>
-    ),
-    children: "Back",
-    variant: "outline",
-  },
+/** No red buttons: the consequence is said in danger text beside a strong action. */
+export const Destructive: Story = {
+  render: () => (
+    <div className="flex flex-wrap items-center gap-2.5">
+      <Button variant="strong" size="lg">
+        Confirm cancellation
+      </Button>
+      <span className="text-sm text-[var(--danger)]">Inside 4 hours the deposit is retained.</span>
+    </div>
+  ),
 };
-
-export const WithTrailingIcon: Story = {
-  args: {
-    trailingIcon: (
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-        <path d="M9 18l6-6-6-6" />
-      </svg>
-    ),
-    children: "Continue",
-    variant: "dark",
-  },
-};
-
-export const Disabled: Story = { args: { disabled: true } };
 
 export const AsAnchor: Story = {
-  args: { asChild: true, variant: "dark" },
+  args: { asChild: true, variant: "strong" },
   render: (args) => (
     <Button {...args}>
       <a href="#example">Open as anchor</a>
@@ -129,212 +119,7 @@ export const AsAnchor: Story = {
   ),
 };
 
-/**
- * Full variant × size matrix — every variant × every size, rendered as a
- * grid so visual regressions are obvious. Light-surface aware (cream
- * background) — all variants are visible.
- */
-export const Matrix: Story = {
-  parameters: { layout: "padded" },
-  render: () => (
-    <div className="space-y-5">
-      {(
-        [
-          "primary",
-          "dark",
-          "outline",
-          "secondary",
-          "ghost",
-          "destructive",
-          "link",
-          "acid",
-        ] as const
-      ).map((variant) => (
-        <div key={variant} className="flex items-center gap-3">
-          <div className="w-24 text-[0.75rem] font-medium text-[var(--text-muted)]">
-            {variant}
-          </div>
-          <Button variant={variant} size="sm">
-            Small
-          </Button>
-          <Button variant={variant} size="md">
-            Default
-          </Button>
-          <Button variant={variant} size="lg">
-            Large
-          </Button>
-        </div>
-      ))}
-    </div>
-  ),
-};
-
-// ─── AUTM-948 ──────────────────────────────────────────────────────
-/**
- * `variant="glass"` — the outline button's translucent twin.
- *
- * `outline` paints an OPAQUE `--surface` fill. On a glass panel or over the
- * gradient ground that punches a white slab through the material, which is
- * the same failure mode `ErrorCard`'s white retry button had in dark mode
- * (AUTM-936). The middle button in each pane below is the problem; the right
- * one is the fix.
- *
- * **Buttons keep normal geometry.** Rule 1 puts the skew on pills and status
- * ONLY — a revision that skewed buttons and cut their corners was rejected by
- * Don on 2026-09-01. The pill radius stands.
- *
- * It does not blur. A button is small and there are usually several per
- * screen, and each blurring element is its own GPU surface; the panel
- * underneath supplies the blur.
- */
-export const GlassOnGround: Story = {
-  name: "Glass — on the gradient ground, both themes",
-  parameters: { layout: "fullscreen" },
-  render: () => (
-    <div className="grid sm:grid-cols-2">
-      {(["light", "dark"] as const).map((theme) => (
-        <div key={theme} data-theme={theme}>
-          <GradientGround className="min-h-[16rem] p-8">
-            <p className="mb-4 text-[0.75rem] font-medium text-[var(--text-subtle)]">
-              {theme === "dark" ? "Dark" : "Light"}
-            </p>
-            <div className="flex flex-wrap items-center gap-3">
-              <Button>Accept booking</Button>
-              <Button variant="outline">outline (opaque slab)</Button>
-              <Button variant="glass">glass</Button>
-            </div>
-            <div className="glass-surface mt-5 flex flex-wrap items-center gap-3 p-5">
-              <Button size="sm">Accept</Button>
-              <Button variant="glass" size="sm">
-                Decline
-              </Button>
-              <Button variant="ghost" size="sm">
-                Message
-              </Button>
-            </div>
-          </GradientGround>
-        </div>
-      ))}
-    </div>
-  ),
-};
-
-// ─── The shape language (Don, 2026-09-01) ──────────────────────────
-/**
- * **Buttons are not pills. They take the input's radius.**
- *
- * A button and the field beside it are ONE control group — type, then act. A
- * pill next to a rounded rectangle reads as two unrelated objects that happen
- * to be adjacent. Matching the radius makes them read as a pair. The top row
- * is what shipped before this; the second row is the rule.
- *
- * This reverses the 2026-08-16 call that made buttons fully round. The
- * complaint then was that buttons "read square" — the answer was never a
- * pill, it was the input's own radius.
- *
- * **What the change buys.** The shape language collapses from three families
- * to two, which is what makes it enforceable:
- *
- * | Family | Radius | Means |
- * |---|---|---|
- * | Shared | `--radius-autara-md` **14px** (cards 16, chips 8) | a surface or a control |
- * | Rounded parallelogram | skew + radius | status, and only status |
- *
- * And the third row below is the payoff: with buttons off `rounded-full`, the
- * only fully-round things left are **avatars and indicator dots**, so round
- * now means "a person or a state light" and never "an action". That meaning
- * is a finite resource — `shape-language.test.ts` makes spending it a
- * deliberate act with a name attached.
- *
- * Note `lg` steps up to 16px: `.field-input--lg` is 48px at 16px, and the
- * 48px button beside it has to match. Same-height elements, same radius.
- */
-export const PairedRadius: Story = {
-  name: "Shape language — the button pairs with the input",
-  parameters: { layout: "fullscreen" },
-  render: () => (
-    <GradientGround className="min-h-[26rem] p-8">
-      <p className="mb-2 text-[0.75rem] font-medium text-[var(--text-subtle)]">
-        Before — pill beside a rounded rectangle
-      </p>
-      <div className="mb-6 flex items-center gap-2">
-        <Input
-          surface="glass"
-          placeholder="Find a booking"
-          aria-label="Find a booking (before)"
-          className="w-56"
-        />
-        <button
-          type="button"
-          className="h-11 whitespace-nowrap rounded-full bg-[var(--act-fill)] px-5 text-sm font-medium text-[var(--on-act)]"
-        >
-          New booking
-        </button>
-      </div>
-
-      <p className="mb-2 text-[0.75rem] font-medium text-[var(--text-subtle)]">
-        After — one control group
-      </p>
-      <div className="mb-6 flex items-center gap-2">
-        <Input
-          surface="glass"
-          placeholder="Find a booking"
-          aria-label="Find a booking (after)"
-          className="w-56"
-        />
-        <Button data-testid="story-paired-radius-submit">New booking</Button>
-      </div>
-
-      <p className="mb-2 text-[0.75rem] font-medium text-[var(--text-subtle)]">
-        48px rung — lg button pairs with the lg field
-      </p>
-      <div className="mb-6 flex items-center gap-2">
-        <Input
-          size="lg"
-          surface="glass"
-          placeholder="Business name"
-          aria-label="Business name"
-          className="w-56"
-        />
-        <Button size="lg">Continue</Button>
-      </div>
-
-      <p className="mb-2 text-[0.75rem] font-medium text-[var(--text-subtle)]">
-        What round still means
-      </p>
-      <div className="flex flex-wrap items-center gap-3">
-        <Avatar className="h-10 w-10">
-          <AvatarFallback>PN</AvatarFallback>
-        </Avatar>
-        <MetaChip tone="flight" dot>
-          On the way
-        </MetaChip>
-        <Badge variant="money">Paid</Badge>
-        <span className="text-sm text-[var(--text-muted)]">
-          a person · a state light · a status marker
-        </span>
-      </div>
-    </GradientGround>
-  ),
-};
-
-// ─── AUTM-915 ──────────────────────────────────────────────────────
-/**
- * The regression this size change exists for.
- *
- * Both columns are 183px wide — the content box measured on merchant-web
- * `/onboarding/complete` at a 375px viewport. The left column simulates
- * 200% text scale by setting the root font size on the container.
- *
- * Before AUTM-915, `whitespace-nowrap` in BASE plus a fixed `h-11` meant
- * "Go to your dashboard" rendered 372px wide inside that 183px box, with
- * roughly half the label off screen. It now wraps and the box grows.
- *
- * Every consumer inherited that defect, and merchant-web had already
- * shipped an `h-auto min-h-11 whitespace-normal py-1` override at each
- * call site. Needing an override everywhere is the usual sign the default
- * is wrong, so the fix moved into the primitive.
- */
+/** At 200% text the label wraps and the pill becomes a rounded rectangle, never a capsule. */
 export const LongLabelAtTextScale: Story = {
   name: "Edge — long label at 200% text scale",
   parameters: { layout: "padded" },
@@ -345,20 +130,15 @@ export const LongLabelAtTextScale: Story = {
         { label: "Normal (16px root)", size: "16px" },
       ].map((col) => (
         <div key={col.label}>
-          <p className="mb-3 text-[0.75rem] font-medium text-[var(--text-muted)]">
-            {col.label}
-          </p>
-          <div
-            style={{ fontSize: col.size, width: "183px" }}
-            className="space-y-3 rounded-autara-lg border border-dashed border-[var(--border-strong)] p-2"
-          >
-            <Button variant="dark" fullWidth>
+          <p className="mb-3 text-sm font-medium text-[var(--text-muted)]">{col.label}</p>
+          <div style={{ fontSize: col.size, width: "183px" }} className="space-y-3">
+            <Button variant="strong" fullWidth>
               Go to your dashboard
             </Button>
-            <Button variant="outline" fullWidth size="sm">
+            <Button variant="quiet" fullWidth size="sm">
               Contact Autara Support
             </Button>
-            <Button variant="primary" fullWidth size="lg">
+            <Button fullWidth size="lg">
               Confirm and pay the deposit
             </Button>
           </div>
@@ -368,180 +148,104 @@ export const LongLabelAtTextScale: Story = {
   ),
 };
 
-/**
- * Heights are unchanged at normal text scale — that is the constraint the
- * fix had to hold. `min-h-*` renders identically to the old `h-*` for a
- * single line: sm 36px, md 44px, lg 48px, icon 40x40.
- */
-export const HeightParity: Story = {
-  name: "Sizes — unchanged at normal scale",
-  parameters: { layout: "padded" },
-  render: () => (
-    <div className="flex flex-wrap items-center gap-3">
-      <Button size="sm">Small, 36</Button>
-      <Button size="md">Medium, 44</Button>
-      <Button size="lg">Large, 48</Button>
-      <Button size="icon" aria-label="Add a service">
-        <svg
-          aria-hidden
-          viewBox="0 0 24 24"
-          width="18"
-          height="18"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2.4}
-          strokeLinecap="round"
-        >
-          <path d="M12 5v14M5 12h14" />
-        </svg>
-      </Button>
-    </div>
-  ),
-};
-
-/**
- * Opt back into a single line where you genuinely want one — a short label
- * in a fixed-width toolbar. `className` wins through tailwind-merge, so no
- * new prop was needed.
- */
-export const OptInNowrap: Story = {
-  name: "Edge — opting back into nowrap",
-  parameters: { layout: "padded" },
-  render: () => (
-    <div className="flex w-40 gap-2 rounded-autara-lg border border-dashed border-[var(--border-strong)] p-2">
-      <Button size="sm" variant="outline" className="whitespace-nowrap">
-        Filters
-      </Button>
-      <Button size="sm" variant="dark" className="whitespace-nowrap">
-        Sort
-      </Button>
-    </div>
-  ),
-};
-
-/**
- * AUTM-955 — the reported bug, as a story you can look at.
- *
- * Don's screenshot: a search field and "New booking" side by side, the
- * button wrapped to two lines and standing visibly taller than the field
- * next to it, on a wide screen with room to spare.
- *
- * The first row is the layout that broke. The second is the same row at a
- * width that genuinely cannot fit the phrase — the label SHOULD wrap there,
- * and the button SHOULD grow; that is AUTM-915 working, not a regression.
- * Both behaviours come from one declaration, so check both when touching it.
- */
-export const BesideAField = {
-    render: () => (
-        <div className="flex flex-col gap-8">
-            <div>
-                <p className="mb-2 text-xs text-[var(--text-muted)]">
-                    Room to spare — one line, same height as the field
-                </p>
-                <div className="flex items-center gap-3">
-                    <input
-                        className="field-input min-h-11 flex-1"
-                        placeholder="Find a booking"
-                        aria-label="Find a booking"
-                    />
-                    <Button>New booking</Button>
-                </div>
-            </div>
-            <div>
-                <p className="mb-2 text-xs text-[var(--text-muted)]">
-                    Genuinely too narrow — wraps and grows, rather than overflowing
-                </p>
-                <div className="flex w-[230px] items-center gap-3">
-                    <input
-                        className="field-input min-h-11 min-w-0 flex-1"
-                        placeholder="Find"
-                        aria-label="Find"
-                    />
-                    <Button>New booking</Button>
-                </div>
-            </div>
-        </div>
-    ),
-}
-
-/**
- * AUTM-977 — one focus signature, inherited from BASE.
- *
- * Every variant used to carry its own `focus-visible:ring-<colour>/<alpha>`:
- * `/35` on primary, dark and destructive, `/30` on outline, secondary, link
- * and glass, `/25` on ghost, `/55` on acid. Eight rings for one job, and at
- * 35% over the surface behind the control a ring measures roughly 1.9:1 —
- * under the 3:1 of WCAG 2.4.11.
- *
- * The ring now lives on BASE at full strength, so a variant gets it for free
- * and cannot forget it. The 2px offset band, painted in `--background`, is
- * what keeps a purple ring legible on a purple `primary` fill — matching the
- * ring to the control's own colour is the instinct that produced purple on
- * purple at 1.0:1 in the merchant-mobile Today pass.
- *
- * Forced on statically, because `@storybook/test` is not installed and there
- * are no play functions to drive real focus. `Foundations/Focus ring → Live`
- * has the tabbable version.
- *
- * `outline`, `light-outline` and `light` are included. Their outlined
- * TREATMENT is out of scope — that is AUTM-976, it needs a designed solid
- * `secondary` first, and it is 69 call sites across three repos. Their focus
- * RING is a different axis: changing it cannot pre-empt how the variant is
- * eventually redesigned, and leaving the most-used secondary button below the
- * WCAG floor would have been the odd outcome for an accessibility ticket.
- * Landed as its own commit so it can be dropped on its own.
- */
+/** AUTM-977: one focus ring for every variant, in both themes. */
 export const FocusRingPerVariant: Story = {
-    name: "AUTM-977 — the focus ring, every variant, both themes",
-    render: () => (
-        <div className="grid gap-6 lg:grid-cols-2">
-            {[
-                { label: "Light", theme: undefined },
-                { label: "Dark", theme: "dark" as const },
-            ].map((col) => (
-                <div
-                    key={col.label}
-                    data-theme={col.theme}
-                    className="space-y-3 rounded-autara-lg bg-[var(--background)] p-5"
-                >
-                    <p className="text-[0.75rem] font-medium text-[var(--text-muted)]">
-                        {col.label}
-                    </p>
-                    <div className="flex flex-wrap items-center gap-4">
-                        {(
-                            [
-                                "primary",
-                                "dark",
-                                "secondary",
-                                "ghost",
-                                "destructive",
-                                "link",
-                                "acid",
-                                "outline",
-                            ] as const
-                        ).map((variant) => (
-                            <Button
-                                key={variant}
-                                variant={variant}
-                                className="ring-2 ring-[var(--accent)] ring-offset-2 ring-offset-[var(--background)]"
-                            >
-                                {variant}
-                            </Button>
-                        ))}
-                    </div>
-                    <p className="text-[0.75rem] font-medium text-[var(--text-muted)]">
-                        The same ring on a glass panel, where the ground is not the canvas
-                    </p>
-                    <GradientGround className="rounded-autara-lg p-5">
-                        <Button
-                            variant="glass"
-                            className="ring-2 ring-[var(--accent)] ring-offset-2 ring-offset-[var(--background)]"
-                        >
-                            glass
-                        </Button>
-                    </GradientGround>
-                </div>
+  name: "AUTM-977 — the focus ring, every variant, both themes",
+  parameters: { layout: "padded" },
+  render: () => (
+    <div className="grid gap-6 lg:grid-cols-2">
+      {[
+        { label: "Light", theme: "light" },
+        { label: "Dark", theme: "dark" },
+      ].map((col) => (
+        <div key={col.label} data-theme={col.theme} className="space-y-3 rounded-[1.5rem] bg-[var(--background)] p-5">
+          <p className="text-sm font-medium text-[var(--text-muted)]">{col.label}</p>
+          <div className="flex flex-wrap items-center gap-4">
+            {(["primary", "strong", "quiet", "link", "ghost"] as const).map((variant) => (
+              <Button key={variant} variant={variant} className="ring-2 ring-[var(--accent)] ring-offset-2 ring-offset-[var(--background)]">
+                {variant}
+              </Button>
             ))}
+          </div>
         </div>
-    ),
+      ))}
+    </div>
+  ),
+};
+
+function Specimen({ name, component, note, children }: { name: string; component: string; note?: string; children: ReactNode }) {
+  return (
+    <div className="flex min-w-0 flex-col gap-2.5">
+      <div className="flex items-baseline justify-between gap-3">
+        <span className="text-[0.9375rem] leading-[normal] font-bold">{name}</span>
+        <code className="font-mono text-xs text-[var(--text-subtle)]">{component}</code>
+      </div>
+      <div className="flex flex-wrap items-center gap-2.5">{children}</div>
+      {note && <span className="text-[0.8125rem] leading-[1.45] text-[var(--text-subtle)]">{note}</span>}
+    </div>
+  );
 }
+
+/**
+ * The sheet's Buttons section, laid out at its geometry (1440, 80px gutters,
+ * three columns) so it can be overlaid on UiComponents / UiComponentsDark.
+ */
+export const Sheet: Story = {
+  parameters: { layout: "fullscreen" },
+  render: () => (
+    <div style={{ padding: "72px 80px", background: "var(--paper)", color: "var(--text-strong)" }}>
+      <section className="flex flex-col gap-5 border-t border-[var(--hairline)] py-10">
+        <div className="flex flex-col gap-1.5">
+          <h2 className="text-section m-0">Buttons</h2>
+          <p className="text-body m-0 text-[var(--text-muted)]">
+            Pills, 44px minimum. Primary is lime on paper; on band and in dark dialogs the strong action is ink (white in dark). Destructive actions are a strong button whose label says what happens; danger stays in the text.
+          </p>
+        </div>
+        <div className="grid grid-cols-3 gap-x-10 gap-y-8">
+          <Specimen name="Primary" component="Button variant=primary" note="Lime with ink text, on paper only.">
+            <Button size="lg" leadingIcon={<Calendar />}>New booking</Button>
+            <Button size="md">Continue</Button>
+            <Button size="sm">Save</Button>
+          </Specimen>
+          <Specimen name="Strong" component="Button variant=strong" note="Ink. The action inside band cards, sheets and checklists.">
+            <Button variant="strong" size="lg">Confirm</Button>
+            <Button variant="strong" size="md">Send request</Button>
+            <Button variant="strong" size="sm">Connect</Button>
+          </Specimen>
+          <Specimen name="Quiet" component="Button variant=quiet" note="Band. Secondary choices; never competes with the primary.">
+            <Button variant="quiet" size="lg">Cancel</Button>
+            <Button variant="quiet" size="md" leadingIcon={<Tag />}>Add service</Button>
+            <Button variant="quiet" size="sm">Back</Button>
+          </Specimen>
+          <Specimen name="Destructive" component="Button variant=strong + ConfirmDialog" note="No red buttons: the consequence is said in danger text beside it.">
+            <Button variant="strong" size="lg">Confirm cancellation</Button>
+            <span className="text-sm text-[var(--danger)]">Inside 4 hours the deposit is retained.</span>
+          </Specimen>
+          <Specimen name="On brand-deep" component="Button variant=ondeep" note="Lime leads; the rest are translucent white.">
+            <div className="flex gap-2 rounded-[1.25rem] bg-[var(--hero)] p-3.5">
+              <Button>View booking</Button>
+              <Button variant="ondeep">Add to calendar</Button>
+            </div>
+          </Specimen>
+          <Specimen name="Busy and disabled" component="Button busy / disabled" note="Busy keeps the label and width. Disabled carries its reason as the label or a title.">
+            <Button busy>Saving…</Button>
+            <Button disabled title="Finish your profile to take bookings">New booking</Button>
+          </Specimen>
+          <Specimen name="Text" component="Button variant=link">
+            <Button variant="link" size="sm">View all bookings</Button>
+            <Button variant="link" size="sm">Make default</Button>
+          </Specimen>
+          <Specimen name="Icon disc" component="IconButton" note="Every icon-only control carries an aria-label.">
+            <IconButton icon={<Doc />} label="Remove" />
+            <IconButton icon={<Bell />} label="Notifications, 12 unread" badge={<Count n={12} />} />
+          </Specimen>
+          <Specimen name="Sizes" component="size=lg / md / sm">
+            <Button variant="quiet" size="lg">52</Button>
+            <Button variant="quiet" size="md">48</Button>
+            <Button variant="quiet" size="sm">44</Button>
+          </Specimen>
+        </div>
+      </section>
+    </div>
+  ),
+};

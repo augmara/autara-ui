@@ -108,14 +108,23 @@ const Spinner = React.forwardRef<HTMLSpanElement, SpinnerProps>(
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
-                    strokeWidth={2.5}
+                    strokeWidth={3}
                     strokeLinecap="round"
                     data-spinner-motion=""
                     className={cn(SIZE[size], 'animate-spin motion-reduce:animate-none')}
                 >
-                    {/* Moving state: a faint full track plus a quarter arc. */}
+                    {/* Moving state: a full track plus a quarter arc. AUTM-1594
+                        (canvas v44 "Spinner"): on the accent tone the track is
+                        band and the arc is the accent, 3px; other tones keep a
+                        faint track in their own colour. */}
                     <g className="motion-reduce:hidden">
-                        <circle cx="12" cy="12" r="10" opacity="0.25" />
+                        <circle
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke={tone === 'accent' ? 'var(--band)' : undefined}
+                            opacity={tone === 'accent' ? 1 : 0.25}
+                        />
                         <path d="M22 12a10 10 0 0 0-10-10" />
                     </g>
                     {/* Reduced-motion state: a still, dashed ring. 8 dashes of

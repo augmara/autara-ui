@@ -6,10 +6,13 @@ import { cn } from '../lib/cn'
  * filter on filtered-list screens (booking status, inbox filter,
  * service status, notification tab).
  *
- * Active chip uses the canonical "Torph ink" capsule treatment
- * (`bg-[var(--surface-inverse)] text-[var(--text-on-inverse)]`); inactive chips
- * are a quiet `--surface-elevated` ground with muted ink. The row scrolls
- * horizontally on narrow surfaces.
+ * AUTM-1594 — canvas v44 "Filter chips": pills, 13px Medium. The active chip
+ * is the selected colour (#2e1070, #8f6bff in dark) with its own ink; the
+ * rest are band with ink. The row scrolls horizontally on narrow surfaces.
+ * Drawn at the sheet's 36px with AUTM-622's 44px floor kept as a hit area
+ * (the unpainted pseudo-element Switch and Tabs use). The row scrolls, and a
+ * scroller clips what pokes out of it, so the row carries 4px of vertical
+ * padding: that is where the extra 8px of target lives.
  *
  * ─── AUTM-974: the inactive chip lost its border ────────────────────────
  *
@@ -68,7 +71,11 @@ export function FilterChipRow<V>({
             role="tablist"
             aria-label={ariaLabel}
             className={cn(
-                '-mx-1 flex gap-1.5 overflow-x-auto pb-1 pl-1 pr-1',
+                // 10px between chips, as the sheet spaces them.
+                // -mt-1 cancels the top padding's offset, so the chips sit
+                // where the row starts; the padding is only there to hold
+                // the hit area.
+                '-mx-1 -mt-1 flex gap-2.5 overflow-x-auto px-1 py-1',
                 className,
             )}
         >
@@ -82,8 +89,8 @@ export function FilterChipRow<V>({
                         aria-selected={active}
                         onClick={() => onChange(o.value)}
                         className={cn(
-                            /* 8px, same rung as MetaChip — round is avatars and dots only
-                               (Don, 2026-09-01); see MetaChip for the geometry. */
+                            /* A pill (canvas v44), which supersedes the 8px rung
+                               the 2026-09-01 shape rule gave chips. */
                             /* AUTM-622 — `min-h-11` (44px). This was MISSED by the
                                first pass at that ticket, which fixed `Switch` and
                                `Tabs` and shipped in 5.3.1 while the ticket also
@@ -96,11 +103,12 @@ export function FilterChipRow<V>({
                                reason Tabs uses one: at 200% text scale the label
                                is taller than 44px and the control has to grow
                                with it rather than clip. */
-                            'shrink-0 min-h-11 rounded-autara-sm px-3 py-1.5 text-[12px] font-medium transition-colors',
+                            'relative shrink-0 min-h-9 rounded-full px-3 py-1.5 text-[0.8125rem] font-medium transition-colors',
+                            "before:absolute before:left-1/2 before:top-1/2 before:h-11 before:w-full before:min-w-11 before:-translate-x-1/2 before:-translate-y-1/2 before:content-['']",
                             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]',
                             active
-                                ? 'bg-[var(--surface-inverse)] text-[var(--text-on-inverse)]'
-                                : 'bg-[var(--surface-elevated)] text-[var(--text-muted)] hover:text-[var(--text-strong)]',
+                                ? 'bg-[var(--selected)] text-[var(--on-selected)]'
+                                : 'bg-[var(--band)] text-[var(--text-strong)] hover:bg-[var(--band-press)]',
                         )}
                     >
                         {o.label}

@@ -5,15 +5,19 @@ import type { ReactNode } from "react";
  * Used heavily on customer-web's merchant profile page (Open today,
  * X services, Comes to you · 10km, Highly rated, etc.).
  *
- * Tones:
- *   - neutral  — SOLID achromatic slate. The default (AUTM-974)
+ * AUTM-1594 — canvas v44 "Default and meta": a 28px pill, 13px Medium, in
+ * the consumer's case. Tones (the sheet's palette):
+ *   - neutral  — band with ink. The default
  *   - muted    — no chrome at all: muted ink, no fill. De-emphasis
- *   - success  — SOLID lime. Alias of `money`, kept for pinned consumers
- *   - brand    — SOLID purple. Alias of `act`, kept for pinned consumers
- *   - act      — SOLID purple. Something is waiting on the user (AUTM-948)
- *   - flight   — SOLID aqua. Confirmed, running, money on its way
- *   - money    — SOLID lime. Done, paid, money in
- *   - glass    — translucent, for a chip on the gradient ground
+ *   - success  — lime. Alias of `money`, kept for pinned consumers
+ *   - brand    — brand purple. Alias of `act`, kept for pinned consumers
+ *   - act      — brand purple. Something is waiting on the user
+ *   - flight   — aqua. Confirmed, running, money on its way
+ *   - money    — lime. Done, paid, money in, Default
+ *   - glass    — band; the sheet has no glass, so a glass chip is band
+ *
+ * The history below explains how the tones became solid; the sheet keeps
+ * that, and moves the shape to a pill and the label out of uppercase.
  *
  * ─── AUTM-974: every tone is now solid ──────────────────────────────────
  *
@@ -49,12 +53,8 @@ import type { ReactNode } from "react";
  *   - Dropped raw tailwind `emerald-50/700/200` in favour of brand-
  *     `lime-drive` ink, so every tone now sits on the same colour
  *     vocabulary as the rest of the design system.
- *   - Type (AUTM-1483): 0.75rem sentence case at weight 500, no
- *     letterspacing. It was 11px capitals tracked to 0.12em, applied
- *     through CSS; that grammar is retired (Don, 2026-09-03). The label
- *     renders exactly as authored, so write it in sentence case
- *     ("Open today", "Comes to you · 10 km"). The solid fill is what
- *     reads as a chip.
+ *   - (Retired by AUTM-1594 and AUTM-1483: the 11px letterspaced uppercase
+ *     this line used to describe. Labels now render in the case passed.)
  *
  * The optional `dot` renders a colored pulse-dot before the label —
  * use it for status indicators ("Open now") not for static labels.
@@ -71,9 +71,12 @@ type Tone =
   // Glass companion for a chip sitting on the gradient ground.
   | "glass";
 
+// AUTM-1594 — canvas v44 "Default and meta": the sheet's band and lime
+// pills. Neutral is band with ink, not the slate fill it was; the status
+// trio takes the palette (brand, aqua, lime) as Badge does.
 const TONES: Record<Tone, string> = {
   // AUTM-974 — solid, and no ring on any of them. See the header.
-  neutral: "bg-[var(--neutral-fill)] text-[var(--on-neutral)]",
+  neutral: "bg-[var(--band)] text-[var(--text-strong)]",
   // Deliberately chrome-less: de-emphasis is less, not fainter.
   // Keeps the chip's padding so it still lines up with its solid siblings in
   // a row — the tone strings are concatenated into a template literal, not
@@ -81,38 +84,38 @@ const TONES: Record<Tone, string> = {
   // order rather than class order and win or lose by accident.
   muted: "bg-transparent text-[var(--text-muted)]",
   // Aliases of `money` and `act` — the tinted versions of the same idea.
-  success: "bg-[var(--money-fill)] text-[var(--on-money)]",
-  brand: "bg-[var(--act-fill)] text-[var(--on-act)]",
+  success: "bg-[var(--lime)] text-[var(--on-lime)]",
+  brand: "bg-[var(--brand)] text-[var(--on-brand)]",
 
   // ─── AUTM-948: purple ACTS · aqua IN FLIGHT · lime DONE / money-in ───
   // Rule 4 is "solid fills on status, never a tint, and never an outline".
   // `success` and `brand` above now resolve to `money` and `act`; these are
   // the names new status code should reach for. One accent per zone — aqua
   // and lime never compete inside the same block.
-  act: "bg-[var(--act-fill)] text-[var(--on-act)]",
-  flight: "bg-[var(--flight-fill)] text-[var(--on-flight)]",
-  money: "bg-[var(--money-fill)] text-[var(--on-money)]",
+  act: "bg-[var(--brand)] text-[var(--on-brand)]",
+  flight: "bg-[var(--aqua)] text-[var(--on-aqua)]",
+  money: "bg-[var(--lime)] text-[var(--on-lime)]",
 
   // For a chip sitting directly on the gradient ground rather than on a
   // card. No backdrop-filter: a chip is small and there are usually several
   // per row, and each blurring element is its own GPU surface.
-  glass:
-    "bg-[var(--glass-fill)] text-[var(--text-strong)] ring-1 ring-inset ring-[var(--glass-edge)] shadow-[inset_0_1px_0_var(--glass-hi)]",
+  // The sheet has no glass; on paper a glass chip renders as band.
+  glass: "bg-[var(--band)] text-[var(--text-strong)]",
 };
 
 const DOT_COLORS: Record<Tone, string> = {
   // On a solid fill the dot reads against the FILL, so it takes that fill's
   // on-colour. `muted` has no fill, so it stays on the ink ladder.
-  neutral: "bg-[var(--on-neutral)]",
-  success: "bg-[var(--on-money)]",
-  brand: "bg-[var(--on-act)]",
+  neutral: "bg-[var(--text-strong)]",
+  success: "bg-[var(--on-lime)]",
+  brand: "bg-[var(--on-brand)]",
   muted: "bg-[var(--text-muted)]",
   // On a solid fill the dot has to read against the FILL, so it takes the
   // on-colour rather than the accent it is already sitting on.
-  act: "bg-[var(--on-act)]",
-  flight: "bg-[var(--on-flight)]",
-  money: "bg-[var(--on-money)]",
-  glass: "bg-[var(--text-subtle)]",
+  act: "bg-[var(--on-brand)]",
+  flight: "bg-[var(--on-aqua)]",
+  money: "bg-[var(--on-lime)]",
+  glass: "bg-[var(--text-strong)]",
 };
 
 export interface MetaChipProps {
@@ -134,19 +137,11 @@ export function MetaChip({
 }: MetaChipProps) {
   return (
     <span
-      /* AUTM-948 moved the size to rem so the chip scales with OS Dynamic
-         Type. AUTM-1483 took it from 0.6875rem capitals to 0.75rem sentence
-         case with no tracking: a lowercase word at 11px sets visibly smaller
-         than the capitals did, and 0.75rem is the Badge label size.
-
-         `rounded-autara-sm` (8px), not `rounded-full`: round is reserved for
-         avatars and indicator dots (Don, 2026-09-01). One step tighter than
-         the 14px shared control radius because this chip is ~26px tall — at
-         that height a 14px radius clamps to height/2 and renders as a pill
-         regardless, so the shared token cannot express the rule here. A
-         smaller control inside a larger container is the documented
-         exception. */
-      className={`inline-flex items-center gap-1.5 rounded-autara-sm px-3 py-[5px] text-[0.75rem] font-medium ${TONES[tone]} ${className}`}
+      /* AUTM-1594 — canvas v44: a 28px pill, 13px Medium, in the case the
+         consumer passes. This closes AUTM-1483 for MetaChip: no letterspaced
+         uppercase. rem throughout, and `min-h`, so it grows with text. The
+         pill supersedes the 2026-09-01 8px chip rung. */
+      className={`inline-flex min-h-7 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-0.5 text-[0.8125rem] font-medium leading-tight ${TONES[tone]} ${className}`}
     >
       {dot ? (
         <span

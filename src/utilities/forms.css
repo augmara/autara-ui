@@ -1,14 +1,13 @@
 /* ─── Autara Form Styles ─────────────────────────────────────────────────
  *
- * Canonical input — Stripe / Linear / Vercel pattern.
+ * AUTM-1594 — canvas v44's "Fields": one field family. 52px, 14px radius,
+ * a 1px field edge (`--field-edge`, 48% ink) on paper, 17px text. Focus is
+ * a 2px accent ring and nothing else (no tint, no halo); an error is a
+ * danger border plus a message under the field; disabled is a hairline
+ * edge at 60%. Apply `.field-input` to any text-style control.
  *
- *   Apply `.field-input` to any text-style control on a marketing or
- *   form surface. The focus state (v2.4) tints the field warm-cream and
- *   turns its hairline border solid brand-purple — a clean symmetric
- *   ring with NO outer halo. See the rule below; this comment used to
- *   describe a "soft 4px halo" and contradicted the CSS 30 lines down,
- *   which is how the stale claim reached two CLAUDE.md files and an
- *   agent brief (corrected 2026-09-01).
+ * The 2px focus is the 1px border plus a 1px inset ring in the same colour,
+ * so the text does not move by a pixel when the field takes focus.
  *
  * v1.0.x shipped `.input-light` with a similar treatment but smaller
  * 3px halo; that class is aliased below for backwards compat and is
@@ -28,18 +27,18 @@
      * font-size — i.e. with OS Dynamic Type. 2.75rem/0.875rem/1rem are
      * identical to the old 44px/14px/16px at a 16px root: zero visual
      * change, just unfrozen for accessibility text scaling. */
-    height: 2.75rem;
-    padding: 0 0.875rem;
+    height: 3.25rem;
+    padding: 0 1rem;
     border-radius: var(--radius-autara-md);
-    background: var(--surface);
+    background: var(--paper);
     /* AUTM-713 — was a hardcoded rgba(17,24,39,0.10) while every other
        bordered control used the 0.08 token, so text fields sat a shade
        darker than the Select, MultiSelect and FieldStack beside them. Now
        the token: fields track the ladder instead of diverging from it. */
-    border: 1px solid var(--border-subtle);
+    border: 1px solid var(--field-edge);
     color: var(--text-strong);
     font-family: inherit;
-    font-size: 1rem;
+    font-size: 1.0625rem;
     line-height: 1.4;
     transition: border-color 150ms ease, box-shadow 150ms ease,
         background-color 150ms ease;
@@ -50,36 +49,38 @@
     color: var(--text-subtle);
 }
 .field-input:hover:not(:disabled):not(:focus) {
-    border-color: var(--border-strong);
+    border-color: var(--text-muted);
 }
-/* Autara focus signature (v2.4): the field tints warm-cream and its
- * hairline border goes solid brand-purple — a clean, symmetric ring,
- * no outer halo and no one-sided bar. */
+/* Focus (AUTM-1594): a 2px accent ring, the border plus a 1px inset in the
+ * same colour. No tint: the sheet keeps the field on paper while typing. */
 .field-input:focus,
 .field-input:focus-visible {
     outline: none;
-    background: var(--surface-warm);
     border-color: var(--accent);
+    box-shadow: inset 0 0 0 1px var(--accent);
 }
 .field-input:disabled {
-    background: var(--surface-warm);
+    border-color: var(--hairline);
     color: var(--text-subtle);
+    opacity: 0.6;
     cursor: not-allowed;
 }
 .field-input[aria-invalid="true"] {
-    border-color: var(--color-autara-error);
+    border-color: var(--danger);
 }
 .field-input[aria-invalid="true"]:focus,
 .field-input[aria-invalid="true"]:focus-visible {
-    background: var(--intent-error-soft);
-    border-color: var(--color-autara-error);
+    border-color: var(--danger);
+    box-shadow: inset 0 0 0 1px var(--danger);
 }
 
+/* AUTM-1594: there is one field height now, so `--lg` is the base field.
+ * Kept so a consumer passing size="lg" is not broken by the bump. */
 .field-input--lg {
-    height: 3rem;
+    height: 3.25rem;
     padding: 0 1rem;
-    border-radius: var(--radius-autara-lg);
-    font-size: 1rem;
+    border-radius: var(--radius-autara-md);
+    font-size: 1.0625rem;
 }
 
 /* ─── Glass field — AUTM-948 ─────────────────────────────────────────────
@@ -157,19 +158,19 @@
 .field-textarea {
     display: block;
     width: 100%;
-    min-height: 96px;
-    padding: 12px 14px;
+    min-height: 6rem;
+    padding: 0.875rem 1rem;
     border-radius: var(--radius-autara-md);
-    background: var(--surface);
+    background: var(--paper);
     /* AUTM-713 — was a hardcoded rgba(17,24,39,0.10) while every other
        bordered control used the 0.08 token, so text fields sat a shade
        darker than the Select, MultiSelect and FieldStack beside them. Now
        the token: fields track the ladder instead of diverging from it. */
-    border: 1px solid var(--border-subtle);
+    border: 1px solid var(--field-edge);
     color: var(--text-strong);
     font-family: inherit;
-    font-size: 16px;
-    line-height: 1.55;
+    font-size: 1.0625rem;
+    line-height: 1.5;
     resize: vertical;
     transition: border-color 150ms ease, box-shadow 150ms ease;
 }
@@ -177,13 +178,27 @@
     color: var(--text-subtle);
 }
 .field-textarea:hover:not(:disabled):not(:focus) {
-    border-color: var(--border-strong);
+    border-color: var(--text-muted);
 }
 .field-textarea:focus,
 .field-textarea:focus-visible {
     outline: none;
-    background: var(--surface-warm);
     border-color: var(--accent);
+    box-shadow: inset 0 0 0 1px var(--accent);
+}
+.field-textarea:disabled {
+    border-color: var(--hairline);
+    color: var(--text-subtle);
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+.field-textarea[aria-invalid="true"] {
+    border-color: var(--danger);
+}
+.field-textarea[aria-invalid="true"]:focus,
+.field-textarea[aria-invalid="true"]:focus-visible {
+    border-color: var(--danger);
+    box-shadow: inset 0 0 0 1px var(--danger);
 }
 
 /* Force outline-none on inputs that own their focus treatment (matches

@@ -4,13 +4,18 @@
  * load the font themselves via next/font/local; v1.1.0 makes
  * `@import "@autara-au/autara-ui/tokens"` enough.
  *
- * Note: Satoshi doesn't ship a Bold (700) weight — autara-customer-web
- * mapped Satoshi-Black to CSS weight 700 (the heavier Black reads as
- * the brand's "bold"). Mirroring that decision here.
+ * Each CSS weight maps to the face designed for it (AUTM-1568). This file
+ * used to say Satoshi has no Bold and mapped Satoshi-Black to 700. Satoshi
+ * does ship a Bold, and the fonts' own OS/2 weight classes are Bold 700 and
+ * Black 900. With Black at 700, every bold label, button and title in every
+ * consumer rendered the heaviest face, and a heading set at 900 had no face
+ * at all, so it fell back to that same Black. merchant-web had already
+ * worked round it with a local Bold (AUTM-839).
  *
- * Workspace MEMORY policy: "Satoshi weights: 400 / 500 / 700 only.
- * No w300 / w600 / w800 / w900." Light (300) is loaded for completeness
- * but consumers should NOT use it.
+ * Weights: 400 / 500 / 700 for body and UI everywhere. 900 (Black) is for
+ * DISPLAY headlines on the Autara Web marketing surfaces only (AUTM-1513,
+ * Don, 2026-09-29). Never 600 or 800. Light (300) is loaded for
+ * completeness but consumers should NOT use it.
  */
 
 @font-face {
@@ -36,8 +41,15 @@
 }
 @font-face {
     font-family: "Satoshi";
-    src: url("../fonts/Satoshi-Black.otf") format("opentype");
+    src: url("../fonts/Satoshi-Bold.otf") format("opentype");
     font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: "Satoshi";
+    src: url("../fonts/Satoshi-Black.otf") format("opentype");
+    font-weight: 900;
     font-style: normal;
     font-display: swap;
 }
@@ -53,6 +65,35 @@
     /* Backwards-compat alias for v1.0.x consumers and the
      * autara-customer-web globals.css that still reads --font-brand-var. */
     --font-brand-var: "Satoshi";
+
+    /* ─── Type scale (AUTM-1594, canvas v44 UiComponents "Type") ─────────
+     * Display and headings Black at 1.04; body Regular; labels and buttons
+     * Medium; emphasis Bold. Sentence case, no letterspaced capitals. rem,
+     * so every step follows the reader's text size.
+     *
+     *   text-display  52  h1                text-section 28  h2, SectionHeading
+     *   text-figure   40  StatTile value    text-title   17  h3, row title
+     *   text-body     16  p                 text-caption 14  meta
+     *
+     * The meta step is named caption, the sheet's own label for it, because
+     * autara-customer-web already defines a 13px `text-meta` of its own. */
+    --text-display: 3.25rem;
+    --text-display--line-height: 1.04;
+    --text-display--letter-spacing: -0.03em;
+    --text-display--font-weight: 900;
+    --text-section: 1.75rem;
+    --text-section--line-height: 1.04;
+    --text-section--font-weight: 900;
+    --text-figure: 2.5rem;
+    --text-figure--line-height: 1;
+    --text-figure--font-weight: 900;
+    --text-title: 1.0625rem;
+    --text-title--line-height: 1.3;
+    --text-title--font-weight: 700;
+    --text-body: 1rem;
+    --text-body--line-height: 1.5;
+    --text-caption: 0.875rem;
+    --text-caption--line-height: 1.4;
 
     /* System font stacks for non-brand surfaces (code blocks, monospace UI). */
     --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;

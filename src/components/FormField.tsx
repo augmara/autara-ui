@@ -109,7 +109,7 @@ const FormField = React.forwardRef<HTMLDivElement, FormFieldProps>(
             : children
 
         return (
-            <div ref={ref} className={cn('space-y-1.5', className)} {...props}>
+            <div ref={ref} className={cn('space-y-2', className)} {...props}>
                 {label && (
                     <Label htmlFor={controlId} theme={theme}>
                         {label}
@@ -130,11 +130,11 @@ const FormField = React.forwardRef<HTMLDivElement, FormFieldProps>(
                     <p
                         id={descriptionId}
                         className={cn(
-                            'text-xs',
-                            // AUTM-734 — static gray → themed subtle ink (see Label).
+                            // AUTM-1594: the sheet's hint is 14px at 72% ink.
+                            'text-sm',
                             theme === 'dark'
-                                ? 'text-white/30'
-                                : 'text-[var(--text-subtle)]'
+                                ? 'text-white/60'
+                                : 'text-[var(--text-muted)]'
                         )}
                     >
                         {description}
@@ -144,7 +144,7 @@ const FormField = React.forwardRef<HTMLDivElement, FormFieldProps>(
                     <p
                         id={errorId}
                         role="alert"
-                        className="text-xs text-autara-error mt-1.5"
+                        className="text-sm text-[var(--danger)]"
                     >
                         {error}
                     </p>

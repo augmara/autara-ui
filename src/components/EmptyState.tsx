@@ -6,11 +6,12 @@ import type { ReactNode } from "react";
  * cross-stack non-negotiable: "Every list (e.g. uploaded documents) has
  * a designed empty state with icon, headline, body, primary action").
  *
- * Layout:
- *   - Dashed hairline border (signals "this is a placeholder")
- *   - Optional purple-tinted icon disc
- *   - Bold title + muted description
- *   - Optional action button (compose with BrandButton)
+ * Layout (AUTM-1594, canvas v44 "Empty"): a band card, 24px radius, 20px
+ * in, left-aligned, 10px between parts:
+ *   - Optional 44px icon disc (raised)
+ *   - 18px Bold title + 15px description at 72% ink
+ *   - Optional action, full width. On band the action is ink: pass a
+ *     `Button variant="strong" size="sm"`.
  *
  * Copy guidance — recoverable + specific:
  *   - Bad: "No data"
@@ -35,28 +36,21 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div
-      /* AUTM-1221: a solid hairline on the ladder. The dashed border read
-         as a drop zone, and the panel is not one. */
-      className={`flex flex-col items-center justify-center rounded-autara-lg border border-[var(--border-subtle)] bg-[var(--surface-elevated)] px-6 py-10 text-center ${className}`}
+      className={`flex flex-col gap-2.5 rounded-[1.5rem] bg-[var(--band)] p-5 text-[var(--text-strong)] ${className}`}
     >
       {icon ? (
         <div
           aria-hidden="true"
-          /* AUTM-1221: a solid purple tile on the ladder. Rules 3 and 4:
-             round is for avatars and status dots, and emphasis is a fill,
-             never an 8% tint. */
-          className="mb-4 grid h-12 w-12 place-items-center rounded-autara bg-[var(--color-autara-purple-static)] text-white"
+          className="grid size-11 shrink-0 place-items-center rounded-full bg-[var(--raised)] text-[var(--text-strong)]"
         >
           {icon}
         </div>
       ) : null}
-      <p className="text-sm font-bold text-[var(--text-strong)]">{title}</p>
+      <p className="text-lg leading-snug font-bold">{title}</p>
       {description ? (
-        <p className="mt-1.5 max-w-xs text-sm text-[var(--text-muted)]">
-          {description}
-        </p>
+        <p className="text-[0.9375rem] leading-normal text-[var(--text-muted)]">{description}</p>
       ) : null}
-      {action ? <div className="mt-5">{action}</div> : null}
+      {action ? <div className="flex flex-col">{action}</div> : null}
     </div>
   );
 }

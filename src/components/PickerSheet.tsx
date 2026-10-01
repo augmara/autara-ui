@@ -156,15 +156,16 @@ interface Level<T> {
  * The rows were also boxes for no reason. Every row was `--surface` on a
  * sheet that is itself `--surface`, so the hairline WAS the row — the same
  * 1.0:1-fill-plus-outline defect AUTM-969 found on ModeChip, at row scale.
- * They are now plain rows: no fill, no edge, hover paints `--surface-elevated`
- * and selection is a solid `--act-fill` marker on the right, in both single
- * and multi mode.
+ * They are now plain rows: no fill, no edge.
+ *
+ * AUTM-1594 (canvas v44 "Picker sheet"): 52px rows under a hairline, hover
+ * paints band, and the chosen single-select row is Bold with an ink check on
+ * the right; multi-select keeps a checkbox filled in the selected colour.
  *
  * The row is deliberately NOT painted solid when selected. `renderRow` is
  * consumer content and this component does not own its ink — repainting the
  * container is how the merchant-mobile booking-detail pass nearly shipped a
- * status sentence at 3.40:1. The marker is a surface we do own, so its
- * contrast is ours to guarantee.
+ * status sentence at 3.40:1. Bold weight and the check are safe on any ink.
  */
 export function PickerSheet<T = unknown>(props: PickerSheetProps<T>) {
     const {
@@ -320,17 +321,18 @@ export function PickerSheet<T = unknown>(props: PickerSheetProps<T>) {
                                     aria-selected={isSelected}
                                     disabled={option.disabled}
                                     onClick={() => handleRow(option)}
-                                    /* AUTM-974 — the row has no box and no
-                                       outline. See the rule-4 note in the
-                                       component header: selection is the
-                                       solid marker on the right, hover is a
-                                       fill, and the row itself is just its
-                                       own content. */
+                                    /* AUTM-1594 — canvas v44 "Picker sheet":
+                                       52px rows under a hairline, 16px
+                                       Medium; the chosen row is Bold with a
+                                       check. No box, no outline, no fill
+                                       marker (AUTM-974's solid marker is
+                                       retired by the sheet). */
                                     className={cn(
-                                        'flex min-h-[44px] w-full items-center gap-3 rounded-autara-md px-3 py-2 text-left transition-colors',
+                                        'flex min-h-13 w-full items-center gap-3 border-t border-[var(--hairline)] px-1 py-2 text-left text-base transition-colors',
                                         'bg-transparent text-[var(--text-strong)]',
-                                        'hover:bg-[var(--surface-elevated)]',
-                                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]',
+                                        isSelected ? 'font-bold' : 'font-medium',
+                                        'hover:bg-[var(--band)]',
+                                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper)]',
                                         'disabled:cursor-not-allowed disabled:opacity-50',
                                     )}
                                 >
@@ -351,26 +353,20 @@ export function PickerSheet<T = unknown>(props: PickerSheetProps<T>) {
                                         <span
                                             aria-hidden="true"
                                             className={cn(
-                                                'flex size-5 shrink-0 items-center justify-center rounded-autara-sm',
+                                                'flex size-6 shrink-0 items-center justify-center rounded-autara-sm',
                                                 isSelected
-                                                    ? 'bg-[var(--act-fill)] text-[var(--on-act)]'
-                                                    : 'border border-[var(--border-subtle)] bg-[var(--surface)]',
+                                                    ? 'bg-[var(--selected)] text-[var(--on-selected)]'
+                                                    : 'border-2 border-[var(--field-edge)] bg-[var(--paper)]',
                                             )}
                                         >
                                             {isSelected ? <CheckGlyph size={14} /> : null}
                                         </span>
                                     ) : isSelected ? (
-                                        /* Single-select selection is a SOLID
-                                           marker, not a bare tick — it is the
-                                           only thing left carrying "this one"
-                                           now the row border is gone, and the
-                                           two modes should not disagree about
-                                           what chosen looks like. */
-                                        <span
-                                            aria-hidden="true"
-                                            className="flex size-5 shrink-0 items-center justify-center rounded-autara-sm bg-[var(--act-fill)] text-[var(--on-act)]"
-                                        >
-                                            <CheckGlyph size={14} />
+                                        /* Single select: the Bold label and
+                                           an ink check, as the sheet draws
+                                           it. aria-selected carries it too. */
+                                        <span aria-hidden="true" className="shrink-0 text-[var(--text-strong)]">
+                                            <CheckGlyph size={16} />
                                         </span>
                                     ) : null}
                                 </button>
@@ -381,11 +377,11 @@ export function PickerSheet<T = unknown>(props: PickerSheetProps<T>) {
             )}
 
             {mode === 'multi' ? (
-                <div className="flex items-center justify-between border-t border-[var(--border-subtle)] pt-3">
+                <div className="flex items-center justify-between border-t border-[var(--hairline)] pt-3">
                     <span className="text-sm text-[var(--text-muted)]">
                         {selectedSet.size} selected
                     </span>
-                    <Button variant="secondary" onClick={() => onOpenChange(false)}>
+                    <Button variant="strong" onClick={() => onOpenChange(false)}>
                         {confirmLabel}
                     </Button>
                 </div>
@@ -422,7 +418,9 @@ export function PickerSheet<T = unknown>(props: PickerSheetProps<T>) {
                         <SheetTitle>{title}</SheetTitle>
                         {description ? <SheetDescription>{description}</SheetDescription> : null}
                     </SheetHeader>
-                    {body}
+                    {/* AUTM-1594: the sheet's 20px inset. The dialog pads its
+                        own content; a bottom sheet leaves it to the body. */}
+                    <div className="flex min-h-0 flex-1 flex-col px-5 pb-6">{body}</div>
                 </SheetContent>
             </Sheet>
         )

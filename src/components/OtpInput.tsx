@@ -19,8 +19,9 @@ import {
  *     drops the whole code in and it's split across the boxes.
  *   - Arrow keys move between boxes.
  *
- * Aesthetic: hairline-bordered surface boxes, brand-purple border + warm
- * tint on focus (the `.field-input` focus signature), no shadow. The digit
+ * Aesthetic (AUTM-1594, canvas v44 "Code"): 44 x 56 boxes on paper with the
+ * field edge, 14px radius, the digit 22px Bold; focus is the field's 2px
+ * accent ring, an error the danger border. No tint, no shadow. The digit
  * size is set inline in `rem` so it (a) survives a consumer's global
  * `input[type]{font-size}` rule and (b) still scales with OS Dynamic Type.
  *
@@ -126,7 +127,7 @@ export function OtpInput({
     <div
       role="group"
       aria-label={ariaLabel}
-      className="flex items-center justify-center gap-2 sm:gap-2.5"
+      className="flex items-center justify-center gap-2.5"
     >
       {Array.from({ length }).map((_, i) => (
         <input
@@ -147,11 +148,11 @@ export function OtpInput({
           onKeyDown={(e) => handleKeyDown(i, e)}
           onPaste={handlePaste}
           onFocus={(e) => e.currentTarget.select()}
-          style={{ fontSize: "1.5rem" }}
-          className={`h-[3.25rem] w-[2.75rem] rounded-[12px] border bg-[var(--surface)] text-center font-bold tabular-nums text-[var(--text-strong)] caret-[var(--color-autara-purple)] transition-colors duration-150 focus:bg-[var(--surface-warm)] focus:outline-none disabled:opacity-60 ${
+          style={{ fontSize: "1.375rem" }}
+          className={`h-14 w-11 rounded-autara-md border bg-[var(--paper)] text-center font-bold tabular-nums text-[var(--text-strong)] caret-[var(--accent)] transition-colors duration-150 focus:outline-none disabled:opacity-60 ${
             invalid
-              ? "border-[var(--color-autara-error)] focus:border-[var(--color-autara-error)]"
-              : "border-[var(--border-subtle)] focus:border-[var(--color-autara-purple)]"
+              ? "border-[var(--danger)] focus:shadow-[inset_0_0_0_1px_var(--danger)]"
+              : "border-[var(--field-edge)] focus:border-[var(--accent)] focus:shadow-[inset_0_0_0_1px_var(--accent)]"
           }`}
         />
       ))}

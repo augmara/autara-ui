@@ -137,10 +137,14 @@ describe('the specific outlines this sweep removed stay removed', () => {
     })
 
     it('Badge default is a solid fill, not a hairline box', () => {
+        // AUTM-1594: the default tone is the sheet's band; every tone is
+        // declared in one TONES table, and none carries a border or ring.
         const s = source('Badge.tsx')
-        const def = /\n\s*default:\s*\n?\s*'([^']*)'/.exec(s)?.[1] ?? ''
-        expect(def).toContain('--neutral-fill')
-        expect(def).not.toMatch(/\bborder\b|\bring-/)
+        expect(s).toMatch(/defaultVariants:\s*{\s*variant:\s*'band'/)
+        expect(s).toContain("band: `${PILL} bg-[var(--band)] text-[var(--text-strong)]`")
+        const tones = /const TONES[\s\S]*?\n}/.exec(s)?.[0] ?? ''
+        expect(tones).not.toBe('')
+        expect(tones).not.toMatch(/\bborder\b|\bring-/)
     })
 })
 
@@ -169,23 +173,31 @@ describe('Table is built from tokens', () => {
 
 /** The fills that replaced an outline, and what each has to keep doing. */
 describe('the replacements are actually solid', () => {
-    it('Tabs marks the active trigger with a fill, not a ring', () => {
+    it('Tabs marks the active trigger with the Selected fill and a weight, not a ring', () => {
+        // AUTM-1594, canvas v51: the active segment takes the Selected fill
+        // (as the chosen filter chip) with its own ink, and its label Bold.
         const s = source('Tabs.tsx')
-        expect(s).toContain('data-[state=active]:bg-[var(--act-fill)]')
-        expect(s).toContain('data-[state=active]:text-[var(--on-act)]')
+        expect(s).toContain('data-[state=active]:bg-[var(--selected)]')
+        expect(s).toContain('data-[state=active]:font-bold')
+        expect(s).toContain('data-[state=active]:text-[var(--on-selected)]')
+        expect(s).not.toContain('data-[state=active]:bg-[var(--raised)]')
     })
 
-    it('MetaChip neutral takes the achromatic solid added for it', () => {
+    it('MetaChip neutral is the sheet\'s band with ink', () => {
+        // AUTM-1594: canvas v44 "Default and meta" draws meta chips on band.
         expect(source('MetaChip.tsx')).toContain(
-            'neutral: "bg-[var(--neutral-fill)] text-[var(--on-neutral)]"'
+            'neutral: "bg-[var(--band)] text-[var(--text-strong)]"'
         )
     })
 
-    it('PickerSheet marks selection with a solid marker in both modes', () => {
+    it('PickerSheet marks selection without an outline in both modes', () => {
+        // AUTM-1594: canvas v44 marks the chosen single-select row Bold with
+        // an ink check; multi-select keeps a filled checkbox in the selected
+        // colour. Neither uses a border as the emphasis.
         const s = source('PickerSheet.tsx')
-        expect(
-            s.match(/bg-\[var\(--act-fill\)\] text-\[var\(--on-act\)\]/g)?.length ?? 0
-        ).toBeGreaterThanOrEqual(2)
+        expect(s).toContain("isSelected ? 'font-bold' : 'font-medium'")
+        expect(s).toContain('bg-[var(--selected)] text-[var(--on-selected)]')
+        expect(s).not.toMatch(/border-autara-purple/)
     })
 })
 
@@ -286,13 +298,16 @@ function token(name: string, theme: Theme): RGB {
  * Every fill that now carries emphasis, with the ink it has to hold and the
  * grounds it sits on in the components above.
  *
- *   act      Tabs active trigger, Table selected row, PickerSheet marker
+ *   act      Table selected row
+ *   selected Tabs active trigger, FilterChipRow active chip (AUTM-1594)
  *   neutral  MetaChip neutral, Badge default
  *   money    MetaChip success (was a lime tint + ring)
  *   flight   MetaChip flight
  */
 const FILLS: { fill: string; ink: string; grounds: string[] }[] = [
     { fill: 'act-fill', ink: 'on-act', grounds: ['surface', 'surface-elevated', 'background'] },
+    // AUTM-1594: the active segment and the chosen chip, on the band track.
+    { fill: 'selected', ink: 'on-selected', grounds: ['band', 'paper'] },
     { fill: 'neutral-fill', ink: 'on-neutral', grounds: ['surface', 'surface-elevated', 'background'] },
     { fill: 'money-fill', ink: 'on-money', grounds: ['surface', 'surface-elevated', 'background'] },
     { fill: 'flight-fill', ink: 'on-flight', grounds: ['surface', 'surface-elevated', 'background'] },
@@ -343,9 +358,9 @@ describe('every emphasis fill defines its own shape — that is what earns dropp
  * component actually names.
  */
 const FOCUS_BANDS: [string, string][] = [
-    ['Tabs trigger', 'surface-elevated'],
+    ['Tabs trigger', 'band'],
     ['FilterChipRow chip', 'background'],
-    ['PickerSheet row', 'surface'],
+    ['PickerSheet row', 'paper'],
     // AUTM-977 — the rest of the library, swept to the same signature.
     ['Button (BASE, every variant)', 'background'],
     ['Accordion trigger', 'surface'],
@@ -354,7 +369,7 @@ const FOCUS_BANDS: [string, string][] = [
     ['Checkbox', 'background'],
     ['Dialog close', 'surface'],
     ['Radio', 'background'],
-    ['Sheet close', 'surface'],
+    ['Sheet close', 'paper'],
     ['Stepper step', 'background'],
     ['Switch', 'background'],
     // AUTM-1127 — AccountMenu. The rows and the accent CTA sit on the panel,

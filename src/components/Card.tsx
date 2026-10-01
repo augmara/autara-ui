@@ -3,7 +3,21 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '../lib/cn'
 
 /**
- * Card — the panel primitive. Glass by default.
+ * Card — the panel primitive.
+ *
+ * ─── AUTM-1594: canvas v44 "Surfaces" ───────────────────────────────────
+ *
+ * Band cards on paper, raised rows inside band cards, one brand-deep hero per
+ * screen. Radius 24 for cards. No shadows and no outlines: depth is the step
+ * between paper, band and raised. So:
+ *
+ *   band    (default) the card: band, 24px
+ *   hero    brand-deep (brand in dark: --hero) with on-deep ink, one per screen
+ *   raised  a row or a card sitting on band: raised, 16px
+ *
+ * The glass variants below are retired by the sheet. Each still renders, as
+ * a band card, so a consumer bump changes the look and nothing else; the
+ * history that follows explains how glass got here and is kept as record.
  *
  * ─── AUTM-948 reworks AUTM-934 ──────────────────────────────────────────
  *
@@ -48,61 +62,26 @@ import { cn } from '../lib/cn'
  * See `GlassSurface` for the two gotchas that come with `backdrop-filter`
  * (fixed-position containing block, GPU cost).
  */
-const cardVariants = cva('transition-all duration-[350ms]', {
+const BAND = 'rounded-[1.5rem] bg-[var(--band)] text-[var(--text-strong)]'
+
+const cardVariants = cva('transition-colors', {
     variants: {
         variant: {
-            // ─── The house material ──────────────────────────────────
-            // Composes the ONE glass implementation rather than
-            // re-deriving a blur value here. `rounded-autara-lg` and the
-            // fill/edge/highlight all come from `.glass-surface`.
-            glass: 'glass-surface glass-surface--interactive',
-
-            // ─── Opaque twin — same ladder, no GPU cost ──────────────
-            // Also what `.glass-surface` collapses to under
-            // `prefers-reduced-transparency: reduce`, so the two stay
-            // visually consistent by construction.
-            surface: [
-                'rounded-autara-lg bg-[var(--surface)] text-[var(--text-strong)]',
-                'border border-[var(--glass-edge)]',
-                'shadow-[inset_0_1px_0_var(--glass-hi)]',
-                'hover:border-[var(--glass-edge-hi)]',
-            ].join(' '),
-
-            // Glass without the blur — for rows inside a long list. Keeps
-            // the fill, edge and highlight so it reads as the same family.
-            'glass-flat': [
-                'glass-surface glass-surface--flat glass-surface--interactive',
-            ].join(' '),
-
-            // ─── Legacy names, moved onto the ladder ─────────────────
-            // No `hover:translate-y` any more: a card-shaped surface that
-            // floats on hover contradicts the brand (buttons may translate,
-            // cards may not).
-            service: [
-                'glass-surface glass-surface--flat glass-surface--interactive',
-                'p-6 cursor-pointer',
-            ].join(' '),
-            outline:
-                'rounded-autara-lg border border-[var(--glass-edge)] bg-transparent text-[var(--text-strong)]',
-            solid: [
-                'rounded-autara-lg bg-[var(--surface-elevated)] text-[var(--text-strong)]',
-                'border border-[var(--glass-edge)]',
-            ].join(' '),
-
-            // ─── UNTOUCHED — what consumers pin ──────────────────────
-            // Autara ships shadow-free. Depth is the hairline border; lift
-            // on hover is a border-colour shift. No box-shadow, no translate.
-            light: [
-                'rounded-autara-lg bg-[var(--surface)] p-7 text-[var(--text-strong)]',
-                'border border-[var(--border-subtle)]',
-                'hover:border-autara-purple/30',
-            ].join(' '),
+            band: BAND,
+            hero: 'rounded-[1.5rem] bg-[var(--hero)] text-[var(--on-deep)]',
+            raised: 'rounded-2xl bg-[var(--raised)] text-[var(--text-strong)]',
+            // Retired by the sheet: each renders as a band card.
+            glass: BAND,
+            'glass-flat': BAND,
+            surface: BAND,
+            solid: BAND,
+            outline: BAND,
+            light: `${BAND} p-7`,
+            service: `${BAND} cursor-pointer p-6 hover:bg-[var(--band-press)]`,
         },
     },
     defaultVariants: {
-        // AUTM-948 — back to 'glass', but glass that actually renders.
-        // AUTM-934 had moved it to 'surface' when glass was 1.001:1.
-        variant: 'glass',
+        variant: 'band',
     },
 })
 
@@ -127,7 +106,8 @@ const CardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <div
         ref={ref}
-        className={cn('flex flex-col space-y-1.5 p-6', className)}
+        // AUTM-1594: 20px in, 10px between title and description, as the sheet.
+        className={cn('flex flex-col gap-2.5 p-5', className)}
         {...props}
     />
 ))
@@ -139,7 +119,7 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <div
         ref={ref}
-        className={cn('text-lg font-bold leading-none tracking-tight', className)}
+        className={cn('text-lg font-bold leading-snug', className)}
         {...props}
     />
 ))
@@ -156,7 +136,7 @@ const CardDescription = React.forwardRef<
            invisible everywhere, in both themes' light halves. `--text-muted`
            is the themed secondary-copy rung and clears 4.5:1 on `--surface`
            and `--surface-elevated` in both themes (see text-contrast.test.ts). */
-        className={cn('text-sm text-[var(--text-muted)]', className)}
+        className={cn('text-[0.9375rem] leading-normal text-[var(--text-muted)]', className)}
         {...props}
     />
 ))
@@ -166,7 +146,7 @@ const CardContent = React.forwardRef<
     HTMLDivElement,
     React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('p-6 pt-0', className)} {...props} />
+    <div ref={ref} className={cn('p-5 pt-0', className)} {...props} />
 ))
 CardContent.displayName = 'CardContent'
 
@@ -176,7 +156,7 @@ const CardFooter = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <div
         ref={ref}
-        className={cn('flex items-center p-6 pt-0', className)}
+        className={cn('flex items-center p-5 pt-0', className)}
         {...props}
     />
 ))

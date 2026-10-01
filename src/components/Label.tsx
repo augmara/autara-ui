@@ -3,8 +3,12 @@ import * as LabelPrimitive from '@radix-ui/react-label'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '../lib/cn'
 
+/**
+ * AUTM-1594 — canvas v44 "Fields": the label is 15px Medium ink, 8px above
+ * its field. It was 13px, in px, so it did not follow the reader's text size.
+ */
 const labelVariants = cva(
-    'text-[13px] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
+    'block text-[0.9375rem] font-medium leading-snug peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
     {
         variants: {
             theme: {

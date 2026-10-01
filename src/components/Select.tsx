@@ -72,14 +72,17 @@ const SelectTrigger = React.forwardRef<
     <SelectPrimitive.Trigger
         ref={ref}
         className={cn(
-            'flex h-11 w-full items-center justify-between gap-2 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface)] px-3.5 text-sm text-[var(--text-strong)] outline-none transition-colors',
+            // AUTM-1594: the sheet's field (and PickerTrigger's look) — 52px,
+            // 14px, the field edge on paper; focus or open is a 2px accent
+            // ring with no halo; an error is the danger edge.
+            'flex min-h-13 w-full items-center justify-between gap-2 rounded-autara-md border border-[var(--field-edge)] bg-[var(--paper)] px-4 text-[1.0625rem] text-[var(--text-strong)] outline-none transition-colors',
             'placeholder:text-[var(--text-subtle)]',
-            'hover:border-[rgba(17,24,39,0.18)]',
+            'hover:border-[var(--text-muted)]',
             'data-[placeholder]:text-[var(--text-subtle)]',
-            'focus-visible:border-[var(--color-autara-purple)] focus-visible:[box-shadow:0_0_0_4px_rgba(78,27,189,0.10)]',
-            'data-[state=open]:border-[var(--color-autara-purple)] data-[state=open]:[box-shadow:0_0_0_4px_rgba(78,27,189,0.10)]',
-            'aria-invalid:border-[var(--color-autara-error)] aria-invalid:[box-shadow:0_0_0_4px_rgba(221,56,56,0.10)]',
-            'disabled:cursor-not-allowed disabled:bg-[var(--surface-warm)] disabled:text-[var(--text-subtle)]',
+            'focus-visible:border-[var(--accent)] focus-visible:shadow-[inset_0_0_0_1px_var(--accent)]',
+            'data-[state=open]:border-[var(--accent)] data-[state=open]:shadow-[inset_0_0_0_1px_var(--accent)]',
+            'aria-invalid:border-[var(--danger)] aria-invalid:shadow-[inset_0_0_0_1px_var(--danger)]',
+            'disabled:cursor-not-allowed disabled:border-[var(--hairline)] disabled:text-[var(--text-subtle)] disabled:opacity-60',
             /*
               AUTM-418 — single-line truncation via `truncate`, NOT `line-clamp-1`.
 
