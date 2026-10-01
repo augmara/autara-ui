@@ -34,6 +34,11 @@ describe("Stepper (AUTM-1594)", () => {
     it("renders the numbered list for wide screens and the bars for phones", () => {
         const { container } = render(<Stepper steps={steps} currentStep={2} ariaLabel="Booking progress" />);
         expect(container.querySelector("ol")?.className).toContain("lg:flex");
+        // The bars are visually hidden from 64rem, never removed: the named
+        // progressbar must exist at every width.
+        const bars = container.querySelector("[role='progressbar']")!.parentElement!;
+        expect(bars.className).toContain("lg:sr-only");
+        expect(bars.className).not.toContain("lg:hidden");
         expect(screen.getByRole("progressbar", { name: "Booking progress" })).toHaveAttribute("aria-valuetext", "Step 3 of 4: When");
         expect(screen.getByText("When", { selector: "span" }).closest("[aria-current='step']")).not.toBeNull();
     });

@@ -103,7 +103,12 @@ const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(function Stepper(
 
     return (
         <nav ref={ref} aria-label={ariaLabel} className={cn('w-full', className)}>
-            <div className={cn('flex flex-col gap-2', !barsOnly && 'lg:hidden')}>
+            {/* From 64rem the numbered list is what is SEEN, but the bars stay
+                in the accessibility tree (sr-only, not hidden): the named
+                progressbar and "Step N of M" are what assistive tech and
+                merchant-web's a11y spec rely on at every width. Found by the
+                merchant-web dry run under AUTM-1594. */}
+            <div className={cn('flex flex-col gap-2', !barsOnly && 'lg:sr-only')}>
                 <div
                     className="flex gap-1.5"
                     role="progressbar"
@@ -163,8 +168,10 @@ const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(function Stepper(
                                         status === 'upcoming' && 'text-[var(--text-muted)]'
                                     )}
                                 >
+                                    {/* The label alone is the accessible name: consumers
+                                        and autara-web-automation find steps by it, so a
+                                        suffix here would be a breaking change. */}
                                     {step.label}
-                                    {status === 'complete' ? <span className="sr-only"> (done)</span> : null}
                                 </span>
                             </>
                         )
