@@ -123,8 +123,14 @@ docs/
   brand purple in dark. Don't reach for `--surface-inverse` on a CTA —
   that token inverts (correct for a Tooltip/Toast capsule, wrong for a
   button, which turned into a white slab on dark before this landed).
-- **Satoshi typography** — bundled. Use weights 400 / 500 / 700 only
-  (Black mapped to 700). Never 300, 600, 800, 900.
+- **Satoshi typography** — bundled. Use weights 400 / 500 / 700 for body
+  and UI; 700 is Satoshi Bold. 900 is Satoshi Black, for display headlines
+  on the Autara Web marketing surfaces only (AUTM-1513). Never 300, 600 or
+  800. *Corrected 2026-10-01 (AUTM-1568): this said "Black mapped to 700",
+  and the package did exactly that, so every bold label in every consumer
+  rendered Black and a 900 heading had no face of its own.
+  `src/tokens/typography.test.ts` now checks each weight against the font's
+  own OS/2 weight class.*
 - **Focus signature (v2.4): warm-cream tint + solid brand-purple border, NO
   halo** on focused inputs (`.field-input`). Corrected 2026-09-01 — this line
   used to claim a "4px brand-purple halo", and `src/utilities/forms.css` says

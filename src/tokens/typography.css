@@ -4,13 +4,18 @@
  * load the font themselves via next/font/local; v1.1.0 makes
  * `@import "@autara-au/autara-ui/tokens"` enough.
  *
- * Note: Satoshi doesn't ship a Bold (700) weight — autara-customer-web
- * mapped Satoshi-Black to CSS weight 700 (the heavier Black reads as
- * the brand's "bold"). Mirroring that decision here.
+ * Each CSS weight maps to the face designed for it (AUTM-1568). This file
+ * used to say Satoshi has no Bold and mapped Satoshi-Black to 700. Satoshi
+ * does ship a Bold, and the fonts' own OS/2 weight classes are Bold 700 and
+ * Black 900. With Black at 700, every bold label, button and title in every
+ * consumer rendered the heaviest face, and a heading set at 900 had no face
+ * at all, so it fell back to that same Black. merchant-web had already
+ * worked round it with a local Bold (AUTM-839).
  *
- * Workspace MEMORY policy: "Satoshi weights: 400 / 500 / 700 only.
- * No w300 / w600 / w800 / w900." Light (300) is loaded for completeness
- * but consumers should NOT use it.
+ * Weights: 400 / 500 / 700 for body and UI everywhere. 900 (Black) is for
+ * DISPLAY headlines on the Autara Web marketing surfaces only (AUTM-1513,
+ * Don, 2026-09-29). Never 600 or 800. Light (300) is loaded for
+ * completeness but consumers should NOT use it.
  */
 
 @font-face {
@@ -36,8 +41,15 @@
 }
 @font-face {
     font-family: "Satoshi";
-    src: url("../fonts/Satoshi-Black.otf") format("opentype");
+    src: url("../fonts/Satoshi-Bold.otf") format("opentype");
     font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: "Satoshi";
+    src: url("../fonts/Satoshi-Black.otf") format("opentype");
+    font-weight: 900;
     font-style: normal;
     font-display: swap;
 }
