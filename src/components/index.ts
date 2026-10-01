@@ -1,5 +1,6 @@
 export { GradientBar } from './GradientBar'
 export { Button, buttonVariants, type ButtonProps } from './Button'
+export { IconButton, type IconButtonProps } from './IconButton'
 export { Input, inputVariants, type InputProps } from './Input'
 export { OtpInput, type OtpInputProps } from './OtpInput'
 export {
@@ -63,6 +64,7 @@ export {
     type PickerRowRender,
     type PickerSheetProps,
 } from './PickerSheet'
+export { PickerTrigger, type PickerTriggerProps } from './PickerTrigger'
 
 export { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from './Accordion'
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './Tabs'
@@ -136,6 +138,7 @@ export { RadioGroup, RadioGroupItem } from './Radio'
 export { Avatar, AvatarImage, AvatarFallback, avatarVariants } from './Avatar'
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './Tooltip'
 export { Progress } from './Progress'
+export { ProgressSteps, type ProgressStepsProps } from './ProgressSteps'
 // AUTM-1046 — indeterminate busy indicator for work in progress (uploads, saves).
 export { Spinner, type SpinnerProps, type SpinnerSize, type SpinnerTone } from './Spinner'
 export { MultiSelect, type MultiSelectOption, type MultiSelectProps } from './MultiSelect'
@@ -154,6 +157,7 @@ export {
 // ─── v1.1.0 promotions from autara-customer-web ──────────────────────────
 export { BrandButton, brandButtonVariants, type BrandButtonProps } from './BrandButton'
 export { MetaChip, type MetaChipProps } from './MetaChip'
+export { StatusDot, type StatusDotProps, type StatusDotTone } from './StatusDot'
 export { RatingStars, type RatingStarsProps } from './RatingStars'
 export { EmptyState, type EmptyStateProps } from './EmptyState'
 export { LockedFeature, type LockedFeatureProps } from './LockedFeature'
@@ -295,6 +299,7 @@ export {
 // ConfirmActionDialog); NativeSelect: a real <select> dressed as a field;
 // MoneyBreakdown: lines of money, then the one that matters.
 export { InlineAlert, type InlineAlertProps, type InlineAlertTone } from './InlineAlert'
+export { Banner, type BannerProps } from './Banner'
 export { ConfirmDialog, type ConfirmDialogProps } from './ConfirmDialog'
 export { NativeSelect, type NativeSelectProps } from './NativeSelect'
 export { MoneyBreakdown, type MoneyBreakdownProps, type MoneyRow } from './MoneyBreakdown'

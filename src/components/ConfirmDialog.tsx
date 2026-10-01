@@ -88,7 +88,7 @@ export function ConfirmDialog({
                 {loading ? (
                     <p
                         role="status"
-                        className="mt-4 rounded-autara border border-[var(--border-subtle)] bg-[var(--surface-elevated)] px-3 py-2 text-sm text-[var(--text-muted)]"
+                        className="mt-4 rounded-2xl bg-[var(--band)] px-4 py-3 text-[0.9375rem] text-[var(--text-muted)]"
                     >
                         Working on it. Closing this won&rsquo;t stop it.
                     </p>
@@ -104,18 +104,23 @@ export function ConfirmDialog({
                     </InlineAlert>
                 ) : null}
 
-                <DialogFooter className="mt-5 flex-row justify-end gap-2">
+                {/* AUTM-1594 — canvas v44: quiet Cancel and the strong action,
+                    side by side and full width. Destructive is strong too: no
+                    red buttons, the consequence is said in the body. */}
+                <DialogFooter className="mt-2 flex-row gap-2.5">
                     <Button
-                        variant="glass"
+                        variant="quiet"
                         size="md"
+                        fullWidth
                         onClick={onClose}
                         data-testid={testId ? `${testId}-cancel` : undefined}
                     >
                         {loading ? 'Close' : cancelLabel}
                     </Button>
                     <Button
-                        variant={tone === 'destructive' ? 'destructive' : 'primary'}
+                        variant="strong"
                         size="md"
+                        fullWidth
                         disabled={loading}
                         onClick={onConfirm}
                         data-testid={testId ? `${testId}-confirm` : undefined}

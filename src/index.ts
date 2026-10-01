@@ -2,6 +2,7 @@
 export {
     GradientBar,
     Button, buttonVariants, type ButtonProps,
+    IconButton, type IconButtonProps,
     Input, inputVariants, type InputProps,
     PhoneInput, DEFAULT_COUNTRIES, findCountryByIso, type PhoneInputProps, type PhoneCountry,
     Textarea, textareaVariants, type TextareaProps,
@@ -22,6 +23,7 @@ export {
     Dialog, DialogPortal, DialogOverlay, DialogClose, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription,
     Sheet, SheetPortal, SheetOverlay, SheetTrigger, SheetClose, SheetContent, SheetHeader, SheetFooter, SheetTitle, SheetDescription,
     PickerSheet, type PickerOption, type PickerRowRender, type PickerSheetProps,
+    PickerTrigger, type PickerTriggerProps,
     Accordion, AccordionItem, AccordionTrigger, AccordionContent,
     Tabs, TabsList, TabsTrigger, TabsContent,
     DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuGroup, DropdownMenuPortal, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent, type DropdownMenuContentProps,
@@ -40,6 +42,7 @@ export {
     Avatar, AvatarImage, AvatarFallback, avatarVariants,
     Tooltip, TooltipTrigger, TooltipContent, TooltipProvider,
     Progress,
+    ProgressSteps, type ProgressStepsProps,
     // AUTM-1046 — indeterminate busy indicator for work in progress.
     Spinner, type SpinnerProps, type SpinnerSize, type SpinnerTone,
     MultiSelect, type MultiSelectOption, type MultiSelectProps,
@@ -47,6 +50,7 @@ export {
     // v1.1.0 — promoted from autara-customer-web
     BrandButton, brandButtonVariants, type BrandButtonProps,
     MetaChip, type MetaChipProps,
+    StatusDot, type StatusDotProps, type StatusDotTone,
     OtpInput, type OtpInputProps,
     RatingStars, type RatingStarsProps,
     EmptyState, type EmptyStateProps,
@@ -112,6 +116,7 @@ export {
     type AccountMenuTone,
     // AUTM-1185 — the customer-web hardening sweep's four primitives
     InlineAlert, type InlineAlertProps, type InlineAlertTone,
+    Banner, type BannerProps,
     ConfirmDialog, type ConfirmDialogProps,
     NativeSelect, type NativeSelectProps,
     MoneyBreakdown, type MoneyBreakdownProps, type MoneyRow,

@@ -7,6 +7,22 @@ import { cn } from '../lib/cn'
 /**
  * Tabs — Radix tab primitive, segmented-control shape.
  *
+ * ─── AUTM-1594: canvas v44 "Segmented" ──────────────────────────────────
+ *
+ * A band pill track; the tab you are on takes the SELECTED fill (#2e1070
+ * with white in light, #8f6bff with ink in dark) and its label in Bold; the
+ * rest are Medium at 72% ink. Selected is the same fill as the chosen
+ * filter chip, so "selected" reads one way everywhere.
+ *
+ * The first build drew the active tab raised (white on band, 1.05:1), as v44
+ * did. That was the step AUTM-974 (below) called invisible; the design
+ * session changed it to the Selected fill on canvas v51 (2026-10-01).
+ *
+ * Drawn at the sheet's size (40px pills in a 48px track) with AUTM-622's
+ * 44px floor kept as a hit area: each trigger carries a centred, unpainted
+ * 44px pseudo-element, the pattern Switch uses. The track's 4px padding is
+ * the room it needs.
+ *
  * ─── AUTM-974: why the active tab is a solid fill now ───────────────────
  *
  * It used to be `bg-[var(--surface)]` with `ring-1 ring-inset` on a
@@ -71,7 +87,7 @@ const TabsList = React.forwardRef<
              * floor plus its own 0.25rem padding on each side. Sized in rem
              * and as a MINIMUM for the same reason the old value was: at 200%
              * text scale a fixed height clips the label. */
-            'inline-flex min-h-[3.25rem] items-center justify-center gap-1 rounded-autara-md bg-[var(--surface-elevated)] p-1 text-[var(--text-muted)]',
+            'inline-flex min-h-12 items-center justify-center gap-1 rounded-full bg-[var(--band)] p-1 text-[var(--text-muted)]',
             className
         )}
         {...props}
@@ -91,15 +107,16 @@ const TabsTrigger = React.forwardRef<
              * switcher measured 32px tall on phone, tablet AND desktop. The
              * 44px floor is a cross-stack rule, and a segmented control the
              * merchant hits constantly is the worst place to be under it. */
-            'inline-flex min-h-11 items-center justify-center whitespace-nowrap rounded-autara-sm px-3 py-1.5 text-sm font-medium transition-colors',
+            'relative inline-flex min-h-10 items-center justify-center whitespace-nowrap rounded-full px-3.5 py-1.5 text-[0.9375rem] font-medium transition-colors',
+            "before:absolute before:left-1/2 before:top-1/2 before:h-11 before:w-full before:min-w-11 before:-translate-x-1/2 before:-translate-y-1/2 before:content-['']",
             'text-[var(--text-muted)] hover:text-[var(--text-strong)]',
             // See the focus-ring note in the header — full-strength accent,
             // and the offset band painted in the track that is really behind
             // it, because that band is what keeps a purple ring off a purple
             // fill.
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-elevated)]',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--band)]',
             'disabled:pointer-events-none disabled:opacity-50',
-            'data-[state=active]:bg-[var(--act-fill)] data-[state=active]:text-[var(--on-act)]',
+            'data-[state=active]:bg-[var(--selected)] data-[state=active]:font-bold data-[state=active]:text-[var(--on-selected)]',
             className
         )}
         {...props}

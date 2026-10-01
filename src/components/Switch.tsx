@@ -5,12 +5,11 @@ import * as SwitchPrimitive from '@radix-ui/react-switch'
 import { cn } from '../lib/cn'
 
 /**
- * Switch — Radix switch primitive styled for the Autara cream canvas.
+ * Switch — Radix switch primitive (AUTM-1594, canvas v44 "Switch").
  *
- * **Unchecked**: surface-elevated track with a hairline border.
- * **Checked**: autara-purple track. Thumb is a clean white pill — no
- * drop shadow (depth comes from the track contrast, per the Autara
- * house rule against `box-shadow`).
+ * A 52 x 32 track with a 24px white thumb 4px in. **Off**: band with the
+ * field edge. **On**: the selected colour (#2e1070, #8f6bff in dark). No
+ * shadow on the thumb: depth is the track's contrast.
  *
  * The `theme` prop is preserved for source-level compatibility with
  * existing consumers (e.g. autara-merchant-web's local wrapper) but
@@ -28,7 +27,7 @@ const Switch = React.forwardRef<
 >(({ className, theme: _theme, ...props }, ref) => (
     <SwitchPrimitive.Root
         className={cn(
-            'peer relative inline-flex h-[24px] w-[44px] shrink-0 cursor-pointer items-center rounded-full border transition-colors',
+            'peer relative inline-flex h-8 w-13 shrink-0 cursor-pointer items-center rounded-full border transition-colors',
             /* AUTM-622 — a 44x44 hit area WITHOUT changing the painted
              * control. A switch is 24px tall by design; that is the shape
              * people recognise, so growing the box would fix the target and
@@ -39,12 +38,12 @@ const Switch = React.forwardRef<
              * generates no box at all and the whole rule silently does
              * nothing, which is the version of this that measures as fixed
              * and still misses at 24px. */
-            'before:absolute before:left-1/2 before:top-1/2 before:h-11 before:w-11',
+            'before:absolute before:left-1/2 before:top-1/2 before:h-11 before:w-13',
             "before:-translate-x-1/2 before:-translate-y-1/2 before:content-['']",
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]',
             'disabled:cursor-not-allowed disabled:opacity-50',
-            'border-[var(--border-subtle)] bg-[var(--surface-elevated)]',
-            'data-[state=checked]:border-autara-purple data-[state=checked]:bg-autara-purple',
+            'border-[var(--field-edge)] bg-[var(--band)]',
+            'data-[state=checked]:border-transparent data-[state=checked]:bg-[var(--selected)]',
             className
         )}
         {...props}
@@ -52,8 +51,9 @@ const Switch = React.forwardRef<
     >
         <SwitchPrimitive.Thumb
             className={cn(
-                'pointer-events-none block h-[18px] w-[18px] translate-x-[2px] rounded-full bg-white ring-0 transition-transform',
-                'data-[state=checked]:translate-x-[22px]'
+                // 3px + the 1px border = 4px in; 52 - 2 - 24 - 3 = 23px when on.
+                'pointer-events-none block size-6 translate-x-[3px] rounded-full bg-white ring-0 transition-transform',
+                'data-[state=checked]:translate-x-[23px]'
             )}
         />
     </SwitchPrimitive.Root>

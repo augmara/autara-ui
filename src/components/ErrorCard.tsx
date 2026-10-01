@@ -18,11 +18,10 @@ import { Button } from "./Button";
  * possible place for the copy to be unreadable, because the retry control
  * is the only way out.
  *
- * The rebuild follows the house grammar rather than re-tinting: a normal
- * hairline panel on `--surface`, with the tone carried by a SOLID intent
- * disc and a hairline border in the intent colour. Solid, never pastel
- * (the same call AUTM-211 made for Badge). Every value is a token, so
- * both themes track the ladder.
+ * The rebuild followed the house grammar rather than re-tinting. AUTM-1594
+ * moved it to canvas v44's band card (see the render below): no intent disc
+ * and no hairline, the words and the ink Retry carry it. Every value is a
+ * token, so both themes track the ladder.
  *
  * Copy guidance — recoverable + specific:
  *   - Bad: "Something went wrong" (Autara house rule: don't ship this)
@@ -62,36 +61,14 @@ export interface ErrorCardProps {
  * same ones Badge's status tones use. They read on cream and on ink, which
  * is exactly what a tone marker has to do.
  */
-const TONE: Record<Tone, { fill: string; border: string }> = {
-  error: {
-    fill: "bg-[var(--color-autara-error)]",
-    border: "border-[var(--color-autara-error)]/30",
-  },
-  warning: {
-    fill: "bg-[var(--color-autara-warning)]",
-    border: "border-[var(--color-autara-warning)]/35",
-  },
-};
-
-/** Solar Bold — rounded caps, 2.4 stroke on a 24 viewBox. */
-const AlertIcon = () => (
-  <svg
-    aria-hidden
-    viewBox="0 0 24 24"
-    width="18"
-    height="18"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={2.4}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M12 7.5v5.5" />
-    <path d="M12 16.5h.01" />
-    <path d="M10.3 3.6 2.5 17.2A2 2 0 0 0 4.2 20.2h15.6a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0Z" />
-  </svg>
-);
-
+/*
+ * AUTM-1594 — canvas v44 "Error": a band card, 24px radius, 20px in; an
+ * 18px Bold title that names the thing, a 15px line that says the way out,
+ * and Retry as the strong action across the card. On band the action is ink.
+ * No intent medallion: the words carry it. `icon` still renders, in a raised
+ * disc, for a consumer that wants one. `tone` is kept on the element as
+ * data-tone for consumers and tests that read it.
+ */
 export function ErrorCard({
   title = "Couldn't load this",
   message,
@@ -102,59 +79,33 @@ export function ErrorCard({
   icon,
   className,
 }: ErrorCardProps) {
-  const t = TONE[tone];
   return (
     <div
       role="alert"
+      data-tone={tone}
       className={cn(
-        "rounded-autara-lg border bg-[var(--surface)] p-4",
-        t.border,
+        "flex flex-col gap-2.5 rounded-[1.5rem] bg-[var(--band)] p-5 text-[var(--text-strong)]",
         className,
       )}
     >
-      <div className="flex items-start gap-3">
+      {icon ? (
         <span
           aria-hidden
-          className={cn(
-            /* AUTM-1221: on the ladder. The solid intent fill stays; it is
-               the shape that was the pill. */
-            "grid h-8 w-8 shrink-0 place-items-center rounded-autara-sm text-white",
-            t.fill,
-          )}
+          className="grid size-11 shrink-0 place-items-center rounded-full bg-[var(--raised)] text-[var(--danger)]"
         >
-          {icon ?? <AlertIcon />}
+          {icon}
         </span>
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-bold text-[var(--text-strong)]">{title}</p>
-          <p className="mt-0.5 text-sm text-[var(--text-muted)]">{message}</p>
-          {detail ? (
-            <p className="mt-1 text-xs text-[var(--text-subtle)]">{detail}</p>
-          ) : null}
-          {onRetry ? (
-            /*
-             * Rendered through the Button primitive rather than a bare
-             * <button>. The hand-rolled one had no focus-visible treatment
-             * at all — consumers apply a global outline reset, so a keyboard
-             * user tabbing to the only escape from an error state saw
-             * nothing. It was also h-9 = 36px, under the 44px minimum, so
-             * this is `md`: the one control on the screen is not the place
-             * to save 8px.
-             *
-             * AUTM-1221: glass, not outline. Rule 4 of the Autara Glass
-             * direction: a secondary control is a flat glass surface, never
-             * an outline.
-             */
-            <Button
-              variant="glass"
-              size="md"
-              onClick={onRetry}
-              className="mt-3"
-            >
-              {retryLabel}
-            </Button>
-          ) : null}
-        </div>
-      </div>
+      ) : null}
+      <p className="text-lg leading-snug font-bold">{title}</p>
+      <p className="text-[0.9375rem] leading-normal text-[var(--text-muted)]">{message}</p>
+      {detail ? (
+        <p className="text-[0.8125rem] text-[var(--text-subtle)]">{detail}</p>
+      ) : null}
+      {onRetry ? (
+        <Button variant="strong" size="sm" fullWidth onClick={onRetry}>
+          {retryLabel}
+        </Button>
+      ) : null}
     </div>
   );
 }

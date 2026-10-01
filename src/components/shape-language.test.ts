@@ -3,6 +3,14 @@ import { readFileSync, readdirSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 
 /**
+ * AUTM-1594 — canvas v44's component sheet, approved by Don for Autara Web,
+ * supersedes the rule below for BUTTONS: "Pills, 44px minimum". A button is a
+ * pill again (radius half its height, in rem, so a wrapped label at 200% text
+ * gives a rounded rectangle rather than a capsule), and the icon-only action
+ * is a 44px disc. Fields keep 14px; the surfaces' ladder moves with their own
+ * family. The rest of this file still guards everything the sheet has not
+ * reached yet, and each family that lands updates its part here.
+ *
  * THE SHAPE LANGUAGE — Don, 2026-09-01. Two families, and only two.
  *
  *   1. SHARED RADIUS — input, button, chip, card, panel. "A surface or a
@@ -45,8 +53,23 @@ const KEEPS: Record<string, string> = {
     // Arrived via AUTM-936, which merged after AUTM-948 was branched — this
     // guard caught it on the merge rather than after it shipped, which is the
     // whole reason the list exists.
-    'ErrorCard.tsx': 'the 32px icon medallion — a state light, not the retry button. The retry button itself takes the shared radius',
+    'ErrorCard.tsx': 'the optional icon disc (AUTM-1594 removed the default medallion); the retry is a pill Button',
     'InlineAlert.tsx': 'the 24px intent disc, the same state light as ErrorCard, never a control (AUTM-1185)',
+    'Button.tsx': 'size="icon", the 44px icon disc on canvas v44 (AUTM-1594). Every other size is a pill by its own half-height radius',
+    'Tabs.tsx': 'the segmented track and its pills, canvas v44 "Segmented" (AUTM-1594)',
+    'FilterChipRow.tsx': 'filter chips are pills on canvas v44 (AUTM-1594), superseding the 8px chip rung',
+    'ChoiceCard.tsx': 'the 40px icon disc beside the label, a glyph in a circle like StepCard (AUTM-1594)',
+    'MetaChip.tsx': 'meta chips are 28px pills on canvas v44 (AUTM-1594), superseding the 8px chip rung',
+    'StatusDot.tsx': 'the 8px state light itself (AUTM-1594), the meaning round was reserved for',
+    'StatTile.tsx': 'the 28px icon disc beside the label (AUTM-1594)',
+    'ListSection.tsx': 'the row icon disc and the 4px accent bar\'s round caps (AUTM-1594)',
+    'Stepper.tsx': 'the 28px step discs and the bars\' round caps, canvas v44 "Steps and progress" (AUTM-1594)',
+    'ProgressSteps.tsx': 'a state bar per step; the round cap is what makes it read as fill, as Progress',
+    'Countdown.tsx': 'the countdown is a 32px pill on canvas v44 (AUTM-1594), a status not an action',
+    'Dialog.tsx': 'the 44px close disc, an icon disc like IconButton (AUTM-1594)',
+    'Toast.tsx': 'the status dot, and the action pill and dismiss disc on the capsule (AUTM-1594)',
+    'EmptyState.tsx': 'the 44px icon disc, canvas v44 "Empty" (AUTM-1594)',
+    'LockedFeature.tsx': 'the optional icon disc (AUTM-1594)',
 }
 
 /**
@@ -150,31 +173,30 @@ describe('round means a person, a state light, or a status marker — never an a
      * thing Don flagged: a fully-round purple button sitting next to a
      * rounded-rectangle input.
      */
-    it.each([
-        ['Button.tsx', 'rounded-autara-md'],
-        ['MetaChip.tsx', 'rounded-autara-sm'],
-        ['FilterChipRow.tsx', 'rounded-autara-sm'],
-    ])('%s carries %s, and any round left on it is a dot', (file, radius) => {
+    /* AUTM-1594: MetaChip and FilterChipRow, the last two on this list, are
+     * pills on canvas v44 and are now in KEEPS with that reason. The list
+     * is empty rather than deleted so the next family that pins a corner
+     * here has the shape to follow. */
+    it.each([] as Array<[string, string]>)('%s carries %s, and any round left on it is a dot', (file, radius) => {
         const text = readFileSync(join(DIR, file), 'utf8')
         expect(code(text)).toContain(radius)
-        // MetaChip keeps a round STATUS DOT, and should — that is the
-        // reserved meaning, not a leftover. The container is what had to move.
         expect(roundNonDots(text)).toEqual([])
     })
 
     /**
-     * The 48px button pairs with the 48px field, not with the 44px one.
-     * "Same-height elements get the same radius" is the part of the rule that
-     * is easiest to lose in a later refactor, because it looks like an
-     * inconsistency until you put the two controls side by side.
+     * AUTM-1594 — each Button size is a pill by a radius of HALF ITS HEIGHT.
+     * 9999px would also draw a pill on one line, and is the tempting fix, but
+     * at 200% text the label wraps, the box grows, and a 9999px radius makes
+     * a capsule whose ends eat the label. Pinned per size so a later "just
+     * use rounded-full" loses by name. `min-h-*`, never `h-*` (AUTM-915).
      */
-    it('Button size="lg" steps up to the 48px field radius', () => {
+    it.each([
+        ['sm', 'min-h-11', '1.375rem'],
+        ['md', 'min-h-12', '1.5rem'],
+        ['lg', 'min-h-13', '1.625rem'],
+    ])('Button size="%s" is %s with a %s radius', (size, height, radius) => {
         const text = code(readFileSync(join(DIR, 'Button.tsx'), 'utf8'))
-        // `min-h-12`, not `h-12`: AUTM-915 replaced every fixed height so a
-        // label wraps and the box grows at 200% text scale instead of
-        // overflowing. What this test guards is the RADIUS pairing, so it
-        // must not re-pin the height AUTM-915 deliberately removed.
-        expect(text).toMatch(/lg:\s*"min-h-12 rounded-autara-lg/)
+        expect(text).toMatch(new RegExp(`${size}:\\s*"${height} rounded-\\[${radius.replace('.', '\\.')}\\]`))
     })
 
     /**

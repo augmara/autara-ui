@@ -46,7 +46,8 @@ export function AsyncSkeleton({
   className,
 }: AsyncSkeletonProps) {
   const baseRow =
-    "animate-pulse rounded-2xl bg-[var(--surface-elevated)]";
+    // AUTM-1594 — canvas v44 "Loading": band blocks at 14px.
+    "animate-pulse rounded-autara-md bg-[var(--band)]";
 
   /* The shapes stay `aria-hidden` either way: they carry no information, and
      announcing a dozen empty boxes is worse than announcing nothing. The one
@@ -86,7 +87,7 @@ function renderShapes({
       <span
         aria-hidden
         className={cn(
-          "block h-7 w-12 animate-pulse rounded-md bg-[var(--surface-elevated)]",
+          "block h-7 w-12 animate-pulse rounded-md bg-[var(--band)]",
           className,
         )}
       />
@@ -102,7 +103,7 @@ function renderShapes({
         {Array.from({ length: count }).map((_, i) => (
           <span
             key={i}
-            className="h-6 w-20 animate-pulse rounded-full bg-[var(--surface-elevated)]"
+            className="h-6 w-20 animate-pulse rounded-full bg-[var(--band)]"
           />
         ))}
       </div>
@@ -116,7 +117,7 @@ function renderShapes({
           <span
             key={i}
             className={cn(
-              "block h-3 animate-pulse rounded bg-[var(--surface-elevated)]",
+              "block h-3 animate-pulse rounded bg-[var(--band)]",
               i === count - 1 ? "w-3/4" : "w-full",
             )}
           />
@@ -127,11 +128,11 @@ function renderShapes({
 
   // list (default)
   return (
-    <ul aria-hidden className={cn("space-y-2", className)}>
+    <ul aria-hidden className={cn("space-y-2.5", className)}>
       {Array.from({ length: count }).map((_, i) => (
         <li
           key={i}
-          className={cn(baseRow, rowHeight ?? "h-[78px]")}
+          className={cn(baseRow, rowHeight ?? "h-16")}
         />
       ))}
     </ul>

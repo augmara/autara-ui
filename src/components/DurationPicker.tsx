@@ -236,19 +236,18 @@ export function DurationPicker({
                     // when the trigger wraps under the input at large text
                     // sizes. `flex-wrap` is what lets it wrap instead of
                     // squeezing the input toward zero width.
-                    'flex min-h-11 w-full flex-wrap items-stretch',
-                    'rounded-autara-md border bg-[var(--surface)] transition-colors',
+                    // AUTM-1594: the sheet's field — 52px, 14px, the field
+                    // edge on paper; focus a 2px accent ring with no tint.
+                    'flex min-h-13 w-full flex-wrap items-stretch',
+                    'rounded-autara-md border bg-[var(--paper)] transition-colors',
                     invalid
-                        ? 'border-[var(--color-autara-error)] focus-within:bg-[var(--intent-error-soft)]'
+                        ? 'border-[var(--danger)] focus-within:shadow-[inset_0_0_0_1px_var(--danger)]'
                         : [
-                              'border-[var(--border-subtle)]',
-                              // The Autara focus signature, as `.field-input`
-                              // states it: warm-cream tint plus a solid
-                              // brand-purple edge. No outer halo.
-                              'focus-within:border-[var(--accent)] focus-within:bg-[var(--surface-warm)]',
-                              !disabled && 'hover:border-[var(--border-strong)]',
+                              'border-[var(--field-edge)]',
+                              'focus-within:border-[var(--accent)] focus-within:shadow-[inset_0_0_0_1px_var(--accent)]',
+                              !disabled && 'hover:border-[var(--text-muted)]',
                           ],
-                    disabled && 'bg-[var(--surface-warm)]',
+                    disabled && 'border-[var(--hairline)] opacity-60',
                     className,
                 )}
             >
@@ -276,8 +275,9 @@ export function DurationPicker({
                     className={cn(
                         // `basis-24` gives the input a 6rem floor so the
                         // trigger wraps away rather than crushing it.
-                        'min-h-11 min-w-0 flex-1 basis-24 bg-transparent px-3.5',
-                        'text-base text-[var(--text-strong)] tabular-nums outline-none',
+                        // 50px inside the 1px edge: the field is 52 overall.
+                        'min-h-[3.125rem] min-w-0 flex-1 basis-24 bg-transparent px-4',
+                        'text-[1.0625rem] text-[var(--text-strong)] tabular-nums outline-none',
                         'placeholder:text-[var(--text-subtle)]',
                         'disabled:cursor-not-allowed disabled:text-[var(--text-subtle)]',
                     )}
@@ -304,7 +304,7 @@ export function DurationPicker({
                         // starts.
                         'flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1.5 rounded-autara-md px-3',
                         'text-base font-medium text-[var(--text-muted)] transition-colors',
-                        'hover:bg-[var(--surface-elevated)] hover:text-[var(--text-strong)]',
+                        'hover:bg-[var(--band)] hover:text-[var(--text-strong)]',
                         // The indicator is drawn INSIDE the button (negative
                         // offset), because the trigger sits flush against the
                         // field's own edge: an outward ring or a positive

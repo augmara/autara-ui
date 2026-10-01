@@ -164,19 +164,19 @@ export function StatTile({
          * or a <button>: a button centres its content vertically by default,
          * so an interactive tile beside a static one sat its number 15px
          * lower (Today beside Pending payouts, 2026-09-24). */
-        'flex flex-col items-stretch justify-start rounded-[14px] px-5 py-[18px] text-left transition-colors',
-        hero
-            ? // No border: the fill IS the edge. A hairline on a filled
-              // tile reads as a seam against its own colour.
-              'bg-[var(--accent-fill)]'
-            : 'border border-[var(--border-subtle)] bg-[var(--surface)]',
+        /* AUTM-1594 — canvas v44 "Stat tiles": a 20px tile, 20px in. The
+         * hero is the --hero surface (brand-deep, brand in dark) with a lime
+         * figure; the plain tile is band. No border on either: the fill is
+         * the edge, and depth is the step between paper, band and raised. */
+        'flex flex-col items-stretch justify-start rounded-[1.25rem] p-5 text-left transition-colors',
+        hero ? 'bg-[var(--hero)]' : 'bg-[var(--band)]',
         // The hover is a border and fill shift, never a translate: a card
         // that floats on hover contradicts the interactive rule these tokens
         // already set.
         interactive &&
             (hero
-                ? 'hover:bg-[var(--accent-fill-hover)]'
-                : 'hover:border-[var(--border-strong)] hover:bg-[var(--surface-elevated)]'),
+                ? 'hover:bg-[color-mix(in_srgb,var(--hero),white_8%)]'
+                : 'hover:bg-[var(--band-press)]'),
         interactive &&
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]',
         className,
@@ -190,18 +190,22 @@ export function StatTile({
                 to one without, or a label that wrapped, pushed its number down
                 (seen on the marketing capture of Today, 2026-09-24). The label
                 truncates rather than wraps; it keeps its full text in `title`. */}
-            <div className="mb-3 flex min-h-7 items-start justify-between gap-2">
+            {/* AUTM-1594: the row is 20px (was 28), the label's own line, so a
+                tile sits at the sheet's height; it is still the same height
+                in every tile, which is what AUTM-1426 needs. */}
+            <div className="mb-1.5 flex min-h-5 items-start justify-between gap-2">
                 <p
                     title={label}
                     className={cn(
-                        'min-w-0 truncate text-[0.8125rem] font-medium leading-7',
+                        'min-w-0 truncate text-[0.9375rem] font-medium leading-5',
                         hero
-                            ? // AUTM-1194 — full on-accent. At 75% the label
-                              // measured 4.36:1 on the dark accent fill (and
-                              // about 3.6:1 on its hover fill), under the 4.5:1
-                              // floor for text this size. The value still
-                              // out-shouts it through size and weight.
-                              'text-[var(--on-accent)]'
+                            ? // AUTM-1594: on-deep at 78%, as the sheet draws
+                              // it. AUTM-1194 lifted this to full strength
+                              // because 75% on the old purple fill measured
+                              // 4.36:1; on brand-deep the 78% label is 9.3:1
+                              // (7.9:1 on the hover fill); in dark, 82% on
+                              // brand is 6.8:1.
+                              'text-[var(--on-deep-muted)]'
                             : 'text-[var(--text-muted)]',
                     )}
                 >
@@ -211,10 +215,10 @@ export function StatTile({
                     <span
                         aria-hidden
                         className={cn(
-                            'grid h-7 w-7 shrink-0 place-items-center rounded-lg',
+                            'grid size-5 shrink-0 place-items-center rounded-full',
                             hero
-                                ? 'bg-[var(--on-accent)]/15 text-[var(--on-accent)]'
-                                : 'bg-[var(--accent-tint)] text-[var(--accent)]',
+                                ? 'bg-[var(--on-deep)]/15 text-[var(--on-deep)]'
+                                : 'bg-[var(--raised)] text-[var(--accent)]',
                         )}
                     >
                         {icon}
@@ -225,17 +229,18 @@ export function StatTile({
                 <span
                     aria-hidden
                     className={cn(
-                        'block h-8 w-24 animate-pulse rounded-md',
-                        hero
-                            ? 'bg-[var(--on-accent)]/20'
-                            : 'bg-[var(--surface-elevated)]',
+                        'block h-10 w-24 animate-pulse rounded-md',
+                        hero ? 'bg-[var(--on-deep)]/20' : 'bg-[var(--band-press)]',
                     )}
                 />
             ) : (
                 <p
                     className={cn(
-                        'text-[2rem] font-bold leading-none tabular-nums tracking-[-0.02em]',
-                        hero ? 'text-[var(--on-accent)]' : 'text-[var(--text-strong)]',
+                        // The sheet's figure: 40px Black. On the hero it is
+                        // lime, which AUTM-1592 asked for (the figure and the
+                        // label could not be coloured separately).
+                        'text-[2.5rem] font-black leading-none tabular-nums',
+                        hero ? 'text-[var(--lime)]' : 'text-[var(--text-strong)]',
                     )}
                 >
                     {value}
@@ -244,9 +249,8 @@ export function StatTile({
             {caption ? (
                 <p
                     className={cn(
-                        'mt-2 text-[0.875rem]',
-                        // AUTM-1194 — full on-accent, as the label above.
-                        hero ? 'text-[var(--on-accent)]' : 'text-[var(--text-muted)]',
+                        'mt-1.5 text-[0.875rem] leading-snug',
+                        hero ? 'text-[var(--on-deep-muted)]' : 'text-[var(--text-muted)]',
                     )}
                     /* On a hero the fill already owns the colour, and a green
                      * delta on brand purple reads as a defect rather than as

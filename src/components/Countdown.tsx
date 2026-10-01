@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { cn } from '../lib/cn'
 
 /**
  * Countdown — a live "expires in" line.
@@ -31,7 +32,16 @@ export interface CountdownProps {
     locale?: string
     testId?: string
     className?: string
+    /**
+     * AUTM-1594 — `pill` (default) is canvas v44's countdown: a 32px band
+     * pill, 13px Medium ink; the words carry the urgency, not colour. `text`
+     * renders the bare words for a consumer that places them in a sentence.
+     */
+    appearance?: 'pill' | 'text'
 }
+
+const PILL =
+    'inline-flex min-h-8 shrink-0 items-center whitespace-nowrap rounded-full bg-[var(--band)] px-3 text-[0.8125rem] font-medium text-[var(--text-strong)]'
 
 /**
  * The remaining span in words, `""` once the deadline has passed, or null
@@ -60,7 +70,9 @@ export function Countdown({
     locale = 'en-AU',
     testId,
     className,
+    appearance = 'pill',
 }: CountdownProps) {
+    const cls = cn(appearance === 'pill' && PILL, className)
     const [now, setNow] = useState<number | null>(null)
 
     useEffect(() => {
@@ -88,7 +100,7 @@ export function Countdown({
                   minute: '2-digit',
               })
         return (
-            <span data-testid={testId} className={className} aria-live="polite">
+            <span data-testid={testId} className={cls} aria-live="polite">
                 {prefix} {readable}
             </span>
         )
@@ -98,7 +110,7 @@ export function Countdown({
         <span
             data-testid={testId}
             data-expired={text === '' || undefined}
-            className={className}
+            className={cls}
             aria-live="polite"
         >
             {text === '' ? expiredLabel : `${prefix} ${text}`}

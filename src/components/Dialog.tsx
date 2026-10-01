@@ -42,7 +42,8 @@ const DialogOverlay = React.forwardRef<
     <DialogPrimitive.Overlay
         ref={ref}
         className={cn(
-            'fixed inset-0 z-50 bg-[#0E0A1A]/55',
+            // AUTM-1594: the sheet's scrim, 42% ink (60% black in dark).
+            'fixed inset-0 z-50 bg-[var(--scrim)]',
             // Real CSS, from utilities/animations.css. This used to be
             // `animate-in fade-in-0`, which resolved to nothing — see the
             // AUTM-967 note in the component header.
@@ -66,11 +67,12 @@ const DialogContent = React.forwardRef<
         <DialogPrimitive.Content
             ref={ref}
             className={cn(
-                'fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4',
+                'fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-3',
                 // The sheet rung, not Tailwind's 2xl — a dialog is the largest
                 // surface the user sees and carries the softest corner.
-                'rounded-autara-xl bg-[var(--surface)] p-6',
-                'ring-1 ring-inset ring-[var(--border-subtle)]',
+                // AUTM-1594 — canvas v44 "Dialog (web)": paper, 24px radius,
+                // 24px in, no outline. The scrim is the edge.
+                'rounded-[1.5rem] bg-[var(--paper)] p-6 text-[var(--text-strong)]',
                 // `duration-200` went with it: `duration-*` sets
                 // `transition-duration`, never `animation-duration`, so it
                 // was tuning a transition that did not exist either.
@@ -86,10 +88,10 @@ const DialogContent = React.forwardRef<
                     /* AUTM-1221: 44px on the ladder. It was 28px, which is
                        under the floor on the one control that dismisses a
                        modal, and a pill besides. */
-                    'absolute right-3 top-3 grid h-11 w-11 place-items-center rounded-autara',
+                    'absolute right-3 top-3 grid h-11 w-11 place-items-center rounded-full',
                     'text-[var(--text-subtle)] transition-colors',
-                    'hover:bg-[var(--surface-elevated)] hover:text-[var(--text-strong)]',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]'
+                    'hover:bg-[var(--band)] hover:text-[var(--text-strong)]',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper)]'
                 )}
             >
                 <svg
@@ -130,7 +132,7 @@ const DialogFooter = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
     <div
         className={cn(
-            'flex flex-col-reverse gap-2 sm:flex-row sm:justify-end',
+            'flex flex-col-reverse gap-2.5 sm:flex-row sm:justify-end',
             className
         )}
         {...props}
@@ -146,7 +148,7 @@ const DialogTitle = React.forwardRef<
         ref={ref}
         className={cn(
             // Satoshi: 500 only, no semibold/bold.
-            'text-lg font-medium leading-tight text-[var(--text-strong)]',
+            'text-[1.25rem] font-black leading-tight text-[var(--text-strong)]',
             className
         )}
         {...props}
@@ -161,7 +163,7 @@ const DialogDescription = React.forwardRef<
     <DialogPrimitive.Description
         ref={ref}
         className={cn(
-            'text-sm leading-relaxed text-[var(--text-muted)]',
+            'text-[0.9375rem] leading-normal text-[var(--text-muted)]',
             className
         )}
         {...props}

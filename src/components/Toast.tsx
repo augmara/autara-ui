@@ -206,130 +206,15 @@ function ToastProvider({
     )
 }
 
-// ─── Solar Bold-style status icons ────────────────────────────────
-// Accent colours for each variant — light versions are slightly
-// darker so they keep ≥ 4.5:1 against the cream / white surface.
-
-// AUTM-734: the `dark` variant is the inverse capsule — dark in light
-// theme, light in dark theme — so its accents ride the `--inverse-accent-*`
-// tokens, which flip OPPOSITE to the normal intent ramp. The `light`
-// variant sits on `--surface` and uses the text-grade intent tokens.
-const ACCENT: Record<ToastVariant, Record<Exclude<ToastType, 'default'>, string>> = {
-    dark: {
-        loading: 'var(--inverse-accent-loading)',
-        success: 'var(--inverse-accent-success)',
-        error: 'var(--inverse-accent-error)',
-        warning: 'var(--inverse-accent-warning)',
-        info: 'var(--inverse-accent-info)',
-    },
-    light: {
-        loading: 'var(--intent-success-text)',
-        success: 'var(--intent-success-text)',
-        error: 'var(--intent-error-text)',
-        warning: 'var(--intent-warning-text)',
-        info: 'var(--intent-info-text)',
-    },
-}
-
-const SpinnerIcon: React.FC<{ color: string }> = ({ color }) => (
-    <svg
-        aria-hidden
-        viewBox="0 0 24 24"
-        width="16"
-        height="16"
-        className="autara-toast-spin"
-        style={{ color }}
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={2.4}
-        strokeLinecap="round"
-    >
-        <path opacity="0.25" d="M22 12a10 10 0 1 1-10-10" />
-        <path d="M22 12a10 10 0 0 0-10-10" />
-    </svg>
-)
-
-const CheckIcon: React.FC<{ color: string }> = ({ color }) => (
-    <svg
-        aria-hidden
-        viewBox="0 0 24 24"
-        width="16"
-        height="16"
-        style={{ color }}
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={2.4}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-    >
-        <path d="M5 12.5l4.5 4.5L19 7.5" />
-    </svg>
-)
-
-const CrossIcon: React.FC<{ color: string }> = ({ color }) => (
-    <svg
-        aria-hidden
-        viewBox="0 0 24 24"
-        width="16"
-        height="16"
-        style={{ color }}
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={2.4}
-        strokeLinecap="round"
-    >
-        <path d="M6 6l12 12M18 6L6 18" />
-    </svg>
-)
-
-const WarningIcon: React.FC<{ color: string }> = ({ color }) => (
-    <svg
-        aria-hidden
-        viewBox="0 0 24 24"
-        width="16"
-        height="16"
-        style={{ color }}
-        fill="currentColor"
-    >
-        <circle cx="12" cy="12" r="10" opacity="0.2" />
-        <rect x="11" y="7" width="2" height="7" rx="1" />
-        <circle cx="12" cy="17" r="1.2" />
-    </svg>
-)
-
-const InfoIcon: React.FC<{ color: string }> = ({ color }) => (
-    <svg
-        aria-hidden
-        viewBox="0 0 24 24"
-        width="16"
-        height="16"
-        style={{ color }}
-        fill="currentColor"
-    >
-        <circle cx="12" cy="12" r="10" opacity="0.2" />
-        <circle cx="12" cy="8" r="1.2" />
-        <rect x="11" y="10.5" width="2" height="7" rx="1" />
-    </svg>
-)
-
-function renderTypeIcon(
-    type: ToastType,
-    variant: ToastVariant
-): React.ReactNode {
-    if (type === 'default') return null
-    const color = ACCENT[variant][type]
-    switch (type) {
-        case 'loading':
-            return <SpinnerIcon color={color} />
-        case 'success':
-            return <CheckIcon color={color} />
-        case 'error':
-            return <CrossIcon color={color} />
-        case 'warning':
-            return <WarningIcon color={color} />
-        case 'info':
-            return <InfoIcon color={color} />
-    }
+// ─── Status dots ──────────────────────────────────────────────────
+// AUTM-1594 (canvas v44 "Toasts") replaced the type icons with a status dot.
+// The words carry the meaning; the dot only marks the kind.
+const TOAST_DOT: Record<Exclude<ToastType, 'default'>, string> = {
+    success: 'bg-[var(--lime)]',
+    loading: 'bg-[var(--aqua)]',
+    info: 'bg-[var(--aqua)]',
+    warning: 'bg-[var(--caution)]',
+    error: 'bg-[var(--danger-fill)]',
 }
 
 // ─── Viewport + Item ──────────────────────────────────────────────
@@ -474,12 +359,12 @@ function ToastItem({
     // is the only thing that flips.
     const idleOffset = isTop ? '-translate-y-2' : 'translate-y-2'
 
-    // Variant grammar — dark is the Torph ink capsule; light is the
-    // cream-canvas companion (white surface + ink text + hairline).
+    // AUTM-1594 — canvas v44 "Toasts": ink (white in dark) with a status
+    // dot, 16px radius, 15px. `light` is the band companion, no outline.
     const isDark = variant === 'dark'
     const variantCls = isDark
         ? 'bg-[var(--surface-inverse)] text-[var(--text-on-inverse)]'
-        : 'bg-[var(--surface)] text-[var(--text-strong)] ring-1 ring-inset ring-[var(--border-subtle)]'
+        : 'bg-[var(--band)] text-[var(--text-strong)]'
 
     return (
         <div
@@ -487,7 +372,7 @@ function ToastItem({
                 /* AUTM-1221: 12px, on the 8/12/16/24 ladder. Round is
                    reserved for avatars and status dots (glass rule 3); the
                    capsule was the last pill in the feedback set. */
-                'pointer-events-auto inline-flex max-w-[min(560px,calc(100vw-32px))] items-center gap-2.5 rounded-autara px-4 py-2 text-[13px] font-medium transition-all duration-[180ms] ease-out',
+                'pointer-events-auto inline-flex max-w-[min(560px,calc(100vw-32px))] items-center gap-2.5 rounded-2xl px-4 py-3 text-[0.9375rem] leading-snug transition-all duration-[180ms] ease-out',
                 variantCls,
                 isVisible && !isLeaving
                     ? 'translate-y-0 opacity-100'
@@ -496,9 +381,13 @@ function ToastItem({
             role={t.type === 'error' ? 'alert' : 'status'}
         >
             {t.type && t.type !== 'default' && (
-                <span className="grid h-4 w-4 shrink-0 place-items-center">
-                    {renderTypeIcon(t.type, variant)}
-                </span>
+                /* The sheet's status dot. The words say what happened; the
+                   dot only marks the kind, so it is hidden from AT. */
+                <span
+                    aria-hidden="true"
+                    data-toast-dot={t.type}
+                    className={cn('size-2 shrink-0 rounded-full', TOAST_DOT[t.type])}
+                />
             )}
             <span
                 key={contentKey}
@@ -513,10 +402,10 @@ function ToastItem({
                         /* AUTM-1221: sentence case on the type scale. A
                            letterspaced uppercase action label is the
                            treatment the house rules retired. */
-                        'ml-1 shrink-0 rounded-autara-sm px-2.5 py-1 text-xs font-medium transition-colors',
+                        'ml-1 shrink-0 rounded-full px-3 py-1 text-[0.8125rem] font-medium transition-colors',
                         isDark
                             ? 'bg-[var(--text-on-inverse)]/10 text-[var(--text-on-inverse)] hover:bg-[var(--text-on-inverse)]/20'
-                            : 'bg-[var(--surface-elevated)] text-[var(--text-strong)] hover:bg-[var(--accent-tint)]'
+                            : 'bg-[var(--raised)] text-[var(--text-strong)] hover:bg-[var(--paper)]'
                     )}
                 >
                     {t.action.label}
@@ -528,10 +417,10 @@ function ToastItem({
                     /* AUTM-1221: on the ladder. Dismiss is an action, and
                        round is reserved for people, state lights and status
                        markers (see shape-language.test.ts). */
-                    'ml-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-autara-sm transition-colors',
+                    'ml-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full transition-colors',
                     isDark
                         ? 'text-[var(--text-on-inverse)]/45 hover:bg-[var(--text-on-inverse)]/10 hover:text-[var(--text-on-inverse)]'
-                        : 'text-[var(--text-subtle)] hover:bg-[var(--surface-elevated)] hover:text-[var(--text-strong)]'
+                        : 'text-[var(--text-subtle)] hover:bg-[var(--raised)] hover:text-[var(--text-strong)]'
                 )}
                 aria-label="Dismiss notification"
             >

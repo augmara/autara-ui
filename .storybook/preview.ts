@@ -4,8 +4,8 @@ import "./storybook.css";
 /**
  * Global preview config — applies to every story.
  *
- * - Backgrounds: Autara warm-cream surface by default, with surface-warm
- *   and dark options for component states that need them.
+ * - Backgrounds: paper by default (canvas v44), with band, dark paper
+ *   and brand deep for component states that need them.
  * - Viewports: phone-first defaults plus tablet + desktop breakpoints
  *   matching customer-web's Tailwind ramp (sm 640, md 768, lg 1024).
  * - a11y addon runs axe-core against every story.
@@ -41,12 +41,13 @@ const preview: Preview = {
   parameters: {
     layout: "padded",
     backgrounds: {
-      default: "Background (warm cream)",
+      // AUTM-1594: canvas v44's grounds. Paper is the page, band the cards.
+      default: "Paper",
       values: [
-        { name: "Background (warm cream)", value: "#FBFAF6" },
-        { name: "Surface (white)", value: "#FFFFFF" },
-        { name: "Surface elevated", value: "#F4F2EC" },
-        { name: "Dark (marketing hero)", value: "#0E0A1A" },
+        { name: "Paper", value: "#FFFFFF" },
+        { name: "Band", value: "#F4F2EC" },
+        { name: "Paper, dark", value: "#0E0A1A" },
+        { name: "Brand deep", value: "#2E1070" },
       ],
     },
     viewport: {

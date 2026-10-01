@@ -64,11 +64,15 @@ describe('AvatarFallback — themed disc', () => {
         })
     }
 
-    it('the fill actually MOVES between themes', () => {
-        // The whole defect was a disc that did not change. If these ever
-        // match, the token has been flattened back to a static value and the
-        // dark-mode bug is back regardless of what the contrast numbers say.
-        expect(token('accent-fill', 'light')).not.toEqual(token('accent-fill', 'dark'))
+    it('the fill is the brand fill in both themes, from the token', () => {
+        // The original defect was a pastel disc (`bg-autara-purple-50`) that
+        // did not track the theme. AUTM-1594 (canvas v44) keeps brand #4e1bbd
+        // as the FILL in both themes on purpose; white initials on it clear
+        // AA in each, which the per-theme case above asserts. What must not
+        // come back is a value that bypasses the token, so pin the token's
+        // value per theme rather than requiring it to differ.
+        expect(token('accent-fill', 'light')).toEqual(token('brand', 'light'))
+        expect(token('accent-fill', 'dark')).toEqual(token('brand', 'dark'))
     })
 
     it('does not reintroduce a static Tailwind ramp', () => {

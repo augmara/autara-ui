@@ -36,6 +36,14 @@ import { cn } from '../lib/cn'
  * words into a banner while the rows underneath — the actual content — sit at
  * a normal weight. Sentence case at `--text-muted` lets the rows lead.
  *
+ * AUTM-1594 — canvas v44 "Row in a card": the group is a band card (24px,
+ * 14px in) and each row is its own raised card inside it (16px radius,
+ * 14 x 16 in, 10px apart), so there are no dividers and no outline. The
+ * label is 16px Bold, the description 14px at 72% ink, the trailing value
+ * ink. `accent` draws the sheet's 4px brand bar at the row's left edge, the
+ * mark of a row that is waiting on someone. Icons sit in a band disc; a
+ * destructive row's label and icon take the danger colour, never a tint.
+ *
  * The type is in `rem`, not `px`. All four sizes here were hardcoded pixels,
  * so the whole pattern ignored OS Dynamic Type on every surface that uses it —
  * settings screens being exactly where someone who has scaled their text goes
@@ -54,11 +62,11 @@ export function ListSection({ title, children, className }: ListSectionProps) {
     return (
         <section className={cn('mt-6 first:mt-0', className)}>
             {title ? (
-                <h2 className="mb-2 px-1 text-[0.75rem] font-medium text-[var(--text-muted)]">
+                <h2 className="mb-2 px-1 text-[0.875rem] font-medium text-[var(--text-muted)]">
                     {title}
                 </h2>
             ) : null}
-            <div className="overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)]">
+            <div className="flex flex-col gap-2.5 rounded-[1.5rem] bg-[var(--band)] p-3.5">
                 {children}
             </div>
         </section>
@@ -72,9 +80,11 @@ export interface ListSectionRowProps {
     /** Value on the right, e.g. a Switch, a pill, a numeric label, etc. */
     trailing?: ReactNode
     onTap?: () => void
-    /** Renders label + icon in destructive (rose) ink. Use for sign-out
+    /** Renders label + icon in the danger colour. Use for sign-out
      *  / delete-account rows. */
     destructive?: boolean
+    /** The sheet's 4px brand bar at the left edge: a row waiting on someone. */
+    accent?: boolean
 }
 
 export function ListSectionRow({
@@ -84,6 +94,7 @@ export function ListSectionRow({
     trailing,
     onTap,
     destructive = false,
+    accent = false,
 }: ListSectionRowProps) {
     const interactive = !!onTap
     const Container = interactive ? 'button' : 'div'
@@ -94,43 +105,42 @@ export function ListSectionRow({
         {
             ...containerProps,
             className: cn(
-                'flex w-full items-center gap-3 px-4 py-3 text-left transition-colors first:rounded-t-2xl last:rounded-b-2xl border-b border-[var(--border-subtle)] last:border-b-0',
+                'flex min-h-11 w-full items-center gap-3 rounded-2xl bg-[var(--raised)] px-4 py-3.5 text-left transition-colors',
                 interactive &&
-                    'hover:bg-[var(--surface-elevated)] focus-visible:outline-none focus-visible:bg-[var(--surface-elevated)]',
+                    'hover:bg-[var(--paper)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--band)]',
             ),
         },
+        accent ? (
+            <span aria-hidden className="w-1 shrink-0 self-stretch rounded-full bg-[var(--brand)]" />
+        ) : null,
         icon ? (
             <span
                 aria-hidden
                 className={cn(
-                    'grid h-9 w-9 shrink-0 place-items-center rounded-lg',
-                    destructive
-                        ? 'bg-[rgba(221,56,56,0.08)] text-[var(--color-autara-error)]'
-                        : 'bg-[rgba(78,27,189,0.06)] text-[var(--color-autara-purple)]',
+                    'grid size-10 shrink-0 place-items-center rounded-full bg-[var(--band)]',
+                    destructive ? 'text-[var(--danger)]' : 'text-[var(--accent)]',
                 )}
             >
                 {icon}
             </span>
         ) : null,
-        <div className="min-w-0 flex-1">
+        <div className="flex min-w-0 flex-1 flex-col gap-[3px]">
             <p
                 className={cn(
-                    'truncate text-[0.875rem] font-medium',
-                    destructive
-                        ? 'text-[var(--color-autara-error)]'
-                        : 'text-[var(--text-strong)]',
+                    'truncate text-base leading-snug font-bold',
+                    destructive ? 'text-[var(--danger)]' : 'text-[var(--text-strong)]',
                 )}
             >
                 {label}
             </p>
             {description ? (
-                <p className="mt-0.5 truncate text-[0.75rem] text-[var(--text-muted)]">
+                <p className="truncate text-sm leading-snug text-[var(--text-muted)]">
                     {description}
                 </p>
             ) : null}
         </div>,
         trailing ? (
-            <span className="shrink-0 text-[0.75rem] text-[var(--text-muted)]">
+            <span className="shrink-0 text-[0.9375rem] text-[var(--text-strong)]">
                 {trailing}
             </span>
         ) : null,
