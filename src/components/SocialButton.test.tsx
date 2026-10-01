@@ -47,4 +47,11 @@ describe('SocialButton', () => {
         fireEvent.click(btn)
         expect(onClick).toHaveBeenCalledTimes(1)
     })
+
+    it('an icon override replaces the provider mark, and busy still wins', () => {
+        const { rerender } = render(<SocialButton provider="mobile" label="Continue with email" icon={<i data-testid="mail-mark" />} />)
+        expect(screen.getByTestId('mail-mark')).toBeTruthy()
+        rerender(<SocialButton provider="mobile" label="Continue with email" icon={<i data-testid="mail-mark" />} busy />)
+        expect(screen.queryByTestId('mail-mark')).toBeNull()
+    })
 })

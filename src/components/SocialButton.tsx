@@ -30,6 +30,12 @@ export interface SocialButtonProps extends React.ButtonHTMLAttributes<HTMLButton
     busy?: boolean
     /** Overrides the default "Continue with …" label. */
     label?: React.ReactNode
+    /**
+     * Overrides the provider mark, for the same slot doing a related job:
+     * customer-web's mobile button becomes "Continue with email" with a mail
+     * mark once the phone form is open. 20px, inherits the label's colour.
+     */
+    icon?: React.ReactNode
 }
 
 const DEFAULT_LABEL: Record<SocialButtonProvider, string> = {
@@ -76,7 +82,7 @@ const MARKS: Record<SocialButtonProvider, () => React.ReactElement> = {
 }
 
 export const SocialButton = React.forwardRef<HTMLButtonElement, SocialButtonProps>(function SocialButton(
-    { provider, theme = 'light', busy = false, label, className, type = 'button', disabled, children, ...props },
+    { provider, theme = 'light', busy = false, label, icon, className, type = 'button', disabled, children, ...props },
     ref,
 ) {
     const Mark = MARKS[provider]
@@ -92,7 +98,7 @@ export const SocialButton = React.forwardRef<HTMLButtonElement, SocialButtonProp
             {...props}
         >
             <span className="social-btn__inner">
-                <span className="social-btn__mark">{busy ? <span className="social-btn__spinner" aria-hidden="true" /> : <Mark />}</span>
+                <span className="social-btn__mark">{busy ? <span className="social-btn__spinner" aria-hidden="true" /> : (icon ?? <Mark />)}</span>
                 <span className="social-btn__label">{children ?? label ?? DEFAULT_LABEL[provider]}</span>
             </span>
         </button>
