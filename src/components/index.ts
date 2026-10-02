@@ -286,6 +286,8 @@ export {
 } from './AccountMenu'
 
 export { DatePicker, type DatePickerProps, type DayState } from './DatePicker'
+// AUTM-1633 — the month, on its own: any date by tap or keyboard.
+export { MonthCalendar, type MonthCalendarProps } from './MonthCalendar'
 export { TimePicker, type TimePickerProps, type SlotState } from './TimePicker'
 // AUTM-1507 — duration as a typable field plus a picker, because every
 // duration a merchant thinks in had to be converted to minutes in their head

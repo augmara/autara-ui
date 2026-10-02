@@ -52,6 +52,34 @@ export const Availability: Story = {
     ),
 }
 
+/**
+ * AUTM-1633 — the merchant's own hours. Sundays and Mondays are closed: muted
+ * and hatched like out-of-hours time on the calendar, and STILL selectable,
+ * because a merchant may take a job on a day they are shut. Open the month
+ * with "Pick a date" to see the same days there, with the note explaining them.
+ */
+export const ClosedDays: Story = {
+    render: () => (
+        <Controlled
+            value="2026-09-10"
+            calendarNote="Muted days are outside your hours. They're still yours to take."
+            dayState={(date): DayState => {
+                const weekday = new Date(`${date}T00:00:00Z`).getUTCDay()
+                return weekday === 0 || weekday === 1 ? 'closed' : 'available'
+            }}
+        />
+    ),
+}
+
+/**
+ * AUTM-1633 — a day chosen beyond the fortnight. The rail has moved to hold
+ * it (three days before it, then the rest) and it is selected, with the year
+ * written out beside the button because it is not this year.
+ */
+export const FarDate: Story = {
+    render: () => <Controlled value="2027-02-12" />,
+}
+
 /** Bounded on both ends, e.g. a reschedule that cannot move more than a month. */
 export const Bounded: Story = {
     render: () => <Controlled value="2026-09-12" min="2026-09-10" max="2026-09-16" />,

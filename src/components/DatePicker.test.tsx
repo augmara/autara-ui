@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 
@@ -268,3 +269,135 @@ describe('DatePicker rail arrows (AUTM-1373)', () => {
         expect(screen.getByTestId('d-later')).toBeDisabled()
     })
 })
+
+/**
+ * AUTM-1633 — any date, and the rail follows it.
+ *
+ * Don: "dates are very limited but I like the UI". The rail stays the primary
+ * control; the month opens from a real button, and a day chosen there that the
+ * rail does not hold moves the rail to hold it, selected.
+ */
+describe('DatePicker any date (AUTM-1633)', () => {
+    function Controlled(props: { initial?: string; dayState?: (d: string) => 'available' | 'closed' }) {
+        const [value, setValue] = React.useState(props.initial ?? '')
+        return (
+            <DatePicker
+                value={value}
+                today={TODAY}
+                onChange={setValue}
+                dayState={props.dayState}
+                calendarNote="Muted days are outside your hours."
+                testId="d"
+            />
+        )
+    }
+
+    it('offers the month as a named button that opens a "Pick a date" dialog', () => {
+        render(<Controlled />)
+        const open = screen.getByRole('button', { name: 'Pick a date' })
+        expect(open).toBe(screen.getByTestId('d-more'))
+        expect(open.getAttribute('aria-haspopup')).toBe('dialog')
+        fireEvent.click(open)
+        const dialog = screen.getByRole('dialog', { name: 'Pick a date' })
+        expect(dialog.textContent).toContain('Muted days are outside your hours.')
+        expect(screen.getByTestId('d-calendar')).toBe(dialog)
+    })
+
+    it('moves the rail to a day chosen beyond it, selected, three days in', () => {
+        render(<Controlled />)
+        expect(screen.queryByTestId('d-day-2026-11-20')).toBeNull()
+        fireEvent.click(screen.getByTestId('d-more'))
+        fireEvent.click(screen.getByRole('button', { name: 'Next' }))
+        fireEvent.click(screen.getByTestId('d-cell-2026-10-20'))
+        // The calendar closes on a pick: its disappearance is the proof.
+        expect(screen.queryByRole('dialog')).toBeNull()
+        expect(screen.getByTestId('d-day-2026-10-20').getAttribute('aria-checked')).toBe('true')
+        // Today's fortnight is 9 to 22 September, so 20 October is beyond it
+        // and the rail starts three days before the chosen day.
+        const days = screen.getAllByRole('radio').map((r) => r.getAttribute('data-day'))
+        expect(days[0]).toBe('2026-10-17')
+        expect(days).toHaveLength(14)
+        expect(screen.getByTestId('d-day-2026-10-20').getAttribute('tabindex')).toBe('0')
+    })
+
+    it('keeps a moved rail where it is when another day on it is tapped', () => {
+        render(<Controlled initial="2026-12-10" />)
+        expect(screen.getAllByRole('radio')[0].getAttribute('data-day')).toBe('2026-12-07')
+        fireEvent.click(screen.getByTestId('d-day-2026-12-15'))
+        expect(screen.getAllByRole('radio')[0].getAttribute('data-day')).toBe('2026-12-07')
+        expect(screen.getByTestId('d-day-2026-12-15').getAttribute('aria-checked')).toBe('true')
+    })
+
+    it('returns the rail to today’s fortnight when a near day is chosen from the month', () => {
+        render(<Controlled initial="2026-12-10" />)
+        fireEvent.click(screen.getByTestId('d-more'))
+        fireEvent.click(screen.getByRole('button', { name: 'Back' }))
+        fireEvent.click(screen.getByRole('button', { name: 'Back' }))
+        fireEvent.click(screen.getByRole('button', { name: 'Back' }))
+        expect(screen.getByText('September 2026')).toBeTruthy()
+        fireEvent.click(screen.getByTestId('d-cell-2026-09-12'))
+        expect(screen.getAllByRole('radio')[0].getAttribute('data-day')).toBe(TODAY)
+        expect(screen.getByTestId('d-day-2026-09-12').getAttribute('aria-checked')).toBe('true')
+    })
+
+    it('lets a closed day be taken from the rail, and says it is closed', () => {
+        render(<Controlled dayState={(d) => (d === '2026-09-13' ? 'closed' : 'available')} />)
+        const sunday = screen.getByTestId('d-day-2026-09-13')
+        expect(sunday.getAttribute('aria-disabled')).toBeNull()
+        expect(sunday.textContent).toContain('closed')
+        fireEvent.click(sunday)
+        expect(sunday.getAttribute('aria-checked')).toBe('true')
+    })
+
+    it('says the year beside a chosen day only when it is not this year', () => {
+        // Read off the row beside the button: the rail's own sr-only labels
+        // carry the same words for every day.
+        const label = () => screen.getByTestId('d-more').parentElement?.textContent
+        const { unmount } = render(<Controlled initial="2026-09-20" />)
+        expect(label()).toBe('Pick a dateSunday 20 September')
+        unmount()
+        render(<Controlled initial="2027-01-08" />)
+        expect(label()).toBe('Pick a dateFriday 8 January 2027')
+    })
+
+    it('scrolls a chosen day that sits off the visible rail into view', () => {
+        // jsdom has no layout, so the geometry is stated: a 400px rail whose
+        // tenth pill starts at 560px. Choosing it must bring it into the box.
+        const offsets = new Map<string, number>()
+        const original = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetLeft')
+        const originalWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetWidth')
+        Object.defineProperty(HTMLElement.prototype, 'offsetLeft', {
+            configurable: true,
+            get() {
+                return offsets.get(this.getAttribute?.('data-day') ?? '') ?? 0
+            },
+        })
+        Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+            configurable: true,
+            get() {
+                return this.getAttribute?.('data-day') ? 52 : 0
+            },
+        })
+        try {
+            for (let i = 0; i < 14; i++) offsets.set(addDaysLocal(TODAY, i), i * 58)
+            const { rerender } = render(
+                <DatePicker value="" today={TODAY} onChange={() => {}} testId="d" />,
+            )
+            const rail = screen.getByRole('radiogroup')
+            Object.defineProperty(rail, 'clientWidth', { value: 400, configurable: true })
+            rail.scrollLeft = 0
+            rerender(<DatePicker value="2026-09-18" today={TODAY} onChange={() => {}} testId="d" />)
+            // Day 9 sits at 522..574; the box must end at or past 574.
+            expect(rail.scrollLeft).toBe(574 - 400)
+        } finally {
+            if (original) Object.defineProperty(HTMLElement.prototype, 'offsetLeft', original)
+            if (originalWidth) Object.defineProperty(HTMLElement.prototype, 'offsetWidth', originalWidth)
+        }
+    })
+})
+
+function addDaysLocal(date: string, days: number): string {
+    const d = new Date(`${date}T00:00:00Z`)
+    d.setUTCDate(d.getUTCDate() + days)
+    return d.toISOString().slice(0, 10)
+}

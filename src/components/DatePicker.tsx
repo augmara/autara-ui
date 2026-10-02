@@ -6,26 +6,25 @@ import { cn } from '../lib/cn'
 import { useLabelFor } from '../lib/use-label-for'
 import {
     addDays,
+    dateLabelFrom,
     dayOfMonth,
     daysBetween,
     isISODate,
     longDateLabel,
-    monthGrid,
-    monthYearLabel,
     weekdayIndex,
     WEEKDAY_LABELS,
 } from '../lib/calendar'
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from './Sheet'
+import { Dialog, DialogBody, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './Dialog'
 import { Button } from './Button'
+import {
+    CLOSED_HATCH,
+    DAY_STATE_DOT,
+    DAY_STATE_WORD,
+    MonthCalendar,
+    type DayState,
+} from './MonthCalendar'
 
-/**
- * How a day should read before it is chosen.
- *
- * `limited` is not decoration: a merchant deciding where to put a walk-in
- * wants to see the nearly-full day BEFORE tapping into it, which is the thing
- * a native date input can never show (AUTM-703, AUTM-707).
- */
-export type DayState = 'available' | 'limited' | 'unavailable'
+export type { DayState }
 
 export interface DatePickerProps {
     /** `YYYY-MM-DD`, or `''` when nothing is chosen yet. */
@@ -47,8 +46,17 @@ export interface DatePickerProps {
     max?: string
     /** Days offered on the rail before the merchant has to open the month. */
     stripDays?: number
-    /** Per-day availability. Called for rail days and visible month cells. */
+    /**
+     * Per-day availability. Called for rail days and visible month cells.
+     * `closed` days are muted and hatched but still selectable; only
+     * `unavailable` days are refused (AUTM-1633).
+     */
     dayState?: (date: string) => DayState
+    /**
+     * A line under the month calendar's title, e.g. what a muted day means.
+     * Omit it and the calendar carries only its title.
+     */
+    calendarNote?: string
     disabled?: boolean
     /** Marks the control invalid for assistive tech and colours the edge. */
     invalid?: boolean
@@ -70,16 +78,32 @@ function clampable(date: string, min: string, max?: string): boolean {
     return true
 }
 
-const DOT: Record<DayState, string | null> = {
-    available: null,
-    limited: 'var(--intent-warning-text)',
-    unavailable: 'var(--intent-error-text)',
-}
+/**
+ * AUTM-1633 — how many days sit before a chosen day when the rail has to move
+ * to show it. Three: the day before and after are what a merchant compares
+ * ("Thursday or Friday?"), and at seven pills to a phone's rail the chosen one
+ * lands in the middle of what is visible.
+ */
+const RAIL_LEAD = 3
 
-const STATE_WORD: Record<DayState, string> = {
-    available: '',
-    limited: ', nearly full',
-    unavailable: ', unavailable',
+/** Solar Bold "Calendar", inlined so autara-ui does not depend on an icon set. */
+function CalendarIcon() {
+    return (
+        <svg
+            aria-hidden
+            viewBox="0 0 24 24"
+            width="18"
+            height="18"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <rect x="3.5" y="5" width="17" height="15.5" rx="3.5" />
+            <path d="M8 3v4M16 3v4M3.5 10h17" />
+        </svg>
+    )
 }
 
 /**
@@ -148,6 +172,17 @@ const RailArrow: React.FC<{
 /**
  * DatePicker — a rail of the coming days, with the full month one tap behind it.
  *
+ * ── AUTM-1633: any date, and the rail follows ────────────────────────────
+ *
+ * Don, 2026-10-03: "dates are very limited but I like the UI". The month was
+ * already behind the rail, behind a ghost "More dates" link that read as a
+ * footnote. It is now a "Pick a date" button with a calendar icon, and it
+ * opens `MonthCalendar` as the library's responsive dialog: a bottom sheet on
+ * a phone, a centred card from `sm`. Choosing a day there that the rail does
+ * not hold MOVES the rail to it (three days before it, see `RAIL_LEAD`) and
+ * scrolls it into view selected, so the merchant sees their choice where they
+ * left off rather than a fortnight that no longer contains it.
+ *
  * ── Why a rail and not a calendar ────────────────────────────────────────
  *
  * The moment this serves is a merchant taking a walk-in or a phone booking
@@ -173,6 +208,7 @@ export function DatePicker({
     max,
     stripDays = 14,
     dayState,
+    calendarNote,
     disabled = false,
     invalid = false,
     label = 'Date',
@@ -182,9 +218,31 @@ export function DatePicker({
 }: DatePickerProps) {
     const [monthOpen, setMonthOpen] = React.useState(false)
     const floor = isISODate(min) ? (min as string) : today
-    const days = React.useMemo(
-        () => Array.from({ length: stripDays }, (_, i) => addDays(floor, i)),
+
+    /**
+     * AUTM-1633 — where the rail starts. Today's fortnight (from `floor`)
+     * unless the chosen day is beyond it; then the rail moves to hold it.
+     * Kept in state so a tap on another day of a moved rail does not snap it
+     * back, and adjusted DURING render (React's derived-state pattern) so the
+     * moved rail is what the very first paint shows.
+     */
+    const anchorFor = React.useCallback(
+        (date: string) => {
+            if (!isISODate(date) || date < addDays(floor, stripDays)) return floor
+            return addDays(date, -Math.min(RAIL_LEAD, Math.floor((stripDays - 1) / 2)))
+        },
         [floor, stripDays],
+    )
+    const [railStart, setRailStart] = React.useState(() => anchorFor(value))
+    let start = railStart
+    const holdsValue =
+        !isISODate(value) || value < floor || (value >= start && value < addDays(start, stripDays))
+    if (start < floor || !holdsValue) start = anchorFor(value)
+    if (start !== railStart) setRailStart(start)
+
+    const days = React.useMemo(
+        () => Array.from({ length: stripDays }, (_, i) => addDays(start, i)),
+        [start, stripDays],
     )
 
     /**
@@ -197,6 +255,7 @@ export function DatePicker({
     const [focusIndex, setFocusIndex] = React.useState(0)
     const activeIndex = selectedIndex >= 0 ? selectedIndex : focusIndex
     const railRef = React.useRef<HTMLDivElement>(null)
+    const calendarRef = React.useRef<HTMLDivElement>(null)
 
     const stateOf = React.useCallback(
         (date: string): DayState => {
@@ -256,6 +315,24 @@ export function DatePicker({
         const pitch = measured > 0 ? measured : Math.round(el.clientWidth / 3)
         el.scrollBy({ left: direction * pitch * 3, behavior: 'smooth' })
     }
+
+    /**
+     * AUTM-1633 — bring the chosen day into view whenever it changes: after a
+     * pick in the month calendar, or a prefilled day nine days out. Sets
+     * `scrollLeft` on the rail itself rather than calling `scrollIntoView`,
+     * which would also scroll every scrolling ancestor (the dialog body this
+     * usually sits in) to line the pill up vertically.
+     */
+    React.useLayoutEffect(() => {
+        const rail = railRef.current
+        if (!rail || !isISODate(value)) return
+        const pill = rail.querySelector<HTMLElement>(`[data-day="${value}"]`)
+        if (!pill) return
+        const left = pill.offsetLeft
+        const right = left + pill.offsetWidth
+        if (left < rail.scrollLeft) rail.scrollLeft = left
+        else if (right > rail.scrollLeft + rail.clientWidth) rail.scrollLeft = right - rail.clientWidth
+    }, [value, start])
 
     function moveFocus(next: number) {
         const clamped = Math.max(0, Math.min(days.length - 1, next))
@@ -325,7 +402,8 @@ export function DatePicker({
                         const state = stateOf(date)
                         const isSelected = date === value
                         const isDisabled = disabled || state === 'unavailable'
-                        const dot = DOT[state]
+                        const isClosed = state === 'closed' && !isSelected
+                        const dot = DAY_STATE_DOT[state]
                         return (
                             <button
                                 key={date}
@@ -342,6 +420,7 @@ export function DatePicker({
                                     setFocusIndex(index)
                                     onChange(date)
                                 }}
+                                style={isClosed ? CLOSED_HATCH : undefined}
                                 className={cn(
                                     'snap-start shrink-0 rounded-[12px] border px-3 py-2',
                                     'flex min-h-[3.25rem] min-w-[3.25rem] flex-col items-center justify-center gap-0.5',
@@ -351,7 +430,10 @@ export function DatePicker({
                                     isSelected
                                         ? // Rule 4: a solid fill, never a tint.
                                           'border-transparent bg-[var(--accent-fill)] text-[var(--on-accent)]'
-                                        : 'border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-strong)]',
+                                        : isClosed
+                                          ? // AUTM-1633 — closed but still yours: muted ink over the hatch.
+                                            'border-dashed border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-muted)]'
+                                          : 'border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-strong)]',
                                     !isSelected &&
                                         !isDisabled &&
                                         'hover:border-[var(--border-strong)] hover:bg-[var(--surface-elevated)]',
@@ -382,7 +464,7 @@ export function DatePicker({
                                 <span className="sr-only">
                                     {longDateLabel(date)}
                                     {daysBetween(today, date) === 0 ? ', today' : ''}
-                                    {STATE_WORD[state]}
+                                    {DAY_STATE_WORD[state]}
                                 </span>
                             </button>
                         )
@@ -398,150 +480,70 @@ export function DatePicker({
                 ) : null}
             </div>
 
-            <div className="flex items-center gap-3">
+            {/* AUTM-1633 — the way to any date. A band pill with a calendar
+                icon, where it was a ghost "More dates" that read as a footnote.
+                The test id keeps its `-more` suffix: QA's suite opens the month
+                by it (autara-web-automation NewBookingPage, InvoiceFormPage). */}
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                 <Button
                     type="button"
-                    variant="ghost"
+                    variant="quiet"
                     size="sm"
                     disabled={disabled}
                     onClick={() => setMonthOpen(true)}
+                    leadingIcon={<CalendarIcon />}
+                    aria-haspopup="dialog"
                     data-testid={testId ? `${testId}-more` : undefined}
                 >
-                    More dates
+                    Pick a date
                 </Button>
                 {value ? (
-                    <span className="text-[0.8125rem] text-[var(--text-muted)]">
-                        {longDateLabel(value)}
+                    <span className="text-[0.875rem] text-[var(--text-muted)]">
+                        {dateLabelFrom(today, value)}
                     </span>
                 ) : null}
             </div>
 
-            <MonthSheet
-                open={monthOpen}
-                onOpenChange={setMonthOpen}
-                value={value}
-                today={today}
-                min={floor}
-                max={max}
-                stateOf={stateOf}
-                onSelect={(date) => {
-                    onChange(date)
-                    setMonthOpen(false)
-                }}
-                testId={testId}
-            />
-        </div>
-    )
-}
-
-interface MonthSheetProps {
-    open: boolean
-    onOpenChange: (open: boolean) => void
-    value: string
-    today: string
-    min: string
-    max?: string
-    stateOf: (date: string) => DayState
-    onSelect: (date: string) => void
-    testId?: string
-}
-
-function MonthSheet({
-    open,
-    onOpenChange,
-    value,
-    today,
-    min,
-    max,
-    stateOf,
-    onSelect,
-    testId,
-}: MonthSheetProps) {
-    const [cursor, setCursor] = React.useState(value || today)
-    // Reopening on a stale month is disorienting, so re-anchor each time.
-    React.useEffect(() => {
-        if (open) setCursor(value || today)
-    }, [open, value, today])
-
-    const cells = React.useMemo(() => monthGrid(cursor), [cursor])
-    const canGoBack = `${cursor.slice(0, 7)}-01` > min
-
-    return (
-        <Sheet open={open} onOpenChange={onOpenChange}>
-            <SheetContent side="bottom" className="flex max-h-[85dvh] flex-col gap-3">
-                <SheetHeader>
-                    <SheetTitle>Pick a date</SheetTitle>
-                    <SheetDescription>{monthYearLabel(cursor)}</SheetDescription>
-                </SheetHeader>
-
-                <div className="flex items-center justify-between">
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        disabled={!canGoBack}
-                        onClick={() => setCursor(addDays(`${cursor.slice(0, 7)}-01`, -1))}
-                    >
-                        Back
-                    </Button>
-                    <span className="text-[0.9375rem] font-medium text-[var(--text-strong)]">
-                        {monthYearLabel(cursor)}
-                    </span>
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setCursor(addDays(`${cursor.slice(0, 7)}-01`, 32))}
-                    >
-                        Next
-                    </Button>
-                </div>
-
-                <div className="grid grid-cols-7 gap-1 text-center">
-                    {WEEKDAY_LABELS.map((day) => (
-                        <span
-                            key={day}
-                            aria-hidden
-                            className="py-1 text-[0.6875rem] font-medium text-[var(--text-muted)]"
-                        >
-                            {day}
-                        </span>
-                    ))}
-                    {cells.map(({ date, inMonth }) => {
-                        const state = stateOf(date)
-                        const isSelected = date === value
-                        const isDisabled = state === 'unavailable'
-                        return (
-                            <button
-                                key={date}
-                                type="button"
-                                data-testid={testId ? `${testId}-cell-${date}` : undefined}
-                                aria-pressed={isSelected}
-                                aria-disabled={isDisabled || undefined}
-                                onClick={() => !isDisabled && onSelect(date)}
-                                className={cn(
-                                    'flex min-h-[2.75rem] items-center justify-center rounded-[10px]',
-                                    'text-[0.9375rem] tabular-nums transition-colors',
-                                    'focus-visible:outline-none focus-visible:ring-2',
-                                    'focus-visible:ring-[var(--accent)]',
-                                    isSelected
-                                        ? 'bg-[var(--accent-fill)] font-bold text-[var(--on-accent)]'
-                                        : 'text-[var(--text-strong)] hover:bg-[var(--surface-elevated)]',
-                                    !inMonth && !isSelected && 'text-[var(--text-muted)] opacity-50',
-                                    isDisabled && 'cursor-not-allowed opacity-30 hover:bg-transparent',
-                                    date === today && !isSelected && 'font-bold',
-                                )}
-                            >
-                                {dayOfMonth(date)}
-                                <span className="sr-only">
-                                    {longDateLabel(date)}
-                                    {STATE_WORD[state]}
-                                </span>
-                            </button>
+            <Dialog open={monthOpen} onOpenChange={setMonthOpen}>
+                <DialogContent
+                    ref={calendarRef}
+                    layout="responsive"
+                    className="sm:max-w-[26rem]"
+                    data-testid={testId ? `${testId}-calendar` : undefined}
+                    // No description means no `aria-describedby`, rather than
+                    // Radix pointing it at nothing.
+                    {...(calendarNote ? {} : { 'aria-describedby': undefined })}
+                    // Open on the day holding the calendar's tab stop, not on
+                    // Back (the first tabbable control), so arrows work at once.
+                    onOpenAutoFocus={(event) => {
+                        const day = calendarRef.current?.querySelector<HTMLElement>(
+                            '[data-calendar-active]',
                         )
-                    })}
-                </div>
-            </SheetContent>
-        </Sheet>
+                        if (!day) return
+                        event.preventDefault()
+                        day.focus()
+                    }}
+                >
+                    <DialogHeader>
+                        <DialogTitle>Pick a date</DialogTitle>
+                        {calendarNote ? <DialogDescription>{calendarNote}</DialogDescription> : null}
+                    </DialogHeader>
+                    <DialogBody>
+                        <MonthCalendar
+                            value={value}
+                            today={today}
+                            min={floor}
+                            max={max}
+                            dayState={dayState}
+                            onSelect={(date) => {
+                                onChange(date)
+                                setMonthOpen(false)
+                            }}
+                            testId={testId}
+                        />
+                    </DialogBody>
+                </DialogContent>
+            </Dialog>
+        </div>
     )
 }

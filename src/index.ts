@@ -148,6 +148,8 @@ export {
 } from './lib/motion-tokens'
 
 export { DatePicker, type DatePickerProps, type DayState } from './components/DatePicker'
+// AUTM-1633 — the month, on its own: any date by tap or keyboard.
+export { MonthCalendar, type MonthCalendarProps } from './components/MonthCalendar'
 export { TimePicker, type TimePickerProps, type SlotState } from './components/TimePicker'
 // AUTM-1507 — duration as a typable field plus a picker, because every
 // duration a merchant thinks in had to be converted to minutes in their head
@@ -162,6 +164,8 @@ export {
 } from './components/DurationPicker'
 export {
     addDays,
+    addMonths,
+    dateLabelFrom,
     daysBetween,
     timeSlots,
     timeLabel,

@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import {
     addDays,
+    addMonths,
+    dateLabelFrom,
     daysBetween,
     monthGrid,
     monthYearLabel,
@@ -12,6 +14,19 @@ import {
 } from './calendar'
 
 describe('calendar arithmetic', () => {
+    it('moves by whole months, clamping to the shorter month (AUTM-1633)', () => {
+        expect(addMonths('2026-01-31', 1)).toBe('2026-02-28')
+        expect(addMonths('2028-01-31', 1)).toBe('2028-02-29')
+        expect(addMonths('2026-03-31', -1)).toBe('2026-02-28')
+        expect(addMonths('2026-12-15', 1)).toBe('2027-01-15')
+        expect(addMonths('2026-10-03', -12)).toBe('2025-10-03')
+    })
+
+    it('adds the year to a date label only when it is not this year (AUTM-1633)', () => {
+        expect(dateLabelFrom('2026-10-03', '2026-11-20')).toBe('Friday 20 November')
+        expect(dateLabelFrom('2026-10-03', '2027-01-08')).toBe('Friday 8 January 2027')
+    })
+
     it('rolls over months and years', () => {
         expect(addDays('2026-09-30', 1)).toBe('2026-10-01')
         expect(addDays('2026-01-01', -1)).toBe('2025-12-31')
