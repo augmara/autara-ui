@@ -31,10 +31,10 @@ function Controlled({
 }
 
 function field() {
-    return screen.getByTestId('d') as HTMLInputElement
+    return screen.getByTestId('d') as HTMLButtonElement
 }
 function openSheet() {
-    fireEvent.click(screen.getByTestId('d-open'))
+    fireEvent.click(screen.getByTestId('d'))
     return screen.getByRole('dialog')
 }
 function radio(sheet: HTMLElement, group: 'Hours' | 'Minutes', name: string) {
@@ -93,99 +93,110 @@ describe('durationLabel and durationSpoken', () => {
     })
 })
 
-describe('DurationPicker: the field reads in words', () => {
-    it('is a text field, never a number input with a spinner', () => {
-        render(<DurationPicker value="90" onChange={() => {}} testId="d" />)
-        expect(field().getAttribute('type')).toBe('text')
+describe('DurationPicker: the field is a button that reads in words', () => {
+    it('is a button, not a text field, and opens the sheet', () => {
+        render(<DurationPicker value="150" onChange={() => {}} testId="d" />)
+        const f = screen.getByTestId('d')
+        expect(f.tagName).toBe('BUTTON')
+        expect(f.getAttribute('aria-haspopup')).toBe('dialog')
+        expect(screen.queryByRole('textbox')).toBeNull()
+        fireEvent.click(f)
+        expect(screen.getByRole('dialog')).toBeTruthy()
     })
 
     it.each([
         ['150', '2 hr 30 min'],
         ['50', '50 min'],
+        ['143', '2 hr 23 min'],
         ['4320', '3 days'],
         ['1440', '24 hr'],
     ])('shows a stored %o as %o, never as raw minutes', (value, words) => {
         render(<DurationPicker value={value} onChange={() => {}} testId="d" />)
-        expect(field().value).toBe(words)
+        expect(field().textContent).toBe(words)
     })
 
-    it('shows something it cannot read exactly as it is', () => {
+    it('says "Choose a length" when there is none', () => {
+        render(<DurationPicker value="" onChange={() => {}} testId="d" />)
+        expect(field().textContent).toBe('Choose a length')
+    })
+
+    it('shows a stored value it cannot read as it is, and the invalid edge', () => {
         render(<DurationPicker value="12.5" onChange={() => {}} invalid testId="d" />)
-        expect(field().value).toBe('12.5')
+        expect(field().textContent).toBe('12.5')
         expect(field().getAttribute('aria-invalid')).toBe('true')
     })
 
-    it('does not repeat the reading on the clock when the field already says it', () => {
+    it('carries the value in its name, spoken in full', () => {
         render(<DurationPicker value="150" onChange={() => {}} testId="d" />)
-        expect(screen.getByTestId('d-open').textContent).toBe('Choose duration')
+        expect(screen.getByRole('button', { name: 'Duration, 2 hours 30 minutes' })).toBe(field())
+    })
+
+    it('submits minutes through a hidden input when it has a name', () => {
+        const { container } = render(
+            <DurationPicker value="150" onChange={() => {}} name="duration" testId="d" />,
+        )
+        const hidden = container.querySelector('input[type="hidden"][name="duration"]') as HTMLInputElement
+        expect(hidden.value).toBe('150')
     })
 })
 
-describe('DurationPicker: typing', () => {
-    it('sends minutes for words, and keeps the words as typed', () => {
+describe('DurationPicker: typing a length inside the sheet', () => {
+    function startTyping() {
+        const sheet = openSheet()
+        fireEvent.click(within(sheet).getByTestId('d-manual-open'))
+        return { sheet, input: within(sheet).getByTestId('d-manual') as HTMLInputElement }
+    }
+
+    it('opens on the current value in words and reads what is typed, live', () => {
+        render(<Controlled initial="150" />)
+        const { sheet, input } = startTyping()
+        expect(input.value).toBe('2 hr 30 min')
+        fireEvent.change(input, { target: { value: '2h 23' } })
+        expect(within(sheet).getByTestId('d-reading').textContent).toContain('2 hr 23 min')
+    })
+
+    it('commits an off-step length with Done, as minutes', () => {
+        const onChange = vi.fn()
+        render(<Controlled initial="150" onChange={onChange} />)
+        const { sheet, input } = startTyping()
+        fireEvent.change(input, { target: { value: '143' } })
+        fireEvent.click(within(sheet).getByRole('button', { name: 'Done' }))
+        expect(onChange).toHaveBeenLastCalledWith('143')
+        expect(field().textContent).toBe('2 hr 23 min')
+    })
+
+    it('commits on Enter too', () => {
         const onChange = vi.fn()
         render(<Controlled onChange={onChange} />)
-        fireEvent.change(field(), { target: { value: '1 hr 30' } })
+        const { input } = startTyping()
+        fireEvent.change(input, { target: { value: '1.5 hours' } })
+        fireEvent.keyDown(input, { key: 'Enter' })
         expect(onChange).toHaveBeenLastCalledWith('90')
-        expect(field().value).toBe('1 hr 30')
-        // The clock reads it back, since the field's text is not the reading.
-        expect(screen.getByTestId('d-open').textContent).toContain('1 hr 30 min')
     })
 
-    it.each(['abc', '12.5', '-30', '  ', '1e3'])(
-        'passes %o straight through, for the consumer to refuse in its own words',
-        (typed) => {
-            const onChange = vi.fn()
-            render(<Controlled onChange={onChange} />)
-            fireEvent.change(field(), { target: { value: typed } })
-            expect(onChange).toHaveBeenLastCalledWith(typed)
-            expect(field().value).toBe(typed)
-        },
-    )
+    it.each([
+        ['12.5', 'Use whole minutes (90) or hours and minutes (1 hr 30).'],
+        ['abc', 'Use whole minutes (90) or hours and minutes (1 hr 30).'],
+        ['0', 'A length has to be at least 1 min.'],
+        ['4320', 'That is 3 days. The most is 24 hr.'],
+    ])('holds Done for %o and says why', (typed, why) => {
+        const onChange = vi.fn()
+        render(<Controlled onChange={onChange} />)
+        const { sheet, input } = startTyping()
+        fireEvent.change(input, { target: { value: typed } })
+        expect(within(sheet).getByText(why)).toBeTruthy()
+        expect(input.getAttribute('aria-invalid')).toBe('true')
+        const done = within(sheet).getByRole('button', { name: 'Done' }) as HTMLButtonElement
+        expect(done.disabled).toBe(true)
+        fireEvent.keyDown(input, { key: 'Enter' })
+        expect(onChange).not.toHaveBeenCalled()
+    })
 
-    it('keeps typed minutes as typed after blur, and reads them on the clock (QA toHaveValue)', () => {
-        // autara-web-automation fills #service-duration with `720` and then
-        // asserts the field still holds `720`. Normalising it to "12 hr" on
-        // blur would fail that without the product being wrong.
+    it('goes back to the list without changing anything', () => {
         render(<Controlled initial="150" />)
-        fireEvent.focus(field())
-        fireEvent.change(field(), { target: { value: '720' } })
-        fireEvent.blur(field())
-        expect(field().value).toBe('720')
-        expect(screen.getByTestId('d-open').textContent).toContain('12 hr')
-    })
-
-    it('describes the field with the reading in full words, beside any caller description', () => {
-        render(<Controlled aria-describedby="hint" />)
-        fireEvent.change(field(), { target: { value: '720' } })
-        const ids = (field().getAttribute('aria-describedby') ?? '').split(' ')
-        expect(ids[0]).toBe('hint')
-        expect(document.getElementById(ids[1])?.textContent).toBe('12 hours')
-    })
-
-    it('reads an over-the-cap number truthfully, so the stray digit is visible', () => {
-        render(<Controlled />)
-        fireEvent.change(field(), { target: { value: '4320' } })
-        expect(screen.getByTestId('d-open').textContent).toContain('3 days')
-    })
-
-    it('drops what was typed when the value changes from outside', () => {
-        function Resettable() {
-            const [value, setValue] = React.useState('')
-            return (
-                <>
-                    <DurationPicker value={value} onChange={setValue} testId="d" />
-                    <button type="button" onClick={() => setValue('120')}>
-                        reset
-                    </button>
-                </>
-            )
-        }
-        render(<Resettable />)
-        fireEvent.change(field(), { target: { value: '45' } })
-        expect(field().value).toBe('45')
-        fireEvent.click(screen.getByText('reset'))
-        expect(field().value).toBe('2 hr')
+        const { sheet } = startTyping()
+        fireEvent.click(within(sheet).getByRole('button', { name: 'Pick from the list instead' }))
+        expect(within(sheet).getByRole('radiogroup', { name: 'Hours' })).toBeTruthy()
     })
 })
 
@@ -228,7 +239,7 @@ describe('DurationPicker: one sheet, hours and minutes together', () => {
         expect(within(sheet).getByTestId('d-reading').textContent).toContain('3 hr 15 min')
         fireEvent.click(within(sheet).getByRole('button', { name: 'Done' }))
         expect(onChange).toHaveBeenLastCalledWith('195')
-        expect(field().value).toBe('3 hr 15 min')
+        expect(field().textContent).toBe('3 hr 15 min')
         expect(screen.queryByRole('dialog')).toBeNull()
     })
 
@@ -239,7 +250,7 @@ describe('DurationPicker: one sheet, hours and minutes together', () => {
         fireEvent.click(radio(sheet, 'Hours', '5 hours'))
         fireEvent.click(within(sheet).getByRole('button', { name: 'Cancel' }))
         expect(onChange).not.toHaveBeenCalled()
-        expect(field().value).toBe('2 hr 30 min')
+        expect(field().textContent).toBe('2 hr 30 min')
     })
 
     it('commits a common length in one tap', () => {
@@ -285,13 +296,13 @@ describe('DurationPicker: one sheet, hours and minutes together', () => {
         ).toBe(true)
         fireEvent.click(within(sheet).getByRole('button', { name: 'Cancel' }))
         expect(onChange).not.toHaveBeenCalled()
-        expect(field().value).toBe('50 min')
+        expect(field().textContent).toBe('50 min')
     })
 
     it('opens a pre-cap 3-day value without breaking, and replaces it only if asked', () => {
         const onChange = vi.fn()
         render(<Controlled initial="4320" onChange={onChange} />)
-        expect(field().value).toBe('3 days')
+        expect(field().textContent).toBe('3 days')
         const sheet = openSheet()
         expect(within(sheet).getByTestId('d-reading').textContent).toContain('3 days')
         // Choosing an hour on its own means that hour, on the hour.
@@ -362,11 +373,11 @@ describe('DurationPicker: one sheet, hours and minutes together', () => {
         expect(document.activeElement).toBe(sheet)
     })
 
-    it('keeps 44px targets on the clock, the rows and the presets', () => {
+    it('keeps 44px targets on the field, the rows and the presets', () => {
         // jsdom has no layout, so this asserts the classes that produce it.
         render(<Controlled initial="90" />)
-        expect(screen.getByTestId('d-open').className).toContain('min-h-11')
-        expect(screen.getByTestId('d-open').className).toContain('min-w-11')
+        // min-h-13 is 52px, and a minimum, so it grows at 200% text.
+        expect(field().className).toContain('min-h-13')
         const sheet = openSheet()
         expect(radio(sheet, 'Hours', '1 hour').className).toContain('min-h-11')
         expect(within(sheet).getByRole('button', { name: '30 min' }).className).toContain('min-h-11')
@@ -374,18 +385,17 @@ describe('DurationPicker: one sheet, hours and minutes together', () => {
 })
 
 describe('DurationPicker: disabled', () => {
-    it('cannot be typed in and cannot be opened', () => {
+    it('cannot be opened', () => {
         render(<DurationPicker value="90" onChange={() => {}} disabled testId="d" />)
         expect(field().disabled).toBe(true)
-        expect((screen.getByTestId('d-open') as HTMLButtonElement).disabled).toBe(true)
-        fireEvent.click(screen.getByTestId('d-open'))
+        fireEvent.click(field())
         expect(screen.queryByRole('dialog')).toBeNull()
     })
 })
 
 describe('DurationPicker with a caller-written <label htmlFor> (AUTM-1267)', () => {
-    it('puts the id on the typable input, is named by the label, and a label click focuses it', () => {
-        // QA's suite locates `#service-duration` and drives it with `.fill()`.
+    it('puts the id on the field button, is named by the label and its value, and a label click reaches it', () => {
+        // QA's suite locates `#service-duration`; it is the button now.
         render(
             <>
                 <label htmlFor="service-duration">Duration</label>
@@ -393,31 +403,29 @@ describe('DurationPicker with a caller-written <label htmlFor> (AUTM-1267)', () 
             </>,
         )
         expect(document.getElementById('service-duration')).toBe(field())
-        expect(screen.getByLabelText('Duration')).toBe(field())
-        fireEvent.click(screen.getByText('Duration'))
+        // Named by the label, then by its own text (the value).
+        const label = screen.getByText('Duration')
+        expect(field().getAttribute('aria-labelledby')).toBe(`${label.id} service-duration`)
+        fireEvent.click(label)
         expect(document.activeElement).toBe(field())
     })
 
     it('falls back to its own name when no label points at it', () => {
         render(<DurationPicker value="" onChange={() => {}} testId="d" />)
-        expect(screen.getByLabelText('Duration')).toBe(field())
+        expect(screen.getByRole('button', { name: 'Duration, Choose a length' })).toBe(field())
     })
 
-    it('carries a caller’s extra input props', () => {
+    it('carries a caller’s extra props, the form error’s describedby included', () => {
         const onBlur = vi.fn()
         render(
             <DurationPicker
                 value="90"
                 onChange={() => {}}
                 onBlur={onBlur}
-                name="duration"
-                required
                 aria-describedby="hint"
                 testId="d"
             />,
         )
-        expect(field().name).toBe('duration')
-        expect(field().required).toBe(true)
         expect(field().getAttribute('aria-describedby')).toBe('hint')
         fireEvent.blur(field())
         expect(onBlur).toHaveBeenCalled()

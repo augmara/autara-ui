@@ -156,58 +156,58 @@ export function parseDuration(text: string): number | null {
     return Number.isSafeInteger(rounded) ? rounded : null
 }
 
-/**
- * Solar Bold style, drawn inline (autara-ui carries no icon dependency).
- * Sized in `em` so the glyph grows with the text beside it at 200%.
- */
-function DurationGlyph() {
+/** A chevron, drawn inline (autara-ui carries no icon dependency), in `em`. */
+function Chevron() {
     return (
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="size-[1.125em] shrink-0">
-            <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2.4" />
-            <path
-                d="M12 7.6V12l3 2"
-                stroke="currentColor"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-            />
+        <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+            className="size-[1.125em] shrink-0 text-[var(--text-muted)]"
+        >
+            <path d="m6 9 6 6 6-6" />
         </svg>
     )
 }
 
 export interface DurationPickerProps
     extends Omit<
-        React.ComponentPropsWithoutRef<'input'>,
-        'value' | 'onChange' | 'type' | 'inputMode' | 'id' | 'disabled' | 'className' | 'aria-invalid'
+        React.ComponentPropsWithoutRef<'button'>,
+        'value' | 'onChange' | 'type' | 'id' | 'disabled' | 'className' | 'aria-invalid' | 'children'
     > {
-    /** Minutes, as text. `''` when empty. Anything the field cannot read is passed through as typed. */
+    /** Minutes, as text. `''` when empty. A stored value it cannot read is shown as it is. */
     value: string
-    /**
-     * Called with whole minutes as text whenever the field reads as a
-     * duration (typed `1 hr 30 min` sends `'90'`), and with the raw text
-     * otherwise (`'12.5'` sends `'12.5'`), so the consumer's validator stays
-     * the one authority on what saves.
-     */
+    /** Called with whole minutes as text when a length is chosen. */
     onChange: (value: string) => void
     /**
-     * The longest duration the sheet offers.
+     * The longest duration the sheet allows, presets and typing included.
      * @default 1440 (24 hours)
      */
     maxMinutes?: number
-    /** The minute column's step. @default 15 */
+    /** The minute column's step. Typing reaches the minutes in between. @default 15 */
     minuteStep?: number
     /** The one-tap lengths above the columns, in minutes. Lengths over the cap are dropped. */
     presets?: readonly number[]
-    /** @default 'e.g. 1 hr 30 min' */
+    /** What the field says when there is no length yet. @default 'Choose a length' */
     placeholder?: string
     disabled?: boolean
     /** Paints the error edge and sets `aria-invalid`. Always the consumer's call. */
     invalid?: boolean
     /** Names the field when no `<label htmlFor>` points at `id`. @default 'Duration' */
     label?: string
-    /** Goes on the TEXT INPUT, so a caller's `<label htmlFor>` associates natively. */
+    /** Goes on the field's BUTTON, so a caller's `<label htmlFor>` names it and a click on the label focuses it. */
     id?: string
-    /** Lands on the input; the clock takes `{testId}-open`, the sheet `{testId}-sheet`. */
+    /** Submitted with a native form as minutes, through a hidden input. */
+    name?: string
+    /**
+     * Lands on the field's button. The sheet's parts take `{testId}-sheet`,
+     * `-reading`, `-hours`, `-minutes`, `-manual-open`, `-manual` (the text
+     * field) and `-done`.
+     */
     testId?: string
     className?: string
 }
@@ -215,49 +215,49 @@ export interface DurationPickerProps
 /**
  * DurationPicker — how long a job takes.
  *
- * ── The field ─────────────────────────────────────────────────────────────
+ * ── The field is a button ─────────────────────────────────────────────────
  *
- * A text field that READS in hours and minutes. A value that arrives from
- * outside (a stored service, the sheet) is shown in words, "2 hr 30 min",
- * never as 150. A merchant can also type, in minutes or in words: `90`,
- * `1h 30`, `1.5 hours` all mean the same thing, and the consumer receives 90.
+ * Don, 2026-10-02, on the version with a typable field and a clock beside
+ * it: the same value read twice ("2hrs 23min" typed, "2 hr 23 min" echoed).
+ * So the field is one button that says the length in words, "2 hr 30 min",
+ * or "Choose a length", and opens the sheet on a tap, Enter or Space. There
+ * is no typing in the field and nothing beside it.
  *
- * What a merchant typed is never rewritten. Two reasons, and the second is
- * load-bearing:
- *
- *  1. A field that changes under your fingers on blur reads as the app
- *     disagreeing with you.
- *  2. QA's suite drives this field with `.fill()` on `#service-duration`
- *     (`autara-web-automation`, `ServiceFormPage.ts`), including arbitrary
- *     invalid strings, then asserts the consumer's three validation messages
- *     and, for a valid value, that the field still holds exactly what was
- *     typed (`toHaveValue`). A control that normalised `720` to `12 hr` on
- *     blur would fail those assertions without the product being wrong.
- *
- * So typed text stays as typed, and its reading appears on the clock beside
- * it ("12 hr") whenever the text is not already the reading. `type="text"`:
- * `type="number"` draws a native spinner and refuses words.
+ * It is still a labelled form control: a caller's `<label htmlFor={id}>`
+ * names it and focuses it, its accessible name carries the value
+ * ("Duration, 2 hr 30 min"), `invalid` sets `aria-invalid`, and a caller's
+ * `aria-describedby` (the form's error) lands on it. With `name`, a hidden
+ * input submits the minutes with a native form.
  *
  * ── The sheet ─────────────────────────────────────────────────────────────
  *
- * Hours and minutes are chosen together, both visible: two labelled columns
- * side by side (a radio group each, one tab stop, arrow keys), with the
- * result in words at the top, announced politely. Above them, the common
- * lengths are one tap each and commit straight away. Done commits a column
- * choice; Cancel, the scrim and Escape keep the value as it was.
+ * Tap-ready: the result in words at the top (announced, spoken in full),
+ * the common lengths one tap each (they commit), then hours and minutes side
+ * by side, both visible, as two labelled radio groups with arrow keys.
+ * Done commits a column choice; Cancel, the scrim and Escape keep the value.
  *
- * Rejected on purpose (AUTM-1507, Don 2026-10-02): the first version drilled
- * from an hour into its minutes, which hid the minutes behind a chevron and
- * read as "hours only". And wheels (timespent, Wanderlog on Mobbin): a wheel
- * is a drag gesture with no keyboard model and no 200% text story, where a
- * column of 44px rows is a tap, an arrow key and a heading.
+ * "Type a length" swaps the columns for one text field that reads minutes or
+ * words (90, 1h 30, 1.5 hours, 1:30), shows its reading live, and commits
+ * with Done. That is where the minutes between the steps come from (2 hr 23
+ * min). A length that is not a whole number of minutes, zero, or past the
+ * cap is refused there, in words, with Done held, so the sheet never hands
+ * the form a value it cannot save.
+ *
+ * Rejected on purpose: drilling from an hour into its minutes (the first
+ * version: the minutes were hidden and it read as "hours only"), and wheels
+ * (timespent, Wanderlog on Mobbin: a drag with no keyboard model and no 200%
+ * text story).
  *
  * A stored value that is not on the steps (50 min, or 4320 from before the
- * cap) opens with nothing selected and says so; it is kept unless the
- * merchant picks a new one.
+ * cap) reads correctly on the field ("50 min", "3 days"), opens with nothing
+ * chosen and a line saying so, and is kept unless the merchant picks again.
  *
- * Validity stays the consumer's: the sheet only offers lengths that can be
- * saved, the field takes anything.
+ * ── Room for working days (AUTM-1575) ─────────────────────────────────────
+ *
+ * Multi-day work is a later mode, not a redesign: the sheet's header is
+ * where an "Hours | Working days" switch goes, `Column` is generic (a days
+ * column is `options={[1..14]}`), and the value stays minutes, so the field
+ * and the consumer do not change. The cap moves with it, as `maxMinutes`.
  */
 export function DurationPicker({
     value,
@@ -265,136 +265,66 @@ export function DurationPicker({
     maxMinutes = DEFAULT_MAX_DURATION_MINUTES,
     minuteStep = DEFAULT_MINUTE_STEP,
     presets = DEFAULT_PRESETS,
-    placeholder = 'e.g. 1 hr 30 min',
+    placeholder = 'Choose a length',
     disabled = false,
     invalid = false,
     label = 'Duration',
     id,
+    name,
     testId,
     className,
-    onFocus,
-    onBlur,
-    'aria-describedby': describedBy,
     ...rest
 }: DurationPickerProps) {
     const [open, setOpen] = React.useState(false)
-    const inputRef = React.useRef<HTMLInputElement>(null)
-    const labelledBy = useLabelFor(id, () => inputRef.current)
-    const readingId = `${React.useId()}-reading`
-
-    /*
-     * What the merchant typed, kept as typed. It stays until the value is
-     * changed from OUTSIDE (a stored service hydrating, the sheet, a reset),
-     * which is detected as a value that is not the one this field last sent.
-     */
-    const [typed, setTyped] = React.useState<string | null>(null)
-    const lastSent = React.useRef<string | null>(null)
-    if (typed !== null && value !== lastSent.current) {
-        // Render-phase reset is React's sanctioned way to derive state from a
-        // prop change without an effect and a flash of the stale text.
-        setTyped(null)
-    }
+    const buttonRef = React.useRef<HTMLButtonElement>(null)
+    const labelledBy = useLabelFor(id, () => buttonRef.current)
+    const ownId = React.useId()
+    const buttonId = id ?? `${ownId}-duration`
 
     const minutes = parseDuration(value)
-    const reading = minutes === null ? null : durationLabel(minutes)
-    const shown = typed ?? (reading ?? value)
-    // The clock spells the reading only when the field does not already.
-    const clockReading = reading !== null && shown.trim() !== reading ? reading : null
-    // ...and then the input is described by it too, spoken in full words, so
-    // a screen reader on the field hears "12 hours" after "720".
-    const describedByAll =
-        [describedBy, clockReading !== null ? readingId : null].filter(Boolean).join(' ') || undefined
-
-    function send(next: string) {
-        lastSent.current = next
-        onChange(next)
-    }
+    const reading = minutes === null ? (value.trim() === '' ? null : value) : durationLabel(minutes)
+    const spoken = minutes === null ? reading : durationSpoken(minutes)
 
     return (
         <>
-            <div
-                data-testid={testId ? `${testId}-field` : undefined}
+            <button
+                {...rest}
+                ref={buttonRef}
+                id={buttonId}
+                type="button"
+                onClick={() => setOpen(true)}
+                disabled={disabled}
+                aria-haspopup="dialog"
+                aria-expanded={open}
+                aria-invalid={invalid || undefined}
+                // Named by the caller's label AND its own text, so the value a
+                // merchant sees is in the name (WCAG 2.5.3): "Duration, 2 hr
+                // 30 min". With no label, its own `label` does the same.
+                aria-labelledby={labelledBy ? `${labelledBy} ${buttonId}` : undefined}
+                aria-label={labelledBy ? undefined : `${label}, ${spoken ?? placeholder}`}
+                data-testid={testId}
+                data-value={minutes ?? undefined}
                 className={cn(
-                    // `min-h`, not `h`, and `flex-wrap`, so at large text the
-                    // clock wraps under the input instead of crushing it.
                     // AUTM-1594: the sheet's field, 52px, the field edge on
-                    // paper; focus a 2px accent ring with no tint.
-                    'flex min-h-13 w-full flex-wrap items-stretch',
-                    'rounded-autara-md border bg-[var(--paper)] transition-colors',
+                    // paper. `min-h` so it grows at 200% text.
+                    'flex min-h-13 w-full items-center justify-between gap-2 rounded-autara-md border bg-[var(--paper)] px-4 py-2 text-left',
+                    'text-[1.0625rem] tabular-nums transition-colors',
+                    'duration-[var(--motion-panel-in)] ease-[var(--motion-ease-out)]',
+                    'focus-visible:outline-none focus-visible:border-[var(--accent)] focus-visible:shadow-[inset_0_0_0_1px_var(--accent)]',
+                    'aria-expanded:border-[var(--accent)] aria-expanded:shadow-[inset_0_0_0_1px_var(--accent)]',
                     invalid
-                        ? 'border-[var(--danger)] focus-within:shadow-[inset_0_0_0_1px_var(--danger)]'
-                        : [
-                              'border-[var(--field-edge)]',
-                              'focus-within:border-[var(--accent)] focus-within:shadow-[inset_0_0_0_1px_var(--accent)]',
-                              !disabled && 'hover:border-[var(--text-muted)]',
-                          ],
-                    disabled && 'border-[var(--hairline)] opacity-60',
+                        ? 'border-[var(--danger)] shadow-[inset_0_0_0_1px_var(--danger)]'
+                        : ['border-[var(--field-edge)]', !disabled && 'hover:border-[var(--text-muted)]'],
+                    'disabled:cursor-not-allowed disabled:border-[var(--hairline)] disabled:opacity-60',
                     className,
                 )}
             >
-                <input
-                    {...rest}
-                    ref={inputRef}
-                    id={id}
-                    type="text"
-                    autoComplete="off"
-                    spellCheck={false}
-                    value={shown}
-                    onChange={(event) => {
-                        const text = event.target.value
-                        setTyped(text)
-                        const parsed = parseDuration(text)
-                        send(parsed === null ? text : String(parsed))
-                    }}
-                    onFocus={onFocus}
-                    onBlur={onBlur}
-                    placeholder={placeholder}
-                    disabled={disabled}
-                    aria-invalid={invalid || undefined}
-                    aria-describedby={describedByAll}
-                    aria-labelledby={labelledBy}
-                    aria-label={labelledBy ? undefined : label}
-                    data-testid={testId}
-                    className={cn(
-                        // `basis-28` gives the input a floor so the clock
-                        // wraps away rather than squeezing it to nothing.
-                        'min-h-[3.125rem] min-w-0 flex-1 basis-28 bg-transparent px-4',
-                        'text-[1.0625rem] text-[var(--text-strong)] tabular-nums outline-none',
-                        'placeholder:text-[var(--text-subtle)]',
-                        'disabled:cursor-not-allowed disabled:text-[var(--text-subtle)]',
-                    )}
-                />
-                <button
-                    type="button"
-                    onClick={() => setOpen(true)}
-                    disabled={disabled}
-                    aria-haspopup="dialog"
-                    aria-expanded={open}
-                    data-testid={testId ? `${testId}-open` : undefined}
-                    className={cn(
-                        // `min-w-11` too: with no reading the trigger is the
-                        // glyph and its padding, 42px wide before this.
-                        'flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1.5 rounded-autara-md px-3',
-                        'text-base font-medium text-[var(--text-muted)] transition-colors',
-                        'duration-[var(--motion-panel-in)] ease-[var(--motion-ease-out)]',
-                        'hover:bg-[var(--band)] hover:text-[var(--text-strong)]',
-                        // Drawn inside the button: it sits flush on the
-                        // field's edge, so an outward ring would straddle it.
-                        // `--accent`, not the fill-grade purple (AUTM-974).
-                        'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--accent)]',
-                        'disabled:cursor-not-allowed disabled:hover:bg-transparent',
-                    )}
-                >
-                    <DurationGlyph />
-                    <span className="sr-only">Choose duration</span>
-                    {clockReading ? <span className="whitespace-nowrap">{clockReading}</span> : null}
-                </button>
-                {clockReading !== null && minutes !== null ? (
-                    <span id={readingId} hidden>
-                        {durationSpoken(minutes)}
-                    </span>
-                ) : null}
-            </div>
+                <span className={cn('min-w-0 flex-1', reading ? 'text-[var(--text-strong)]' : 'text-[var(--text-subtle)]')}>
+                    {reading ?? placeholder}
+                </span>
+                <Chevron />
+            </button>
+            {name ? <input type="hidden" name={name} value={minutes ?? ''} /> : null}
             <DurationSheet
                 open={open}
                 onOpenChange={setOpen}
@@ -404,12 +334,8 @@ export function DurationPicker({
                 presets={presets}
                 testId={testId}
                 onCommit={(next) => {
-                    send(String(next))
-                    setTyped(null)
+                    onChange(String(next))
                     setOpen(false)
-                    // Back to the field, so a keyboard merchant is not left
-                    // at the top of the document when the sheet unmounts.
-                    requestAnimationFrame(() => inputRef.current?.focus())
                 }}
             />
         </>
@@ -430,6 +356,15 @@ interface DurationSheetProps {
 /** Is `minutes` a value the two columns can express exactly? */
 function onTheSteps(minutes: number | null, maxMinutes: number, step: number): minutes is number {
     return minutes !== null && minutes > 0 && minutes <= maxMinutes && minutes % step === 0
+}
+
+/** Why typed text cannot be committed, in words, or null when it can. */
+function typedProblem(text: string, parsed: number | null, maxMinutes: number): string | null {
+    if (text.trim() === '') return 'Type a length, like 90 or 1 hr 30.'
+    if (parsed === null) return 'Use whole minutes (90) or hours and minutes (1 hr 30).'
+    if (parsed <= 0) return 'A length has to be at least 1 min.'
+    if (parsed > maxMinutes) return `That is ${durationLabel(parsed)}. The most is ${durationLabel(maxMinutes)}.`
+    return null
 }
 
 function DurationSheet({
@@ -456,24 +391,34 @@ function DurationSheet({
     // The draft, reset every time the sheet opens. null = not chosen yet.
     const [hours, setHours] = React.useState<number | null>(null)
     const [mins, setMins] = React.useState<number | null>(null)
+    const [typing, setTyping] = React.useState(false)
+    const [typed, setTyped] = React.useState('')
     const [wasOpen, setWasOpen] = React.useState(false)
     if (open !== wasOpen) {
         setWasOpen(open)
         if (open) {
             setHours(fits ? Math.floor(current / 60) : null)
             setMins(fits ? current % 60 : null)
+            setTyping(false)
+            setTyped(current !== null && current > 0 ? durationLabel(current) : '')
         }
     }
 
+    const typedMinutes = parseDuration(typed)
+    const problem = typing ? typedProblem(typed, typedMinutes, maxMinutes) : null
+
     const chosen = hours !== null || mins !== null
-    const draft = chosen ? (hours ?? 0) * 60 + (mins ?? 0) : null
+    const draft = typing ? typedMinutes : chosen ? (hours ?? 0) * 60 + (mins ?? 0) : null
     const shownTotal = draft ?? current
-    const tooShort = draft !== null && draft <= 0
-    const canDone = draft !== null && draft > 0 && draft <= maxMinutes
+    const tooShort = !typing && draft !== null && draft <= 0
+    const canDone = typing ? problem === null : draft !== null && draft > 0 && draft <= maxMinutes
 
     const ids = React.useId()
     const hoursLabelId = `${ids}-hours`
     const minutesLabelId = `${ids}-minutes`
+    const typedId = `${ids}-typed`
+    const typedHintId = `${ids}-typed-hint`
+    const typedRef = React.useRef<HTMLInputElement>(null)
 
     function pickHour(hour: number) {
         setHours(hour)
@@ -484,6 +429,9 @@ function DurationSheet({
     function pickMinute(minute: number) {
         setMins(minute)
         if (hours === null) setHours(0)
+    }
+    function commit() {
+        if (canDone && draft !== null) onCommit(draft)
     }
 
     const offeredPresets = presets.filter((p) => p > 0 && p <= maxMinutes)
@@ -512,7 +460,9 @@ function DurationSheet({
                 <DialogHeader>
                     <DialogTitle>Duration</DialogTitle>
                     <DialogDescription>
-                        Pick the hours and the minutes, or tap a common length.
+                        {typing
+                            ? 'Type minutes, or hours and minutes.'
+                            : 'Pick the hours and the minutes, or tap a common length.'}
                     </DialogDescription>
                 </DialogHeader>
                 <DialogBody className="space-y-5">
@@ -537,7 +487,7 @@ function DurationSheet({
                             <p className="mt-1 text-[0.9375rem] text-[var(--danger)]">
                                 Pick at least {durationLabel(minuteStep)}.
                             </p>
-                        ) : current !== null && current > 0 && !fits && !chosen ? (
+                        ) : !typing && current !== null && current > 0 && !fits && !chosen ? (
                             <p className="mt-1 text-[0.9375rem] leading-normal text-[var(--text-muted)]">
                                 Not on the {minuteStep}-minute steps below. It stays as it is unless
                                 you pick a new length.
@@ -545,59 +495,131 @@ function DurationSheet({
                         ) : null}
                     </div>
 
-                    {offeredPresets.length > 0 ? (
-                        <div role="group" aria-label="Common lengths" className="flex flex-wrap gap-2">
-                            {offeredPresets.map((preset) => {
-                                const pressed = shownTotal === preset
-                                return (
-                                    <button
-                                        key={preset}
-                                        type="button"
-                                        aria-pressed={pressed}
-                                        onClick={() => onCommit(preset)}
-                                        className={cn(
-                                            // A one-tap action, so the shared control
-                                            // radius (Button sm), not a status pill's.
-                                            'min-h-11 rounded-[1.375rem] px-4 text-[0.9375rem] font-medium',
-                                            'transition-[background-color,color,transform] duration-[var(--motion-panel-in)] ease-[var(--motion-ease-out)]',
-                                            'active:scale-[0.97] motion-reduce:active:scale-100',
-                                            'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]',
-                                            pressed
-                                                ? 'bg-[var(--selected)] text-[var(--on-selected)]'
-                                                : 'bg-[var(--band)] text-[var(--text-strong)] hover:bg-[var(--band-press)]',
-                                        )}
-                                    >
-                                        {durationLabel(preset)}
-                                    </button>
-                                )
-                            })}
+                    {typing ? (
+                        <div>
+                            <label
+                                htmlFor={typedId}
+                                className="text-[0.9375rem] font-bold text-[var(--text-strong)]"
+                            >
+                                Type a length
+                            </label>
+                            <input
+                                ref={typedRef}
+                                id={typedId}
+                                type="text"
+                                autoComplete="off"
+                                spellCheck={false}
+                                value={typed}
+                                onChange={(event) => setTyped(event.target.value)}
+                                onKeyDown={(event) => {
+                                    if (event.key === 'Enter') {
+                                        event.preventDefault()
+                                        commit()
+                                    }
+                                }}
+                                placeholder="e.g. 2 hr 23 min, or 143"
+                                aria-invalid={problem !== null && typed.trim() !== '' ? true : undefined}
+                                aria-describedby={typedHintId}
+                                data-testid={testId ? `${testId}-manual` : undefined}
+                                className={cn(
+                                    'mt-2 min-h-13 w-full rounded-autara-md border bg-[var(--paper)] px-4',
+                                    'text-[1.0625rem] text-[var(--text-strong)] tabular-nums outline-none',
+                                    'placeholder:text-[var(--text-subtle)]',
+                                    problem !== null && typed.trim() !== ''
+                                        ? 'border-[var(--danger)] shadow-[inset_0_0_0_1px_var(--danger)]'
+                                        : 'border-[var(--field-edge)] focus:border-[var(--accent)] focus:shadow-[inset_0_0_0_1px_var(--accent)]',
+                                )}
+                            />
+                            <p
+                                id={typedHintId}
+                                aria-live="polite"
+                                className={cn(
+                                    'mt-1.5 text-[0.9375rem] leading-normal',
+                                    problem !== null && typed.trim() !== ''
+                                        ? 'text-[var(--danger)]'
+                                        : 'text-[var(--text-muted)]',
+                                )}
+                            >
+                                {problem ?? `Up to ${durationLabel(maxMinutes)}.`}
+                            </p>
+                            <Button
+                                variant="link"
+                                size="sm"
+                                className="mt-1 px-0"
+                                onClick={() => setTyping(false)}
+                            >
+                                Pick from the list instead
+                            </Button>
                         </div>
-                    ) : null}
+                    ) : (
+                        <>
+                            {offeredPresets.length > 0 ? (
+                                <div role="group" aria-label="Common lengths" className="flex flex-wrap gap-2">
+                                    {offeredPresets.map((preset) => {
+                                        const pressed = shownTotal === preset
+                                        return (
+                                            <button
+                                                key={preset}
+                                                type="button"
+                                                aria-pressed={pressed}
+                                                onClick={() => onCommit(preset)}
+                                                className={cn(
+                                                    // A one-tap action, so the shared control
+                                                    // radius (Button sm), not a status pill's.
+                                                    'min-h-11 rounded-[1.375rem] px-4 text-[0.9375rem] font-medium',
+                                                    'transition-[background-color,color,transform] duration-[var(--motion-panel-in)] ease-[var(--motion-ease-out)]',
+                                                    'active:scale-[0.97] motion-reduce:active:scale-100',
+                                                    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]',
+                                                    pressed
+                                                        ? 'bg-[var(--selected)] text-[var(--on-selected)]'
+                                                        : 'bg-[var(--band)] text-[var(--text-strong)] hover:bg-[var(--band-press)]',
+                                                )}
+                                            >
+                                                {durationLabel(preset)}
+                                            </button>
+                                        )
+                                    })}
+                                </div>
+                            ) : null}
 
-                    <div className="grid grid-cols-2 gap-3">
-                        <Column
-                            labelId={hoursLabelId}
-                            heading="Hours"
-                            options={hourOptions}
-                            selected={hours}
-                            visible={(hour) => `${hour} hr`}
-                            spoken={(hour) => `${hour} ${hour === 1 ? 'hour' : 'hours'}`}
-                            disabledFor={() => false}
-                            onPick={pickHour}
-                            testId={testId ? `${testId}-hours` : undefined}
-                        />
-                        <Column
-                            labelId={minutesLabelId}
-                            heading="Minutes"
-                            options={minuteOptions}
-                            selected={mins}
-                            visible={(minute) => `${minute} min`}
-                            spoken={(minute) => `${minute} ${minute === 1 ? 'minute' : 'minutes'}`}
-                            disabledFor={(minute) => (hours ?? 0) * 60 + minute > maxMinutes}
-                            onPick={pickMinute}
-                            testId={testId ? `${testId}-minutes` : undefined}
-                        />
-                    </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <Column
+                                    labelId={hoursLabelId}
+                                    heading="Hours"
+                                    options={hourOptions}
+                                    selected={hours}
+                                    visible={(hour) => `${hour} hr`}
+                                    spoken={(hour) => `${hour} ${hour === 1 ? 'hour' : 'hours'}`}
+                                    disabledFor={() => false}
+                                    onPick={pickHour}
+                                    testId={testId ? `${testId}-hours` : undefined}
+                                />
+                                <Column
+                                    labelId={minutesLabelId}
+                                    heading="Minutes"
+                                    options={minuteOptions}
+                                    selected={mins}
+                                    visible={(minute) => `${minute} min`}
+                                    spoken={(minute) => `${minute} ${minute === 1 ? 'minute' : 'minutes'}`}
+                                    disabledFor={(minute) => (hours ?? 0) * 60 + minute > maxMinutes}
+                                    onPick={pickMinute}
+                                    testId={testId ? `${testId}-minutes` : undefined}
+                                />
+                            </div>
+
+                            <Button
+                                variant="quiet"
+                                size="sm"
+                                data-testid={testId ? `${testId}-manual-open` : undefined}
+                                onClick={() => {
+                                    setTyping(true)
+                                    requestAnimationFrame(() => typedRef.current?.focus())
+                                }}
+                            >
+                                Type a length
+                            </Button>
+                        </>
+                    )}
                 </DialogBody>
                 <DialogFooter>
                     <Button variant="quiet" size="md" onClick={() => onOpenChange(false)}>
@@ -607,7 +629,7 @@ function DurationSheet({
                         variant="strong"
                         size="md"
                         disabled={!canDone}
-                        onClick={() => draft !== null && onCommit(draft)}
+                        onClick={commit}
                         data-testid={testId ? `${testId}-done` : undefined}
                     >
                         Done
