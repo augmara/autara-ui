@@ -293,6 +293,8 @@ export { TimePicker, type TimePickerProps, type SlotState } from './TimePicker'
 export {
     DurationPicker,
     durationLabel,
+    durationSpoken,
+    parseDuration,
     DEFAULT_MAX_DURATION_MINUTES,
     type DurationPickerProps,
 } from './DurationPicker'

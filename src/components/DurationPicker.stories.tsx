@@ -11,7 +11,7 @@ const meta: Meta<typeof DurationPicker> = {
         docs: {
             description: {
                 component:
-                    'How long a job takes. The field is typable minutes, with no native spinner anywhere, and the picker beside it offers hours and quarter hours so nobody has to convert an hour and a half into 90 in their head. The picker only offers durations that can be saved; the field takes anything, so the form keeps reporting bad input in its own words.',
+                    'How long a job takes. The field is one button that says the length in words ("2 hr 30 min", or "Choose a length") and opens a sheet: the result in words at the top, the common lengths one tap each, hours and minutes side by side, and "Type a length" for the minutes between the steps (2 hr 23 min). It saves minutes. A stored value off the steps reads correctly and is kept unless changed.',
             },
         },
     },
@@ -29,19 +29,17 @@ function Controlled(props: Partial<React.ComponentProps<typeof DurationPicker>>)
 }
 
 /**
- * Open the picker and drill into one hour, without a test-library import
- * (anything imported here is compiled into `dist`, which consumers install).
+ * Open the sheet, without a test-library import (anything imported here is
+ * compiled into `dist`, which consumers install).
  */
-function openTo(hourRow: string) {
+function openSheet(typing = false) {
     return async ({ canvasElement }: { canvasElement: HTMLElement }) => {
-        canvasElement.querySelector<HTMLButtonElement>('[data-testid$="-open"]')?.click()
-        // The sheet portals to document.body, so the search starts there.
+        canvasElement.querySelector<HTMLButtonElement>('[data-testid="duration"]')?.click()
+        if (!typing) return
         for (let attempt = 0; attempt < 60; attempt += 1) {
-            const row = Array.from(document.querySelectorAll<HTMLElement>('[role="option"]')).find(
-                (el) => el.textContent?.trim().startsWith(hourRow),
-            )
-            if (row) {
-                row.click()
+            const manual = document.querySelector<HTMLButtonElement>('[data-testid="duration-manual-open"]')
+            if (manual) {
+                manual.click()
                 return
             }
             await new Promise((resolve) => setTimeout(resolve, 25))
@@ -53,60 +51,67 @@ export const Default: Story = {
     render: () => <Controlled testId="duration" />,
 }
 
-/** An hour and a half, which is the duration this control exists for. */
-export const TypicalValue: Story = {
-    name: 'A typical value (90 min)',
-    render: () => <Controlled value="90" testId="duration" />,
+/** A stored 150 minutes reads as the merchant says it. */
+export const StoredValue: Story = {
+    name: 'A stored value (150 min)',
+    render: () => <Controlled value="150" testId="duration" />,
 }
 
-/** Whole hours drop the zero part: "2 hr", never "2 hr 0 min". */
-export const WholeHours: Story = {
-    render: () => <Controlled value="120" testId="duration" />,
+/** Hours and minutes side by side, the result in words, the common lengths above. */
+export const SheetOpen: Story = {
+    name: 'The sheet',
+    render: () => <Controlled value="150" testId="duration" />,
+    play: openSheet(),
 }
 
 /**
- * The cap is 1440 minutes (`MAX_DURATION_MINUTES` in merchant-mobile's
- * `form-rules.ts`), so 24 hr is the last savable duration and the three
- * minute rows above it are out, each saying why rather than just dimming.
- * There is no days unit anywhere, because there is no duration beyond this.
+ * 50 minutes is not on the 15-minute steps. It reads correctly, opens with
+ * nothing chosen, says so, and is kept unless a new length is picked.
  */
+export const OffTheSteps: Story = {
+    name: 'A stored value off the steps (50 min)',
+    render: () => <Controlled value="50" testId="duration" />,
+    play: openSheet(),
+}
+
+/**
+ * A three-day value saved before the 24-hour cap. It reads "3 days", and the
+ * form's validator is what says it can no longer be saved as it is.
+ */
+export const PreCapThreeDays: Story = {
+    name: 'A stored value from before the cap (3 days)',
+    render: () => <Controlled value="4320" invalid testId="duration" />,
+}
+
+/** "Type a length", for the minutes between the steps: 2 hr 23 min. */
+export const TypingALength: Story = {
+    name: 'Typing a length in the sheet',
+    render: () => <Controlled value="143" testId="duration" />,
+    play: openSheet(true),
+}
+
+/** The 24 hr maximum: minutes past it are not offered. */
 export const AtTheMaximum: Story = {
     name: 'The 24 hr maximum',
     render: () => <Controlled value="1440" testId="duration" />,
-    play: openTo('24 hr'),
-}
-
-/** The shortest durations live under the first hour, which reads as itself. */
-export const UnderAnHour: Story = {
-    render: () => <Controlled value="45" testId="duration" />,
-    play: openTo('Under 1 hr'),
+    play: openSheet(),
 }
 
 /**
- * The field does not rewrite what was typed, and it does not pretend to
- * understand it either: `12.5` stays `12.5`, no summary is drawn, and the
- * message below is the consumer's, exactly as the service form writes it.
+ * A stored value the field cannot read is shown as it is, with the
+ * consumer's message below it, exactly as the service form writes it.
  */
 export const InvalidValueIsLeftAlone: Story = {
-    name: 'An invalid value, left as typed',
+    name: 'A stored value it cannot read',
     render: () => (
         <div className="flex max-w-sm flex-col gap-1.5">
-            <Label htmlFor="story-invalid-duration">Duration (min)</Label>
+            <Label htmlFor="story-invalid-duration">Duration</Label>
             <Controlled id="story-invalid-duration" value="12.5" invalid testId="duration" />
-            <p className="text-[0.8125rem] text-[var(--color-autara-error)]">
+            <p className="text-[0.8125rem] text-[var(--danger)]">
                 Duration must be a whole number of minutes.
             </p>
         </div>
     ),
-}
-
-/**
- * Over the cap, and read back truthfully as 72 hr. Seeing the reading is how
- * a merchant spots a stray digit; hiding it would only delay the discovery
- * until the save fails.
- */
-export const OverTheCap: Story = {
-    render: () => <Controlled value="4320" invalid testId="duration" />,
 }
 
 export const Disabled: Story = {
@@ -121,9 +126,8 @@ export const Disabled: Story = {
  * '200%' }}` on a parent moves nothing at all here. 32px is twice the 16px
  * browser default, which is what the OS "larger text" settings do.
  *
- * What to look for: the field grows instead of cropping, and the picker
- * trigger wraps under the input rather than squeezing it, so neither the
- * typed minutes nor the summary is truncated.
+ * What to look for: the field grows instead of cropping, and the value in
+ * words wraps rather than being cut.
  */
 export const TextScale200: Story = {
     name: 'At 200% text scale',
@@ -164,10 +168,10 @@ export const DarkTheme: Story = {
 }
 
 export const DarkThemeSheetOpen: Story = {
-    name: 'Dark theme, picker open',
+    name: 'Dark theme, sheet open',
     globals: { theme: 'dark' },
-    render: () => <Controlled value="1440" testId="duration" />,
-    play: openTo('24 hr'),
+    render: () => <Controlled value="150" testId="duration" />,
+    play: openSheet(),
 }
 
 /**
@@ -176,11 +180,11 @@ export const DarkThemeSheetOpen: Story = {
  * mirror of `serviceDurationError` from its `form-rules.ts`.
  *
  * Two things this story is here to hold:
- *  - the `<Label htmlFor="service-duration">` points at the typable input,
- *    which is the element QA's suite locates and `.fill()`s, so the label
- *    names it and a click on the label focuses it with no extra wiring;
- *  - validity is entirely the consumer's. Type `12.5`, `0` or `4320` and the
- *    field keeps it while the message below reports it.
+ *  - the `<Label htmlFor="service-duration">` names the field button and a
+ *    click on the label focuses it; the button's name carries the value;
+ *  - the form's own error still attaches to the field (`aria-describedby`)
+ *    for a stored value the form refuses; the sheet itself never hands the
+ *    form a length it cannot save.
  */
 export const InServiceForm: Story = {
     name: 'In context: service form',
@@ -205,14 +209,13 @@ export const InServiceForm: Story = {
 
             return (
                 <div className="flex max-w-sm flex-col gap-1.5">
-                    <Label htmlFor="service-duration">Duration (min)</Label>
+                    <Label htmlFor="service-duration">Duration</Label>
                     <DurationPicker
                         id="service-duration"
                         testId="service-duration"
                         value={durationText}
                         onChange={setDurationText}
                         onBlur={() => setTouched(true)}
-                        placeholder="60"
                         invalid={show}
                         aria-describedby={show ? 'service-duration-error' : undefined}
                     />
