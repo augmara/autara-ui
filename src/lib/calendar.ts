@@ -91,6 +91,48 @@ export function longDateLabel(date: string): string {
 }
 
 /**
+ * AUTM-1633 — the same day `months` months away, clamped to that month's
+ * length, so 31 January plus one month is 28 February rather than 3 March.
+ * Page Up and Page Down in the month calendar move by this.
+ */
+export function addMonths(date: string, months: number): string {
+    const [y, m, d] = date.split('-').map(Number)
+    const first = new Date(Date.UTC(y, m - 1 + months, 1))
+    const last = new Date(Date.UTC(first.getUTCFullYear(), first.getUTCMonth() + 1, 0)).getUTCDate()
+    first.setUTCDate(Math.min(d, last))
+    return fromUTC(first)
+}
+
+/** The first of the month `date` sits in. */
+export function startOfMonth(date: string): string {
+    return `${date.slice(0, 7)}-01`
+}
+
+/** True when both dates sit in the same calendar month. */
+export function sameMonth(a: string, b: string): boolean {
+    return a.slice(0, 7) === b.slice(0, 7)
+}
+
+const LONG_DATE_YEAR = new Intl.DateTimeFormat('en-AU', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+})
+
+/**
+ * AUTM-1633 — "Saturday 3 October", with the year added only when it is not
+ * `today`'s. Once any date can be chosen, a booking next January must not
+ * read the same as one this January.
+ */
+export function dateLabelFrom(today: string, date: string): string {
+    return today.slice(0, 4) === date.slice(0, 4)
+        ? LONG_DATE.format(toUTC(date))
+        : LONG_DATE_YEAR.format(toUTC(date))
+}
+
+/**
  * The month `date` sits in, as whole Monday-first weeks.
  *
  * Leading and trailing cells belong to the neighbouring months and are
