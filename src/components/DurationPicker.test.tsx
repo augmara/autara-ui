@@ -1,249 +1,403 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
+import * as React from 'react'
 
-import { DurationPicker, durationLabel } from './DurationPicker'
+import {
+    DurationPicker,
+    durationLabel,
+    durationSpoken,
+    parseDuration,
+    type DurationPickerProps,
+} from './DurationPicker'
 
-/**
- * jsdom has no `matchMedia`, so PickerSheet's `useIsMobile` stays false and
- * these exercise the dialog branch. The rows are the same either way.
- */
-function open() {
+/** A controlled field, the way every consumer holds it. */
+function Controlled({
+    initial = '',
+    onChange,
+    ...props
+}: Partial<DurationPickerProps> & { initial?: string }) {
+    const [value, setValue] = React.useState(initial)
+    return (
+        <DurationPicker
+            testId="d"
+            {...props}
+            value={value}
+            onChange={(next) => {
+                setValue(next)
+                onChange?.(next)
+            }}
+        />
+    )
+}
+
+function field() {
+    return screen.getByTestId('d') as HTMLInputElement
+}
+function openSheet() {
     fireEvent.click(screen.getByTestId('d-open'))
+    return screen.getByRole('dialog')
+}
+function radio(sheet: HTMLElement, group: 'Hours' | 'Minutes', name: string) {
+    return within(within(sheet).getByRole('radiogroup', { name: group })).getByRole('radio', {
+        name,
+    }) as HTMLButtonElement
 }
 
-function option(name: string | RegExp) {
-    return screen.getByRole('option', { name }) as HTMLButtonElement
-}
-
-describe('DurationPicker: the field takes anything, unchanged', () => {
-    it('is a text field with a numeric keypad, never a number input', () => {
-        // AUTM-1507 — `type="number"` is what draws the native spinner Don
-        // screenshotted. There is no spinner to suppress rather than a
-        // suppressed one, which is why this also holds in Firefox and Safari.
-        render(<DurationPicker value="90" onChange={() => {}} testId="d" />)
-        const input = screen.getByTestId('d') as HTMLInputElement
-        expect(input.getAttribute('type')).toBe('text')
-        expect(input.getAttribute('inputmode')).toBe('numeric')
+describe('parseDuration: what a merchant can type', () => {
+    it.each([
+        ['90', 90],
+        ['0090', 90],
+        ['0', 0],
+        ['4320', 4320],
+        ['1 hr 30 min', 90],
+        ['1hr 30min', 90],
+        ['1h30', 90],
+        ['1 h 30 m', 90],
+        ['1 hr 30', 90],
+        ['1.5 hours', 90],
+        ['2 hrs', 120],
+        ['2 hours and 15 minutes', 135],
+        ['1:30', 90],
+        ['45 min', 45],
+        ['3 days', 4320],
+        ['  2 HR  ', 120],
+    ])('reads %o as %i minutes', (text, minutes) => {
+        expect(parseDuration(text)).toBe(minutes)
     })
 
-    it.each(['abc', '12.5', '-30', '0', '4320', '1e3', '  '])(
-        'passes %o straight through without rewriting it',
+    it.each(['', '  ', 'abc', '12.5', '-30', '1e3', '1.5 min', '30 2', '2 hr 3 hr', '1:75', 'hr'])(
+        'refuses %o, so the consumer sees it as typed',
+        (text) => {
+            expect(parseDuration(text)).toBeNull()
+        },
+    )
+})
+
+describe('durationLabel and durationSpoken', () => {
+    it.each([
+        [0, '0 min', '0 minutes'],
+        [1, '1 min', '1 minute'],
+        [15, '15 min', '15 minutes'],
+        [50, '50 min', '50 minutes'],
+        [60, '1 hr', '1 hour'],
+        [90, '1 hr 30 min', '1 hour 30 minutes'],
+        [150, '2 hr 30 min', '2 hours 30 minutes'],
+        [1440, '24 hr', '24 hours'],
+        // Past the cap, from before it existed: whole days read as days.
+        [2880, '2 days', '2 days'],
+        [4320, '3 days', '3 days'],
+        [1500, '25 hr', '25 hours'],
+    ])('%i reads %o and is spoken %o', (minutes, label, spoken) => {
+        expect(durationLabel(minutes)).toBe(label)
+        expect(durationSpoken(minutes)).toBe(spoken)
+    })
+})
+
+describe('DurationPicker: the field reads in words', () => {
+    it('is a text field, never a number input with a spinner', () => {
+        render(<DurationPicker value="90" onChange={() => {}} testId="d" />)
+        expect(field().getAttribute('type')).toBe('text')
+    })
+
+    it.each([
+        ['150', '2 hr 30 min'],
+        ['50', '50 min'],
+        ['4320', '3 days'],
+        ['1440', '24 hr'],
+    ])('shows a stored %o as %o, never as raw minutes', (value, words) => {
+        render(<DurationPicker value={value} onChange={() => {}} testId="d" />)
+        expect(field().value).toBe(words)
+    })
+
+    it('shows something it cannot read exactly as it is', () => {
+        render(<DurationPicker value="12.5" onChange={() => {}} invalid testId="d" />)
+        expect(field().value).toBe('12.5')
+        expect(field().getAttribute('aria-invalid')).toBe('true')
+    })
+
+    it('does not repeat the reading on the clock when the field already says it', () => {
+        render(<DurationPicker value="150" onChange={() => {}} testId="d" />)
+        expect(screen.getByTestId('d-open').textContent).toBe('Choose duration')
+    })
+})
+
+describe('DurationPicker: typing', () => {
+    it('sends minutes for words, and keeps the words as typed', () => {
+        const onChange = vi.fn()
+        render(<Controlled onChange={onChange} />)
+        fireEvent.change(field(), { target: { value: '1 hr 30' } })
+        expect(onChange).toHaveBeenLastCalledWith('90')
+        expect(field().value).toBe('1 hr 30')
+        // The clock reads it back, since the field's text is not the reading.
+        expect(screen.getByTestId('d-open').textContent).toContain('1 hr 30 min')
+    })
+
+    it.each(['abc', '12.5', '-30', '  ', '1e3'])(
+        'passes %o straight through, for the consumer to refuse in its own words',
         (typed) => {
             const onChange = vi.fn()
-            render(<DurationPicker value="" onChange={onChange} testId="d" />)
-            fireEvent.change(screen.getByTestId('d'), { target: { value: typed } })
-            expect(onChange).toHaveBeenCalledWith(typed)
+            render(<Controlled onChange={onChange} />)
+            fireEvent.change(field(), { target: { value: typed } })
+            expect(onChange).toHaveBeenLastCalledWith(typed)
+            expect(field().value).toBe(typed)
         },
     )
 
-    it('shows an invalid value exactly as typed, because the consumer owns validity', () => {
-        // QA types arbitrary strings here to assert the three messages
-        // `serviceDurationError` produces. A field that corrected itself
-        // would make those assertions unreachable.
-        render(<DurationPicker value="12.5" onChange={() => {}} invalid testId="d" />)
-        const input = screen.getByTestId('d') as HTMLInputElement
-        expect(input.value).toBe('12.5')
-        expect(input.getAttribute('aria-invalid')).toBe('true')
-    })
-})
-
-describe('DurationPicker: the summary reads the value back', () => {
-    it.each([
-        ['45', '45 min'],
-        ['90', '1 hr 30 min'],
-        ['120', '2 hr'],
-        ['1440', '24 hr'],
-        // Over the cap and still read back truthfully: seeing "72 hr" is how
-        // the merchant notices, and the validator is what refuses it.
-        ['4320', '72 hr'],
-        // Canonicalised, not rejected.
-        ['0090', '1 hr 30 min'],
-    ])('reads %o as %o', (value, expected) => {
-        render(<DurationPicker value={value} onChange={() => {}} testId="d" />)
-        expect(screen.getByTestId('d-open').textContent).toContain(expected)
+    it('keeps typed minutes as typed after blur, and reads them on the clock (QA toHaveValue)', () => {
+        // autara-web-automation fills #service-duration with `720` and then
+        // asserts the field still holds `720`. Normalising it to "12 hr" on
+        // blur would fail that without the product being wrong.
+        render(<Controlled initial="150" />)
+        fireEvent.focus(field())
+        fireEvent.change(field(), { target: { value: '720' } })
+        fireEvent.blur(field())
+        expect(field().value).toBe('720')
+        expect(screen.getByTestId('d-open').textContent).toContain('12 hr')
     })
 
-    it('omits the zero part rather than saying "2 hr 0 min"', () => {
-        render(<DurationPicker value="120" onChange={() => {}} testId="d" />)
-        expect(screen.getByTestId('d-open').textContent).not.toContain('0 min')
+    it('describes the field with the reading in full words, beside any caller description', () => {
+        render(<Controlled aria-describedby="hint" />)
+        fireEvent.change(field(), { target: { value: '720' } })
+        const ids = (field().getAttribute('aria-describedby') ?? '').split(' ')
+        expect(ids[0]).toBe('hint')
+        expect(document.getElementById(ids[1])?.textContent).toBe('12 hours')
     })
 
-    it.each(['', '12.5', '-30', 'abc', '1.0'])(
-        'shows no summary at all for %o, rather than a wrong one',
-        (value) => {
-            render(<DurationPicker value={value} onChange={() => {}} testId="d" />)
-            // Only the trigger's own accessible name is left.
-            expect(screen.getByTestId('d-open').textContent).toBe('Choose duration')
-        },
-    )
-
-    it('keeps a 44px target on the trigger even with no summary to widen it', () => {
-        // Measured in the browser at 42px wide before `min-w-11` was added:
-        // the glyph plus its padding, in the EMPTY state, which is where
-        // every merchant starts. jsdom has no layout engine, so this asserts
-        // the classes that produce the geometry, as `tap-targets.test.tsx`
-        // explains at length.
-        render(<DurationPicker value="" onChange={() => {}} testId="d" />)
-        const trigger = screen.getByTestId('d-open')
-        expect(trigger.className).toContain('min-h-11')
-        expect(trigger.className).toContain('min-w-11')
-        // MINIMUMS, so 200% text scale grows the control instead of clipping.
-        // Matched on whole class tokens: `\bh-11\b` also matches inside
-        // `min-h-11`, because `-` is a word boundary, so that spelling of
-        // this assertion fails against the correct code.
-        expect(trigger.className).not.toMatch(/(?:^|\s)[hw]-11(?=\s|$)/)
+    it('reads an over-the-cap number truthfully, so the stray digit is visible', () => {
+        render(<Controlled />)
+        fireEvent.change(field(), { target: { value: '4320' } })
+        expect(screen.getByTestId('d-open').textContent).toContain('3 days')
     })
 
-    it('names the trigger so its visible text is part of the name, not replaced by it', () => {
-        // WCAG 2.5.3. An `aria-label` would have hidden "1 hr 30 min" from
-        // anyone speaking what they can see.
-        render(<DurationPicker value="90" onChange={() => {}} testId="d" />)
-        expect(screen.getByRole('button', { name: 'Choose duration 1 hr 30 min' })).toBeTruthy()
-    })
-})
-
-describe('DurationPicker: picking from the sheet', () => {
-    it('emits the minute total for the hour and minute chosen', () => {
-        const onChange = vi.fn()
-        render(<DurationPicker value="" onChange={onChange} testId="d" />)
-        open()
-        fireEvent.click(option('1 hr'))
-        fireEvent.click(option('1 hr 30 min'))
-        expect(onChange).toHaveBeenCalledWith('90')
-    })
-
-    it('emits a whole hour as its minutes, with no zero-minute step needed', () => {
-        const onChange = vi.fn()
-        render(<DurationPicker value="" onChange={onChange} testId="d" />)
-        open()
-        fireEvent.click(option('2 hr'))
-        fireEvent.click(option('2 hr'))
-        expect(onChange).toHaveBeenCalledWith('120')
-    })
-
-    it('reaches the short durations under the first hour', () => {
-        const onChange = vi.fn()
-        render(<DurationPicker value="" onChange={onChange} testId="d" />)
-        open()
-        // "0 hr" is not how anyone says it.
-        fireEvent.click(option('Under 1 hr'))
-        fireEvent.click(option('45 min'))
-        expect(onChange).toHaveBeenCalledWith('45')
-    })
-
-    it('marks the hour holding the current value, so the root level is not anonymous', () => {
-        render(<DurationPicker value="90" onChange={() => {}} testId="d" />)
-        open()
-        expect(option('1 hr Current')).toBeTruthy()
-    })
-
-    it('marks the exact row the value came from', () => {
-        render(<DurationPicker value="90" onChange={() => {}} testId="d" />)
-        open()
-        fireEvent.click(option('1 hr Current'))
-        expect(option('1 hr 30 min').getAttribute('aria-selected')).toBe('true')
-        expect(option('1 hr 15 min').getAttribute('aria-selected')).toBe('false')
-    })
-
-    it('marks nothing when the value is off the 15-minute steps, and keeps it anyway', () => {
-        // The mirror of TimePicker's off-grid value: 95 is not one of the
-        // rows, so no row claims it, and the field still holds it.
-        render(<DurationPicker value="95" onChange={() => {}} testId="d" />)
-        expect((screen.getByTestId('d') as HTMLInputElement).value).toBe('95')
-        expect(screen.getByTestId('d-open').textContent).toContain('1 hr 35 min')
-        open()
-        fireEvent.click(option('1 hr Current'))
-        expect(
-            screen.getAllByRole('option').filter((o) => o.getAttribute('aria-selected') === 'true'),
-        ).toHaveLength(0)
-    })
-})
-
-describe('DurationPicker: the 24 hour cap', () => {
-    it('offers 24 hr and refuses to offer a minute past it', () => {
-        render(<DurationPicker value="" onChange={() => {}} testId="d" />)
-        open()
-        fireEvent.click(option('24 hr'))
-        expect(option('24 hr').disabled).toBe(false)
-        for (const label of ['24 hr 15 min', '24 hr 30 min', '24 hr 45 min']) {
-            expect(option(new RegExp(`^${label}`)).disabled).toBe(true)
+    it('drops what was typed when the value changes from outside', () => {
+        function Resettable() {
+            const [value, setValue] = React.useState('')
+            return (
+                <>
+                    <DurationPicker value={value} onChange={setValue} testId="d" />
+                    <button type="button" onClick={() => setValue('120')}>
+                        reset
+                    </button>
+                </>
+            )
         }
+        render(<Resettable />)
+        fireEvent.change(field(), { target: { value: '45' } })
+        expect(field().value).toBe('45')
+        fireEvent.click(screen.getByText('reset'))
+        expect(field().value).toBe('2 hr')
+    })
+})
+
+describe('DurationPicker: one sheet, hours and minutes together', () => {
+    it('shows both columns at once, labelled, with the current value chosen', () => {
+        render(<Controlled initial="150" />)
+        const sheet = openSheet()
+        expect(within(sheet).getByRole('radiogroup', { name: 'Hours' })).toBeTruthy()
+        expect(within(sheet).getByRole('radiogroup', { name: 'Minutes' })).toBeTruthy()
+        expect(radio(sheet, 'Hours', '2 hours').getAttribute('aria-checked')).toBe('true')
+        expect(radio(sheet, 'Minutes', '30 minutes').getAttribute('aria-checked')).toBe('true')
+        expect(within(sheet).getByTestId('d-reading').textContent).toContain('2 hr 30 min')
+        // Spoken in full words for screen readers.
+        expect(within(sheet).getByText('2 hours 30 minutes')).toBeTruthy()
     })
 
-    it('says why, rather than leaving a row merely faint', () => {
-        render(<DurationPicker value="" onChange={() => {}} testId="d" />)
-        open()
-        fireEvent.click(option('24 hr'))
-        expect(option(/^24 hr 15 min/).textContent).toContain('over 24 hr')
+    it('offers minutes in 15-minute steps and hours 0 to 24', () => {
+        render(<Controlled />)
+        const sheet = openSheet()
+        const minutes = within(within(sheet).getByRole('radiogroup', { name: 'Minutes' })).getAllByRole(
+            'radio',
+        )
+        expect(minutes.map((m) => m.getAttribute('aria-label'))).toEqual([
+            '0 minutes',
+            '15 minutes',
+            '30 minutes',
+            '45 minutes',
+        ])
+        expect(
+            within(within(sheet).getByRole('radiogroup', { name: 'Hours' })).getAllByRole('radio'),
+        ).toHaveLength(25)
     })
 
-    it('offers no hour above the cap', () => {
-        render(<DurationPicker value="" onChange={() => {}} testId="d" />)
-        open()
-        expect(screen.getAllByRole('option')).toHaveLength(25)
-        expect(screen.queryByRole('option', { name: '25 hr' })).toBeNull()
-    })
-
-    it('holds a lower cap when a caller sets one', () => {
-        render(<DurationPicker value="" onChange={() => {}} maxMinutes={90} testId="d" />)
-        open()
-        expect(screen.getAllByRole('option')).toHaveLength(2)
-        fireEvent.click(option('1 hr'))
-        expect(option('1 hr 30 min').disabled).toBe(false)
-        expect(option(/^1 hr 45 min/).disabled).toBe(true)
-        expect(option(/^1 hr 45 min/).textContent).toContain('over 1 hr 30 min')
-    })
-
-    it('will not offer zero, which the validator refuses anyway', () => {
+    it('commits the hour and minute chosen together on Done, as minutes', () => {
         const onChange = vi.fn()
-        render(<DurationPicker value="" onChange={onChange} testId="d" />)
-        open()
-        fireEvent.click(option('Under 1 hr'))
-        const zero = option(/^0 min/)
-        expect(zero.disabled).toBe(true)
-        expect(zero.textContent).toContain('too short')
-        fireEvent.click(zero)
+        render(<Controlled initial="150" onChange={onChange} />)
+        const sheet = openSheet()
+        fireEvent.click(radio(sheet, 'Hours', '3 hours'))
+        fireEvent.click(radio(sheet, 'Minutes', '15 minutes'))
+        expect(within(sheet).getByTestId('d-reading').textContent).toContain('3 hr 15 min')
+        fireEvent.click(within(sheet).getByRole('button', { name: 'Done' }))
+        expect(onChange).toHaveBeenLastCalledWith('195')
+        expect(field().value).toBe('3 hr 15 min')
+        expect(screen.queryByRole('dialog')).toBeNull()
+    })
+
+    it('keeps the value when the sheet is cancelled', () => {
+        const onChange = vi.fn()
+        render(<Controlled initial="150" onChange={onChange} />)
+        const sheet = openSheet()
+        fireEvent.click(radio(sheet, 'Hours', '5 hours'))
+        fireEvent.click(within(sheet).getByRole('button', { name: 'Cancel' }))
         expect(onChange).not.toHaveBeenCalled()
+        expect(field().value).toBe('2 hr 30 min')
+    })
+
+    it('commits a common length in one tap', () => {
+        const onChange = vi.fn()
+        render(<Controlled onChange={onChange} />)
+        const sheet = openSheet()
+        const group = within(sheet).getByRole('group', { name: 'Common lengths' })
+        expect(within(group).getAllByRole('button').map((b) => b.textContent)).toEqual([
+            '30 min',
+            '45 min',
+            '1 hr',
+            '1 hr 30 min',
+            '2 hr',
+            '3 hr',
+            '4 hr',
+        ])
+        fireEvent.click(within(group).getByRole('button', { name: '1 hr 30 min' }))
+        expect(onChange).toHaveBeenLastCalledWith('90')
+        expect(screen.queryByRole('dialog')).toBeNull()
+    })
+
+    it('marks the common length the value already is', () => {
+        render(<Controlled initial="90" />)
+        const sheet = openSheet()
+        expect(
+            within(sheet).getByRole('button', { name: '1 hr 30 min' }).getAttribute('aria-pressed'),
+        ).toBe('true')
+    })
+
+    it('opens an off-step stored value with nothing chosen, says so, and keeps it', () => {
+        const onChange = vi.fn()
+        render(<Controlled initial="50" onChange={onChange} />)
+        const sheet = openSheet()
+        expect(within(sheet).getByTestId('d-reading').textContent).toContain('50 min')
+        expect(within(sheet).getByText(/Not on the 15-minute steps/)).toBeTruthy()
+        expect(
+            within(sheet)
+                .getAllByRole('radio')
+                .filter((r) => r.getAttribute('aria-checked') === 'true'),
+        ).toHaveLength(0)
+        expect(
+            (within(sheet).getByRole('button', { name: 'Done' }) as HTMLButtonElement).disabled,
+        ).toBe(true)
+        fireEvent.click(within(sheet).getByRole('button', { name: 'Cancel' }))
+        expect(onChange).not.toHaveBeenCalled()
+        expect(field().value).toBe('50 min')
+    })
+
+    it('opens a pre-cap 3-day value without breaking, and replaces it only if asked', () => {
+        const onChange = vi.fn()
+        render(<Controlled initial="4320" onChange={onChange} />)
+        expect(field().value).toBe('3 days')
+        const sheet = openSheet()
+        expect(within(sheet).getByTestId('d-reading').textContent).toContain('3 days')
+        // Choosing an hour on its own means that hour, on the hour.
+        fireEvent.click(radio(sheet, 'Hours', '8 hours'))
+        expect(within(sheet).getByTestId('d-reading').textContent).toContain('8 hr')
+        fireEvent.click(within(sheet).getByRole('button', { name: 'Done' }))
+        expect(onChange).toHaveBeenLastCalledWith('480')
+    })
+
+    it('has no minutes past the 24 hr cap, and 24 hr clears them', () => {
+        render(<Controlled initial="90" />)
+        const sheet = openSheet()
+        fireEvent.click(radio(sheet, 'Hours', '24 hours'))
+        expect(radio(sheet, 'Minutes', '0 minutes').getAttribute('aria-checked')).toBe('true')
+        for (const name of ['15 minutes', '30 minutes', '45 minutes']) {
+            expect(radio(sheet, 'Minutes', name).disabled).toBe(true)
+        }
+        expect(within(sheet).getByTestId('d-reading').textContent).toContain('24 hr')
+    })
+
+    it('will not commit zero, and says why', () => {
+        const onChange = vi.fn()
+        render(<Controlled initial="30" onChange={onChange} />)
+        const sheet = openSheet()
+        fireEvent.click(radio(sheet, 'Minutes', '0 minutes'))
+        expect(within(sheet).getByText('Pick at least 15 min.')).toBeTruthy()
+        const done = within(sheet).getByRole('button', { name: 'Done' }) as HTMLButtonElement
+        expect(done.disabled).toBe(true)
+        fireEvent.click(done)
+        expect(onChange).not.toHaveBeenCalled()
+    })
+
+    it('holds a lower cap when a caller sets one, presets included', () => {
+        render(<Controlled maxMinutes={90} />)
+        const sheet = openSheet()
+        expect(
+            within(within(sheet).getByRole('radiogroup', { name: 'Hours' })).getAllByRole('radio'),
+        ).toHaveLength(2)
+        const group = within(sheet).getByRole('group', { name: 'Common lengths' })
+        expect(within(group).getAllByRole('button').map((b) => b.textContent)).toEqual([
+            '30 min',
+            '45 min',
+            '1 hr',
+            '1 hr 30 min',
+        ])
+        fireEvent.click(radio(sheet, 'Hours', '1 hour'))
+        expect(radio(sheet, 'Minutes', '30 minutes').disabled).toBe(false)
+        expect(radio(sheet, 'Minutes', '45 minutes').disabled).toBe(true)
+    })
+
+    it('moves and selects with the arrow keys, one tab stop per column', () => {
+        render(<Controlled initial="120" />)
+        const sheet = openSheet()
+        const hours = within(sheet).getByRole('radiogroup', { name: 'Hours' })
+        const tabbable = within(hours)
+            .getAllByRole('radio')
+            .filter((r) => r.tabIndex === 0)
+        expect(tabbable.map((r) => r.getAttribute('aria-label'))).toEqual(['2 hours'])
+        fireEvent.keyDown(hours, { key: 'ArrowDown' })
+        expect(radio(sheet, 'Hours', '3 hours').getAttribute('aria-checked')).toBe('true')
+        fireEvent.keyDown(hours, { key: 'Home' })
+        expect(radio(sheet, 'Hours', '0 hours').getAttribute('aria-checked')).toBe('true')
+    })
+
+    it('keeps 44px targets on the clock, the rows and the presets', () => {
+        // jsdom has no layout, so this asserts the classes that produce it.
+        render(<Controlled initial="90" />)
+        expect(screen.getByTestId('d-open').className).toContain('min-h-11')
+        expect(screen.getByTestId('d-open').className).toContain('min-w-11')
+        const sheet = openSheet()
+        expect(radio(sheet, 'Hours', '1 hour').className).toContain('min-h-11')
+        expect(within(sheet).getByRole('button', { name: '30 min' }).className).toContain('min-h-11')
     })
 })
 
 describe('DurationPicker: disabled', () => {
     it('cannot be typed in and cannot be opened', () => {
         render(<DurationPicker value="90" onChange={() => {}} disabled testId="d" />)
-        expect((screen.getByTestId('d') as HTMLInputElement).disabled).toBe(true)
+        expect(field().disabled).toBe(true)
         expect((screen.getByTestId('d-open') as HTMLButtonElement).disabled).toBe(true)
         fireEvent.click(screen.getByTestId('d-open'))
-        expect(screen.queryByRole('option')).toBeNull()
+        expect(screen.queryByRole('dialog')).toBeNull()
     })
 })
 
 describe('DurationPicker with a caller-written <label htmlFor> (AUTM-1267)', () => {
-    it('puts the id on the typable input, is named by the label, and a click on the label focuses it', () => {
-        // The id has to land on the INPUT: QA's suite locates
-        // `#service-duration` and drives it with `.fill()`
-        // (autara-web-automation, ServiceFormPage.ts). Unlike DatePicker and
-        // TimePicker, this control HAS a labelable element, so the native
-        // `for` association does the naming and the focusing on its own.
+    it('puts the id on the typable input, is named by the label, and a label click focuses it', () => {
+        // QA's suite locates `#service-duration` and drives it with `.fill()`.
         render(
             <>
-                <label htmlFor="service-duration">Duration (min)</label>
+                <label htmlFor="service-duration">Duration</label>
                 <DurationPicker id="service-duration" value="" onChange={() => {}} testId="d" />
             </>,
         )
-        const input = screen.getByTestId('d')
-        expect(document.getElementById('service-duration')).toBe(input)
-        expect(screen.getByLabelText('Duration (min)')).toBe(input)
-
-        fireEvent.click(screen.getByText('Duration (min)'))
-        expect(document.activeElement).toBe(input)
+        expect(document.getElementById('service-duration')).toBe(field())
+        expect(screen.getByLabelText('Duration')).toBe(field())
+        fireEvent.click(screen.getByText('Duration'))
+        expect(document.activeElement).toBe(field())
     })
 
     it('falls back to its own name when no label points at it', () => {
         render(<DurationPicker value="" onChange={() => {}} testId="d" />)
-        expect(screen.getByLabelText('Duration')).toBe(screen.getByTestId('d'))
+        expect(screen.getByLabelText('Duration')).toBe(field())
     })
 
-    it('carries a caller’s extra input props, so the consumer’s form still works', () => {
+    it('carries a caller’s extra input props', () => {
         const onBlur = vi.fn()
         render(
             <DurationPicker
@@ -252,28 +406,14 @@ describe('DurationPicker with a caller-written <label htmlFor> (AUTM-1267)', () 
                 onBlur={onBlur}
                 name="duration"
                 required
+                aria-describedby="hint"
                 testId="d"
             />,
         )
-        const input = screen.getByTestId('d') as HTMLInputElement
-        expect(input.name).toBe('duration')
-        expect(input.required).toBe(true)
-        fireEvent.blur(input)
+        expect(field().name).toBe('duration')
+        expect(field().required).toBe(true)
+        expect(field().getAttribute('aria-describedby')).toBe('hint')
+        fireEvent.blur(field())
         expect(onBlur).toHaveBeenCalled()
-    })
-})
-
-describe('durationLabel', () => {
-    it.each([
-        [0, '0 min'],
-        [1, '1 min'],
-        [15, '15 min'],
-        [59, '59 min'],
-        [60, '1 hr'],
-        [75, '1 hr 15 min'],
-        [120, '2 hr'],
-        [1440, '24 hr'],
-    ])('%i is %o', (minutes, expected) => {
-        expect(durationLabel(minutes)).toBe(expected)
     })
 })
