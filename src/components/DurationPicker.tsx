@@ -502,6 +502,12 @@ function DurationSheet({
                     event.preventDefault()
                     ;(event.currentTarget as HTMLElement | null)?.focus()
                 }}
+                // The sheet is a container, not a control: no focus ring on
+                // it. Inline, because a consumer's unlayered
+                // `*:focus-visible` outline (merchant-mobile has one) beats
+                // any utility class, and the ring around the whole sheet read
+                // as a selection.
+                style={{ outline: 'none' }}
             >
                 <DialogHeader>
                     <DialogTitle>Duration</DialogTitle>
