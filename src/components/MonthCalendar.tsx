@@ -102,8 +102,8 @@ function Chevron({ direction }: { direction: 'back' | 'forward' }) {
         <svg
             aria-hidden
             viewBox="0 0 24 24"
-            width="16"
-            height="16"
+            // In em, so the chevron grows with text scaling like its label.
+            className="size-[1.1em] shrink-0"
             fill="none"
             stroke="currentColor"
             strokeWidth={2.4}
@@ -237,10 +237,15 @@ export function MonthCalendar({
     }
 
     return (
-        <div className={cn('flex flex-col gap-3', className)}>
+        <div className={cn('@container flex flex-col gap-3', className)}>
             {/* Back and Next keep their printed words as their names (AUTM-1266,
-                WCAG 2.5.3 Label in Name): "click Back" has to work by voice. */}
-            <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
+                WCAG 2.5.3 Label in Name): "click Back" has to work by voice.
+                Below 19rem of container (a 320 phone, or any phone at large
+                text) Back and Next drop to their chevrons, their words kept
+                for assistive tech, and the month wraps between them, rather
+                than the three wrapping into stacked rows. Container queries in
+                rem, so they follow text scale. */}
+            <div className="flex items-center justify-between gap-x-2">
                 <Button
                     type="button"
                     variant="ghost"
@@ -249,14 +254,14 @@ export function MonthCalendar({
                     onClick={() => page(-1)}
                     leadingIcon={<Chevron direction="back" />}
                     data-testid={testId ? `${testId}-calendar-back` : undefined}
-                    className="px-3"
+                    className="shrink-0 px-3 @max-[19rem]:min-w-11 @max-[19rem]:px-0"
                 >
-                    Back
+                    <span className="@max-[19rem]:sr-only">Back</span>
                 </Button>
                 <p
                     id={headingId}
                     aria-live="polite"
-                    className="text-[1rem] font-bold text-[var(--text-strong)]"
+                    className="min-w-0 flex-1 text-center text-[1rem] font-bold text-[var(--text-strong)]"
                 >
                     {monthYearLabel(active)}
                 </p>
@@ -268,9 +273,9 @@ export function MonthCalendar({
                     onClick={() => page(1)}
                     trailingIcon={<Chevron direction="forward" />}
                     data-testid={testId ? `${testId}-calendar-next` : undefined}
-                    className="px-3"
+                    className="shrink-0 px-3 @max-[19rem]:min-w-11 @max-[19rem]:px-0"
                 >
-                    Next
+                    <span className="@max-[19rem]:sr-only">Next</span>
                 </Button>
             </div>
 
@@ -281,7 +286,12 @@ export function MonthCalendar({
                 onKeyDown={onKeyDown}
                 className="flex flex-col gap-1"
             >
-                <div role="row" className="grid grid-cols-7 gap-1">
+                {/* Below 15rem of container (large text on a phone) seven
+                    columns cannot hold three-letter days or 15px figures, so
+                    the days drop to one letter (still named in full) and the
+                    figures step down. Measured: at 200% on a 320 phone the
+                    three-letter row overlapped itself. */}
+                <div role="row" className="grid grid-cols-7 gap-1 @max-[15rem]:gap-0">
                     {WEEKDAY_LABELS.map((day, i) => (
                         <div
                             key={day}
@@ -289,19 +299,31 @@ export function MonthCalendar({
                             aria-label={WEEKDAY_NAMES[i]}
                             className="py-1 text-center text-[0.75rem] font-medium text-[var(--text-muted)]"
                         >
-                            <span aria-hidden>{day}</span>
+                            <span aria-hidden className="@max-[15rem]:hidden">
+                                {day}
+                            </span>
+                            <span aria-hidden className="hidden @max-[15rem]:inline">
+                                {day[0]}
+                            </span>
                         </div>
                     ))}
                 </div>
                 {weeks.map((week) => (
-                    <div role="row" key={week[0].date} className="grid grid-cols-7 gap-1">
+                    <div
+                        role="row"
+                        key={week[0].date}
+                        className="grid grid-cols-7 gap-1 @max-[15rem]:gap-0"
+                    >
                         {week.map(({ date, inMonth }) => {
                             const state = stateOf(date)
                             const isSelected = date === value
                             const isToday = date === today
                             const isDisabled = state === 'unavailable'
                             const isActive = date === active
-                            const dot = DAY_STATE_DOT[state]
+                            // Only `limited` earns a dot here. A refused day
+                            // is already faded and says "unavailable" in its
+                            // name; a red dot under every past day was noise.
+                            const dot = state === 'limited' ? DAY_STATE_DOT.limited : null
                             return (
                                 <div role="gridcell" aria-selected={isSelected} key={date}>
                                     <button
@@ -320,7 +342,7 @@ export function MonthCalendar({
                                         style={state === 'closed' && !isSelected ? CLOSED_HATCH : undefined}
                                         className={cn(
                                             'relative flex min-h-11 w-full items-center justify-center rounded-[0.75rem]',
-                                            'text-[0.9375rem] tabular-nums transition-colors',
+                                            'text-[0.9375rem] tabular-nums transition-colors @max-[15rem]:text-[0.6875rem]',
                                             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]',
                                             'focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper)]',
                                             isSelected
