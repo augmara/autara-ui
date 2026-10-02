@@ -490,7 +490,19 @@ function DurationSheet({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent layout="responsive" data-testid={testId ? `${testId}-sheet` : undefined}>
+            <DialogContent
+                layout="responsive"
+                data-testid={testId ? `${testId}-sheet` : undefined}
+                // Focus the sheet itself, not its first control. Radix's
+                // default lands on the first preset, and Safari draws that as
+                // focus-visible on a tap, so "30 min" opened looking chosen
+                // (seen on the iPad simulator). Tab still starts at the
+                // presets, and Escape still closes.
+                onOpenAutoFocus={(event) => {
+                    event.preventDefault()
+                    ;(event.currentTarget as HTMLElement | null)?.focus()
+                }}
+            >
                 <DialogHeader>
                     <DialogTitle>Duration</DialogTitle>
                     <DialogDescription>

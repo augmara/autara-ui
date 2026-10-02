@@ -356,6 +356,12 @@ describe('DurationPicker: one sheet, hours and minutes together', () => {
         expect(radio(sheet, 'Hours', '0 hours').getAttribute('aria-checked')).toBe('true')
     })
 
+    it('opens with focus on the sheet, not on a preset that would then look chosen', () => {
+        render(<Controlled initial="150" />)
+        const sheet = openSheet()
+        expect(document.activeElement).toBe(sheet)
+    })
+
     it('keeps 44px targets on the clock, the rows and the presets', () => {
         // jsdom has no layout, so this asserts the classes that produce it.
         render(<Controlled initial="90" />)
