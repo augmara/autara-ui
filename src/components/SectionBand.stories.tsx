@@ -19,7 +19,7 @@ export const Lime: Story = {
         editorial
         eyebrow="How it works"
         title="How it works, in three steps."
-        description="Autara connects you with car-care professionals across Australia — detailing, wraps, paint protection, ceramic, tinting. Every one of them is ABN verified before they can take bookings."
+        description="Autara connects you with car care pros across Australia: cleaning, wraps, paint protection, ceramic, tinting. Every one of them is ABN verified before they can take bookings."
         tone="lime"
       />
     </SectionBand>

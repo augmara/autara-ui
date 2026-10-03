@@ -117,7 +117,7 @@ export const Decorative: Story = {
 export const LongLabel: Story = {
   name: "Edge — long accessible label",
   args: {
-    label: "Uploading the cover photo for Northside Mobile Detailing, this can take a few seconds on a slow connection",
+    label: "Uploading the cover photo for Northside Mobile Car Care, this can take a few seconds on a slow connection",
   },
 };
 

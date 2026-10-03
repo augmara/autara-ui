@@ -63,7 +63,7 @@ const customer = {
 
 const merchant = {
     name: 'Priya Nair',
-    secondary: 'Gleam Detailing Co.',
+    secondary: 'Gleam Car Care Co.',
 }
 
 const customerItems = [

@@ -58,7 +58,7 @@ export const Default: Story = {
                     Full interior and exterior detail
                 </h3>
                 <p className="mt-2 text-sm text-[var(--text-muted)]">
-                    Saturday 14 September, 10:00 with Northside Mobile Detailing.
+                    Saturday 14 September, 10:00 with Northside Mobile Car Care.
                     They come to you.
                 </p>
             </GlassSurface>
@@ -251,7 +251,7 @@ export const BothThemes: Story = {
                         <GlassSurface className="p-6">
                             <div className="flex items-start justify-between gap-3">
                                 <h3 className="text-base font-bold text-[var(--text-strong)]">
-                                    Northside Mobile Detailing
+                                    Northside Mobile Car Care
                                 </h3>
                                 <Badge variant="flight">On the way</Badge>
                             </div>

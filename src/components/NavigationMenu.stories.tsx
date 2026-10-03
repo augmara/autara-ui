@@ -103,7 +103,7 @@ export const Default: Story = {
                         <NavigationMenuContent>
                             <Panel
                                 items={[
-                                    { title: 'Mobile detailers', blurb: 'You go to them.' },
+                                    { title: 'Mobile pros', blurb: 'You go to them.' },
                                     { title: 'Shopfronts', blurb: 'They come to you.' },
                                     { title: 'Pricing', blurb: '15% and nothing up front.' },
                                     { title: 'Founding vendors', blurb: 'First five customers free.' },

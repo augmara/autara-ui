@@ -195,7 +195,7 @@ export const MarketingFAQ: Story = {
                     Merchant FAQ
                 </h2>
                 <p className="mt-2 max-w-prose text-[15px] text-[var(--text-muted)]">
-                    Everything detailers ask in the first 24 hours. Can&apos;t
+                    Everything new pros ask in the first 24 hours. Can&apos;t
                     find your answer? Email{' '}
                     <span className="underline decoration-[var(--text-muted)] underline-offset-2">
                         support@autara.au

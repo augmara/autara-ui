@@ -71,7 +71,7 @@ function Narrow() {
     return (
         <div className="w-[300px]">
             <ChoiceGroup name="mode" value={value} onChange={setValue} legend="How would you like this booked?" columns={1}>
-                <ChoiceCard value="MOBILE" label="Comes to you" description="The detailer drives to your address, anywhere inside their 15 km radius." />
+                <ChoiceCard value="MOBILE" label="Comes to you" description="The pro drives to your address, anywhere inside their 15 km radius." />
                 <ChoiceCard value="WORKSHOP" label="Visit the workshop" description="Drop the vehicle at Brunswick. The street address is shared once your deposit is paid." />
             </ChoiceGroup>
         </div>

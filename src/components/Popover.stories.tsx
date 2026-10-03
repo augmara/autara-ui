@@ -255,7 +255,7 @@ export const InsideAGlassHeader: Story = {
                     portal matters. */}
                 <header className="glass-surface flex items-center gap-3 rounded-none border-x-0 border-t-0 px-5 py-3">
                     <span className="text-sm font-medium text-[var(--text-strong)]">
-                        Northside Mobile Detailing
+                        Northside Mobile Car Care
                     </span>
                     <Badge variant="money" className="ml-1">
                         Taking bookings

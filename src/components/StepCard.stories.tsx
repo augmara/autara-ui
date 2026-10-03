@@ -12,7 +12,7 @@ const meta = {
     total: 3,
     title: "Find a professional",
     description:
-      "Wrap installers, detailers, ceramic coaters, tinters — search by service, location, and availability. See reviews from customers who actually booked the job.",
+      "Wrap installers, ceramic coaters, tinters and mobile car care pros: search by service, location, and availability. See reviews from customers who actually booked the job.",
     chips: ["ABN verified", "Customer reviews"],
   },
 } satisfies Meta<typeof StepCard>;
@@ -62,7 +62,7 @@ export const LimeBandComposition: Story = {
         editorial
         eyebrow="How it works"
         title="How it works, in three steps."
-        description="Autara connects you with car-care professionals across Australia — detailing, wraps, paint protection, ceramic, tinting. Every one of them is ABN verified before they can take bookings."
+        description="Autara connects you with car care pros across Australia: cleaning, wraps, paint protection, ceramic, tinting. Every one of them is ABN verified before they can take bookings."
         tone="lime"
       />
 
@@ -73,7 +73,7 @@ export const LimeBandComposition: Story = {
         <StepCard
           step={1}
           title="Find a professional"
-          description="Wrap installers, detailers, ceramic coaters, tinters — search by service, location, and availability. See reviews from customers who actually booked the job."
+          description="Wrap installers, ceramic coaters, tinters and mobile car care pros: search by service, location, and availability. See reviews from customers who actually booked the job."
           chips={["ABN verified", "Customer reviews"]}
           as="a"
           href="#step-1"

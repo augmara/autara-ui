@@ -49,7 +49,7 @@ export const HairlineHover: Story = {
   render: () => (
     <Card className="glass-card max-w-sm cursor-pointer">
       <CardHeader>
-        <CardTitle>Detailing — Standard wash</CardTitle>
+        <CardTitle>Standard wash</CardTitle>
         <CardDescription>
           Hand wash, dry, tyre dressing, interior vacuum.
         </CardDescription>
@@ -178,7 +178,7 @@ export const DescriptionLegibility: Story = {
           <CardTitle>On --surface</CardTitle>
           <CardDescription>
             Cancel free up to 24 hours before your slot. After that the
-            deposit is retained by the detailer.
+            deposit is retained by your pro.
           </CardDescription>
         </CardHeader>
       </Card>
@@ -188,7 +188,7 @@ export const DescriptionLegibility: Story = {
             <CardTitle>Nested on --surface-elevated</CardTitle>
             <CardDescription>
               Cancel free up to 24 hours before your slot. After that the
-              deposit is retained by the detailer.
+              deposit is retained by your pro.
             </CardDescription>
           </CardHeader>
         </Card>
@@ -209,7 +209,7 @@ export const InContextBookingSummary: Story = {
       <CardHeader>
         <CardTitle>Full interior and exterior detail</CardTitle>
         <CardDescription>
-          Saturday 14 September, 10:00 with Northside Mobile Detailing.
+          Saturday 14 September, 10:00 with Northside Mobile Car Care.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -269,7 +269,7 @@ export const OnTheGradientGround: Story = {
                   </div>
                   <CardDescription>
                     Saturday 14 September, 10:00 with Northside Mobile
-                    Detailing.
+                    Car Care.
                   </CardDescription>
                 </CardHeader>
                 <CardFooter className="gap-2">

@@ -49,7 +49,7 @@ export const OnInk: Story = {
   render: () => (
     <div className="flex items-center gap-10 rounded-3xl bg-[var(--text-strong)] p-10 text-[var(--background)]">
       <div className="max-w-xs">
-        <h2 className="text-2xl font-bold tracking-[-0.02em]">Run a detailing business?</h2>
+        <h2 className="text-2xl font-bold tracking-[-0.02em]">Run a car care business?</h2>
         <p className="mt-2 text-sm opacity-75">List your services, get verified, take bookings with the deposit paid up front.</p>
       </div>
       <div className="w-[420px]">

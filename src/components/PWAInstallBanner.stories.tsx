@@ -173,8 +173,8 @@ export const LongCopy: Story = {
     args: {
         appName: 'Autara',
         headline:
-            'Autara Mobile Detailing Marketplace on your home screen, for faster bookings',
-        body: 'Quick access, no app store, works offline. Your upcoming bookings, your messages with the detailer, your receipts and your saved vehicles are all one tap away, and the shortcut behaves like an app rather than a bookmark. Nothing is downloaded and nothing is installed from a store.',
+            'Autara Mobile Car Care Marketplace on your home screen, for faster bookings',
+        body: 'Quick access, no app store, works offline. Your upcoming bookings, your messages with your pro, your receipts and your saved vehicles are all one tap away, and the shortcut behaves like an app rather than a bookmark. Nothing is downloaded and nothing is installed from a store.',
         firstShowDelayMs: 0,
     },
     decorators: [
