@@ -160,7 +160,10 @@ export {
     durationSpoken,
     parseDuration,
     DEFAULT_MAX_DURATION_MINUTES,
+    DEFAULT_MIN_WORKING_DAYS,
+    DEFAULT_MAX_WORKING_DAYS,
     type DurationPickerProps,
+    type DurationWorkingDays,
 } from './components/DurationPicker'
 export {
     addDays,

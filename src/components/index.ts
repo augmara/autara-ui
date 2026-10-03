@@ -298,7 +298,10 @@ export {
     durationSpoken,
     parseDuration,
     DEFAULT_MAX_DURATION_MINUTES,
+    DEFAULT_MIN_WORKING_DAYS,
+    DEFAULT_MAX_WORKING_DAYS,
     type DurationPickerProps,
+    type DurationWorkingDays,
 } from './DurationPicker'
 
 // ─── AUTM-1185 — the customer-web hardening sweep's four primitives ──────

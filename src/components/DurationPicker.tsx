@@ -22,12 +22,20 @@ import {
  * can't be more than 1440 minutes (24 hours)."
  *
  * That ceiling is why the sheet offers no hour above 24 and no days: a
- * longer duration is not something a merchant can currently save, so
- * offering it would be offering a value the form then rejects. Multi-day
- * work is AUTM-1575 (working days, for workshop merchants), a cap change on
- * the server and the form, not a control change.
+ * longer duration is not something a merchant can save in hours. A job that
+ * keeps the car for days is set in WORKING DAYS instead (AUTM-1575), which is
+ * the `workingDays` mode below, not a longer sheet.
  */
 export const DEFAULT_MAX_DURATION_MINUTES = 1440
+
+/**
+ * AUTM-1575 — the working-days bounds, mirroring `MULTI_DAY_MIN_WORKING_DAYS`
+ * and `MULTI_DAY_MAX_WORKING_DAYS` in `@autara-au/autara-contracts`, which is
+ * what merchant-api refuses outside of. Don, 1 and 3 Oct 2026: a job of fewer
+ * than 2 working days is set in hours, and no job takes more than 10.
+ */
+export const DEFAULT_MIN_WORKING_DAYS = 2
+export const DEFAULT_MAX_WORKING_DAYS = 10
 
 /** The minute column's step. The approved Services board draws 15. */
 const DEFAULT_MINUTE_STEP = 15
@@ -174,6 +182,46 @@ function Chevron() {
     )
 }
 
+/** A minus or a plus, drawn inline like the chevron, in `em`. */
+function StepGlyph({ plus }: { plus: boolean }) {
+    return (
+        <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            aria-hidden="true"
+            className="size-[1.25em] shrink-0"
+        >
+            <path d="M5 12h14" />
+            {plus ? <path d="M12 5v14" /> : null}
+        </svg>
+    )
+}
+
+/**
+ * AUTM-1575 — the duration in working days, for a job that keeps the car.
+ *
+ * Present only when the consumer offers it: a merchant who only travels to
+ * the customer never sees the switch (Don, 1 Oct 2026), so the consumer
+ * simply does not pass this.
+ */
+export interface DurationWorkingDays {
+    /** Working days, or null while the duration is set in hours. */
+    value: number | null
+    /**
+     * A whole number of days switches to (or stays in) working days; null
+     * switches back to hours. The minutes `value` is left as it was, so
+     * switching back and forth loses nothing.
+     */
+    onChange: (next: number | null) => void
+    /** @default 2 */
+    min?: number
+    /** @default 10 */
+    max?: number
+}
+
 export interface DurationPickerProps
     extends Omit<
         React.ComponentPropsWithoutRef<'button'>,
@@ -206,9 +254,18 @@ export interface DurationPickerProps
     /**
      * Lands on the field's button. The sheet's parts take `{testId}-sheet`,
      * `-reading`, `-hours`, `-minutes`, `-manual-open`, `-manual` (the text
-     * field) and `-done`.
+     * field) and `-done`. With `workingDays`: `-unit` (the switch),
+     * `-unit-hours`, `-unit-days`, `-days` (the stepper), `-days-reading`,
+     * `-days-fewer` and `-days-more`.
      */
     testId?: string
+    /**
+     * AUTM-1575 — offers "Hours | Working days" above the field, and a
+     * working-days stepper in place of the field while it is chosen. Leave it
+     * out and the control is exactly the hours field it always was.
+     */
+    workingDays?: DurationWorkingDays
+    /** On the field's button, as before. */
     className?: string
 }
 
@@ -252,12 +309,24 @@ export interface DurationPickerProps
  * cap) reads correctly on the field ("50 min", "3 days"), opens with nothing
  * chosen and a line saying so, and is kept unless the merchant picks again.
  *
- * ── Room for working days (AUTM-1575) ─────────────────────────────────────
+ * ── Working days (AUTM-1575) ──────────────────────────────────────────────
  *
- * Multi-day work is a later mode, not a redesign: the sheet's header is
- * where an "Hours | Working days" switch goes, `Column` is generic (a days
- * column is `options={[1..14]}`), and the value stays minutes, so the field
- * and the consumer do not change. The cap moves with it, as `maxMinutes`.
+ * A ceramic coating or a paint correction keeps the car for two or three
+ * days, and no number of hours says that. With `workingDays`, an "Hours |
+ * Working days" switch sits ABOVE the field, as the approved v39 frame draws
+ * it (not in the sheet's header, where this note used to plan it: a switch
+ * inside the sheet would hide which unit the service is in until the sheet
+ * was opened). Working days swaps the field for a stepper, "− 3 working days
+ * +", bounded at 2 and 10. Pick-up is worked out by the server from the
+ * merchant's hours, so the stepper counts days and nothing else.
+ *
+ * The two values stay separate on purpose: `value` is still minutes and
+ * `workingDays.value` is days, so switching back to hours finds the minutes
+ * where they were, and a consumer never has to encode days as minutes.
+ *
+ * Prior art (Mobbin, AUTM-1575): Tripadvisor's "Dates | Trip length" switch
+ * over a count stepper is the steal: the same quantity said two ways, chosen
+ * by a switch, with the count as a stepper rather than a typed number.
  */
 export function DurationPicker({
     value,
@@ -272,12 +341,22 @@ export function DurationPicker({
     id,
     name,
     testId,
+    workingDays,
     className,
+    'aria-describedby': describedBy,
     ...rest
 }: DurationPickerProps) {
     const [open, setOpen] = React.useState(false)
     const buttonRef = React.useRef<HTMLButtonElement>(null)
-    const labelledBy = useLabelFor(id, () => buttonRef.current)
+    const stepperRef = React.useRef<HTMLDivElement>(null)
+    const daysMode = workingDays !== undefined && workingDays.value !== null
+    // A label click focuses the field, or in working days the stepper's first
+    // live button, which is what a label click does for every other field.
+    const labelledBy = useLabelFor(id, () =>
+        daysMode
+            ? stepperRef.current?.querySelector<HTMLButtonElement>('button:not(:disabled)')
+            : buttonRef.current,
+    )
     const ownId = React.useId()
     const buttonId = id ?? `${ownId}-duration`
 
@@ -285,10 +364,16 @@ export function DurationPicker({
     const reading = minutes === null ? (value.trim() === '' ? null : value) : durationLabel(minutes)
     const spoken = minutes === null ? reading : durationSpoken(minutes)
 
-    return (
+    // The last count chosen, so Hours then Working days again returns to it
+    // rather than to the minimum.
+    const lastDays = React.useRef<number | null>(null)
+    if (workingDays?.value != null) lastDays.current = workingDays.value
+
+    const hoursField = (
         <>
             <button
                 {...rest}
+                aria-describedby={describedBy}
                 ref={buttonRef}
                 id={buttonId}
                 type="button"
@@ -340,7 +425,198 @@ export function DurationPicker({
             />
         </>
     )
+
+    if (!workingDays) return hoursField
+
+    const min = workingDays.min ?? DEFAULT_MIN_WORKING_DAYS
+    const max = Math.max(min, workingDays.max ?? DEFAULT_MAX_WORKING_DAYS)
+    return (
+        <div className="space-y-3">
+            <UnitSwitch
+                label={label}
+                daysMode={daysMode}
+                disabled={disabled}
+                testId={testId}
+                onPick={(days) => {
+                    if (days === daysMode) return
+                    workingDays.onChange(days ? Math.min(max, Math.max(min, lastDays.current ?? min)) : null)
+                }}
+            />
+            {daysMode ? (
+                <DaysStepper
+                    ref={stepperRef}
+                    id={buttonId}
+                    labelledBy={labelledBy}
+                    label={label}
+                    describedBy={describedBy}
+                    days={workingDays.value as number}
+                    min={min}
+                    max={max}
+                    disabled={disabled}
+                    testId={testId}
+                    onChange={workingDays.onChange}
+                />
+            ) : (
+                hoursField
+            )}
+        </div>
+    )
 }
+
+/**
+ * "Hours | Working days": a radio group with one tab stop, arrows move AND
+ * select (the ARIA radio pattern), drawn as the library's segmented control
+ * (Tabs): a band track, the Selected fill on the chosen unit.
+ *
+ * Radios, not Tabs: this is a value the form saves, not a choice of panel.
+ */
+function UnitSwitch({
+    label,
+    daysMode,
+    disabled,
+    testId,
+    onPick,
+}: {
+    label: string
+    daysMode: boolean
+    disabled: boolean
+    testId?: string
+    onPick: (days: boolean) => void
+}) {
+    const groupRef = React.useRef<HTMLDivElement>(null)
+    const options = [
+        { days: false, text: 'Hours', suffix: 'hours' },
+        { days: true, text: 'Working days', suffix: 'days' },
+    ] as const
+    return (
+        <div
+            ref={groupRef}
+            role="radiogroup"
+            aria-label={`${label} unit`}
+            aria-disabled={disabled || undefined}
+            data-testid={testId ? `${testId}-unit` : undefined}
+            onKeyDown={(event) => {
+                if (disabled) return
+                let next: boolean | null = null
+                if (event.key === 'ArrowRight' || event.key === 'ArrowDown') next = true
+                else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') next = false
+                else if (event.key === 'Home') next = false
+                else if (event.key === 'End') next = true
+                if (next === null) return
+                event.preventDefault()
+                onPick(next)
+                groupRef.current?.querySelector<HTMLElement>(`[data-unit="${next ? 'days' : 'hours'}"]`)?.focus()
+            }}
+            // `min-h`, never `h`: at 200% text the labels grow and the track
+            // grows with them (AUTM-915). 20rem is the frame's width.
+            className="grid min-h-12 w-full max-w-[20rem] grid-cols-2 gap-1 rounded-full bg-[var(--band)] p-1"
+        >
+            {options.map((option) => {
+                const checked = option.days === daysMode
+                return (
+                    <button
+                        key={option.suffix}
+                        type="button"
+                        role="radio"
+                        aria-checked={checked}
+                        tabIndex={checked ? 0 : -1}
+                        disabled={disabled}
+                        data-unit={option.suffix}
+                        data-testid={testId ? `${testId}-unit-${option.suffix}` : undefined}
+                        onClick={() => onPick(option.days)}
+                        className={cn(
+                            'inline-flex min-h-10 items-center justify-center rounded-full px-3 py-1.5 text-center text-[0.9375rem] leading-tight',
+                            'transition-colors duration-[var(--motion-panel-in)] ease-[var(--motion-ease-out)]',
+                            // Full-strength accent, offset in the track's own
+                            // colour, as Tabs does: the band between ring and
+                            // fill is what keeps a purple ring off a purple fill.
+                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--band)]',
+                            'disabled:cursor-not-allowed disabled:opacity-60',
+                            checked
+                                ? 'bg-[var(--selected)] font-bold text-[var(--on-selected)]'
+                                : 'font-medium text-[var(--text-muted)] not-disabled:hover:text-[var(--text-strong)]',
+                        )}
+                    >
+                        {option.text}
+                    </button>
+                )
+            })}
+        </div>
+    )
+}
+
+interface DaysStepperProps {
+    id: string
+    labelledBy: string | undefined
+    label: string
+    describedBy: string | undefined
+    days: number
+    min: number
+    max: number
+    disabled: boolean
+    testId?: string
+    onChange: (next: number) => void
+}
+
+/**
+ * "− 3 working days +". The count is a display figure (Satoshi Black, as
+ * autara-ui 7.x sets figures), announced politely as it changes. The minus
+ * and plus are the library's icon disc (`Button size="icon"`, quiet), so the
+ * stepper spends no new round shape. A stored
+ * count outside the bounds still reads as it is, and the first press brings
+ * it back inside them rather than one step further out.
+ */
+const DaysStepper = React.forwardRef<HTMLDivElement, DaysStepperProps>(function DaysStepper(
+    { id, labelledBy, label, describedBy, days, min, max, disabled, testId, onChange },
+    ref,
+) {
+    const readingId = `${id}-days-reading`
+    const fewer = Math.min(days - 1, max)
+    const more = Math.max(days + 1, min)
+    return (
+        <div
+            ref={ref}
+            id={id}
+            role="group"
+            aria-labelledby={labelledBy ? `${labelledBy} ${readingId}` : readingId}
+            aria-label={labelledBy ? undefined : `${label}, ${days} working ${days === 1 ? 'day' : 'days'}`}
+            aria-describedby={describedBy}
+            data-testid={testId ? `${testId}-days` : undefined}
+            data-value={days}
+            className="flex flex-wrap items-center gap-x-5 gap-y-2"
+        >
+            <Button
+                variant="quiet"
+                size="icon"
+                aria-label="Fewer working days"
+                disabled={disabled || days <= min}
+                onClick={() => onChange(fewer)}
+                data-testid={testId ? `${testId}-days-fewer` : undefined}
+            >
+                <StepGlyph plus={false} />
+            </Button>
+            <output
+                id={readingId}
+                aria-live="polite"
+                data-testid={testId ? `${testId}-days-reading` : undefined}
+                className="flex min-w-[8.5rem] items-baseline justify-center gap-1.5 text-[var(--text-strong)]"
+            >
+                <span className="text-[1.75rem] leading-none font-black tabular-nums">{days}</span>
+                <span className="text-[1rem] font-medium">working {days === 1 ? 'day' : 'days'}</span>
+            </output>
+            <Button
+                variant="quiet"
+                size="icon"
+                aria-label="More working days"
+                disabled={disabled || days >= max}
+                onClick={() => onChange(more)}
+                data-testid={testId ? `${testId}-days-more` : undefined}
+            >
+                <StepGlyph plus />
+            </Button>
+        </div>
+    )
+})
 
 interface DurationSheetProps {
     open: boolean

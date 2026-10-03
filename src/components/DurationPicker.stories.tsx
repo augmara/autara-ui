@@ -234,3 +234,96 @@ export const InServiceForm: Story = {
         return <ServiceFormField />
     },
 }
+
+/**
+ * AUTM-1575 — a field that offers working days, held the way a consumer
+ * holds it: minutes and days as two values, so switching units loses neither.
+ */
+function WithWorkingDays({
+    minutes = '150',
+    days = null,
+    ...props
+}: Partial<React.ComponentProps<typeof DurationPicker>> & { minutes?: string; days?: number | null }) {
+    const [value, setValue] = React.useState(minutes)
+    const [workingDays, setWorkingDays] = React.useState<number | null>(days)
+    const id = `story-working-days-${React.useId().replace(/:/g, '')}`
+    return (
+        <div className="flex max-w-xl flex-col gap-1.5">
+            <Label htmlFor={id}>Duration</Label>
+            <DurationPicker
+                id={id}
+                testId="duration"
+                {...props}
+                value={value}
+                onChange={setValue}
+                workingDays={{ value: workingDays, onChange: setWorkingDays }}
+            />
+        </div>
+    )
+}
+
+/** The switch above the hours field, Hours chosen. */
+export const WorkingDaysOffered: Story = {
+    name: 'Working days offered, set in hours',
+    render: () => <WithWorkingDays />,
+}
+
+/**
+ * Working days chosen: the stepper in place of the field. The approved v39
+ * frame's Ceramic Coating, 3 working days.
+ */
+export const WorkingDaysChosen: Story = {
+    name: 'Working days: 3',
+    render: () => <WithWorkingDays days={3} />,
+}
+
+/** The minus stops at 2: a one-day job is set in hours. */
+export const WorkingDaysAtTheMinimum: Story = {
+    name: 'Working days: the minimum (2)',
+    render: () => <WithWorkingDays days={2} />,
+}
+
+/** The plus stops at 10 (Don, 3 Oct 2026). */
+export const WorkingDaysAtTheMaximum: Story = {
+    name: 'Working days: the maximum (10)',
+    render: () => <WithWorkingDays days={10} />,
+}
+
+export const WorkingDaysDisabled: Story = {
+    name: 'Working days: disabled',
+    render: () => <WithWorkingDays days={3} disabled />,
+}
+
+export const WorkingDaysDark: Story = {
+    name: 'Working days, dark theme',
+    globals: { theme: 'dark' },
+    render: () => (
+        <div className="flex flex-col gap-6">
+            <WithWorkingDays />
+            <WithWorkingDays days={3} />
+        </div>
+    ),
+}
+
+/** 200% text, set on the root: the switch and the stepper wrap, never crop. */
+export const WorkingDaysTextScale200: Story = {
+    name: 'Working days at 200% text scale',
+    render: () => {
+        function RootScaled() {
+            React.useEffect(() => {
+                const previous = document.documentElement.style.fontSize
+                document.documentElement.style.fontSize = '32px'
+                return () => {
+                    document.documentElement.style.fontSize = previous
+                }
+            }, [])
+            return (
+                <div className="flex max-w-[20rem] flex-col gap-6">
+                    <WithWorkingDays />
+                    <WithWorkingDays days={3} />
+                </div>
+            )
+        }
+        return <RootScaled />
+    },
+}

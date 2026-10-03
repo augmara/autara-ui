@@ -431,3 +431,144 @@ describe('DurationPicker with a caller-written <label htmlFor> (AUTM-1267)', () 
         expect(onBlur).toHaveBeenCalled()
     })
 })
+
+/** AUTM-1575 — the field as a working-days consumer holds it: two values. */
+function WithDays({
+    minutes = '150',
+    days = null,
+    onDays,
+    onMinutes,
+    ...props
+}: Partial<DurationPickerProps> & {
+    minutes?: string
+    days?: number | null
+    onDays?: (next: number | null) => void
+    onMinutes?: (next: string) => void
+}) {
+    const [value, setValue] = React.useState(minutes)
+    const [workingDays, setWorkingDays] = React.useState<number | null>(days)
+    return (
+        <DurationPicker
+            testId="d"
+            {...props}
+            value={value}
+            onChange={(next) => {
+                setValue(next)
+                onMinutes?.(next)
+            }}
+            workingDays={{
+                value: workingDays,
+                onChange: (next) => {
+                    setWorkingDays(next)
+                    onDays?.(next)
+                },
+            }}
+        />
+    )
+}
+
+describe('DurationPicker: working days (AUTM-1575)', () => {
+    it('is exactly the hours field when working days are not offered', () => {
+        render(<DurationPicker value="90" onChange={() => {}} testId="d" />)
+        expect(screen.queryByRole('radiogroup', { name: 'Duration unit' })).toBeNull()
+        expect(field().textContent).toContain('1 hr 30 min')
+    })
+
+    it('offers Hours | Working days above the field, Hours chosen while days are null', () => {
+        render(<WithDays />)
+        const group = screen.getByRole('radiogroup', { name: 'Duration unit' })
+        const hours = within(group).getByRole('radio', { name: 'Hours' })
+        const days = within(group).getByRole('radio', { name: 'Working days' })
+        expect(hours.getAttribute('aria-checked')).toBe('true')
+        expect(days.getAttribute('aria-checked')).toBe('false')
+        expect(hours.tabIndex).toBe(0)
+        expect(days.tabIndex).toBe(-1)
+        expect(field().textContent).toContain('2 hr 30 min')
+    })
+
+    it('switching to working days starts at the minimum and swaps the field for the stepper', () => {
+        const onDays = vi.fn()
+        render(<WithDays onDays={onDays} />)
+        fireEvent.click(screen.getByTestId('d-unit-days'))
+        expect(onDays).toHaveBeenLastCalledWith(2)
+        expect(screen.queryByTestId('d')).toBeNull()
+        expect(screen.getByTestId('d-days-reading').textContent).toBe('2working days')
+        expect(screen.getByTestId('d-days').getAttribute('data-value')).toBe('2')
+    })
+
+    it('steps within 2 and 10, and the buttons stop at the bounds', () => {
+        const onDays = vi.fn()
+        render(<WithDays days={3} onDays={onDays} />)
+        const fewer = screen.getByRole('button', { name: 'Fewer working days' }) as HTMLButtonElement
+        const more = screen.getByRole('button', { name: 'More working days' }) as HTMLButtonElement
+        fireEvent.click(fewer)
+        expect(onDays).toHaveBeenLastCalledWith(2)
+        expect(fewer.disabled).toBe(true)
+        for (let i = 0; i < 12; i += 1) fireEvent.click(more)
+        expect(onDays).toHaveBeenLastCalledWith(10)
+        expect(more.disabled).toBe(true)
+        expect(screen.getByTestId('d-days').getAttribute('data-value')).toBe('10')
+    })
+
+    it('brings a stored count outside the bounds back inside on the first press', () => {
+        const onDays = vi.fn()
+        render(<WithDays days={14} onDays={onDays} />)
+        expect(screen.getByTestId('d-days-reading').textContent).toContain('14')
+        expect((screen.getByRole('button', { name: 'More working days' }) as HTMLButtonElement).disabled).toBe(true)
+        fireEvent.click(screen.getByRole('button', { name: 'Fewer working days' }))
+        expect(onDays).toHaveBeenLastCalledWith(10)
+    })
+
+    it('switching back to hours sends null and finds the minutes where they were', () => {
+        const onDays = vi.fn()
+        const onMinutes = vi.fn()
+        render(<WithDays days={3} onDays={onDays} onMinutes={onMinutes} />)
+        fireEvent.click(screen.getByTestId('d-unit-hours'))
+        expect(onDays).toHaveBeenLastCalledWith(null)
+        expect(onMinutes).not.toHaveBeenCalled()
+        expect(field().textContent).toContain('2 hr 30 min')
+    })
+
+    it('returns to the last count chosen, not the minimum', () => {
+        const onDays = vi.fn()
+        render(<WithDays days={5} onDays={onDays} />)
+        fireEvent.click(screen.getByTestId('d-unit-hours'))
+        fireEvent.click(screen.getByTestId('d-unit-days'))
+        expect(onDays).toHaveBeenLastCalledWith(5)
+    })
+
+    it('arrow keys move and select, as radios do', () => {
+        const onDays = vi.fn()
+        render(<WithDays onDays={onDays} />)
+        const group = screen.getByRole('radiogroup', { name: 'Duration unit' })
+        fireEvent.keyDown(group, { key: 'ArrowRight' })
+        expect(onDays).toHaveBeenLastCalledWith(2)
+        expect(document.activeElement).toBe(screen.getByTestId('d-unit-days'))
+        fireEvent.keyDown(group, { key: 'ArrowLeft' })
+        expect(onDays).toHaveBeenLastCalledWith(null)
+        expect(document.activeElement).toBe(screen.getByTestId('d-unit-hours'))
+    })
+
+    it('a caller’s label names the stepper with its count, and its describedby moves with it', () => {
+        render(
+            <>
+                <label htmlFor="service-duration">Duration</label>
+                <WithDays id="service-duration" days={3} aria-describedby="hint" />
+            </>,
+        )
+        const label = screen.getByText('Duration')
+        const stepper = screen.getByRole('group', { name: 'Duration 3 working days' })
+        expect(stepper.id).toBe('service-duration')
+        expect(stepper.getAttribute('aria-describedby')).toBe('hint')
+        expect(label.id).not.toBe('')
+        fireEvent.click(label)
+        expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Fewer working days' }))
+    })
+
+    it('disables the switch and the stepper together', () => {
+        render(<WithDays days={3} disabled />)
+        expect((screen.getByTestId('d-unit-hours') as HTMLButtonElement).disabled).toBe(true)
+        expect((screen.getByRole('button', { name: 'More working days' }) as HTMLButtonElement).disabled).toBe(true)
+        expect((screen.getByRole('button', { name: 'Fewer working days' }) as HTMLButtonElement).disabled).toBe(true)
+    })
+})
