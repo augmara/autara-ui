@@ -72,6 +72,7 @@ const KEEPS: Record<string, string> = {
     'EmptyState.tsx': 'the 44px icon disc, canvas v44 "Empty" (AUTM-1594)',
     'LockedFeature.tsx': 'the optional icon disc (AUTM-1594)',
     'SwatchRadioGroup.tsx': 'colour swatches are 44px circles on canvas v50, a choice of colour, not an action (AUTM-1591)',
+    'DurationPicker.tsx': 'the Hours | Working days switch, canvas v44 "Segmented" drawn as Tabs draws it (AUTM-1575); the stepper uses Button\'s icon disc',
 }
 
 /**
