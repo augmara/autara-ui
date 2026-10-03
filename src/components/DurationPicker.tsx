@@ -595,14 +595,20 @@ const DaysStepper = React.forwardRef<HTMLDivElement, DaysStepperProps>(function 
             >
                 <StepGlyph plus={false} />
             </Button>
+            {/* The live region is the <output>; the NAME comes from the span
+                inside it. Chrome leaves an <output> (role status) out of an
+                aria-labelledby name, so pointing at it named the group
+                "Duration" alone (measured in Chromium, AUTM-1575; jsdom
+                includes it, which is why the unit test could not see it). */}
             <output
-                id={readingId}
                 aria-live="polite"
                 data-testid={testId ? `${testId}-days-reading` : undefined}
-                className="flex min-w-[8.5rem] items-baseline justify-center gap-1.5 text-[var(--text-strong)]"
+                className="flex min-w-[8.5rem] justify-center text-[var(--text-strong)]"
             >
-                <span className="text-[1.75rem] leading-none font-black tabular-nums">{days}</span>
-                <span className="text-[1rem] font-medium">working {days === 1 ? 'day' : 'days'}</span>
+                <span id={readingId} className="flex items-baseline gap-1.5">
+                    <span className="text-[1.75rem] leading-none font-black tabular-nums">{days}</span>
+                    <span className="text-[1rem] font-medium">working {days === 1 ? 'day' : 'days'}</span>
+                </span>
             </output>
             <Button
                 variant="quiet"
