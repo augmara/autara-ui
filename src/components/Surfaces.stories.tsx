@@ -70,7 +70,7 @@ export const Sheet: Story = {
             <Card variant="hero" className="flex w-full flex-col gap-2 p-[1.375rem]">
               <Badge variant="lime" className="self-start">Confirmed</Badge>
               <span className="text-[1.375rem] leading-snug font-black">Full Interior Detail</span>
-              <span className="text-[0.9375rem] leading-snug text-[var(--on-deep-muted)]">Demo Detailing · Fri 3 Oct, 11:00 am</span>
+              <span className="text-[0.9375rem] leading-snug text-[var(--on-deep-muted)]">Demo Car Care · Fri 3 Oct, 11:00 am</span>
             </Card>
           </Specimen>
           <Specimen name="Money breakdown" component="MoneyBreakdown" note="Amounts come from the server; never summed on the page.">

@@ -79,7 +79,7 @@ export const InContext: Story = {
   render: () => (
     <div className="max-w-sm rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface)] p-5">
       <h3 className="text-base font-bold text-[var(--text-strong)]">
-        Sydney Detailing Co.
+        Sydney Car Care Co.
       </h3>
       <div className="mt-2 flex items-center gap-2 text-sm">
         <RatingStars rating={4.7} size="md" />

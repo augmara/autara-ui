@@ -37,7 +37,7 @@ export const Default: Story = {
     render: () => (
         <div className="max-w-sm">
             <FormField label="Business name">
-                <Input placeholder="Northside Mobile Detailing" />
+                <Input placeholder="Northside Mobile Car Care" />
             </FormField>
         </div>
     ),
@@ -194,7 +194,7 @@ export const InContextOnboardingStep: Story = {
                 Tell us about the business
             </h2>
             <FormField label="Business name" required>
-                <Input defaultValue="Northside Mobile Detailing" />
+                <Input defaultValue="Northside Mobile Car Care" />
             </FormField>
             <div className="grid gap-5 sm:grid-cols-2">
                 <FormField
@@ -215,7 +215,7 @@ export const InContextOnboardingStep: Story = {
                 label="What you do"
                 description="Customers see this on your profile."
             >
-                <Textarea defaultValue="Mobile detailing across the inner north." />
+                <Textarea defaultValue="Mobile car care across the inner north." />
             </FormField>
             <Button variant="dark" fullWidth type="submit">
                 Continue

@@ -160,7 +160,7 @@ export const BothThemesOnACard: Story = {
               Autobahn Auto Spa
             </h3>
             <p className="mb-3 text-sm text-[var(--text-muted)]">
-              Surry Hills · mobile detailing
+              Surry Hills · mobile car care
             </p>
             {/* Rule 5 — one accent per zone. Lime for "open", purple for
                 the thing the customer is meant to act on, and nothing else

@@ -108,7 +108,7 @@ export const WarningThatInterrupts: Story = {
         role: 'alert',
         title: 'This business may already be on Autara',
         children:
-            'An account for Northside Mobile Detailing at 14 Pitt Street already exists. If it is yours, sign in to it. If it is a different business, you can continue.',
+            'An account for Northside Mobile Car Care at 14 Pitt Street already exists. If it is yours, sign in to it. If it is a different business, you can continue.',
         action: DUPLICATE_ACTIONS,
     },
     render: (args) => (

@@ -8,7 +8,7 @@ const meta = {
   parameters: { layout: "padded" },
   args: {
     name: "Pristine Auto Detail",
-    primaryService: "Exterior detailing",
+    primaryService: "Exterior care",
     location: "Surry Hills, NSW",
     rating: 4.9,
     reviewCount: 184,
@@ -34,7 +34,7 @@ const CARS = {
 const SAMPLE: MerchantCardProps[] = [
   {
     name: "Pristine Auto Detail",
-    primaryService: "Exterior detailing",
+    primaryService: "Exterior care",
     location: "Surry Hills, NSW",
     rating: 4.9,
     reviewCount: 184,
@@ -63,8 +63,8 @@ const SAMPLE: MerchantCardProps[] = [
     badge: { tone: "purple", label: "Featured" },
   },
   {
-    name: "ShineHaus Detailing",
-    primaryService: "Interior detailing",
+    name: "Lowtide Car Care",
+    primaryService: "Interior care",
     location: "Fortitude Valley, QLD",
     rating: 4.7,
     reviewCount: 121,
@@ -78,7 +78,7 @@ const SAMPLE: MerchantCardProps[] = [
    stars. This is what a public search result looks like today: no price,
    no primary service, a suburb, sometimes a mode. */
 const SAMPLE_NEW: MerchantCardProps[] = [
-  { name: "Brunswick Mobile Detailing", location: "Brunswick, VIC", mode: "mobile", heroImageUrl: CARS.mobile, isNew: true },
+  { name: "Brunswick Mobile Car Care", location: "Brunswick, VIC", mode: "mobile", heroImageUrl: CARS.mobile, isNew: true },
   { name: "Richmond Ceramic Studio", location: "Richmond, VIC", mode: "workshop", heroImageUrl: CARS.bay, isNew: true },
   { name: "St Kilda Interior Care", location: "St Kilda, VIC", mode: "both", heroImageUrl: CARS.magenta, isNew: true },
   { name: "Waverley Wash Co.", location: "Glen Waverley, VIC", mode: "mobile", heroImageUrl: CARS.wrap, isNew: true },
@@ -156,7 +156,7 @@ export const NoPhoto: Story = {
 
 export const LongName: Story = {
   parameters: { layout: "centered" },
-  args: { ...SAMPLE[0], badge: null, name: "Melbourne Premium Mobile Detailing and Paint Correction Specialists" },
+  args: { ...SAMPLE[0], badge: null, name: "Melbourne Premium Mobile Car Care and Paint Correction Specialists" },
   render: One,
 };
 

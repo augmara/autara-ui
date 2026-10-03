@@ -150,7 +150,7 @@ export const LongCopy: Story = {
     <div className="max-w-md">
       <ErrorCard
         title="We couldn't confirm this booking"
-        message="The payment went through but we haven't heard back from the detailer's calendar. Nothing has been charged twice. Tap retry, and if it happens again we'll sort it out from our side."
+        message="The payment went through but we haven't heard back from your pro's calendar. Nothing has been charged twice. Tap retry, and if it happens again we'll sort it out from our side."
         detail="MERCHANT_CALENDAR_TIMEOUT: upstream did not respond within 8000ms"
         onRetry={() => {}}
         retryLabel="Try confirming again"
@@ -195,7 +195,7 @@ export const NoRetry: Story = {
       <ErrorCard
         tone="warning"
         title="This booking was cancelled"
-        message="The detailer cancelled 20 minutes ago and your deposit is on its way back. It usually lands within 5 business days."
+        message="Your pro cancelled 20 minutes ago and your deposit is on its way back. It usually lands within 5 business days."
       />
     </div>
   ),

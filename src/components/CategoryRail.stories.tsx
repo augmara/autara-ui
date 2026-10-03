@@ -54,11 +54,11 @@ const sunIcon = (
 
 const baseCategories: CategoryRailItem[] = [
     {
-        slug: 'mobile-detailing',
-        label: 'Mobile detailing',
+        slug: 'mobile-car-care',
+        label: 'Mobile car care',
         icon: dropIcon,
         blurb: 'Wash & polish at your driveway.',
-        href: '/merchants?category=mobile-detailing',
+        href: '/merchants?category=mobile-car-care',
     },
     {
         slug: 'ceramic-coating',
@@ -119,11 +119,11 @@ export const SixCategories: Story = {
                 href: '/merchants?category=paint-protection-film',
             },
             {
-                slug: 'interior-detailing',
-                label: 'Interior detailing',
+                slug: 'interior-care',
+                label: 'Interior care',
                 icon: dropIcon,
                 blurb: 'Deep steam, leather, fabrics.',
-                href: '/merchants?category=interior-detailing',
+                href: '/merchants?category=interior-care',
             },
             {
                 slug: 'wraps',

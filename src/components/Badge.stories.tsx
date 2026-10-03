@@ -205,7 +205,7 @@ export const BareDefault: Story = {
         <div className="flex max-w-xl flex-wrap items-center gap-3 rounded-xl bg-[var(--background)] p-6 ring-1 ring-inset ring-[var(--border-subtle)]">
             <Badge>Verified</Badge>
             <Badge shape="pill">Verified</Badge>
-            <Badge>Mobile detailing</Badge>
+            <Badge>Mobile car care</Badge>
         </div>
     ),
 }
@@ -239,7 +239,7 @@ export const InCardContext: Story = {
         <div className="max-w-sm rounded-autara-lg border border-[var(--border-subtle)] bg-[var(--surface)] p-5">
             <div className="mb-3 flex items-start justify-between gap-3">
                 <h3 className="text-[0.9375rem] font-bold text-[var(--text-strong)]">
-                    Northside Mobile Detailing
+                    Northside Mobile Car Care
                 </h3>
                 <Badge variant="success">Open now</Badge>
             </div>
@@ -386,7 +386,7 @@ export const SolidNoRings: Story = {
                         {col.label}
                     </p>
                     <div className="flex flex-wrap items-center gap-2">
-                        <Badge>Mobile detailing</Badge>
+                        <Badge>Mobile car care</Badge>
                         <Badge variant="purple">Featured</Badge>
                         <Badge variant="aqua">New</Badge>
                         <Badge variant="lime">Trending</Badge>

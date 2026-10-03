@@ -193,8 +193,8 @@ export const GlassField: Story = {
             </p>
             <Input
               surface="glass"
-              placeholder="Search detailers near you"
-              aria-label="Search detailers near you"
+              placeholder="Search car care pros near you"
+              aria-label="Search car care pros near you"
               data-testid="story-input-glass"
             />
 
