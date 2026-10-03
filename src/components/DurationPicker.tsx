@@ -29,7 +29,7 @@ import {
 export const DEFAULT_MAX_DURATION_MINUTES = 1440
 
 /**
- * AUTM-1575 — the working-days bounds, mirroring `MULTI_DAY_MIN_WORKING_DAYS`
+ * AUTM-1575: the working-days bounds, mirroring `MULTI_DAY_MIN_WORKING_DAYS`
  * and `MULTI_DAY_MAX_WORKING_DAYS` in `@autara-au/autara-contracts`, which is
  * what merchant-api refuses outside of. Don, 1 and 3 Oct 2026: a job of fewer
  * than 2 working days is set in hours, and no job takes more than 10.
@@ -201,7 +201,7 @@ function StepGlyph({ plus }: { plus: boolean }) {
 }
 
 /**
- * AUTM-1575 — the duration in working days, for a job that keeps the car.
+ * AUTM-1575: the duration in working days, for a job that keeps the car.
  *
  * Present only when the consumer offers it: a merchant who only travels to
  * the customer never sees the switch (Don, 1 Oct 2026), so the consumer
@@ -260,7 +260,7 @@ export interface DurationPickerProps
      */
     testId?: string
     /**
-     * AUTM-1575 — offers "Hours | Working days" above the field, and a
+     * AUTM-1575: offers "Hours | Working days" above the field, and a
      * working-days stepper in place of the field while it is chosen. Leave it
      * out and the control is exactly the hours field it always was.
      */

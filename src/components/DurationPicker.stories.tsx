@@ -236,7 +236,7 @@ export const InServiceForm: Story = {
 }
 
 /**
- * AUTM-1575 — a field that offers working days, held the way a consumer
+ * AUTM-1575: a field that offers working days, held the way a consumer
  * holds it: minutes and days as two values, so switching units loses neither.
  */
 function WithWorkingDays({

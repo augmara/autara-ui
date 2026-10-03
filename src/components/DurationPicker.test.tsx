@@ -432,7 +432,7 @@ describe('DurationPicker with a caller-written <label htmlFor> (AUTM-1267)', () 
     })
 })
 
-/** AUTM-1575 — the field as a working-days consumer holds it: two values. */
+/** AUTM-1575: the field as a working-days consumer holds it: two values. */
 function WithDays({
     minutes = '150',
     days = null,
