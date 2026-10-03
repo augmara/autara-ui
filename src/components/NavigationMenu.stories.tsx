@@ -105,8 +105,8 @@ export const Default: Story = {
                                 items={[
                                     { title: 'Mobile pros', blurb: 'You go to them.' },
                                     { title: 'Shopfronts', blurb: 'They come to you.' },
-                                    { title: 'Pricing', blurb: '15% and nothing up front.' },
-                                    { title: 'Founding vendors', blurb: 'First five customers free.' },
+                                    { title: 'Pricing', blurb: 'See how pricing works.' },
+                                    { title: 'Getting started', blurb: 'Set up your profile and services.' },
                                 ]}
                             />
                         </NavigationMenuContent>
