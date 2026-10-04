@@ -1,0 +1,20 @@
+/* ─── Auto-hiding header (AUTM-1679) ──────────────────────────────────────
+ *
+ * useAutoHideHeader: put `.autohide-header` on the fixed header and
+ * `data-hidden` from the hook on the same element. It slides up out of view
+ * on transform alone, so nothing under it moves, and slides back on
+ * --motion-settle. Under reduced motion it still hides, but at once.
+ */
+.autohide-header {
+    transition: transform var(--motion-settle) var(--motion-ease-out);
+}
+.autohide-header[data-hidden='true'] {
+    transform: translateY(-100%);
+    transition: transform var(--motion-page-out) var(--motion-ease-in);
+}
+@media (prefers-reduced-motion: reduce) {
+    .autohide-header,
+    .autohide-header[data-hidden='true'] {
+        transition: none;
+    }
+}

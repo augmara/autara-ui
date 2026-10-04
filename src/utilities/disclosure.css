@@ -1,0 +1,100 @@
+/* ─── Disclosure (AUTM-1679) ──────────────────────────────────────────────
+ *
+ * Disclosure.tsx: a <details> whose answer opens on grid-template-rows,
+ * 0fr to 1fr, so no height is ever measured. `data-expanded` is what the
+ * panel animates to; the component sets the element's `open` a frame before
+ * expanding and clears it once a close has run. Before hydration, and with
+ * no JavaScript at all, the native open state shows the answer as it is.
+ *
+ * The height runs on --motion-settle both ways, on the house ease-out curve,
+ * so the rows under it glide rather than jump. The answer fades in on
+ * --motion-settle as it opens and out on --motion-crossfade (faster) as it
+ * closes, so it has gone before the height has; the icon turns. Transitions
+ * only, and none under reduced motion.
+ */
+
+.disclosure {
+    display: block;
+}
+.disclosure--card {
+    border-radius: 1.25rem;
+    background: var(--paper);
+    color: var(--strong);
+}
+.disclosure-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 3.5rem;
+    padding: 1rem 1.25rem;
+    list-style: none;
+    cursor: pointer;
+    font-weight: 500;
+    color: inherit;
+    border-radius: inherit;
+}
+.disclosure-summary::-webkit-details-marker { display: none; }
+.disclosure-summary::marker { content: ''; }
+.disclosure-summary:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 3px;
+}
+.disclosure-label { min-width: 0; }
+.disclosure-icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    background: var(--band);
+    color: var(--strong);
+    transition: transform var(--motion-settle) var(--motion-ease-out);
+}
+.disclosure[data-icon='chevron'][data-expanded='true'] .disclosure-icon { transform: rotate(180deg); }
+.disclosure[data-icon='plus'][data-expanded='true'] .disclosure-icon { transform: rotate(45deg); }
+
+.disclosure-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--motion-settle) var(--motion-ease-out);
+}
+.disclosure[data-expanded='true'] .disclosure-panel {
+    grid-template-rows: 1fr;
+}
+.disclosure-clip {
+    min-height: 0;
+    overflow: hidden;
+}
+.disclosure-content {
+    padding: 0 1.25rem 1.25rem;
+    opacity: 0;
+    transform: translateY(-0.25rem);
+    transition:
+        opacity var(--motion-crossfade) var(--motion-ease-in),
+        transform var(--motion-crossfade) var(--motion-ease-in);
+}
+.disclosure[data-expanded='true'] .disclosure-content {
+    opacity: 1;
+    transform: none;
+    transition:
+        opacity var(--motion-settle) var(--motion-ease-out),
+        transform var(--motion-settle) var(--motion-ease-out);
+}
+
+/* Before hydration and without JavaScript: the native state, at rest. */
+.disclosure:not([data-enhanced])[open] .disclosure-panel { grid-template-rows: 1fr; }
+.disclosure:not([data-enhanced])[open] .disclosure-content { opacity: 1; transform: none; }
+.disclosure:not([data-enhanced])[open][data-icon='chevron'] .disclosure-icon { transform: rotate(180deg); }
+.disclosure:not([data-enhanced])[open][data-icon='plus'] .disclosure-icon { transform: rotate(45deg); }
+
+@media (prefers-reduced-motion: reduce) {
+    .disclosure-panel,
+    .disclosure-content,
+    .disclosure-icon,
+    .disclosure[data-expanded='true'] .disclosure-content {
+        transition: none;
+    }
+}

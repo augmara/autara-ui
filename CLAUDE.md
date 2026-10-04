@@ -175,6 +175,20 @@ docs/
   both hold, so nothing is ever held at `opacity: 0` waiting for a script.
   Prefer it for new marketing work; `ScrollReveal` stays for consumers that
   already use it.
+- **`ScrollStory` pins at `top: 0`, never under a header offset** (AUTM-1679).
+  The room for a fixed header is padding inside the pin
+  (`--scroll-story-top`), so a header that hides and shows on scroll
+  (`useAutoHideHeader`) slides over that padding and the stage never moves.
+  Its chip rails fill on CSS scroll-driven animations, one named view timeline
+  per step sentinel, which the chips can only reach because the root sets
+  `timeline-scope` to every step's name; drop that and every rail sits empty
+  with no error. The sentinels' `view-timeline-inset: 50% 50%` is what makes
+  a rail fill over exactly its step (top crossing the middle line to bottom
+  crossing it).
+- **`Disclosure` keeps the answer in the HTML, open or closed** (AUTM-1679).
+  It is `<details>`; Radix `Accordion` unmounts a closed answer, which drops
+  it from the server render a FAQ is indexed by. Use `Disclosure` for a
+  marketing FAQ, `Accordion` inside an app.
 - **Loading has three answers, and they are not interchangeable** (AUTM-1706).
   `AutaraLoader` (the mark, turning) for app boot, a route with nothing to show
   yet, and a button's busy state; `Skeleton` / `AsyncSkeleton` for content

@@ -343,6 +343,17 @@ export { DeviceFrame, type DeviceFrameProps, type DeviceKind } from './DeviceFra
 export { BloomField, type BloomFieldProps } from './BloomField'
 export { LitGroup, type LitGroupProps } from './LitGroup'
 export { Reveal, type RevealProps } from './Reveal'
+// AUTM-1679 — the marketing pages' motion: a pinned scroll story with its
+// indicator, and a disclosure that opens and closes smoothly.
+export {
+    ScrollStory,
+    SCROLL_STORY_STILL_QUERY,
+    type ScrollStoryProps,
+    type ScrollStoryStep,
+    type ScrollStoryStepState,
+    type ScrollStoryPhase,
+} from './ScrollStory'
+export { Disclosure, type DisclosureProps } from './Disclosure'
 
 // SocialButton: the one social sign-in button, Google, Apple and mobile (AUTM-1513).
 export { SocialButton, type SocialButtonProps, type SocialButtonProvider } from './SocialButton'
