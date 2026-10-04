@@ -65,9 +65,11 @@ export interface DisclosureProps extends Omit<DetailsHTMLAttributes<HTMLDetailsE
 }
 
 const REDUCED = '(prefers-reduced-motion: reduce)'
-/* The close waits for the height; this is the fallback should no
-   transitionend come (the duration is --motion-settle, 280ms). */
-const CLOSE_FALLBACK_MS = 400
+/* The close waits for the height, then this much more as the fallback should
+   no transitionend come. The height's own duration is read from the panel
+   (--motion-settle, or whatever a consumer sets), so a longer one is not cut
+   short. */
+const CLOSE_GRACE_MS = 120
 
 export const Disclosure = forwardRef<HTMLDetailsElement, DisclosureProps>(function Disclosure(
     {
@@ -86,6 +88,7 @@ export const Disclosure = forwardRef<HTMLDetailsElement, DisclosureProps>(functi
     ref
 ) {
     const detailsRef = useRef<HTMLDetailsElement>(null)
+    const panelRef = useRef<HTMLDivElement>(null)
     useImperativeHandle(ref, () => detailsRef.current as HTMLDetailsElement)
     /* `open`: the element's attribute, which mounts the answer. `expanded`:
        what the panel animates to. Opening sets open first and expanded a
@@ -134,7 +137,11 @@ export const Disclosure = forwardRef<HTMLDetailsElement, DisclosureProps>(functi
         } else {
             setExpanded(false)
             if (reduced) finishClose()
-            else closing.current = window.setTimeout(finishClose, CLOSE_FALLBACK_MS)
+            else {
+                const panel = panelRef.current
+                const seconds = panel ? parseFloat(getComputedStyle(panel).transitionDuration) || 0 : 0
+                closing.current = window.setTimeout(finishClose, seconds * 1000 + CLOSE_GRACE_MS)
+            }
             onOpenChange?.(false)
         }
     }
@@ -181,6 +188,7 @@ export const Disclosure = forwardRef<HTMLDetailsElement, DisclosureProps>(functi
                 </span>
             </summary>
             <div
+                ref={panelRef}
                 className="disclosure-panel"
                 onTransitionEnd={(e) => {
                     if (e.target === e.currentTarget && e.propertyName === 'grid-template-rows' && !expanded) finishClose()
