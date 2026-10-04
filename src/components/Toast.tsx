@@ -5,6 +5,7 @@
 import * as React from 'react'
 import { createPortal } from 'react-dom'
 import { cn } from '../lib/cn'
+import { AutaraLoader } from './AutaraLoader'
 
 /**
  * Toast — Autara notification primitive, modelled on the Torph
@@ -209,9 +210,8 @@ function ToastProvider({
 // ─── Status dots ──────────────────────────────────────────────────
 // AUTM-1594 (canvas v44 "Toasts") replaced the type icons with a status dot.
 // The words carry the meaning; the dot only marks the kind.
-const TOAST_DOT: Record<Exclude<ToastType, 'default'>, string> = {
+const TOAST_DOT: Record<Exclude<ToastType, 'default' | 'loading'>, string> = {
     success: 'bg-[var(--lime)]',
-    loading: 'bg-[var(--aqua)]',
     info: 'bg-[var(--aqua)]',
     warning: 'bg-[var(--caution)]',
     error: 'bg-[var(--danger-fill)]',
@@ -256,31 +256,24 @@ function ToastViewport({
     const isTop = position.startsWith('top')
 
     const viewport = (
-        <>
-            {/* Keyframes for the spinner icon — scoped, no global side effects. */}
-            <style>{`
-                @keyframes autaraToastSpin { to { transform: rotate(360deg); } }
-                .autara-toast-spin { animation: autaraToastSpin 1s linear infinite; transform-origin: 50% 50%; }
-            `}</style>
-            <div
-                className={cn(
-                    'fixed z-[100] flex gap-2 p-4 pointer-events-none',
-                    VIEWPORT_POS[position]
-                )}
-                role="region"
-                aria-label="Notifications"
-            >
-                {toasts.map((t) => (
-                    <ToastItem
-                        key={t.id}
-                        toast={t}
-                        onDismiss={() => removeToast(t.id)}
-                        isTop={isTop}
-                        variant={t.variant ?? providerVariant}
-                    />
-                ))}
-            </div>
-        </>
+        <div
+            className={cn(
+                'fixed z-[100] flex gap-2 p-4 pointer-events-none',
+                VIEWPORT_POS[position]
+            )}
+            role="region"
+            aria-label="Notifications"
+        >
+            {toasts.map((t) => (
+                <ToastItem
+                    key={t.id}
+                    toast={t}
+                    onDismiss={() => removeToast(t.id)}
+                    isTop={isTop}
+                    variant={t.variant ?? providerVariant}
+                />
+            ))}
+        </div>
     )
 
     return createPortal(viewport, document.body)
@@ -380,7 +373,13 @@ function ToastItem({
             )}
             role={t.type === 'error' ? 'alert' : 'status'}
         >
-            {t.type && t.type !== 'default' && (
+            {t.type === 'loading' ? (
+                /* AUTM-1708: a loading toast turns the Autara mark where the
+                   dot was. A still dot on "Saving your changes" read the same
+                   as a stuck one. Decorative: the toast is already a status
+                   and its words say what is happening. */
+                <AutaraLoader size={16} tone="current" decorative data-toast-dot="loading" />
+            ) : t.type && t.type !== 'default' ? (
                 /* The sheet's status dot. The words say what happened; the
                    dot only marks the kind, so it is hidden from AT. */
                 <span
@@ -388,7 +387,7 @@ function ToastItem({
                     data-toast-dot={t.type}
                     className={cn('size-2 shrink-0 rounded-full', TOAST_DOT[t.type])}
                 />
-            )}
+            ) : null}
             <span
                 key={contentKey}
                 className="autara-toast-content min-w-0 truncate"

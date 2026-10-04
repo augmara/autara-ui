@@ -193,14 +193,18 @@ export function ImageCropDialog({
                     >
                         Cancel
                     </Button>
+                    {/* AUTM-1708: the library busy state (the Autara mark over
+                        the label), not a "Cropping…" relabel that changed the
+                        width and the accessible name mid-crop. */}
                     <Button
                         variant="primary"
                         size="md"
                         type="button"
-                        disabled={busy || !areaPixels}
+                        busy={busy}
+                        disabled={!areaPixels}
                         onClick={handleConfirm}
                     >
-                        {busy ? 'Cropping…' : confirmLabel}
+                        {confirmLabel}
                     </Button>
                 </DialogFooter>
             </DialogContent>

@@ -83,7 +83,31 @@ export const Strong: Story = { args: { variant: "strong", children: "Confirm" } 
 export const Quiet: Story = { args: { variant: "quiet", children: "Add service", leadingIcon: <Tag /> } };
 export const Link: Story = { args: { variant: "link", size: "sm", children: "View all bookings" } };
 export const Ghost: Story = { args: { variant: "ghost", children: "Skip" } };
-export const Busy: Story = { args: { busy: true, children: "Saving…" } };
+export const Busy: Story = { args: { busy: true, children: "Save changes" } };
+
+/**
+ * AUTM-1708: every Button presses by default. Hold the pointer down: 97%, or
+ * 98.5% when full width; a link does not shrink; `press={false}` opts out.
+ * Off under reduced motion and while disabled or busy.
+ */
+export const Press: Story = {
+  name: "Press, by default",
+  render: () => (
+    <div className="flex max-w-sm flex-col gap-3">
+      <div className="flex flex-wrap gap-3">
+        <Button>Book now</Button>
+        <Button variant="strong">Confirm</Button>
+        <Button variant="quiet">Add service</Button>
+      </div>
+      <Button fullWidth size="lg">Pay the deposit (98.5%)</Button>
+      <div className="flex flex-wrap items-center gap-3">
+        <Button variant="link" size="sm">View all bookings (no press)</Button>
+        <Button variant="quiet" press={false}>press=false</Button>
+        <Button disabled>Disabled (still)</Button>
+      </div>
+    </div>
+  ),
+};
 export const Disabled: Story = {
   args: { disabled: true, children: "New booking", title: "Finish your profile to take bookings" },
 };

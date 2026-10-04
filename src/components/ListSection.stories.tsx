@@ -161,3 +161,21 @@ export const FullSettings: Story = {
         </div>
     ),
 }
+
+/**
+ * AUTM-1708: a tappable row presses to 98.5% (`motion-press-row`) without a
+ * class; a static row does not. `className` reaches the row, and
+ * `press={false}` opts out.
+ */
+export const Press: Story = {
+    name: 'Press, tappable rows',
+    render: () => (
+        <div className="max-w-md">
+            <ListSection title="Account">
+                <ListSectionRow label="Payouts" description="Next payout Friday" onTap={() => {}} />
+                <ListSectionRow label="Plan" trailing="Founding" />
+                <ListSectionRow label="Sign out" destructive onTap={() => {}} press={false} />
+            </ListSection>
+        </div>
+    ),
+}

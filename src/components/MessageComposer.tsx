@@ -32,12 +32,21 @@ export interface MessageComposerProps {
   onChange: (value: string) => void;
   /** Raised on Send click or Enter (without Shift) when value is non-empty. */
   onSend: () => void;
-  /** While true the field + button disable and the button shows `sendingLabel`. */
+  /**
+   * While true the field disables and Send shows the library busy state: the
+   * turning Autara mark over the label, which stays the button's name and
+   * holds its width (AUTM-1708).
+   */
   sending?: boolean;
   /** Inline error rendered below the field with role="alert". */
   error?: string | null;
   placeholder?: string;
   sendLabel?: string;
+  /**
+   * @deprecated AUTM-1708: ignored. Send keeps `sendLabel` while sending and
+   * shows the turning mark instead; a "Sending…" relabel changed the width.
+   * Kept so existing callers still compile.
+   */
   sendingLabel?: string;
   /**
    * Optional control rendered to the LEFT of the field — e.g. an attach
@@ -58,7 +67,6 @@ export function MessageComposer({
   error,
   placeholder = "Type a message",
   sendLabel = "Send",
-  sendingLabel = "Sending…",
   leading,
   measureClassName = "max-w-[680px]",
   className,
@@ -95,10 +103,11 @@ export function MessageComposer({
           /* AUTM-1221: the house primary. Rule 5: purple acts. */
           variant="primary"
           size="md"
+          busy={sending}
           disabled={!canSend}
           onClick={() => canSend && onSend()}
         >
-          {sending ? sendingLabel : sendLabel}
+          {sendLabel}
         </Button>
       </div>
       {error ? (

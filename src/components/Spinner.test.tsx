@@ -34,18 +34,13 @@ describe('Spinner', () => {
         expect(container.textContent).toBe('')
     })
 
-    it('stops spinning and swaps to a static ring under reduced motion', () => {
+    it('draws the Autara mark (AUTM-1708), whose stylesheet owns the turn and the reduced-motion form', () => {
         const { container } = render(<Spinner />)
-        const svg = container.querySelector('[data-spinner-motion]')!
-        expect(svg.getAttribute('class')).toContain('animate-spin')
-        expect(svg.getAttribute('class')).toContain('motion-reduce:animate-none')
-
-        // The moving arc hides, and a distinct still shape takes its place.
-        expect(svg.querySelector('g')!.getAttribute('class')).toContain('motion-reduce:hidden')
-        const still = container.querySelector('[data-spinner-reduced]')!
-        expect(still.getAttribute('class')).toContain('hidden')
-        expect(still.getAttribute('class')).toContain('motion-reduce:inline')
-        expect(still.getAttribute('stroke-dasharray')).toBeTruthy()
+        expect(container.querySelector('svg.autara-loader')).not.toBeNull()
+        expect(container.querySelectorAll('path.autara-loader-ray')).toHaveLength(8)
+        // No generic ring is left: no Tailwind spin, no quarter arc.
+        expect(container.innerHTML).not.toContain('animate-spin')
+        expect(container.firstElementChild).toHaveAttribute('data-spinner')
     })
 
     it('never hardcodes the brand hex; tones resolve through tokens or currentColor', () => {
@@ -61,11 +56,13 @@ describe('Spinner', () => {
     })
 
     it.each([
-        ['sm', 'size-4'],
-        ['md', 'size-6'],
-        ['lg', 'size-10'],
-    ] as const)('size %s renders %s', (size, cls) => {
+        ['sm', '1rem'],
+        ['md', '1.5rem'],
+        ['lg', '2.5rem'],
+    ] as const)('size %s is %s, as before the mark', (size, rem) => {
         const { container } = render(<Spinner size={size} />)
-        expect(container.querySelector('svg')!.getAttribute('class')).toContain(cls)
+        const root = container.firstElementChild as HTMLElement
+        expect(root.style.width).toBe(rem)
+        expect(root.style.height).toBe(rem)
     })
 })

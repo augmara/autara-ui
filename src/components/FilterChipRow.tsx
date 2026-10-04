@@ -56,7 +56,12 @@ export interface FilterChipRowProps<V> {
     onChange: (value: V) => void
     /** ARIA label for the row; defaults to "Filter". */
     ariaLabel?: string
+    /** Merged onto the row (the tablist). */
     className?: string
+    /** Merged onto every chip. */
+    chipClassName?: string
+    /** Each chip presses to 97% (`motion-press`, AUTM-1708). Default true. */
+    press?: boolean
 }
 
 export function FilterChipRow<V>({
@@ -65,6 +70,8 @@ export function FilterChipRow<V>({
     onChange,
     ariaLabel = 'Filter',
     className,
+    chipClassName,
+    press = true,
 }: FilterChipRowProps<V>) {
     return (
         <div
@@ -109,6 +116,8 @@ export function FilterChipRow<V>({
                             active
                                 ? 'bg-[var(--selected)] text-[var(--on-selected)]'
                                 : 'bg-[var(--band)] text-[var(--text-strong)] hover:bg-[var(--band-press)]',
+                            press && 'motion-press',
+                            chipClassName,
                         )}
                     >
                         {o.label}

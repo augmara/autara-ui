@@ -53,13 +53,37 @@ export const DarkStack: Story = {
     ),
 }
 
-/** Busy: the pressed button keeps its label with a spinner in place of the mark; the caller disables the rest. */
+/**
+ * Busy (AUTM-1708): the pressed button turns the Autara mark in place of the
+ * provider mark, keeps its label and width, and is disabled at full strength
+ * by `busy` alone; the caller disables the rest.
+ */
 export const Busy: Story = {
     render: () => (
         <Stack>
             <SocialButton provider="apple" disabled />
-            <SocialButton provider="google" busy disabled />
+            <SocialButton provider="google" busy />
+            <SocialButton provider="mobile" disabled />
         </Stack>
+    ),
+}
+
+/** Busy on every provider, light and dark, so the mark is checked against each fill. */
+export const BusyEveryProvider: Story = {
+    name: 'Busy, every provider and theme',
+    render: () => (
+        <div className="grid gap-4 sm:grid-cols-2">
+            <Stack>
+                <SocialButton provider="google" busy />
+                <SocialButton provider="apple" busy />
+                <SocialButton provider="mobile" busy />
+            </Stack>
+            <Stack dark>
+                <SocialButton provider="google" theme="dark" busy />
+                <SocialButton provider="apple" theme="dark" busy />
+                <SocialButton provider="mobile" theme="dark" busy />
+            </Stack>
+        </div>
     ),
 }
 
