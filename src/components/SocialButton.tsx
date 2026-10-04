@@ -18,6 +18,9 @@ import { AutaraLoader } from './AutaraLoader'
  *   width and the accessible name hold; it is aria-busy and disabled at full
  *   strength, so a second tap cannot start a second sign-in. The caller
  *   disables the others. (AUTM-1708: it used to be a plain CSS ring.)
+ * - Disabled and busy keep the provider's real colours (AUTM-1719): no 50%
+ *   wash. Disabled is said by aria-disabled and a not-allowed cursor, busy by
+ *   aria-busy and the turning mark.
  * - Press: 97% under the finger on the library's `motion-press`, as Button
  *   does by default (AUTM-1708). `press={false}` opts out.
  *
@@ -100,6 +103,7 @@ export const SocialButton = React.forwardRef<HTMLButtonElement, SocialButtonProp
             type={type}
             disabled={disabled || busy}
             aria-busy={busy || undefined}
+            aria-disabled={disabled || undefined}
             data-provider={provider}
             data-theme={theme}
             className={cn('social-btn', press && 'motion-press', className)}

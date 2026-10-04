@@ -37,6 +37,14 @@ describe('SocialButton', () => {
         expect(btn.querySelector('.social-btn__spinner')).toBeNull()
     })
 
+    it('AUTM-1719: disabled keeps its colours and says so with aria-disabled', () => {
+        render(<SocialButton provider="google" disabled />)
+        const btn = screen.getByRole('button', { name: 'Continue with Google' }) as HTMLButtonElement
+        expect(btn.disabled).toBe(true)
+        expect(btn.getAttribute('aria-disabled')).toBe('true')
+        expect(btn.className).not.toMatch(/opacity/)
+    })
+
     it('presses on motion-press by default, and press={false} opts out', () => {
         const { rerender } = render(<SocialButton provider="apple" />)
         expect(screen.getByRole('button').className).toContain('motion-press')

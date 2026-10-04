@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import type { ReactNode } from "react";
+import { useRef, useState, type FormEvent, type ReactNode } from "react";
 import { Button } from "./Button";
 import { IconButton } from "./IconButton";
+import { FormField } from "./FormField";
+import { Input } from "./Input";
+import { SocialButton } from "./SocialButton";
 
 /**
  * Button — canvas v44's "Buttons" (AUTM-1594).
@@ -108,8 +111,154 @@ export const Press: Story = {
     </div>
   ),
 };
+/**
+ * AUTM-1719: a genuinely unavailable action keeps its real colour, is
+ * disabled (aria-disabled, not-allowed cursor, no hover, no press) and says
+ * why in text beside it, linked with aria-describedby. A `title` alone does
+ * not reach touch or keyboard users.
+ */
 export const Disabled: Story = {
-  args: { disabled: true, children: "New booking", title: "Finish your profile to take bookings" },
+  render: () => (
+    <div className="flex max-w-sm flex-col gap-2">
+      <Button disabled aria-describedby="story-disabled-reason">New booking</Button>
+      <p id="story-disabled-reason" className="m-0 text-sm text-[var(--text-muted)]">
+        Finish your profile to take bookings.
+      </p>
+    </div>
+  ),
+};
+
+const SHEET_VARIANTS = ["primary", "strong", "quiet", "ghost", "link"] as const;
+
+/**
+ * AUTM-1719 (Don, 2026-10-04): "don't mute the button colours even if
+ * disabled, show the real colour, everywhere, also loading." Every variant at
+ * rest, disabled and busy, light and dark: the three rows are the same
+ * colours. Disabled differs only by the cursor, the absent hover and press,
+ * and aria-disabled; busy by the turning mark and aria-busy.
+ */
+export const RealColourEveryState: Story = {
+  name: "Real colour: rest, disabled, busy, both themes",
+  render: () => (
+    <div className="grid gap-4 xl:grid-cols-2">
+      {[
+        { label: "Light", theme: undefined },
+        { label: "Dark", theme: "dark" as const },
+      ].map((col) => (
+        <div key={col.label} data-theme={col.theme} className="flex flex-col gap-3 rounded-autara-lg bg-[var(--background)] p-5">
+          <p className="m-0 text-sm font-medium text-[var(--text-muted)]">{col.label}</p>
+          {(["rest", "disabled", "busy"] as const).map((state) => (
+            <div key={state} className="flex flex-wrap items-center gap-2">
+              <span className="w-16 text-sm text-[var(--text-muted)]">{state}</span>
+              {SHEET_VARIANTS.map((v) => (
+                <Button key={v} variant={v} size="sm" disabled={state === "disabled"} busy={state === "busy"}>
+                  {v}
+                </Button>
+              ))}
+              <IconButton icon={<Bell />} label={`Notifications, ${state}`} disabled={state === "disabled"} busy={state === "busy"} />
+            </div>
+          ))}
+          <div className="flex flex-col gap-2 rounded-autara-md bg-[var(--hero)] p-3">
+            {(["rest", "disabled", "busy"] as const).map((state) => (
+              <div key={state} className="flex gap-2">
+                <Button size="sm" disabled={state === "disabled"} busy={state === "busy"}>View booking</Button>
+                <Button size="sm" variant="ondeep" disabled={state === "disabled"} busy={state === "busy"}>Add to calendar</Button>
+              </div>
+            ))}
+          </div>
+          <div className="flex max-w-sm flex-col gap-2">
+            <SocialButton provider="google" theme={col.theme ?? "light"} />
+            <SocialButton provider="google" theme={col.theme ?? "light"} disabled />
+            <SocialButton provider="google" theme={col.theme ?? "light"} busy />
+          </div>
+        </div>
+      ))}
+    </div>
+  ),
+};
+
+/**
+ * AUTM-1719 guidance: **a form's primary button is never disabled.** It stays
+ * enabled and in full colour, and pressing it with something missing:
+ *
+ *   1. shows the inline message under the field (`FormField error`, which is
+ *      `role="alert"`, so it is announced),
+ *   2. moves focus to the first field that needs attention,
+ *   3. does nothing else: no request, no busy state.
+ *
+ * With everything in place it goes busy (the turning mark over the label) and
+ * submits. The switch from `disabled={!valid}` to this is the CONSUMER's: the
+ * library cannot know what valid means for a form.
+ *
+ *     function onSubmit(e) {
+ *         e.preventDefault()
+ *         if (!isComplete(phone)) {
+ *             setError('Enter your full mobile number')
+ *             phoneRef.current?.focus()
+ *             return
+ *         }
+ *         submit()
+ *     }
+ *     <form noValidate onSubmit={onSubmit}>
+ *         <FormField label="Mobile number" error={error}><Input ref={phoneRef} ... /></FormField>
+ *         <Button type="submit" busy={pending}>Continue</Button>
+ *     </form>
+ *
+ * `noValidate` keeps the browser's own bubble out of it, so the message is
+ * the product's, in the product's words. Clear the message as the person
+ * types. Keep every `data-testid` where it was.
+ */
+export const ValidateOnPress: Story = {
+  name: "Guidance: validate on press, never a disabled primary",
+  render: function ValidateOnPressStory() {
+    const [phone, setPhone] = useState("");
+    const [error, setError] = useState<string>();
+    const [pending, setPending] = useState(false);
+    const [sent, setSent] = useState(false);
+    const phoneRef = useRef<HTMLInputElement>(null);
+    const digits = phone.replace(/\D/g, "");
+    function onSubmit(e: FormEvent) {
+      e.preventDefault();
+      if (digits.length < 9) {
+        setError("Enter your full mobile number");
+        phoneRef.current?.focus();
+        return;
+      }
+      setError(undefined);
+      setPending(true);
+      window.setTimeout(() => {
+        setPending(false);
+        setSent(true);
+      }, 1500);
+    }
+    return (
+      <form noValidate onSubmit={onSubmit} className="flex max-w-sm flex-col gap-4 text-[var(--text-strong)]">
+        <h3 className="m-0 text-xl font-bold">Sign in</h3>
+        <FormField label="Mobile number" error={error}>
+          <Input
+            ref={phoneRef}
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            placeholder="0412 345 678"
+            value={phone}
+            onChange={(e) => {
+              setPhone(e.target.value);
+              if (error) setError(undefined);
+              setSent(false);
+            }}
+            data-testid="sign-in-phone"
+          />
+        </FormField>
+        <Button type="submit" size="lg" fullWidth busy={pending} data-testid="sign-in-continue">
+          Continue
+        </Button>
+        <p role="status" className="m-0 min-h-5 text-sm text-[var(--text-muted)]">
+          {sent ? "We sent a code to your mobile." : ""}
+        </p>
+      </form>
+    );
+  },
 };
 
 /** On a brand-deep hero, lime leads and the rest are translucent white. */
@@ -251,9 +400,10 @@ export const Sheet: Story = {
               <Button variant="ondeep">Add to calendar</Button>
             </div>
           </Specimen>
-          <Specimen name="Busy and disabled" component="Button busy / disabled" note="Busy turns the Autara mark where the label was; the label holds the width and stays the name. Disabled carries its reason as the label or a title.">
-            <Button busy>Saving…</Button>
-            <Button disabled title="Finish your profile to take bookings">New booking</Button>
+          <Specimen name="Busy and disabled" component="Button busy / disabled" note="Both keep the real colour (AUTM-1719). Busy turns the Autara mark where the label was; the label holds the width and stays the name. Disabled says why in text beside it; a form's primary is never disabled, it validates on press.">
+            <Button busy>Save changes</Button>
+            <Button disabled aria-describedby="specimen-disabled-reason">New booking</Button>
+            <span id="specimen-disabled-reason" className="text-sm text-[var(--text-muted)]">Finish your profile to take bookings.</span>
           </Specimen>
           <Specimen name="Text" component="Button variant=link">
             <Button variant="link" size="sm">View all bookings</Button>
