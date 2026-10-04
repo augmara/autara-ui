@@ -88,7 +88,7 @@ export const ThreeStates: Story = {
         <CardContent>
           <span
             aria-hidden="true"
-            className="block h-7 w-20 animate-pulse rounded-md bg-[var(--surface-elevated)]"
+            className="block h-7 w-20 motion-skeleton rounded-md bg-[var(--surface-elevated)]"
           />
           <p className="mt-2 text-xs text-[var(--text-muted)]">
             Fetching your earnings…

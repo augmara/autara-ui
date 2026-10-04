@@ -144,8 +144,12 @@ export {
     motionDurations,
     motionEasings,
     motionTransition,
+    // AUTM-1678: page content motion
+    motionStaggerDelay,
+    MOTION_STAGGER_CAP,
     type MotionBezier,
     type MotionDurationName,
+    type MotionTransitionName,
 } from './lib/motion-tokens'
 
 export { DatePicker, type DatePickerProps, type DayState } from './components/DatePicker'

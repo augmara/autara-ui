@@ -52,6 +52,6 @@ describe('StatTile as a control', () => {
             <StatTile label="Today" value={null} onClick={() => {}} />,
         )
         expect(container.textContent).not.toContain('0')
-        expect(container.querySelector('.animate-pulse')).not.toBeNull()
+        expect(container.querySelector('.motion-skeleton')).not.toBeNull()
     })
 })

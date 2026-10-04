@@ -143,12 +143,24 @@ describe('every animated surface is wired to a rule that exists', () => {
         ['PhoneInput.tsx', ['floating-panel']],
         ['Popover.tsx', ['floating-panel']],
         ['NavigationMenu.tsx', ['nav-menu-content', 'nav-menu-viewport', 'nav-menu-indicator']],
-        ['ServiceCard.tsx', ['service-card-reveal']],
+        ['ServiceCard.tsx', ['service-card-reveal', 'motion-skeleton']],
+        // AUTM-1678
+        ['Reveal.tsx', ['reveal-view', 'reveal-stagger']],
+        ['ScrollReveal.tsx', ['animate-on-scroll', 'animate-slide-left', 'animate-slide-right', 'animate-scale']],
+        ['Skeleton.tsx', ['motion-skeleton']],
+        ['AsyncSkeleton.tsx', ['motion-skeleton']],
+        ['KpiCard.tsx', ['motion-skeleton']],
+        ['StatTile.tsx', ['motion-skeleton']],
     ]
 
     it.each(WIRING)('%s carries its motion classes', (file, classes) => {
         const text = code(readFileSync(join(DIR, file), 'utf8'))
-        expect(classes.filter((c) => !text.includes(`'${c}'`) && !text.includes(`${c}'`))).toEqual([])
+        // A class sits in a string literal between a quote or a space on each
+        // side. Substring checks, for the CodeQL reason given further down.
+        const edges = ["'", '"', '`', ' ']
+        const carries = (c: string) =>
+            edges.some((pre) => edges.some((post) => text.includes(`${pre}${c}${post}`)))
+        expect(classes.filter((c) => !carries(c))).toEqual([])
     })
 
     /**

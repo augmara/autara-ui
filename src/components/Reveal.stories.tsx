@@ -14,7 +14,7 @@ import { GlassSurface, GradientGround } from './GlassSurface'
  * progress through the viewport. Everyone else sees the content at rest,
  * which is also what the server HTML is.
  *
- * Scroll this story. Each panel fades and rises over the first 38% of its
+ * Scroll this story. Each panel fades and rises over the first 40% of its
  * entry, then stays.
  */
 const meta = {
@@ -60,6 +60,32 @@ export const AsListItems: Story = {
                     </Reveal>
                 ))}
             </ol>
+        </GradientGround>
+    ),
+}
+
+/**
+ * AUTM-1678: `stagger` keeps the list still and reveals each item one step
+ * after the one before, on the item's own scroll progress. A row enters
+ * together and so steps; at rest under reduced motion and without
+ * scroll-driven animations, as the plain reveal is.
+ */
+export const Stagger: Story = {
+    name: 'stagger',
+    render: () => (
+        <GradientGround className="p-10">
+            <p className="mb-[70vh] text-sm text-[var(--text-muted)]">Scroll down.</p>
+            <Reveal as="ul" stagger className="m-0 grid max-w-4xl list-none gap-4 p-0 sm:grid-cols-3">
+                {['List your services', 'Get verified', 'Take paid bookings'].map((t, i) => (
+                    <li key={t}>
+                        <GlassSurface className="h-full p-5">
+                            <span className="text-sm tabular-nums text-[var(--text-subtle)]">0{i + 1}</span>
+                            <h3 className="mt-1 text-lg font-bold text-[var(--text-strong)]">{t}</h3>
+                        </GlassSurface>
+                    </li>
+                ))}
+            </Reveal>
+            <div className="h-[60vh]" />
         </GradientGround>
     ),
 }

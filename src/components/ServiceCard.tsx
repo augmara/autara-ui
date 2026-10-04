@@ -739,7 +739,7 @@ export interface ServiceCardSkeletonProps {
   className?: string;
 }
 
-const BLOCK = "animate-pulse bg-[var(--band-press)]";
+const BLOCK = "motion-skeleton bg-[var(--band-press)]";
 
 export function ServiceCardSkeleton({
   layout = "horizontal",

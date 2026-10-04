@@ -130,7 +130,7 @@ export function KpiCard({
       {isLoading ? (
         <span
           aria-hidden
-          className="mt-1 block h-7 w-12 animate-pulse rounded-md bg-[var(--surface-elevated)]"
+          className="mt-1 block h-7 w-12 motion-skeleton rounded-md bg-[var(--surface-elevated)]"
         />
       ) : (
         <p className="mt-1 text-2xl font-bold tabular-nums text-[var(--text-strong)]">

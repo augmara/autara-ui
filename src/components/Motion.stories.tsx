@@ -1,12 +1,17 @@
 import * as React from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { AnimatePresence, MotionConfig, motion } from 'motion/react'
+import { flushSync } from 'react-dom'
 import {
     motionDurations,
     motionEasings,
+    motionStaggerDelay,
     motionTransition,
     type MotionDurationName,
+    type MotionTransitionName,
 } from '../lib/motion-tokens'
+import { Reveal } from './Reveal'
+import { Skeleton } from './Skeleton'
 import { Button } from './Button'
 import {
     Dialog,
@@ -348,7 +353,12 @@ function JsTokenRow({ name }: { name: MotionDurationName }) {
     React.useEffect(() => {
         setCssValue(getComputedStyle(document.documentElement).getPropertyValue(cssName).trim())
     }, [cssName])
-    const t = motionTransition(name)
+    const NOT_A_TRANSITION: Partial<Record<MotionDurationName, string>> = {
+        stagger: `delay: motionStaggerDelay(i), ${[0, 1, 5, 6].map(motionStaggerDelay).join(', ')}...`,
+        settleDelay: 'delay before settle',
+        skeleton: 'loop, ease-in-out',
+    }
+    const t = NOT_A_TRANSITION[name] ? null : motionTransition(name as MotionTransitionName)
     return (
         <tr className="border-t border-[var(--hairline)]">
             <td className="py-2 pr-4 font-mono text-sm">{name}</td>
@@ -356,7 +366,7 @@ function JsTokenRow({ name }: { name: MotionDurationName }) {
             <td className="py-2 pr-4 text-sm">{motionDurations[name]}ms</td>
             <td className="py-2 pr-4 text-sm text-[var(--text-muted)]">{cssValue || 'not on this page'}</td>
             <td className="py-2 font-mono text-sm text-[var(--text-muted)]">
-                {`{ duration: ${t.duration}, ease: [${t.ease.join(', ')}] }`}
+                {t ? `{ duration: ${t.duration}, ease: [${t.ease.join(', ')}] }` : NOT_A_TRANSITION[name]}
             </td>
         </tr>
     )
@@ -388,8 +398,8 @@ export const JsTokens: Story = {
                         </table>
                     </div>
                     <p className="m-0 text-[0.9375rem] text-[var(--text-muted)]">
-                        Enters run on ease-out [{motionEasings.out.join(', ')}], exits on ease-in [
-                        {motionEasings.in.join(', ')}].
+                        Enters, hover and press run on ease-out [{motionEasings.out.join(', ')}], exits on
+                        ease-in [{motionEasings.in.join(', ')}].
                     </p>
                     <div className="flex flex-col gap-3">
                         <div>
@@ -415,6 +425,432 @@ export const JsTokens: Story = {
                     </div>
                 </div>
             </MotionConfig>
+        )
+    },
+}
+
+/* ─── AUTM-1678: page content motion ────────────────────────────────────
+ *
+ * The overlay stories above cover panels, dialogs and sheets. The stories
+ * below cover what a PAGE does: reveal, stagger, settle, hover, press, a
+ * route change, a skeleton and the crossfade out of it. One story per token
+ * family, each with its token printed beside it and a Replay where the
+ * motion is one-shot. The values and the reduced-motion form of each are the
+ * header of `utilities/animations.css`.
+ */
+
+const PAGE_TOKENS: {
+    token: string
+    js: MotionDurationName
+    use: string
+    reduced: string
+}[] = [
+    { token: '--motion-reveal', js: 'reveal', use: 'A section or a group rising 16px into place', reduced: 'None, content at rest' },
+    { token: '--motion-stagger', js: 'stagger', use: 'Per child, children 1 to 6; the rest share 300ms', reduced: 'None' },
+    { token: '--motion-settle', js: 'settle', use: 'A plate under the hero, up from 2.5rem and 98.5%', reduced: 'None' },
+    { token: '--motion-settle-delay', js: 'settleDelay', use: 'Waits for the hero copy to paint first', reduced: 'None' },
+    { token: '--motion-hover', js: 'hover', use: 'Colour, and a 2px lift on a card (pointer only)', reduced: 'Colour only' },
+    { token: '--motion-press', js: 'press', use: '97% on a button or tile, 98.5% on a full-width row', reduced: 'None, the fill change is the feedback' },
+    { token: '--motion-page-in', js: 'pageIn', use: 'The new route rises 8px and fades in', reduced: 'None, instant swap' },
+    { token: '--motion-page-out', js: 'pageOut', use: 'The old route fades out', reduced: 'None, instant swap' },
+    { token: '--motion-skeleton', js: 'skeleton', use: 'Skeleton pulse to 55%, ease-in-out, loops', reduced: 'Pulse off' },
+    { token: '--motion-crossfade', js: 'crossfade', use: 'Content fading in where the skeleton was', reduced: 'Kept, opacity only' },
+]
+
+function CssValue({ name }: { name: string }) {
+    const [value, setValue] = React.useState('')
+    React.useEffect(() => {
+        setValue(getComputedStyle(document.documentElement).getPropertyValue(name).trim())
+    }, [name])
+    return <>{value || 'missing'}</>
+}
+
+function Panel({ title, token, children }: { title: string; token: string; children: React.ReactNode }) {
+    return (
+        <section className="flex flex-col gap-4 rounded-autara-lg bg-[var(--surface)] p-5 text-[var(--text-strong)]">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <h3 className="m-0 text-base font-medium">{title}</h3>
+                <code className="text-sm text-[var(--text-muted)]">{token}</code>
+            </div>
+            {children}
+        </section>
+    )
+}
+
+function useReplay(): [number, () => void] {
+    const [run, setRun] = React.useState(0)
+    return [run, () => setRun((n) => n + 1)]
+}
+
+export const PageTokens: Story = {
+    name: 'Page content tokens (AUTM-1678)',
+    render: () => (
+        <div className="max-w-5xl overflow-x-auto rounded-autara-lg bg-[var(--surface)] p-6 text-[var(--text-strong)]">
+            <table className="w-full border-collapse text-left">
+                <thead>
+                    <tr className="text-[0.8125rem] text-[var(--text-muted)]">
+                        <th className="pb-2 pr-4 font-medium">CSS token</th>
+                        <th className="pb-2 pr-4 font-medium">On this page</th>
+                        <th className="pb-2 pr-4 font-medium">JS</th>
+                        <th className="pb-2 pr-4 font-medium">Use</th>
+                        <th className="pb-2 font-medium">Reduced motion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {PAGE_TOKENS.map((t) => (
+                        <tr key={t.token} className="border-t border-[var(--hairline)] align-top">
+                            <td className="py-2 pr-4 font-mono text-sm">{t.token}</td>
+                            <td className="py-2 pr-4 text-sm">
+                                <CssValue name={t.token} />
+                            </td>
+                            <td className="py-2 pr-4 font-mono text-sm text-[var(--text-muted)]">
+                                motionDurations.{t.js} = {motionDurations[t.js]}
+                            </td>
+                            <td className="py-2 pr-4 text-sm">{t.use}</td>
+                            <td className="py-2 text-sm text-[var(--text-muted)]">{t.reduced}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    ),
+}
+
+const STEPS = ['Choose a service', 'Pick a time', 'Pay the deposit', 'Get a reminder', 'Pull in', 'Drive off clean', 'Leave a review', 'Book again']
+
+export const StaggerTimed: Story = {
+    name: 'Reveal and stagger, on first paint',
+    render: function StaggerTimedStory() {
+        const [run, replay] = useReplay()
+        return (
+            <Panel title="motion-stagger: eight children, six steps" token="--motion-reveal 480ms, --motion-stagger 60ms">
+                <div>
+                    <Button size="sm" variant="quiet" onClick={replay}>
+                        Replay
+                    </Button>
+                </div>
+                <ol key={run} className="motion-stagger m-0 grid list-none gap-2 p-0 sm:grid-cols-2">
+                    {STEPS.map((s, i) => (
+                        <li key={s} className="rounded-autara-md bg-[var(--band)] px-4 py-3 text-[0.9375rem]">
+                            <span className="mr-2 tabular-nums text-[var(--text-muted)]">{i + 1}</span>
+                            {s}
+                            <span className="ml-2 text-sm text-[var(--text-muted)]">{motionStaggerDelay(i)}ms</span>
+                        </li>
+                    ))}
+                </ol>
+                <p className="m-0 text-sm text-[var(--text-muted)]">
+                    Children seven and eight start with the sixth, so no more than six are ever moving. The group is
+                    done within 780ms.
+                </p>
+            </Panel>
+        )
+    },
+}
+
+export const StaggerOnScroll: Story = {
+    name: 'Reveal stagger, on scroll',
+    parameters: { layout: 'fullscreen' },
+    render: () => (
+        <div className="p-6 text-[var(--text-strong)]">
+            <p className="mb-[80vh] text-sm text-[var(--text-muted)]">
+                Scroll down. Each card rises on its own progress through the viewport, one step later than the one
+                before. Chromium 115+ and Safari 26+; elsewhere, and under reduced motion, the cards are simply there.
+            </p>
+            <Reveal as="ul" stagger className="m-0 grid max-w-4xl list-none gap-3 p-0 sm:grid-cols-3">
+                {['Express wash', 'Interior refresh', 'Ceramic coating'].map((s) => (
+                    <li key={s} className="rounded-autara-lg bg-[var(--band)] p-5">
+                        <h4 className="m-0 text-base font-medium">{s}</h4>
+                        <p className="m-0 mt-1 text-sm text-[var(--text-muted)]">At your place or theirs.</p>
+                    </li>
+                ))}
+            </Reveal>
+            <div className="h-[60vh]" />
+        </div>
+    ),
+}
+
+export const Settle: Story = {
+    name: 'Settle',
+    render: function SettleStory() {
+        const [run, replay] = useReplay()
+        return (
+            <Panel title="motion-settle" token="--motion-settle 280ms after --motion-settle-delay 120ms">
+                <div>
+                    <Button size="sm" variant="quiet" onClick={replay}>
+                        Replay
+                    </Button>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-[1fr_14rem]">
+                    <div>
+                        <p className="m-0 text-xl font-bold">Your book, filled.</p>
+                        <p className="m-0 mt-1 text-[0.9375rem] text-[var(--text-muted)]">
+                            The headline does not move: it is the first paint. The plate settles under it.
+                        </p>
+                    </div>
+                    <div
+                        key={run}
+                        className="motion-settle grid h-56 place-items-center rounded-[1.75rem] bg-[var(--band)] text-sm text-[var(--text-muted)]"
+                    >
+                        Device plate
+                    </div>
+                </div>
+            </Panel>
+        )
+    },
+}
+
+export const HoverAndPress: Story = {
+    name: 'Hover and press',
+    render: () => (
+        <div className="grid gap-4 lg:grid-cols-2">
+            <Panel title="motion-press on buttons and tiles" token="--motion-press 120ms, 97%">
+                <div className="flex flex-wrap gap-3">
+                    <button
+                        type="button"
+                        className="motion-press min-h-11 rounded-full bg-[var(--band)] px-4 text-[0.9375rem] font-medium hover:bg-[var(--band-press)]"
+                    >
+                        Today
+                    </button>
+                    <button
+                        type="button"
+                        className="motion-press min-h-11 rounded-full bg-[var(--band)] px-4 text-[0.9375rem] font-medium hover:bg-[var(--band-press)]"
+                    >
+                        This week
+                    </button>
+                    <button
+                        type="button"
+                        disabled
+                        className="motion-press min-h-11 rounded-full bg-[var(--band)] px-4 text-[0.9375rem] font-medium opacity-45"
+                    >
+                        Disabled stays still
+                    </button>
+                </div>
+                <p className="m-0 text-sm text-[var(--text-muted)]">
+                    Hold the pointer down. The fill moves on --motion-hover, the scale on --motion-press.
+                </p>
+            </Panel>
+            <Panel title="motion-press-row on full-width rows" token="--motion-press 120ms, 98.5%">
+                <div className="flex flex-col gap-2">
+                    {['Block time', 'New booking', 'Send an invoice'].map((r) => (
+                        <button
+                            key={r}
+                            type="button"
+                            className="motion-press-row flex min-h-11 w-full items-center rounded-xl px-3 py-2 text-left text-[0.9375rem] font-medium hover:bg-[var(--band)]"
+                        >
+                            {r}
+                        </button>
+                    ))}
+                </div>
+                <p className="m-0 text-sm text-[var(--text-muted)]">
+                    98.5% on a row, because 97% of a full-width row moves its edge by a fingertip.
+                </p>
+            </Panel>
+            <Panel title="motion-hover-lift on a link card" token="--motion-hover 160ms, 2px">
+                <div className="grid gap-3 sm:grid-cols-2">
+                    {['Express wash', 'Ceramic coating'].map((s) => (
+                        <a
+                            key={s}
+                            href="#"
+                            onClick={(e) => e.preventDefault()}
+                            className="motion-hover-lift motion-press flex flex-col gap-1 rounded-autara-lg bg-[var(--band)] p-4 text-[var(--text-strong)] no-underline hover:bg-[var(--band-press)]"
+                        >
+                            <span className="motion-hover-icon inline-grid size-9 place-items-center rounded-full bg-[var(--surface)] text-sm font-bold">
+                                {s[0]}
+                            </span>
+                            <span className="text-base font-medium">{s}</span>
+                            <span className="text-sm text-[var(--text-muted)]">From $45</span>
+                        </a>
+                    ))}
+                </div>
+                <p className="m-0 text-sm text-[var(--text-muted)]">
+                    Mouse and trackpad only: on an iPad a tap would leave the card lifted. Lift and press combine,
+                    because one moves translate and the other scale.
+                </p>
+            </Panel>
+        </div>
+    ),
+}
+
+const ROUTES = {
+    today: { title: 'Today', rows: ['09:00 Express wash, Priya N', '11:30 Interior refresh, Sam K'] },
+    week: { title: 'This week', rows: ['Mon 4 bookings', 'Tue 2 bookings', 'Wed 5 bookings', 'Thu 3 bookings'] },
+} as const
+
+export const PageTransition: Story = {
+    name: 'Page, a route change',
+    render: function PageTransitionStory() {
+        const [route, setRoute] = React.useState<keyof typeof ROUTES>('today')
+        const supported = typeof document !== 'undefined' && 'startViewTransition' in document
+        const go = (next: keyof typeof ROUTES) => {
+            if (next === route) return
+            const doc = document as Document & { startViewTransition?: (update: () => void) => unknown }
+            if (!doc.startViewTransition) {
+                setRoute(next)
+                return
+            }
+            doc.startViewTransition(() => flushSync(() => setRoute(next)))
+        }
+        const r = ROUTES[route]
+        return (
+            <Panel title="motion-page" token="--motion-page-in 200ms, --motion-page-out 120ms">
+                <nav className="flex gap-2" aria-label="Story routes">
+                    {(Object.keys(ROUTES) as (keyof typeof ROUTES)[]).map((k) => (
+                        <Button
+                            key={k}
+                            size="sm"
+                            variant={k === route ? 'strong' : 'quiet'}
+                            aria-current={k === route ? 'page' : undefined}
+                            onClick={() => go(k)}
+                        >
+                            {ROUTES[k].title}
+                        </Button>
+                    ))}
+                </nav>
+                <main className="motion-page rounded-autara-md bg-[var(--band)] p-4">
+                    <h4 className="m-0 text-lg font-bold">{r.title}</h4>
+                    <ul className="m-0 mt-2 list-none p-0">
+                        {r.rows.map((row) => (
+                            <li key={row} className="py-1 text-[0.9375rem]">
+                                {row}
+                            </li>
+                        ))}
+                    </ul>
+                </main>
+                <p className="m-0 text-sm text-[var(--text-muted)]">
+                    {supported
+                        ? 'This browser supports view transitions: the old view fades out, the new one rises 8px and fades in.'
+                        : 'No view transitions in this browser, so the route swaps instantly, which is the intended fallback.'}{' '}
+                    Only the main column carries motion-page; the shell around it stays still.
+                </p>
+            </Panel>
+        )
+    },
+}
+
+export const SkeletonAndCrossfade: Story = {
+    name: 'Skeleton and the crossfade out of it',
+    render: function SkeletonStory() {
+        const [loading, setLoading] = React.useState(true)
+        return (
+            <Panel title="motion-skeleton, then motion-crossfade" token="--motion-skeleton 1400ms, --motion-crossfade 160ms">
+                <div>
+                    <Button size="sm" variant="quiet" onClick={() => setLoading((v) => !v)}>
+                        {loading ? 'Finish loading' : 'Load again'}
+                    </Button>
+                </div>
+                <div className="min-h-28">
+                    {loading ? (
+                        <div className="flex flex-col gap-2" role="status" aria-live="polite">
+                            <span className="sr-only">Fetching your bookings</span>
+                            <Skeleton label={null} className="h-6 w-40" />
+                            <Skeleton label={null} className="h-4 w-full" />
+                            <Skeleton label={null} className="h-4 w-3/4" />
+                        </div>
+                    ) : (
+                        <div className="motion-crossfade flex flex-col gap-2">
+                            <p className="m-0 text-lg font-bold">2 bookings today</p>
+                            <p className="m-0 text-[0.9375rem]">09:00 Express wash, Priya N</p>
+                            <p className="m-0 text-[0.9375rem]">11:30 Interior refresh, Sam K</p>
+                        </div>
+                    )}
+                </div>
+                <p className="m-0 text-sm text-[var(--text-muted)]">
+                    The content takes the skeleton&apos;s place in the same box, so nothing below it moves.
+                </p>
+            </Panel>
+        )
+    },
+}
+
+/**
+ * Storybook cannot switch `prefers-reduced-motion` itself. To check for
+ * real: DevTools, Rendering, "Emulate CSS media feature
+ * prefers-reduced-motion: reduce", then reload this story.
+ */
+export const PageMotionReduced: Story = {
+    name: 'A11y: page motion under prefers-reduced-motion',
+    render: () => (
+        <div className="max-w-3xl space-y-3 rounded-autara-lg bg-[var(--surface)] p-6 text-[var(--text-strong)]">
+            <h3 className="m-0 text-base font-medium">What a reduced-motion user gets</h3>
+            <ul className="list-disc space-y-2 pl-5 text-sm leading-relaxed text-[var(--text-muted)]">
+                <li>Reveal, stagger, settle and route changes: the end state, at once. No element waits out a delay.</li>
+                <li>Hover: the colour changes, the card does not lift.</li>
+                <li>Press: no scale. The fill change is the feedback.</li>
+                <li>Skeleton: a still placeholder, no pulse.</li>
+                <li>Crossfade: kept, because it is opacity only and 160ms.</li>
+            </ul>
+            <p className="m-0 text-sm leading-relaxed text-[var(--text-muted)]">
+                Every moving rule sits inside prefers-reduced-motion: no-preference, so this is the absence of a rule,
+                not a shortened animation. motion-system.test.ts holds every rule to it.
+            </p>
+            <p className="m-0 text-sm text-[var(--text-muted)]">
+                Your browser reports:{' '}
+                <strong className="font-medium text-[var(--text-strong)]">
+                    <ReducedMotionState />
+                </strong>
+            </p>
+        </div>
+    ),
+}
+
+function ReducedMotionState() {
+    const [reduce, setReduce] = React.useState<boolean | null>(null)
+    React.useEffect(() => {
+        const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+        setReduce(mq.matches)
+        const on = () => setReduce(mq.matches)
+        mq.addEventListener('change', on)
+        return () => mq.removeEventListener('change', on)
+    }, [])
+    if (reduce === null) return <>checking</>
+    return <>{reduce ? 'reduce (page motion is off)' : 'no preference (page motion is on)'}</>
+}
+
+/**
+ * The whole page at 200% text: the root font size doubles while this story is
+ * mounted, as it does under system text scaling. The settle travels 2.5rem, so
+ * it travels twice as far in pixels and still reads as the same gesture; the
+ * press rows grow and wrap, and the scale still applies to the row as a whole.
+ */
+export const TextScale200: Story = {
+    name: 'Edge: page motion at 200% text',
+    render: function TextScaleStory() {
+        React.useLayoutEffect(() => {
+            const html = document.documentElement
+            const before = html.style.fontSize
+            html.style.fontSize = '200%'
+            return () => {
+                html.style.fontSize = before
+            }
+        }, [])
+        const [run, replay] = useReplay()
+        return (
+            <div className="flex max-w-2xl flex-col gap-4">
+                <div>
+                    <Button size="sm" variant="quiet" onClick={replay}>
+                        Replay
+                    </Button>
+                </div>
+                <ol key={`s${run}`} className="motion-stagger m-0 grid list-none gap-2 p-0">
+                    {STEPS.slice(0, 4).map((s) => (
+                        <li key={s} className="rounded-autara-md bg-[var(--band)] px-4 py-3 text-[0.9375rem]">
+                            {s}
+                        </li>
+                    ))}
+                </ol>
+                <div
+                    key={`p${run}`}
+                    className="motion-settle grid h-40 place-items-center rounded-[1.75rem] bg-[var(--band)] text-sm text-[var(--text-muted)]"
+                >
+                    Device plate
+                </div>
+                <button
+                    type="button"
+                    className="motion-press-row flex min-h-11 w-full items-center rounded-xl bg-[var(--band)] px-3 py-2 text-left text-[0.9375rem] font-medium"
+                >
+                    Send the customer a reminder about tomorrow&apos;s booking
+                </button>
+            </div>
         )
     },
 }

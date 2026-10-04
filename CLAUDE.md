@@ -162,6 +162,17 @@ docs/
   Prefer it for new marketing work; `ScrollReveal` stays for consumers that
   already use it.
 
+- **Page motion has tokens; never type a duration or a curve** (AUTM-1678).
+  `--motion-reveal/-stagger/-settle/-hover/-press/-page-in/-page-out/-skeleton/-crossfade`
+  in `utilities/animations.css`, typed in `lib/motion-tokens.ts`, with classes
+  `.motion-stagger`, `.motion-settle`, `.motion-press`, `.motion-press-row`,
+  `.motion-hover-lift`, `.motion-page`, `.motion-skeleton`, `.motion-crossfade`
+  and `Reveal stagger`. Two traps behind them: under Tailwind v4,
+  `transition-[transform] active:scale-[0.97]` never animates, because
+  `scale-*` compiles to the standalone `scale` property; and the global
+  reduced-motion clamp shortens duration but not delay, so a staggered rule
+  outside `prefers-reduced-motion: no-preference` leaves a reduced-motion user
+  staring at invisible items. `motion-system.test.ts` holds both.
 - **Never put type or colour classes on an `h1` to `h6`; put them on an
   element inside it.** merchant-mobile (`src/main.css`) and customer-web
   (`src/app/globals.css`) both style headings with an UNLAYERED rule (colour
