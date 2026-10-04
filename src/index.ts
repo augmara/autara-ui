@@ -15,6 +15,10 @@ export {
     BloomField, type BloomFieldProps,
     LitGroup, type LitGroupProps,
     Reveal, type RevealProps,
+    // AUTM-1679 — a pinned scroll story with its indicator, and a disclosure
+    // that opens and closes smoothly.
+    ScrollStory, SCROLL_STORY_STILL_QUERY, type ScrollStoryProps, type ScrollStoryStep, type ScrollStoryStepState, type ScrollStoryPhase,
+    Disclosure, type DisclosureProps,
     Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, cardVariants, type CardProps,
     BackButton, type BackButtonProps,
     Badge, badgeVariants, type BadgeProps,
@@ -153,6 +157,10 @@ export {
     type MotionDurationName,
     type MotionTransitionName,
 } from './lib/motion-tokens'
+
+/* AUTM-1679 — a fixed header that steps out of the way on the way down and
+ * comes back on the way up (utilities/autohide.css). */
+export { useAutoHideHeader, type AutoHideHeaderOptions } from './lib/use-auto-hide-header'
 
 export { DatePicker, type DatePickerProps, type DayState } from './components/DatePicker'
 // AUTM-1633 — the month, on its own: any date by tap or keyboard.

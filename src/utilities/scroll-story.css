@@ -1,0 +1,260 @@
+/* ─── ScrollStory (AUTM-1679) ─────────────────────────────────────────────
+ *
+ * ScrollStory.tsx. The wrapper is one step of scroll taller per step than
+ * the pin; the pin is sticky at the very top of the viewport, a viewport
+ * tall (svh, the small viewport, so a phone's collapsing address bar never
+ * resizes it), with `--scroll-story-top` of room at its top for a fixed
+ * header. Because the pin itself starts at 0, a header that hides and shows
+ * over that room never moves the stage.
+ *
+ * The sentinels (.scroll-story-step) are a step tall each, placed so sentinel
+ * k crosses the middle of the viewport exactly when the pin has scrolled k
+ * steps; the component watches that line. The last step ends where the
+ * wrapper ends, so the pin lets go after it.
+ *
+ * Consumer hooks, all optional:
+ *   --scroll-story-top           room at the pin's top (a fixed header's height)
+ *   --scroll-story-step          scroll per step (default 80svh)
+ *   --scroll-story-step-compact  the same below 48rem (default 60svh)
+ *   --scroll-story-chip-bg / -fg, --scroll-story-chip-active-bg / -fg,
+ *   --scroll-story-rail, --scroll-story-fill, --scroll-story-muted
+ * The defaults are for a brand-deep ground.
+ */
+
+.scroll-story {
+    --_ss-step: var(--scroll-story-step, 80svh);
+    position: relative;
+    height: calc(var(--scroll-story-steps, 1) * var(--_ss-step) + 100svh);
+}
+@media (max-width: 47.99rem) {
+    .scroll-story { --_ss-step: var(--scroll-story-step-compact, 60svh); }
+}
+
+.scroll-story-pin {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    height: 100svh;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: calc(var(--scroll-story-top, 0px) + 0.75rem) 0 1.25rem;
+}
+
+.scroll-story-step {
+    position: absolute;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+    top: calc(var(--scroll-story-k) * var(--_ss-step) + 50svh);
+    height: var(--_ss-step);
+    /* A chip lands a quarter of the way into its step. */
+    scroll-margin-top: calc(50svh - 0.25 * var(--_ss-step));
+    /* Its view timeline runs from its top crossing the middle line to its
+       bottom crossing it: the chip's rail fills over exactly its step. */
+    view-timeline-inset: 50% 50%;
+}
+
+.scroll-story-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ── The indicator: chips, their rails, the count and the hint ── */
+.scroll-story-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.625rem;
+}
+.scroll-story-chips {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.375rem;
+}
+.scroll-story-chip {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 0.375rem;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.875rem 0.4375rem;
+    border: 0;
+    border-radius: 0.875rem;
+    background: var(--scroll-story-chip-bg, rgb(255 255 255 / 0.1));
+    color: var(--scroll-story-chip-fg, var(--on-deep-muted));
+    font: inherit;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    line-height: 1.2;
+    cursor: pointer;
+}
+.scroll-story-chip[aria-current='step'] {
+    background: var(--scroll-story-chip-active-bg, var(--paper));
+    color: var(--scroll-story-chip-active-fg, var(--strong));
+}
+@media (hover: hover) {
+    .scroll-story-chip:not([aria-current='step']):hover {
+        color: var(--scroll-story-chip-active-bg, var(--on-deep));
+    }
+}
+.scroll-story-chip:focus-visible {
+    outline: 3px solid var(--lime);
+    outline-offset: 3px;
+}
+.scroll-story-rail {
+    display: block;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--scroll-story-rail, rgb(255 255 255 / 0.18));
+    overflow: hidden;
+}
+.scroll-story-chip[aria-current='step'] .scroll-story-rail {
+    background: var(--scroll-story-rail-active, var(--hairline));
+}
+/* At rest a step's rail is full once it is current or passed. */
+.scroll-story-fill {
+    display: block;
+    height: 100%;
+    background: var(--scroll-story-fill, var(--lime));
+    transform-origin: left center;
+    transform: scaleX(0);
+}
+.scroll-story-chip[aria-current='step'] .scroll-story-fill { background: var(--scroll-story-fill-active, var(--brand)); }
+.scroll-story-chip:is([aria-current='step'], [data-done]) .scroll-story-fill { transform: scaleX(1); }
+
+.scroll-story-count {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: var(--scroll-story-muted, var(--on-deep-muted));
+}
+.scroll-story-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    transition: opacity var(--motion-crossfade) var(--motion-ease-in);
+}
+.scroll-story-hint[data-hidden] { opacity: 0; }
+
+/* Where scroll-driven animations run: each rail fills over its own step, and
+   the hint fades over the first fifth of the first step. Linear: the scroll
+   is the easing. Transform and opacity only. */
+@keyframes scroll-story-fill {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+}
+@keyframes scroll-story-hint {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+@supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) and (min-height: 36rem) {
+        .scroll-story-fill {
+            animation: scroll-story-fill linear both;
+            /* animation-timeline is set per chip, inline, to its step's timeline. */
+        }
+        .scroll-story-hint {
+            animation: scroll-story-hint linear both;
+            animation-timeline: --scroll-story-0;
+            animation-range: cover 0% cover 20%;
+        }
+    }
+}
+
+/* ── The stage: the steps in one cell, the captions in the cell under it ── */
+.scroll-story-stage {
+    flex: 1 1 0;
+    min-height: 0;
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: 1rem;
+}
+.scroll-story-screen { display: contents; }
+.scroll-story-shot {
+    grid-area: 1 / 1;
+    position: relative;
+    min-height: 0;
+    /* Sized by the pin, not by its content, so nothing moves when a step's
+       pictures load. Content can size itself with cqw / cqh. */
+    container-type: size;
+    display: grid;
+    place-items: start center;
+}
+/* The step leaving sits under the one arriving; each is its own stacking
+   context (size containment), so they are ordered here, not by the DOM. */
+.scroll-story-shot:is([data-phase='active'], [data-phase='enter']) { z-index: 2; }
+.scroll-story-shot[data-phase='prev'] { z-index: 1; }
+.scroll-story-shot[data-phase='idle'] { visibility: hidden; }
+
+.scroll-story-caption {
+    grid-area: 2 / 1;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(0.375rem);
+    transition:
+        opacity var(--motion-crossfade) var(--motion-ease-in),
+        transform var(--motion-crossfade) var(--motion-ease-in);
+}
+.scroll-story-caption[data-active] {
+    opacity: 1;
+    transform: none;
+    transition:
+        opacity var(--motion-settle) var(--motion-ease-out),
+        transform var(--motion-settle) var(--motion-ease-out);
+}
+.scroll-story-line {
+    margin: 0;
+    max-width: 50rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--scroll-story-muted, var(--on-deep-muted));
+}
+@media (min-width: 48rem) {
+    .scroll-story-chips { gap: 0.5rem; }
+    .scroll-story-chip { padding-inline: 1.125rem; }
+    .scroll-story-line { font-size: 1.0625rem; }
+}
+@media (min-width: 64rem) {
+    .scroll-story-chip { min-height: 3rem; padding-inline: 1.375rem; font-size: 1rem; }
+}
+
+/* A small turn toward a mouse pointer (`tilt`). Hover devices only. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .scroll-story-stage[data-tilt] .scroll-story-shot {
+        transform: perspective(1600px) rotateX(var(--scroll-story-tilt-x, 0deg)) rotateY(var(--scroll-story-tilt-y, 0deg));
+        transition: transform var(--motion-settle) var(--motion-ease-out);
+    }
+}
+
+/* No pin: reduced motion, or a viewport too short to hold one with a stage
+   worth seeing (SCROLL_STORY_STILL_QUERY). The chips switch the step at once,
+   and the stage keeps a fixed box. */
+@media (prefers-reduced-motion: reduce), (max-height: 36rem) {
+    .scroll-story { height: auto; }
+    .scroll-story-pin { position: relative; height: auto; padding-top: 0.75rem; }
+    .scroll-story-stage { flex: none; }
+    .scroll-story-shot { height: clamp(22rem, 64svh, 46rem); }
+    .scroll-story-step { display: none; }
+    .scroll-story-hint { display: none; }
+    .scroll-story-caption { transition: none; transform: none; }
+}
