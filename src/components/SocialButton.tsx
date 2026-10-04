@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import { cn } from '../lib/cn'
+import { AutaraLoader } from './AutaraLoader'
 
 /**
  * AUTM-1513 — the one social sign-in button (canvas v49, UiSocialAuth,
@@ -12,8 +13,13 @@ import { cn } from '../lib/cn'
  * - A 20px mark 12px from the label, the two centred together as one unit.
  * - Google and Apple follow their providers' colours, in light and dark.
  *   Mobile is Autara's own: paper with the field's 1px edge and a phone mark.
- * - Busy: the pressed button swaps its mark for a spinner and keeps its
- *   label (aria-busy); the caller disables the others.
+ * - Busy: the pressed button swaps its mark for the turning Autara mark
+ *   (AutaraLoader, 20px, in the label's colour) and keeps its label, so the
+ *   width and the accessible name hold; it is aria-busy and disabled at full
+ *   strength, so a second tap cannot start a second sign-in. The caller
+ *   disables the others. (AUTM-1708: it used to be a plain CSS ring.)
+ * - Press: 97% under the finger on the library's `motion-press`, as Button
+ *   does by default (AUTM-1708). `press={false}` opts out.
  *
  * Styled by `utilities/social.css` (classes, not Tailwind), so the look is
  * one file and the provider hexes stay out of the TSX. The label defaults to
@@ -26,8 +32,10 @@ export interface SocialButtonProps extends React.ButtonHTMLAttributes<HTMLButton
     provider: SocialButtonProvider
     /** Dark surfaces (the merchant landing, the app's dark theme). */
     theme?: 'light' | 'dark'
-    /** The pressed button: a spinner replaces the mark, the label stays. */
+    /** The pressed button: the turning Autara mark replaces the provider mark, the label stays. */
     busy?: boolean
+    /** Scale to 97% under the finger (`motion-press`). Default true. */
+    press?: boolean
     /** Overrides the default "Continue with …" label. */
     label?: React.ReactNode
     /**
@@ -82,7 +90,7 @@ const MARKS: Record<SocialButtonProvider, () => React.ReactElement> = {
 }
 
 export const SocialButton = React.forwardRef<HTMLButtonElement, SocialButtonProps>(function SocialButton(
-    { provider, theme = 'light', busy = false, label, icon, className, type = 'button', disabled, children, ...props },
+    { provider, theme = 'light', busy = false, press = true, label, icon, className, type = 'button', disabled, children, ...props },
     ref,
 ) {
     const Mark = MARKS[provider]
@@ -90,15 +98,17 @@ export const SocialButton = React.forwardRef<HTMLButtonElement, SocialButtonProp
         <button
             ref={ref}
             type={type}
-            disabled={disabled}
+            disabled={disabled || busy}
             aria-busy={busy || undefined}
             data-provider={provider}
             data-theme={theme}
-            className={cn('social-btn', className)}
+            className={cn('social-btn', press && 'motion-press', className)}
             {...props}
         >
             <span className="social-btn__inner">
-                <span className="social-btn__mark">{busy ? <span className="social-btn__spinner" aria-hidden="true" /> : (icon ?? <Mark />)}</span>
+                <span className="social-btn__mark">
+                    {busy ? <AutaraLoader size={20} tone="current" decorative /> : (icon ?? <Mark />)}
+                </span>
                 <span className="social-btn__label">{children ?? label ?? DEFAULT_LABEL[provider]}</span>
             </span>
         </button>

@@ -33,6 +33,29 @@ describe('ConfirmDialog', () => {
         expect(screen.getByTestId('garage-remove-error').getAttribute('role')).toBe('alert')
     })
 
+    it('AUTM-1708: loading turns the Autara mark on the confirm, keeping its name and width', () => {
+        render(
+            <ConfirmDialog
+                open
+                title="Remove this address?"
+                description="It won't be offered at checkout any more."
+                confirmLabel="Remove"
+                loading
+                onConfirm={vi.fn()}
+                onClose={vi.fn()}
+                testId="address-remove"
+            />,
+        )
+        const confirm = screen.getByTestId('address-remove-confirm') as HTMLButtonElement
+        // Still named "Remove", not "Remove…": a spec that reads the label
+        // finds the same text it found at rest.
+        expect(screen.getByRole('button', { name: 'Remove' })).toBe(confirm)
+        expect(confirm.getAttribute('aria-busy')).toBe('true')
+        expect(confirm.disabled).toBe(true)
+        expect(confirm.querySelector('svg.autara-loader')).not.toBeNull()
+        expect(confirm.textContent).not.toContain('…')
+    })
+
     it('calls onClose, not onConfirm, when dismissed', () => {
         const onClose = vi.fn()
         const onConfirm = vi.fn()

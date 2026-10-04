@@ -110,6 +110,14 @@ const LEGACY: Record<LegacyVariant, SheetVariant> = {
  * No lift on hover and no shadow: depth on the sheet is only the step between
  * paper, band and raised. Hover moves the fill one step; `not-disabled:` keeps
  * a disabled button still while working on `asChild` links too.
+ *
+ * AUTM-1708 — every Button presses by default: the library's `motion-press`
+ * (97% under the finger, on `--motion-press`, colour on `--motion-hover`), or
+ * `motion-press-row` (98.5%) when `fullWidth`, where 97% of a full-width
+ * button would move its edges by a fingertip. Not on `variant="link"`: a text
+ * action does not shrink. Off under reduced motion and while disabled or
+ * busy. `press={false}` opts out. The classes are unlayered CSS, so their
+ * transition list replaces BASE's `transition-colors` in every consumer.
  */
 const BASE =
   "inline-flex select-none items-center justify-center gap-2 text-center break-words min-w-fit font-medium leading-tight transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] disabled:cursor-not-allowed disabled:opacity-45 aria-busy:cursor-progress aria-busy:disabled:opacity-100";
@@ -169,6 +177,17 @@ export interface ButtonProps
    * button is disabled at full strength.
    */
   busy?: boolean;
+  /**
+   * Scale under the finger: 97%, or 98.5% when `fullWidth`. Default true;
+   * never on `variant="link"`. Pass `false` where the control must not move.
+   */
+  press?: boolean;
+}
+
+/** The press class for a variant and width, or nothing (AUTM-1708). */
+function pressClass(variant: SheetVariant, fullWidth: boolean | undefined, press: boolean): string | false {
+  if (!press || variant === "link") return false;
+  return fullWidth ? "motion-press-row" : "motion-press";
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -181,6 +200,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       trailingIcon,
       asChild,
       busy,
+      press = true,
       children,
       className,
       type,
@@ -191,6 +211,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ) {
     const Comp = asChild ? Slot : "button";
     const resolvedSize = size === "default" ? "md" : size;
+    const resolvedVariant = resolveButtonVariant(variant);
     const busyProps = busy ? { "aria-busy": true } : {};
     return (
       <Comp
@@ -198,7 +219,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(
           BASE,
           SIZES[resolvedSize],
-          VARIANT_CLASSES[resolveButtonVariant(variant)],
+          VARIANT_CLASSES[resolvedVariant],
+          pressClass(resolvedVariant, fullWidth, press),
           fullWidth && "w-full",
           busy && !asChild && "relative",
           className,
@@ -245,14 +267,20 @@ Button.displayName = "Button";
 export function buttonVariants(opts?: {
   variant?: Variant;
   size?: Size;
+  /** As Button's: the full-width press (98.5%). Does not add `w-full`. */
+  fullWidth?: boolean;
+  /** As Button's: default true, never on `link`. */
+  press?: boolean;
   className?: string;
 }): string {
-  const { variant = "primary", size = "md", className } = opts ?? {};
+  const { variant = "primary", size = "md", fullWidth, press = true, className } = opts ?? {};
   const resolvedSize = size === "default" ? "md" : size;
+  const resolvedVariant = resolveButtonVariant(variant);
   return cn(
     BASE,
     SIZES[resolvedSize],
-    VARIANT_CLASSES[resolveButtonVariant(variant)],
+    VARIANT_CLASSES[resolvedVariant],
+    pressClass(resolvedVariant, fullWidth, press),
     className,
   );
 }

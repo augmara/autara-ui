@@ -11,9 +11,11 @@ import { cn } from '../lib/cn'
  *              row being saved
  *
  * NOT for content whose shape is known: a shape-matched `Skeleton` makes a
- * page feel faster than any loader, so content areas keep skeletons. And
- * `Spinner` stays for work on something already on screen (a photo
- * uploading into its frame).
+ * page feel faster than any loader, so content areas keep skeletons.
+ * `Spinner` keeps its own job and API (work on something already on screen,
+ * a photo uploading into its frame) and draws this mark too since AUTM-1708,
+ * as do Button, ConfirmDialog, SocialButton, ImageCropDialog, MessageComposer
+ * and a loading Toast, so the library has one loading picture.
  *
  * ─── The mark ───────────────────────────────────────────────────────────
  *
@@ -53,8 +55,11 @@ import { cn } from '../lib/cn'
  * a breathing logo still says "working".
  */
 
-/** px, rendered in rem so it follows system text size. 16 to 24 inline, 48 to 96 for a page. */
-export type AutaraLoaderSize = 16 | 20 | 24 | 48 | 64 | 80 | 96
+/**
+ * px, rendered in rem so it follows system text size. 16 to 24 inline, 48 to
+ * 96 for a page; 40 is `Spinner size="lg"`, over a photo being uploaded.
+ */
+export type AutaraLoaderSize = 16 | 20 | 24 | 40 | 48 | 64 | 80 | 96
 export type AutaraLoaderTone = 'accent' | 'current' | 'on-photo'
 
 const TONE: Record<AutaraLoaderTone, string> = {

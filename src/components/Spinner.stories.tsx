@@ -2,7 +2,8 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Spinner } from "./Spinner";
 
 /**
- * Spinner — an indeterminate "still working" indicator (AUTM-1046).
+ * Spinner — an indeterminate "still working" indicator (AUTM-1046). Since
+ * AUTM-1708 it draws the turning Autara mark, with the same sizes and API.
  *
  * For work in progress on something already on screen: a photo uploading, a
  * save running. For content that has not arrived yet, use a shape-matched
@@ -137,11 +138,11 @@ export const ReducedMotion: Story = {
         </h3>
       </div>
       <ul className="list-disc space-y-2 pl-5 text-sm leading-relaxed text-[var(--text-muted)]">
-        <li>The ring does not spin, and nothing pulses.</li>
+        <li>The mark does not turn (AUTM-1708: Spinner draws the Autara mark).</li>
         <li>
-          The quarter arc is replaced by a still, dashed ring. A frozen arc
-          would look like the stuck upload this component exists to rule out,
-          so the still state is a different shape, not the same one stopped.
+          Every ray goes to full strength, so it is the whole logo standing
+          still, and it breathes in opacity. A frozen, graded mark would look
+          like the stuck upload this component exists to rule out.
         </li>
         <li>The accessible label is unchanged, so a screen reader hears the same thing.</li>
       </ul>

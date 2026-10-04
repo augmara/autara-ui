@@ -23,12 +23,25 @@ describe('SocialButton', () => {
         expect(screen.getByRole('button', { name: 'Continue with mobile' })).toBeTruthy()
     })
 
-    it('busy keeps the label, swaps the mark for a spinner and sets aria-busy', () => {
-        render(<SocialButton provider="google" busy disabled />)
-        const btn = screen.getByRole('button', { name: 'Continue with Google' })
+    it('busy keeps the label, swaps the mark for the turning Autara mark and sets aria-busy (AUTM-1708)', () => {
+        render(<SocialButton provider="google" busy />)
+        const btn = screen.getByRole('button', { name: 'Continue with Google' }) as HTMLButtonElement
         expect(btn.getAttribute('aria-busy')).toBe('true')
-        expect(btn.querySelector('.social-btn__spinner')).toBeTruthy()
-        expect(btn.querySelector('svg')).toBeNull()
+        // Disabled by busy alone, so a second tap cannot start a second sign-in.
+        expect(btn.disabled).toBe(true)
+        const mark = btn.querySelector('.social-btn__mark')!
+        expect(mark.querySelector('svg.autara-loader')).not.toBeNull()
+        // Decorative: the button is already named and busy.
+        expect(mark.firstElementChild!.getAttribute('aria-hidden')).toBe('true')
+        expect(mark.firstElementChild!.getAttribute('data-size')).toBe('20')
+        expect(btn.querySelector('.social-btn__spinner')).toBeNull()
+    })
+
+    it('presses on motion-press by default, and press={false} opts out', () => {
+        const { rerender } = render(<SocialButton provider="apple" />)
+        expect(screen.getByRole('button').className).toContain('motion-press')
+        rerender(<SocialButton provider="apple" press={false} />)
+        expect(screen.getByRole('button').className).not.toContain('motion-press')
     })
 
     it('exposes provider and theme for the stylesheet, and is a plain button', () => {

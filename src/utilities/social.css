@@ -24,7 +24,13 @@
     line-height: 1.25;
     text-align: center;
     cursor: pointer;
-    transition: background-color 0.15s ease;
+}
+/* With `motion-press` (the default) the colour and the press both run on the
+ * library's transition list; this one is only for `press={false}`. Scoped by
+ * `:not`, because this file loads after animations.css and would otherwise
+ * replace that list and leave the press snapping. */
+.social-btn:not(.motion-press) {
+    transition: background-color var(--motion-hover, 160ms) var(--motion-ease-out, ease);
 }
 .social-btn__inner {
     display: inline-flex;
@@ -86,16 +92,5 @@
     color: #ffffff;
 }
 
-/* Busy: a ring in the mark's place, in the label's colour. */
-.social-btn__spinner {
-    width: 1.125rem;
-    height: 1.125rem;
-    border-radius: 9999px;
-    border: 2px solid currentColor;
-    border-right-color: transparent;
-    animation: social-btn-spin 0.8s linear infinite;
-}
-@keyframes social-btn-spin { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) {
-    .social-btn__spinner { animation-duration: 2.4s; }
-}
+/* Busy (AUTM-1708): AutaraLoader in the mark slot, styled by loader.css. The
+ * plain ring that lived here is gone. */

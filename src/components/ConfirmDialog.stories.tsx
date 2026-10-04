@@ -55,6 +55,11 @@ export const Destructive: Story = {
     ),
 }
 
+/**
+ * AUTM-1708: the confirm runs Button's busy state, the turning Autara mark at
+ * full strength, and keeps "Cancel booking" as its name and its width. It used
+ * to read "Cancel booking…" at 45%. The safe option still works, as "Close".
+ */
 export const Loading: Story = {
     args: {} as never,
     render: () => (
@@ -127,5 +132,20 @@ export const CancelBookingInContext: Story = {
                 </FormField>
             </div>
         </Host>
+    ),
+}
+
+/** AUTM-1708, edge: a short confirm label beside a long safe one, busy. The width does not move. */
+export const LoadingShortLabel: Story = {
+    name: 'Loading, short label',
+    args: {} as never,
+    render: () => (
+        <Host
+            title="Sign out?"
+            description="You can sign back in any time."
+            confirmLabel="Sign out"
+            cancelLabel="Stay signed in"
+            loading
+        />
     ),
 }

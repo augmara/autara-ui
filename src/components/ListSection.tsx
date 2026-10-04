@@ -85,6 +85,13 @@ export interface ListSectionRowProps {
     destructive?: boolean
     /** The sheet's 4px brand bar at the left edge: a row waiting on someone. */
     accent?: boolean
+    /**
+     * A tappable row presses to 98.5% (`motion-press-row`, AUTM-1708). Default
+     * true; only applies with `onTap`.
+     */
+    press?: boolean
+    /** Merged onto the row's root (the button when `onTap` is set). */
+    className?: string
 }
 
 export function ListSectionRow({
@@ -95,6 +102,8 @@ export function ListSectionRow({
     onTap,
     destructive = false,
     accent = false,
+    press = true,
+    className,
 }: ListSectionRowProps) {
     const interactive = !!onTap
     const Container = interactive ? 'button' : 'div'
@@ -108,6 +117,8 @@ export function ListSectionRow({
                 'flex min-h-11 w-full items-center gap-3 rounded-2xl bg-[var(--raised)] px-4 py-3.5 text-left transition-colors',
                 interactive &&
                     'hover:bg-[var(--paper)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--band)]',
+                interactive && press && 'motion-press-row',
+                className,
             ),
         },
         accent ? (

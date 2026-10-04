@@ -164,11 +164,20 @@ docs/
 - **Loading has three answers, and they are not interchangeable** (AUTM-1706).
   `AutaraLoader` (the mark, turning) for app boot, a route with nothing to show
   yet, and a button's busy state; `Skeleton` / `AsyncSkeleton` for content
-  whose shape is known; `Spinner` for work on something already on screen.
+  whose shape is known; `Spinner` for work on something already on screen
+  (since AUTM-1708 it draws the same mark, same API). No component draws its
+  own ring or relabels itself "Saving…" while busy; `busy-and-press.test.tsx`
+  greps for it.
   `Button busy` draws the mark OVER the label: the label and icons stay in the
   layout at opacity 0, so the width holds and the accessible name is unchanged.
   A test that looks for the label by visible text still finds it in the DOM;
   one that expected the leading icon to be removed while busy will not.
+- **Button presses by default** (AUTM-1708): `motion-press`, or
+  `motion-press-row` when `fullWidth`, never on `link`; `press={false}` opts
+  out, and `buttonVariants` carries the same. So do IconButton (through
+  Button), SocialButton, tappable ListSectionRows and FilterChipRow chips. Do
+  not add a local `transform: scale` press to anything built on these: it
+  multiplies with the library's `scale` (97% x 97% is about 94%).
 
 - **Page motion has tokens; never type a duration or a curve** (AUTM-1678).
   `--motion-reveal/-stagger/-settle/-hover/-press/-page-in/-page-out/-skeleton/-crossfade`

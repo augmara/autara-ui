@@ -141,3 +141,27 @@ export const FocusRing: Story = {
         )
     },
 }
+
+/**
+ * AUTM-1708: every chip presses to 97% (`motion-press`) without a class, and
+ * `chipClassName` reaches each chip for anything else. `press={false}` opts
+ * out. Hold the pointer down on a chip.
+ */
+export const Press: Story = {
+    name: 'Press, every chip',
+    render: function PressStory() {
+        const [value, setValue] = useState<string | null>(null)
+        return (
+            <div className="flex max-w-xl flex-col gap-4">
+                <FilterChipRow options={STATUS_OPTIONS} value={value} onChange={setValue} />
+                <FilterChipRow
+                    ariaLabel="Filter, no press"
+                    options={STATUS_OPTIONS.slice(0, 3)}
+                    value={value}
+                    onChange={setValue}
+                    press={false}
+                />
+            </div>
+        )
+    },
+}

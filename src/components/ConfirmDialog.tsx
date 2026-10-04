@@ -117,15 +117,19 @@ export function ConfirmDialog({
                     >
                         {loading ? 'Close' : cancelLabel}
                     </Button>
+                    {/* AUTM-1708: Button's busy state, the turning Autara mark
+                        at full strength. The label stays `confirmLabel`, so the
+                        width holds and the accessible name does not change while
+                        the request runs; it used to become "Remove…" at 45%. */}
                     <Button
                         variant="strong"
                         size="md"
                         fullWidth
-                        disabled={loading}
+                        busy={loading}
                         onClick={onConfirm}
                         data-testid={testId ? `${testId}-confirm` : undefined}
                     >
-                        {loading ? `${confirmLabel}…` : confirmLabel}
+                        {confirmLabel}
                     </Button>
                 </DialogFooter>
             </DialogContent>

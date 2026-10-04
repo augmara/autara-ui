@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { cn } from '../lib/cn'
+import { AutaraLoader, type AutaraLoaderSize, type AutaraLoaderTone } from './AutaraLoader'
 
 /**
  * Spinner — an indeterminate "this is still working" indicator (AUTM-1046).
@@ -22,8 +22,8 @@ import { cn } from '../lib/cn'
  * upload looked the same as a stuck one, which is when people tap again or
  * back out. autara-ui had no indeterminate indicator (`Progress` is
  * percentage only), and the only spinner in the package was private to
- * `Toast`. The geometry here is that one — a quarter arc over a faint track —
- * so the two read as the same object.
+ * `Toast`. It first borrowed that one's quarter arc over a faint track; it
+ * draws the Autara mark now (below).
  *
  * ─── Colour ─────────────────────────────────────────────────────────────
  *
@@ -44,32 +44,32 @@ import { cn } from '../lib/cn'
  * says the same thing; the spinner is then `aria-hidden` and announces
  * nothing, so the word is not read twice.
  *
+ * ─── The mark (AUTM-1708) ──────────────────────────────────────────────
+ *
+ * Since AUTM-1708 it draws the Autara mark, turning (`AutaraLoader`), not a
+ * quarter arc. Don asked for one loading picture everywhere (AUTM-1706), and
+ * a generic ring here would have kept one in every consumer that uploads a
+ * photo. The API, the sizes (1, 1.5 and 2.5rem), the tones and the labels
+ * are unchanged, so a consumer bump changes the picture and nothing else.
+ *
  * ─── Reduced motion ─────────────────────────────────────────────────────
  *
- * Under `prefers-reduced-motion: reduce` it does NOT spin, and it does not
- * pulse either: it swaps to a STATIC dashed ring. A frozen quarter arc would
- * look exactly like the stuck state this component exists to rule out, so the
- * reduced-motion state is a different, still shape rather than the same shape
- * standing still. The label is unchanged, so assistive tech hears the same
- * thing either way. (The global clamp in `utilities/animations.css` would
- * stop the rotation on its own; `motion-reduce:animate-none` says so here
- * rather than relying on it.)
+ * AutaraLoader's: it does not turn; the rays go to full strength, so it is
+ * the logo standing still, and it breathes in opacity. A frozen loader would
+ * look like the stuck upload this component exists to rule out, so the still
+ * state is a different picture (the whole logo), not the moving one stopped.
+ * The label is unchanged, so assistive tech hears the same thing either way.
  */
 
+/** sm 1rem, md 1.5rem, lg 2.5rem, as before AUTM-1708. */
 const SIZE = {
-    sm: 'size-4',
-    md: 'size-6',
-    lg: 'size-10',
-} as const
-
-const TONE = {
-    accent: 'text-[var(--accent)]',
-    current: '',
-    'on-photo': 'text-white',
-} as const
+    sm: 16,
+    md: 24,
+    lg: 40,
+} as const satisfies Record<string, AutaraLoaderSize>
 
 export type SpinnerSize = keyof typeof SIZE
-export type SpinnerTone = keyof typeof TONE
+export type SpinnerTone = AutaraLoaderTone
 
 export interface SpinnerProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'role' | 'children'> {
     /** `sm` 1rem, `md` 1.5rem, `lg` 2.5rem. Rem, so it scales with system text size. */
@@ -89,63 +89,17 @@ export interface SpinnerProps extends Omit<React.HTMLAttributes<HTMLSpanElement>
 }
 
 const Spinner = React.forwardRef<HTMLSpanElement, SpinnerProps>(
-    ({ size = 'md', tone = 'accent', label = 'Loading', decorative = false, className, ...props }, ref) => {
-        // `status` does not take its name from content, so the hidden label
-        // is wired as the accessible name as well as being the live text.
-        const labelId = React.useId()
-        return (
-            <span
-                ref={ref}
-                className={cn('inline-flex shrink-0 items-center justify-center', TONE[tone], className)}
-                {...(decorative
-                    ? { 'aria-hidden': true }
-                    : { role: 'status', 'aria-labelledby': labelId })}
-                {...props}
-            >
-                <svg
-                    aria-hidden
-                    focusable="false"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={3}
-                    strokeLinecap="round"
-                    data-spinner-motion=""
-                    className={cn(SIZE[size], 'animate-spin motion-reduce:animate-none')}
-                >
-                    {/* Moving state: a full track plus a quarter arc. AUTM-1594
-                        (canvas v44 "Spinner"): on the accent tone the track is
-                        band and the arc is the accent, 3px; other tones keep a
-                        faint track in their own colour. */}
-                    <g className="motion-reduce:hidden">
-                        <circle
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke={tone === 'accent' ? 'var(--band)' : undefined}
-                            opacity={tone === 'accent' ? 1 : 0.25}
-                        />
-                        <path d="M22 12a10 10 0 0 0-10-10" />
-                    </g>
-                    {/* Reduced-motion state: a still, dashed ring. 8 dashes of
-                        equal length round a circumference of 2π·10 ≈ 62.8. */}
-                    <circle
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        strokeDasharray="4.85 3"
-                        data-spinner-reduced=""
-                        className="hidden motion-reduce:inline"
-                    />
-                </svg>
-                {decorative ? null : (
-                    <span id={labelId} className="sr-only">
-                        {label}
-                    </span>
-                )}
-            </span>
-        )
-    }
+    ({ size = 'md', tone = 'accent', label = 'Loading', decorative = false, ...props }, ref) => (
+        <AutaraLoader
+            ref={ref}
+            size={SIZE[size]}
+            tone={tone}
+            label={label}
+            decorative={decorative}
+            data-spinner=""
+            {...props}
+        />
+    )
 )
 Spinner.displayName = 'Spinner'
 
