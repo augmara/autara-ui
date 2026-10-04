@@ -56,8 +56,11 @@
     outline-offset: 3px;
 }
 .social-btn[data-theme='dark']:focus-visible { outline-color: #d4ff4f; }
-.social-btn:disabled { cursor: not-allowed; opacity: 0.5; }
-.social-btn[aria-busy='true']:disabled { opacity: 1; }
+/* AUTM-1719: disabled keeps the provider's real colours (no 50% wash); the
+ * not-allowed cursor, aria-disabled and the absent hover and press say it.
+ * Busy keeps them too, with the progress cursor. */
+.social-btn:disabled { cursor: not-allowed; }
+.social-btn[aria-busy='true'] { cursor: progress; }
 
 /* Google: white, #747775 edge, #1F1F1F text; dark #131314, #8E918F, #E3E3E3. */
 .social-btn[data-provider='google'] {

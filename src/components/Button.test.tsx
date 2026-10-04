@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { IconButton } from "./IconButton";
 import { Button, buttonVariants } from "./Button";
 
 describe("Button — base rendering", () => {
@@ -19,11 +20,12 @@ describe("Button — base rendering", () => {
         expect(screen.getByRole("button")).toHaveAttribute("type", "submit");
     });
 
-    it("applies the disabled attribute and disabled:opacity utility", () => {
+    it("applies the disabled attribute and the not-allowed cursor, with no opacity wash (AUTM-1719)", () => {
         render(<Button disabled>Disabled</Button>);
         const btn = screen.getByRole("button");
         expect(btn).toBeDisabled();
-        expect(btn.className).toMatch(/disabled:opacity/);
+        expect(btn.className).toMatch(/disabled:cursor-not-allowed/);
+        expect(btn.className).not.toMatch(/disabled:opacity/);
     });
 
     it("applies fullWidth → w-full utility", () => {
@@ -366,8 +368,48 @@ describe("Button: busy (AUTM-1594, AUTM-1706)", () => {
         expect(onClick).not.toHaveBeenCalled();
     });
 
-    it("stays at full strength rather than the disabled 45%", () => {
-        expect(buttonVariants()).toMatch(/aria-busy:disabled:opacity-100/);
-        expect(buttonVariants()).toMatch(/disabled:opacity-45/);
+    it("stays at full strength: no opacity wash in any state (AUTM-1719)", () => {
+        expect(buttonVariants()).not.toMatch(/opacity-/);
+        expect(buttonVariants()).toMatch(/disabled:cursor-not-allowed/);
+        expect(buttonVariants()).toMatch(/aria-busy:cursor-progress/);
+    });
+});
+
+describe("Button: disabled keeps the real colour (AUTM-1719)", () => {
+    it.each(["primary", "strong", "quiet", "ghost", "link", "ondeep"] as const)(
+        "%s disabled carries exactly the resting classes plus nothing that mutes it",
+        (variant) => {
+            const { rerender } = render(<Button variant={variant}>Continue</Button>);
+            const resting = screen.getByRole("button").className;
+            rerender(<Button variant={variant} disabled>Continue</Button>);
+            const btn = screen.getByRole("button");
+            expect(btn.className).toBe(resting);
+            expect(btn.className).not.toMatch(/opacity|grayscale|saturate/);
+        },
+    );
+
+    it("says disabled out loud: aria-disabled, still natively disabled, no click", async () => {
+        const onClick = vi.fn();
+        render(<Button disabled onClick={onClick}>New booking</Button>);
+        const btn = screen.getByRole("button", { name: "New booking" });
+        expect(btn).toHaveAttribute("aria-disabled", "true");
+        expect(btn).toBeDisabled();
+        await userEvent.click(btn);
+        expect(onClick).not.toHaveBeenCalled();
+    });
+
+    it("an enabled or busy button carries no aria-disabled (busy says aria-busy)", () => {
+        const { rerender } = render(<Button>Continue</Button>);
+        expect(screen.getByRole("button")).not.toHaveAttribute("aria-disabled");
+        rerender(<Button busy>Continue</Button>);
+        expect(screen.getByRole("button")).not.toHaveAttribute("aria-disabled");
+        expect(screen.getByRole("button")).toHaveAttribute("aria-busy", "true");
+    });
+
+    it("IconButton inherits it", () => {
+        render(<IconButton icon={<span />} label="Notifications" disabled />);
+        const btn = screen.getByRole("button", { name: "Notifications" });
+        expect(btn).toHaveAttribute("aria-disabled", "true");
+        expect(btn.className).not.toMatch(/opacity/);
     });
 });

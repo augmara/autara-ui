@@ -34,7 +34,20 @@ import { AutaraLoader, type AutaraLoaderSize } from "./AutaraLoader";
  * button is disabled but stays at full strength. (Until AUTM-1706 a generic
  * ring took the leading icon's place, or was added beside the label, which
  * widened the button by the ring and a gap.)
- * Disabled is 45% and should carry its reason as the label or a `title`.
+ *
+ * AUTM-1719 — disabled keeps the variant's REAL fill and text colour (Don,
+ * 2026-10-04: "don't mute the button colours even if disabled, show the real
+ * colour, everywhere, also loading"). It was a 45% wash, which on lime read
+ * as a pale, broken button. A disabled button is now marked by
+ * `aria-disabled`, a not-allowed cursor, no hover step and no press, and it
+ * must say why beside it or in its label: a full-colour button that silently
+ * does nothing is worse than a pale one. So:
+ *   - A form's PRIMARY button is not disabled at all. It stays enabled and
+ *     validates on press: an inline message, announced, and focus on the
+ *     first field that needs attention. See the "Validate on press" story.
+ *   - A button that is genuinely unavailable keeps its colour, is disabled,
+ *     and carries the reason as text beside it (a `title` alone does not
+ *     reach touch or keyboard users).
  *
  * The legacy variant names still render, each as its sheet equivalent (see
  * LEGACY below), so a consumer bump changes the look and nothing else.
@@ -120,7 +133,7 @@ const LEGACY: Record<LegacyVariant, SheetVariant> = {
  * transition list replaces BASE's `transition-colors` in every consumer.
  */
 const BASE =
-  "inline-flex select-none items-center justify-center gap-2 text-center break-words min-w-fit font-medium leading-tight transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] disabled:cursor-not-allowed disabled:opacity-45 aria-busy:cursor-progress aria-busy:disabled:opacity-100";
+  "inline-flex select-none items-center justify-center gap-2 text-center break-words min-w-fit font-medium leading-tight transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] disabled:cursor-not-allowed aria-disabled:cursor-not-allowed aria-busy:cursor-progress";
 
 const SIZES: Record<Exclude<Size, "default">, string> = {
   sm: "min-h-11 rounded-[1.375rem] px-[min(1.125rem,5vw)] py-2 text-[0.9375rem]",
@@ -228,7 +241,15 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {...busyProps}
         {...(asChild
           ? rest
-          : { type: type ?? "button", disabled: disabled || busy, ...rest })}
+          : {
+              type: type ?? "button",
+              disabled: disabled || busy,
+              // AUTM-1719: said out loud, since the colour no longer says it.
+              // Busy is said by aria-busy instead (and keeps its progress
+              // cursor), though it is natively disabled too.
+              "aria-disabled": disabled ? true : undefined,
+              ...rest,
+            })}
       >
         {asChild ? (
           children

@@ -172,6 +172,15 @@ docs/
   layout at opacity 0, so the width holds and the accessible name is unchanged.
   A test that looks for the label by visible text still finds it in the DOM;
   one that expected the leading icon to be removed while busy will not.
+- **Buttons never mute** (AUTM-1719, Don 2026-10-04: "don't mute the button
+  colours even if disabled, show the real colour, everywhere, also loading").
+  Button, IconButton and SocialButton keep the variant's real fill and text
+  when disabled or busy: no opacity, no filter. Disabled is said by
+  `aria-disabled`, the not-allowed cursor and no hover or press; busy by
+  `aria-busy` and the mark. So a form's primary button is never disabled: it
+  validates on press (the "Validate on press" story). `Button.colour.test.ts`
+  holds every variant label to 4.5:1 on its fill in both themes, which is now
+  also its disabled and busy contrast.
 - **Button presses by default** (AUTM-1708): `motion-press`, or
   `motion-press-row` when `fullWidth`, never on `link`; `press={false}` opts
   out, and `buttonVariants` carries the same. So do IconButton (through
