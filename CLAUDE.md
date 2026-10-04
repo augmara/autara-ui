@@ -161,6 +161,14 @@ docs/
   both hold, so nothing is ever held at `opacity: 0` waiting for a script.
   Prefer it for new marketing work; `ScrollReveal` stays for consumers that
   already use it.
+- **Loading has three answers, and they are not interchangeable** (AUTM-1706).
+  `AutaraLoader` (the mark, turning) for app boot, a route with nothing to show
+  yet, and a button's busy state; `Skeleton` / `AsyncSkeleton` for content
+  whose shape is known; `Spinner` for work on something already on screen.
+  `Button busy` draws the mark OVER the label: the label and icons stay in the
+  layout at opacity 0, so the width holds and the accessible name is unchanged.
+  A test that looks for the label by visible text still finds it in the DOM;
+  one that expected the leading icon to be removed while busy will not.
 
 - **Never put type or colour classes on an `h1` to `h6`; put them on an
   element inside it.** merchant-mobile (`src/main.css`) and customer-web

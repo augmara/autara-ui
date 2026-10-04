@@ -227,7 +227,7 @@ export const Sheet: Story = {
               <Button variant="ondeep">Add to calendar</Button>
             </div>
           </Specimen>
-          <Specimen name="Busy and disabled" component="Button busy / disabled" note="Busy keeps the label and width. Disabled carries its reason as the label or a title.">
+          <Specimen name="Busy and disabled" component="Button busy / disabled" note="Busy turns the Autara mark where the label was; the label holds the width and stays the name. Disabled carries its reason as the label or a title.">
             <Button busy>Saving…</Button>
             <Button disabled title="Finish your profile to take bookings">New booking</Button>
           </Specimen>
