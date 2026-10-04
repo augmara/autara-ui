@@ -35,7 +35,9 @@ function Skeleton({ className, label = 'Loading', ...props }: SkeletonProps) {
         <div
             className={cn(
                 // AUTM-1594 — canvas v44 "Loading": band blocks, 14px radius.
-                'animate-pulse rounded-autara-md bg-[var(--band)]',
+                // AUTM-1678: the pulse is `.motion-skeleton` (1400ms, to 55%,
+                // off under reduced motion), not Tailwind's `animate-pulse`.
+                'motion-skeleton rounded-autara-md bg-[var(--band)]',
                 className
             )}
             {...(silent

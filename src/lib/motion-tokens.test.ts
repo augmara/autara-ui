@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { motionDurations, motionEasings, motionTokens, motionTransition } from './motion-tokens'
+import {
+    MOTION_STAGGER_CAP,
+    motionDurations,
+    motionEasings,
+    motionStaggerDelay,
+    motionTokens,
+    motionTransition,
+    type MotionTransitionName,
+} from './motion-tokens'
 
 /**
  * AUTM-1594 — the JS motion tokens and `utilities/animations.css` cannot
@@ -84,14 +92,42 @@ describe('motionTransition', () => {
         expect(motionTransition('panelOut')).toEqual({ duration: 0.12, ease: motionEasings.in })
     })
 
+    it('AUTM-1678: reveal, settle, hover, press and crossfade are not exits, so they run on ease-out', () => {
+        // The pairing used to be "ends in In means ease-out", which sent every
+        // new token without a suffix to the exit curve.
+        for (const name of ['reveal', 'settle', 'hover', 'press', 'crossfade', 'pageIn'] as const) {
+            expect(motionTransition(name).ease, name).toBe(motionEasings.out)
+        }
+        expect(motionTransition('pageOut')).toEqual({ duration: 0.12, ease: motionEasings.in })
+        expect(motionTransition('reveal')).toEqual({ duration: 0.48, ease: motionEasings.out })
+    })
+
     it('pairs every enter with ease-out and every exit with ease-in, as the CSS rules do', () => {
         // Read the pairing from the rules themselves, not from the name.
         for (const m of CSS.matchAll(/var\(--motion-([\w-]+)\)\s+var\(--motion-ease-(out|in)\)/g)) {
             const [, token, curve] = m
-            const name = camel(`--motion-${token}`) as keyof typeof motionDurations
+            const name = camel(`--motion-${token}`) as MotionTransitionName
             expect(motionTransition(name).ease, `${token} runs on ease-${curve} in the CSS`).toBe(
                 motionEasings[curve as 'out' | 'in']
             )
         }
+    })
+})
+
+describe('motionStaggerDelay (AUTM-1678)', () => {
+    it('steps 60ms for children 1 to 6, then holds at 300ms', () => {
+        expect([0, 1, 2, 3, 4, 5, 6, 7, 20].map(motionStaggerDelay)).toEqual([
+            0, 60, 120, 180, 240, 300, 300, 300, 300,
+        ])
+    })
+
+    it('is the stylesheet\'s own cap: six children step, the rest share the last step', () => {
+        expect(MOTION_STAGGER_CAP).toBe(6)
+        expect(CSS).toContain(':nth-child(n + 6) { --stagger-i: 5; }')
+    })
+
+    it('never returns a negative or fractional step', () => {
+        expect(motionStaggerDelay(-3)).toBe(0)
+        expect(motionStaggerDelay(2.7)).toBe(120)
     })
 })

@@ -56,12 +56,15 @@ const ScrollReveal = React.forwardRef<HTMLDivElement, ScrollRevealProps>(
             return () => observer.disconnect()
         }, [threshold, rootMargin, once, resolvedRef])
 
+        // AUTM-1678: `slide-left`, `slide-right` and `scale-in` were never
+        // defined, so those three animations rendered as the plain fade-up.
+        // These are the classes animations.css actually declares.
         const animationClass = {
             fade: 'animate-on-scroll',
             'slide-up': 'animate-on-scroll',
-            'slide-left': 'animate-on-scroll slide-left',
-            'slide-right': 'animate-on-scroll slide-right',
-            scale: 'animate-on-scroll scale-in',
+            'slide-left': 'animate-slide-left',
+            'slide-right': 'animate-slide-right',
+            scale: 'animate-scale',
         }[animation]
 
         return (

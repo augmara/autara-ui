@@ -229,7 +229,7 @@ export function StatTile({
                 <span
                     aria-hidden
                     className={cn(
-                        'block h-10 w-24 animate-pulse rounded-md',
+                        'block h-10 w-24 motion-skeleton rounded-md',
                         hero ? 'bg-[var(--on-deep)]/20' : 'bg-[var(--band-press)]',
                     )}
                 />

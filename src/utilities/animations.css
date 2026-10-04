@@ -1,11 +1,21 @@
 /* ─── Autara Animation Utilities ─── */
 
-/* Scroll-triggered reveal */
+/* Scroll-triggered reveal (`ScrollReveal`, legacy).
+ *
+ * AUTM-1678: retimed onto the motion system. It moved 28px over 700ms while
+ * `Reveal` moved 14px, so one page could carry two reveal distances; both are
+ * now the `--motion-reveal` rise (16px over 480ms on the house curve), and the
+ * stagger is `--motion-stagger` with the same cap as everywhere else: children
+ * 1 to 6 step by 60ms, the seventh onward share 300ms. Before, a seventh child
+ * had no delay at all and arrived ahead of the second.
+ *
+ * Prefer `Reveal` for new work: this family holds its block at opacity 0
+ * until a script adds `.is-visible`. */
 .animate-on-scroll {
     opacity: 0;
-    transform: translateY(28px);
-    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-        transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateY(16px);
+    transition: opacity var(--motion-reveal) var(--motion-ease-out),
+        transform var(--motion-reveal) var(--motion-ease-out);
 }
 .animate-on-scroll.is-visible {
     opacity: 1;
@@ -14,58 +24,80 @@
 
 /* Stagger children */
 .stagger-children .animate-on-scroll:nth-child(1) { transition-delay: 0ms; }
-.stagger-children .animate-on-scroll:nth-child(2) { transition-delay: 80ms; }
-.stagger-children .animate-on-scroll:nth-child(3) { transition-delay: 160ms; }
-.stagger-children .animate-on-scroll:nth-child(4) { transition-delay: 240ms; }
-.stagger-children .animate-on-scroll:nth-child(5) { transition-delay: 320ms; }
-.stagger-children .animate-on-scroll:nth-child(6) { transition-delay: 400ms; }
+.stagger-children .animate-on-scroll:nth-child(2) { transition-delay: calc(1 * var(--motion-stagger)); }
+.stagger-children .animate-on-scroll:nth-child(3) { transition-delay: calc(2 * var(--motion-stagger)); }
+.stagger-children .animate-on-scroll:nth-child(4) { transition-delay: calc(3 * var(--motion-stagger)); }
+.stagger-children .animate-on-scroll:nth-child(5) { transition-delay: calc(4 * var(--motion-stagger)); }
+.stagger-children .animate-on-scroll:nth-child(n + 6) { transition-delay: calc(5 * var(--motion-stagger)); }
 
-/* Slide variants */
+/* Slide and scale variants: the same token and the same 16px. */
 .animate-slide-left {
     opacity: 0;
-    transform: translateX(-40px);
-    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-        transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateX(-16px);
+    transition: opacity var(--motion-reveal) var(--motion-ease-out),
+        transform var(--motion-reveal) var(--motion-ease-out);
 }
 .animate-slide-left.is-visible { opacity: 1; transform: translateX(0); }
 
 .animate-slide-right {
     opacity: 0;
-    transform: translateX(40px);
-    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-        transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateX(16px);
+    transition: opacity var(--motion-reveal) var(--motion-ease-out),
+        transform var(--motion-reveal) var(--motion-ease-out);
 }
 .animate-slide-right.is-visible { opacity: 1; transform: translateX(0); }
 
 .animate-scale {
     opacity: 0;
-    transform: scale(0.92);
-    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-        transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: scale(0.96);
+    transition: opacity var(--motion-reveal) var(--motion-ease-out),
+        transform var(--motion-reveal) var(--motion-ease-out);
 }
 .animate-scale.is-visible { opacity: 1; transform: scale(1); }
 
-/* ─── Scroll-driven reveal (AUTM-1475) ───────────────────────────────────
+/* ─── Scroll-driven reveal (AUTM-1475, retimed AUTM-1678) ─────────────────
  *
  * `Reveal` renders `.reveal-view`. The class does NOTHING by default: server
  * HTML, an engine without scroll-driven animations, and a reduced-motion
  * user all get the block at rest. Only inside the two guards below does it
  * animate, tied to the block's own progress through the viewport, on the
- * compositor, with no listener. `entry 0%` to `entry 38%`: it has fully
- * arrived while the block's top third is still crossing the bottom edge.
+ * compositor, with no listener. `entry 0%` to `entry 40%`: it has fully
+ * arrived while the block's top 40% is still crossing the bottom edge.
+ * Scroll-driven ranges are LINEAR: the scroll is the easing.
+ *
+ * `Reveal stagger` renders `.reveal-stagger`: the block itself stays still and
+ * each DIRECT child reveals on its own view timeline, its range pushed later
+ * by its index. One stagger step is 5% of entry, which is `--motion-stagger`
+ * over `--motion-reveal` (60 / 480) of the 40% reveal range, so a scrolled
+ * stagger keeps the proportions of a timed one. A row of cards enters
+ * together and so steps; a column already steps by position and gains a
+ * little more. Children 1 to 6 step, the seventh onward share the sixth's
+ * offset (`--stagger-i`, set by the stagger index rules further down).
  *
  * `from` is 0.001, not 0: some engines skip painting a fully transparent
  * layer and then re-rasterise it on the first visible frame. */
 @keyframes autara-reveal {
-    from { opacity: 0.001; transform: translateY(14px); }
+    from { opacity: 0.001; transform: translateY(16px); }
     to { opacity: 1; transform: none; }
+}
+:root,
+:host {
+    /* Kept equal to 40% x stagger / reveal by motion-system.test.ts. */
+    --reveal-stagger-step: 5%;
 }
 @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
         .reveal-view {
             animation: autara-reveal linear both;
             animation-timeline: view();
-            animation-range: entry 0% entry 38%;
+            animation-range: entry 0% entry 40%;
+        }
+        .reveal-stagger > * {
+            animation: autara-reveal linear both;
+            animation-timeline: view();
+            animation-range:
+                entry calc(var(--stagger-i, 0) * var(--reveal-stagger-step))
+                entry calc(40% + var(--stagger-i, 0) * var(--reveal-stagger-step));
         }
     }
 }
@@ -166,6 +198,20 @@
     --motion-sheet-out: 200ms;
     --motion-nav-in: 250ms;
     --motion-nav-out: 200ms;
+
+    /* AUTM-1678: page content, what a page does that is not an overlay.
+     * Values, uses and the reduced-motion form of each are in the "Page
+     * content motion" block at the end of this file. */
+    --motion-reveal: 480ms;
+    --motion-stagger: 60ms;
+    --motion-settle: 280ms;
+    --motion-settle-delay: 120ms;
+    --motion-hover: 160ms;
+    --motion-press: 120ms;
+    --motion-page-in: 200ms;
+    --motion-page-out: 120ms;
+    --motion-skeleton: 1400ms;
+    --motion-crossfade: 160ms;
 
     /* The house easing — the same curve `.animate-on-scroll` above uses, so
      * a panel and a reveal feel like one product. */
@@ -525,8 +571,9 @@
 /* ─── Service card reveal (AUTM-1694) ────────────────────────────────────
  *
  * `ServiceCard revealIndex={i}`: each card in a list fades and rises 8px in,
- * 40ms after the one before, capped at the eighth so a long menu does not
- * keep the last card waiting. Opacity and transform only, on the sheet's
+ * one `--motion-stagger` after the one before, capped at the sixth so a long
+ * menu does not keep the last card waiting and no more than six move at once
+ * (AUTM-1678; it was 40ms capped at the eighth). Opacity and transform only, on the sheet's
  * entrance timing and the house curve.
  *
  * The whole rule sits inside `no-preference`, not under the global clamp
@@ -549,6 +596,240 @@
 @media (prefers-reduced-motion: no-preference) {
     .service-card-reveal {
         animation: autara-service-card-in var(--motion-sheet-in) var(--motion-ease-out) both;
-        animation-delay: calc(min(var(--service-card-index, 0), 8) * 40ms);
+        animation-delay: calc(min(var(--service-card-index, 0), 5) * var(--motion-stagger));
+    }
+}
+
+/* ─── Page content motion (AUTM-1678) ─────────────────────────────────────
+ *
+ * The overlay tokens above cover panels, dialogs, sheets and menus. These
+ * cover everything else a page does, so no consumer types a duration or a
+ * curve for any of it. Values and uses are from the 2026-10-03 motion
+ * research (knowledge/project_web_content_motion_research_2026_10_03.md,
+ * section 7b). Typed for JS in `lib/motion-tokens.ts`; the two are held
+ * equal by `motion-tokens.test.ts`.
+ *
+ *   token                    value          class / use
+ *   --motion-reveal          480ms          `.motion-stagger` children, the
+ *                                           legacy `.animate-on-scroll` family
+ *   --motion-stagger         60ms           per child, children 1 to 6; the
+ *                                           seventh onward share 300ms
+ *   --motion-settle          280ms after    `.motion-settle`: a device plate or
+ *   --motion-settle-delay    120ms          phone row below the LCP, on load
+ *   --motion-hover           160ms          `.motion-hover-lift` (pointer only)
+ *                                           and colour on every interactive class
+ *   --motion-press           120ms          `.motion-press` 97% for buttons and
+ *                                           tiles, `.motion-press-row` 98.5% for
+ *                                           full-width rows
+ *   --motion-page-in / -out  200 / 120ms    `.motion-page`: a route change via
+ *                                           `document.startViewTransition`
+ *   --motion-skeleton        1400ms         `.motion-skeleton` pulse, to 55%
+ *   --motion-crossfade       160ms          `.motion-crossfade`: content that
+ *                                           replaces a skeleton fades in
+ *
+ * Curves: every enter and every interactive response on `--motion-ease-out`,
+ * every exit on `--motion-ease-in`, scroll-driven ranges linear. The one
+ * exception is the skeleton pulse, which is neither an enter nor an exit but a
+ * loop, and runs on the symmetric `ease-in-out` so it has no visible seam.
+ *
+ * Rules that travel with the values:
+ *   - Transform and opacity only (`translate` and `scale` are transforms).
+ *     Nothing here animates a box, a filter or a shadow.
+ *   - The LCP element never animates. Hero copy is first paint; the plate
+ *     under it settles.
+ *   - One shot. Nothing re-animates on scroll back; only the skeleton loops.
+ *   - At most six things moving at once, which is what the stagger cap is for.
+ *   - Pointer affordances sit behind `(hover: hover)`, because `:hover`
+ *     sticks after a tap on an iPad.
+ *
+ * ─── Reduced motion, per token ──────────────────────────────────────────
+ *
+ * Designed, not only clamped. Every rule that moves sits inside
+ * `prefers-reduced-motion: no-preference`, so a reduced-motion user is not
+ * merely shown a shortened animation, they are shown the end state. That
+ * matters for anything with a delay: the global clamp above shortens
+ * `animation-duration` but not `animation-delay`, so a staggered child would
+ * sit invisible for its delay.
+ *
+ *   reveal, stagger, settle, page   none: content at rest, route swaps instantly
+ *   hover                           colour only: no lift, no icon scale
+ *   press                           none: the fill change is the feedback.
+ *                                   The research table said "keep"; its own
+ *                                   budget says every animation collapses to
+ *                                   opacity or nothing, and DurationPicker in
+ *                                   this package already drops its press under
+ *                                   `motion-reduce`, so this follows that.
+ *   skeleton                        pulse off: a still placeholder
+ *   crossfade                       stays, opacity only, 160ms
+ */
+
+/* ─── Stagger index ──────────────────────────────────────────────────────
+ *
+ * `--stagger-i` is a direct child's position, 0 to 5, for `.reveal-stagger`
+ * (scroll-driven, above) and `.motion-stagger` (timed, below). Set by
+ * position so server HTML carries it with no script. A consumer can override
+ * it with an inline style when DOM order is not reading order. Outside the
+ * `--motion-` namespace on purpose: that one holds tokens, and
+ * motion-tokens.test.ts reads every name in it as one. */
+.reveal-stagger > *,
+.motion-stagger > * { --stagger-i: 0; }
+.reveal-stagger > :nth-child(2),
+.motion-stagger > :nth-child(2) { --stagger-i: 1; }
+.reveal-stagger > :nth-child(3),
+.motion-stagger > :nth-child(3) { --stagger-i: 2; }
+.reveal-stagger > :nth-child(4),
+.motion-stagger > :nth-child(4) { --stagger-i: 3; }
+.reveal-stagger > :nth-child(5),
+.motion-stagger > :nth-child(5) { --stagger-i: 4; }
+.reveal-stagger > :nth-child(n + 6),
+.motion-stagger > :nth-child(n + 6) { --stagger-i: 5; }
+
+/* ─── Timed stagger: a list or a group arriving on first paint ───────────
+ *
+ * `.motion-stagger` on the parent; each direct child rises 16px and fades
+ * in over `--motion-reveal`, one `--motion-stagger` after the one before.
+ * For content that arrives with the page or with its data (a list's first
+ * paint, plan includes, hero figures BELOW the LCP). For a section further
+ * down the page, use `Reveal stagger`, which waits for the scroll. A group
+ * with stagger is done within 480 + 300ms. */
+@media (prefers-reduced-motion: no-preference) {
+    .motion-stagger > * {
+        animation: autara-reveal var(--motion-reveal) var(--motion-ease-out) both;
+        animation-delay: calc(var(--stagger-i, 0) * var(--motion-stagger));
+    }
+}
+
+/* ─── Settle: a plate arriving under the hero ────────────────────────────
+ *
+ * The waitlist's phone settle (customer-web `aww-settle`), promoted: up from
+ * 2.5rem and 98.5%, after the hero copy has painted. Transform only, so the
+ * plate's box is in place from the first frame and nothing shifts. */
+@keyframes autara-settle {
+    from { transform: translateY(2.5rem) scale(0.985); }
+    to { transform: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+    .motion-settle {
+        animation: autara-settle var(--motion-settle) var(--motion-ease-out) var(--motion-settle-delay) both;
+    }
+}
+
+/* ─── Hover and press ────────────────────────────────────────────────────
+ *
+ * Graduated from merchant-mobile (`.press-scope`), merchant-web and
+ * customer-web, which each typed
+ * `transition-[background-color,transform] duration-[...] active:scale-[0.97]`.
+ * Under Tailwind v4 that copy never animated the press: `scale-*` compiles to
+ * the standalone `scale` property, and a transition on `transform` does not
+ * cover it, so the button snapped to 97%. These transition `scale` and
+ * `translate` by name.
+ *
+ * Individual `scale` and `translate`, not `transform`, so a lifted card that
+ * is also pressed does both, and the keyframes above (which animate
+ * `transform`) compose with them. One transition list on all three classes,
+ * so they combine on one element without one cancelling the other's colour
+ * transition.
+ *
+ * Moving from a local copy: drop the local `transition-*`, `duration-*`,
+ * `ease-*` and `active:scale-*` classes in the same change, and any local
+ * rule that scales with `transform` (merchant-mobile `.press-scope`), or the
+ * two scales multiply to about 94%. */
+.motion-press,
+.motion-press-row,
+.motion-hover-lift {
+    transition:
+        color var(--motion-hover) var(--motion-ease-out),
+        background-color var(--motion-hover) var(--motion-ease-out),
+        border-color var(--motion-hover) var(--motion-ease-out),
+        text-decoration-color var(--motion-hover) var(--motion-ease-out),
+        opacity var(--motion-hover) var(--motion-ease-out),
+        translate var(--motion-hover) var(--motion-ease-out),
+        scale var(--motion-press) var(--motion-ease-out);
+}
+.motion-hover-icon {
+    transition: scale var(--motion-hover) var(--motion-ease-out);
+}
+@media (prefers-reduced-motion: no-preference) {
+    .motion-press:active:not(:disabled, [aria-disabled="true"]) {
+        scale: 0.97;
+    }
+    .motion-press-row:active:not(:disabled, [aria-disabled="true"]) {
+        scale: 0.985;
+    }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .motion-hover-lift:hover:not(:disabled, [aria-disabled="true"]) {
+        translate: 0 -2px;
+    }
+    .motion-hover-lift:hover:not(:disabled, [aria-disabled="true"]) .motion-hover-icon {
+        scale: 1.08;
+    }
+}
+
+/* ─── Page: a route change ───────────────────────────────────────────────
+ *
+ * Put `.motion-page` on the ONE element that changes with the route (the
+ * portal's main column, not the shell) and navigate inside
+ * `document.startViewTransition` (react-router's `viewTransition` does it).
+ * The old view fades out on `--motion-page-out`, the new one rises 8px and
+ * fades in on `--motion-page-in`. Where view transitions are unsupported the
+ * route simply swaps. The group does not animate its size: a taller page
+ * arrives at its own height rather than stretching into it. */
+.motion-page {
+    view-transition-name: autara-page;
+}
+@keyframes autara-page-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+}
+@keyframes autara-page-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+::view-transition-group(autara-page) {
+    animation: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+    ::view-transition-old(autara-page) {
+        animation: autara-page-out var(--motion-page-out) var(--motion-ease-in) both;
+    }
+    ::view-transition-new(autara-page) {
+        animation: autara-page-in var(--motion-page-in) var(--motion-ease-out) both;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(autara-page),
+    ::view-transition-new(autara-page) {
+        animation: none;
+    }
+}
+
+/* ─── Skeleton, and the content that replaces it ─────────────────────────
+ *
+ * `.motion-skeleton` is the pulse every library skeleton runs (Skeleton,
+ * AsyncSkeleton, KpiCard, StatTile, ServiceCard), to 55% and back over
+ * 1400ms. It replaces Tailwind's `animate-pulse` (2s, to 50%) here and the
+ * 1.4s and 1.6s copies in customer-web. A loop is the one exception to "one
+ * shot": it says "still working".
+ *
+ * `.motion-crossfade` goes on the content that arrives in the skeleton's
+ * place: it fades in over 160ms, so the swap reads as the same block
+ * resolving rather than a cut. Opacity only, so it is kept under reduced
+ * motion (the override below lifts the global clamp for this one class). */
+@keyframes autara-skeleton {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
+}
+@media (prefers-reduced-motion: no-preference) {
+    .motion-skeleton {
+        animation: autara-skeleton var(--motion-skeleton) ease-in-out infinite;
+    }
+}
+.motion-crossfade {
+    animation: autara-fade-in var(--motion-crossfade) var(--motion-ease-out) both;
+}
+@media (prefers-reduced-motion: reduce) {
+    .motion-crossfade {
+        animation-duration: var(--motion-crossfade) !important;
     }
 }
