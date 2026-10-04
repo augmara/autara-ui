@@ -45,6 +45,8 @@ export {
     ProgressSteps, type ProgressStepsProps,
     // AUTM-1046 — indeterminate busy indicator for work in progress.
     Spinner, type SpinnerProps, type SpinnerSize, type SpinnerTone,
+    // AUTM-1706
+    AutaraLoader, type AutaraLoaderProps, type AutaraLoaderSize, type AutaraLoaderTone,
     MultiSelect, type MultiSelectOption, type MultiSelectProps,
     Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption,
     // v1.1.0 — promoted from autara-customer-web

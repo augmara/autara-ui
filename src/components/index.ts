@@ -145,6 +145,8 @@ export { Progress } from './Progress'
 export { ProgressSteps, type ProgressStepsProps } from './ProgressSteps'
 // AUTM-1046 — indeterminate busy indicator for work in progress (uploads, saves).
 export { Spinner, type SpinnerProps, type SpinnerSize, type SpinnerTone } from './Spinner'
+// AUTM-1706: the Autara mark as a loader; Button's busy state uses it.
+export { AutaraLoader, type AutaraLoaderProps, type AutaraLoaderSize, type AutaraLoaderTone } from './AutaraLoader'
 export { MultiSelect, type MultiSelectOption, type MultiSelectProps } from './MultiSelect'
 
 export {

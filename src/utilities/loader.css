@@ -1,0 +1,56 @@
+/* ─── AutaraLoader (AUTM-1706) ────────────────────────────────────────────
+ *
+ * The mark turns once per `--motion-skeleton` (1400ms), the motion system's
+ * one loop, so a loader and a skeleton on the same page keep one rhythm. The
+ * fallback is that same value, for a consumer whose stylesheet predates the
+ * token (AUTM-1678).
+ *
+ * Linear, because a turn has no start or end; like the skeleton pulse it is a
+ * loop, not an enter or an exit, so it is not on the two curves.
+ *
+ * The animated element is the `<svg>` itself, a CSS box, rotated with
+ * `transform`: one compositor layer, nothing inside the SVG repaints, which
+ * is what keeps it at 60fps on a mid phone while the page under it works.
+ *
+ * Reduced motion: no turn. The rays go to full strength, so it is the true
+ * logo, and the mark breathes between 100% and 55% opacity on the same
+ * 1400ms. Opacity only. The global clamp in animations.css would cut that
+ * to one 0.01ms frame, so the duration and the loop are restated here with
+ * `!important`, for this one class: it is the only signal left that the
+ * page is still working. */
+@keyframes autara-loader-turn {
+    to {
+        transform: rotate(1turn);
+    }
+}
+
+@keyframes autara-loader-breathe {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.55;
+    }
+}
+
+.autara-loader {
+    transform-origin: 50% 50%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .autara-loader {
+        animation: autara-loader-turn var(--motion-skeleton, 1400ms) linear infinite;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .autara-loader {
+        animation: autara-loader-breathe var(--motion-skeleton, 1400ms) ease-in-out infinite;
+        animation-duration: var(--motion-skeleton, 1400ms) !important;
+        animation-iteration-count: infinite !important;
+    }
+    .autara-loader-ray {
+        opacity: 1;
+    }
+}

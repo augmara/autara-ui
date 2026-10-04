@@ -305,22 +305,54 @@ describe("buttonVariants — legacy CVA helper", () => {
     });
 });
 
-describe("Button — busy (AUTM-1594)", () => {
-    it("keeps the label, shows a ring, and says it is busy", () => {
+describe("Button: busy (AUTM-1594, AUTM-1706)", () => {
+    it("keeps the label as its name, shows the Autara mark, and says it is busy", () => {
         const { container } = render(<Button busy>Saving</Button>);
         const btn = screen.getByRole("button", { name: "Saving" });
         expect(btn).toHaveAttribute("aria-busy", "true");
         expect(btn).toBeDisabled();
-        expect(container.querySelector(".animate-spin")).not.toBeNull();
+        expect(container.querySelector("svg.autara-loader")).not.toBeNull();
+        // The mark is decorative: the button is already named and aria-busy,
+        // so a second "Loading" status inside it would be read twice.
+        expect(screen.queryByRole("status")).toBeNull();
+        expect(container.querySelector(".animate-spin")).toBeNull();
     });
 
-    it("puts the ring where the leading icon was", () => {
-        render(
-            <Button busy leadingIcon={<span data-testid="lead">L</span>}>
+    it("holds the width: label and icons stay in the layout, only transparent", () => {
+        const { container } = render(
+            <Button busy leadingIcon={<span data-testid="lead">L</span>} trailingIcon={<span data-testid="trail">T</span>}>
                 Save
             </Button>,
         );
-        expect(screen.queryByTestId("lead")).not.toBeInTheDocument();
+        const btn = container.querySelector("button")!;
+        const resting = screen.getByTestId("lead").parentElement!;
+        expect(resting).toHaveClass("opacity-0");
+        expect(resting).toHaveTextContent("LSaveT");
+        expect(screen.getByTestId("trail").parentElement).toBe(resting);
+        // The mark sits over it, out of flow, so it adds nothing to the width.
+        const overlay = container.querySelector("svg.autara-loader")!.closest(".absolute")!;
+        expect(overlay).toHaveClass("inset-0");
+        expect(btn).toHaveClass("relative");
+    });
+
+    it.each([
+        ["sm", 20],
+        ["md", 20],
+        ["lg", 24],
+    ] as const)("size %s uses the %ipx mark", (size, px) => {
+        const { container } = render(
+            <Button busy size={size}>
+                Save
+            </Button>,
+        );
+        expect(container.querySelector("[data-size]")).toHaveAttribute("data-size", String(px));
+    });
+
+    it("renders as before when not busy: no wrapper, no mark", () => {
+        const { container } = render(<Button leadingIcon={<span data-testid="lead">L</span>}>Save</Button>);
+        expect(screen.getByTestId("lead").parentElement).toBe(container.querySelector("button"));
+        expect(container.querySelector("svg.autara-loader")).toBeNull();
+        expect(container.querySelector("button")).not.toHaveClass("relative");
     });
 
     it("does not fire onClick while busy", async () => {

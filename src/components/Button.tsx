@@ -1,7 +1,7 @@
 import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cn } from "../lib/cn";
-import { Spinner } from "./Spinner";
+import { AutaraLoader, type AutaraLoaderSize } from "./AutaraLoader";
 
 /**
  * Button — the single canonical Autara CTA primitive.
@@ -27,8 +27,13 @@ import { Spinner } from "./Spinner";
  * Sizes: `sm` 44 → `md`/`default` 48 → `lg` 52; `icon` is a 44px disc
  * (prefer `IconButton`, which requires the label an icon-only control needs).
  *
- * `busy` keeps the label and swaps the leading icon (or adds one) for a ring
- * in the label's colour; the button is disabled but stays at full strength.
+ * `busy` (AUTM-1706) shows the Autara mark, turning, in the label's colour and
+ * centred where the label was. The label and icons stay in the layout and in
+ * the accessibility tree, only transparent, so the button keeps its exact
+ * width and a screen reader still hears its name, with `aria-busy`. The
+ * button is disabled but stays at full strength. (Until AUTM-1706 a generic
+ * ring took the leading icon's place, or was added beside the label, which
+ * widened the button by the ring and a gap.)
  * Disabled is 45% and should carry its reason as the label or a `title`.
  *
  * The legacy variant names still render, each as its sheet equivalent (see
@@ -132,6 +137,14 @@ const VARIANT_CLASSES: Record<SheetVariant, string> = {
     "bg-transparent text-[var(--text-strong)] not-disabled:hover:bg-[var(--band)]",
 };
 
+/** The busy mark per size: 20px in a 44 or 48px button, 24px in the 52px one. */
+const BUSY_LOADER: Record<Exclude<Size, "default">, AutaraLoaderSize> = {
+  sm: 20,
+  md: 20,
+  lg: 24,
+  icon: 20,
+};
+
 /** Resolve a legacy name to the sheet variant that does its job. */
 export function resolveButtonVariant(variant: Variant): SheetVariant {
   return (LEGACY as Record<string, SheetVariant>)[variant] ?? (variant as SheetVariant);
@@ -151,8 +164,9 @@ export interface ButtonProps
   /** Compose with another component (e.g. framework Link) via Radix Slot. */
   asChild?: boolean;
   /**
-   * Work in progress: keeps the label, shows a ring in the leading icon's
-   * place, sets `aria-busy` and disables the button at full strength.
+   * Work in progress: the Autara mark turns where the label was, the label
+   * stays for screen readers and holds the width, `aria-busy` is set and the
+   * button is disabled at full strength.
    */
   busy?: boolean;
 }
@@ -186,6 +200,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           SIZES[resolvedSize],
           VARIANT_CLASSES[resolveButtonVariant(variant)],
           fullWidth && "w-full",
+          busy && !asChild && "relative",
           className,
         )}
         {...busyProps}
@@ -195,9 +210,23 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       >
         {asChild ? (
           children
+        ) : busy ? (
+          <>
+            {/* The resting content, transparent: it holds the width and stays
+                the button's accessible name. `gap-[inherit]` keeps the same
+                spacing it had as direct children. */}
+            <span className="inline-flex min-w-0 items-center justify-center gap-[inherit] opacity-0">
+              {leadingIcon}
+              {children}
+              {trailingIcon}
+            </span>
+            <span className="absolute inset-0 flex items-center justify-center">
+              <AutaraLoader size={BUSY_LOADER[resolvedSize]} tone="current" decorative />
+            </span>
+          </>
         ) : (
           <>
-            {busy ? <Spinner size="sm" tone="current" decorative /> : leadingIcon}
+            {leadingIcon}
             {children}
             {trailingIcon}
           </>
