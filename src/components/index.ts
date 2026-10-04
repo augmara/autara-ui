@@ -168,7 +168,16 @@ export { LockedFeature, type LockedFeatureProps } from './LockedFeature'
 export { MerchantCard, type MerchantCardProps, type MerchantBadge, type MerchantMode } from './MerchantCard'
 export { SectionHeading, type SectionHeadingProps } from './SectionHeading'
 export { CarouselHeader, type CarouselHeaderProps } from './CarouselHeader'
-export { ServiceCard, type ServiceCardProps } from './ServiceCard'
+export {
+    ServiceCard,
+    ServiceCardSkeleton,
+    type ServiceCardProps,
+    type ServiceCardSkeletonProps,
+    type ServiceCardLayout,
+    type ServiceCardChip,
+    type ServiceCardPriceLine,
+    type ServiceCardTestIds,
+} from './ServiceCard'
 export { TrustItem, type TrustItemProps } from './TrustItem'
 export { SectionBand, type SectionBandProps } from './SectionBand'
 export { StepCard, type StepCardProps } from './StepCard'
