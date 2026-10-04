@@ -5,15 +5,14 @@ import { Disclosure } from './Disclosure'
 let reduced = false
 beforeEach(() => {
     reduced = false
-    vi.useFakeTimers()
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'requestAnimationFrame', 'cancelAnimationFrame'] })
     window.matchMedia = vi.fn((query: string) => ({
         matches: query.includes('reduce') ? reduced : false,
         media: query,
         addEventListener: vi.fn(),
         removeEventListener: vi.fn(),
     })) as unknown as typeof window.matchMedia
-    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => setTimeout(() => cb(0), 16) as unknown as number)
-    vi.stubGlobal('cancelAnimationFrame', (id: number) => clearTimeout(id))
+    // Fake timers drive requestAnimationFrame too (a frame is 16ms).
 })
 afterEach(() => {
     vi.useRealTimers()
@@ -103,6 +102,17 @@ describe('Disclosure', () => {
             details().dispatchEvent(new Event('toggle'))
         })
         expect(details()).toHaveAttribute('data-expanded', 'true')
+    })
+
+    it('passes summaryProps to the summary, a test id for example', () => {
+        render(
+            <Disclosure summary="Q" data-testid="d" summaryProps={{ 'data-testid': 'faq-1-toggle' }}>
+                A
+            </Disclosure>
+        )
+        expect(screen.getByTestId('faq-1-toggle').tagName).toBe('SUMMARY')
+        fireEvent.click(screen.getByTestId('faq-1-toggle'))
+        expect(details().open).toBe(true)
     })
 
     it('marks itself enhanced once hydrated, so the no-JavaScript styles step aside', () => {

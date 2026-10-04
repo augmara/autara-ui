@@ -8,6 +8,7 @@ import {
     useRef,
     useState,
     type DetailsHTMLAttributes,
+    type HTMLAttributes,
     type MouseEvent,
     type ReactNode,
 } from 'react'
@@ -56,6 +57,8 @@ export interface DisclosureProps extends Omit<DetailsHTMLAttributes<HTMLDetailsE
     /** `chevron` turns half a turn; `plus` turns to an ×. */
     icon?: 'chevron' | 'plus'
     summaryClassName?: string
+    /** Extra attributes for the <summary>, a test id for example. */
+    summaryProps?: HTMLAttributes<HTMLElement> & { [key: `data-${string}`]: string | undefined }
     contentClassName?: string
     /** Called once the open state changes. */
     onOpenChange?: (open: boolean) => void
@@ -75,6 +78,7 @@ export const Disclosure = forwardRef<HTMLDetailsElement, DisclosureProps>(functi
         icon = 'chevron',
         className,
         summaryClassName,
+        summaryProps,
         contentClassName,
         onOpenChange,
         ...rest
@@ -161,7 +165,7 @@ export const Disclosure = forwardRef<HTMLDetailsElement, DisclosureProps>(functi
             onToggle={onToggle}
             {...rest}
         >
-            <summary className={cn('disclosure-summary', summaryClassName)} onClick={onSummaryClick}>
+            <summary {...summaryProps} className={cn('disclosure-summary', summaryClassName)} onClick={onSummaryClick}>
                 <span className="disclosure-label">{summary}</span>
                 <span className="disclosure-icon" aria-hidden="true">
                     {icon === 'plus' ? (

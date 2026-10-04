@@ -13,9 +13,8 @@ function scrollTo(y: number) {
 }
 
 beforeEach(() => {
-    vi.useFakeTimers()
-    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => setTimeout(() => cb(0), 16) as unknown as number)
-    vi.stubGlobal('cancelAnimationFrame', (id: number) => clearTimeout(id))
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'requestAnimationFrame', 'cancelAnimationFrame'] })
+    // Fake timers drive requestAnimationFrame too (a frame is 16ms).
     Object.defineProperty(window, 'scrollY', { value: 0, configurable: true })
 })
 afterEach(() => {
