@@ -1,58 +1,30 @@
 /* ─── Autara Typography ──────────────────────────────────────────────────
  *
- * Satoshi is bundled inside the package. v1.0.x required consumers to
- * load the font themselves via next/font/local; v1.1.0 makes
- * `@import "@autara-au/autara-ui/tokens"` enough.
+ * This package ships NO font files and declares NO @font-face (AUTM-1724).
  *
- * Each CSS weight maps to the face designed for it (AUTM-1568). This file
- * used to say Satoshi has no Bold and mapped Satoshi-Black to 700. Satoshi
- * does ship a Bold, and the fonts' own OS/2 weight classes are Bold 700 and
- * Black 900. With Black at 700, every bold label, button and title in every
- * consumer rendered the heaviest face, and a heading set at 900 had no face
- * at all, so it fell back to that same Black. merchant-web had already
- * worked round it with a local Bold (AUTM-839).
+ * Satoshi is licensed under the ITF Free Font License v2.0. Section 01 lets
+ * each of our apps self-host it; section 02 forbids making the files
+ * available to anyone else. This repository is PUBLIC, so the files cannot
+ * live here or in the published package. Releases from 1.1.0 until this one
+ * bundled them; old commits still contain them.
  *
- * Weights: 400 / 500 / 700 for body and UI everywhere. 900 (Black) is for
- * DISPLAY headlines on the Autara Web marketing surfaces only (AUTM-1513,
- * Don, 2026-09-29). Never 600 or 800. Light (300) is loaded for
- * completeness but consumers should NOT use it.
+ * The contract: these tokens name the family, "Satoshi", and every consumer
+ * declares its own @font-face for that family from its own private copy of
+ * Fontshare's official files, unaltered:
+ *
+ *   400 Satoshi-Regular   500 Satoshi-Medium
+ *   700 Satoshi-Bold      900 Satoshi-Black
+ *
+ * Each CSS weight is served by the face drawn for it (AUTM-1568: Bold at 700,
+ * Black at 900, never Black at 700). Weights: 400 / 500 / 700 for body and
+ * UI everywhere; 900 for display figures and dialog and sheet titles (Don,
+ * 2026-10-02). Never 300, 600 or 800.
+ *
+ * A consumer that declares no "Satoshi" faces renders the system stack that
+ * follows it in --font-brand. A consumer that declares only SOME weights is
+ * worse: the browser draws every weight with the nearest face it has, so a
+ * page that declares only Black renders its body text in Black.
  */
-
-@font-face {
-    font-family: "Satoshi";
-    src: url("../fonts/Satoshi-Light.otf") format("opentype");
-    font-weight: 300;
-    font-style: normal;
-    font-display: swap;
-}
-@font-face {
-    font-family: "Satoshi";
-    src: url("../fonts/Satoshi-Regular.otf") format("opentype");
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-}
-@font-face {
-    font-family: "Satoshi";
-    src: url("../fonts/Satoshi-Medium.otf") format("opentype");
-    font-weight: 500;
-    font-style: normal;
-    font-display: swap;
-}
-@font-face {
-    font-family: "Satoshi";
-    src: url("../fonts/Satoshi-Bold.otf") format("opentype");
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
-}
-@font-face {
-    font-family: "Satoshi";
-    src: url("../fonts/Satoshi-Black.otf") format("opentype");
-    font-weight: 900;
-    font-style: normal;
-    font-display: swap;
-}
 
 @theme inline {
     /* Primary brand font — referenced by consumers as

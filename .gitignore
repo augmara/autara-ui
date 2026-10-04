@@ -23,3 +23,8 @@ coverage/
 
 # Local design-sync tooling config, not part of the package.
 .design-sync/
+
+# AUTM-1724: a developer's own Satoshi files for local Storybook previews.
+# This repo is PUBLIC and the font licence forbids publishing the files, so
+# they must never be committed. See .storybook/main.ts.
+.storybook/local-fonts/

@@ -25,7 +25,7 @@ Component architecture](../CLAUDE.md#component-architecture--storybook-first-alw
 
 | Layer | Choice |
 |---|---|
-| Build | `tsc` (no bundler — autara-ui ships .js + .d.ts + .css + fonts as-is) |
+| Build | `tsc` (no bundler — autara-ui ships .js + .d.ts + .css as-is; NO fonts, AUTM-1724) |
 | Components | React 19 + Radix primitives + CVA + tailwind-merge |
 | Tokens | CSS custom properties via Tailwind v4 `@theme inline` |
 | Storybook | v10 + `@storybook/react-vite` + Tailwind v4 via `@tailwindcss/vite` |
@@ -54,7 +54,7 @@ src/
 │   ├── colors.css          # semantic surface stack + brand colors
 │   ├── shadows.css         # ALL evaluate to `none` (Autara house rule)
 │   ├── radii.css
-│   ├── typography.css      # @font-face + --font-brand
+│   ├── typography.css      # --font-brand + type scale (no @font-face, AUTM-1724)
 │   └── index.css           # @import all
 ├── utilities/              # CSS utility classes
 │   ├── forms.css           # .field-input, .field-textarea, .input-light alias
@@ -63,7 +63,6 @@ src/
 │   ├── noise.css           # .noise-overlay
 │   ├── buttons.css, gradients.css, sections.css, animations.css
 │   └── index.css
-├── fonts/                  # Satoshi .otf — bundled in v1.1.0+
 ├── preset/index.mjs        # Tailwind v4 preset (consumers import this)
 ├── lib/cn.ts               # clsx + tailwind-merge helper
 └── index.ts                # public package surface
@@ -123,14 +122,14 @@ docs/
   brand purple in dark. Don't reach for `--surface-inverse` on a CTA —
   that token inverts (correct for a Tooltip/Toast capsule, wrong for a
   button, which turned into a white slab on dark before this landed).
-- **Satoshi typography** — bundled. Use weights 400 / 500 / 700 for body
-  and UI; 700 is Satoshi Bold. 900 is Satoshi Black, for display headlines
-  on the Autara Web marketing surfaces only (AUTM-1513). Never 300, 600 or
-  800. *Corrected 2026-10-01 (AUTM-1568): this said "Black mapped to 700",
+- **Satoshi typography** — NOT bundled since AUTM-1724: the tokens name the
+  family and every consumer self-hosts the faces (see Known gotchas). Use
+  weights 400 / 500 / 700 for body and UI; 700 is Satoshi Bold. 900 is
+  Satoshi Black, for display figures and dialog and sheet titles (Don,
+  2026-10-02). Never 300, 600 or 800. *Corrected 2026-10-01 (AUTM-1568): this said "Black mapped to 700",
   and the package did exactly that, so every bold label in every consumer
-  rendered Black and a 900 heading had no face of its own.
-  `src/tokens/typography.test.ts` now checks each weight against the font's
-  own OS/2 weight class.*
+  rendered Black and a 900 heading had no face of its own. The weight to
+  file mapping now lives in each consumer's own @font-face.*
 - **Focus signature (v2.4): warm-cream tint + solid brand-purple border, NO
   halo** on focused inputs (`.field-input`). Corrected 2026-09-01 — this line
   used to claim a "4px brand-purple halo", and `src/utilities/forms.css` says
@@ -142,6 +141,21 @@ docs/
   with a hairline tick (`::before`) — anchors every section heading
 
 ## Known gotchas
+
+- **Never commit a font file to this repo, and never add an @font-face that
+  points at one** (AUTM-1724, Don 2026-10-04). This repository is PUBLIC and
+  Satoshi's licence (ITF FFL v2.0, section 02) forbids making the files
+  available to anyone else; section 01 lets each app self-host its own copy.
+  So the package names the family `"Satoshi"` in `--font-brand` and nothing
+  more, and every consumer declares its own faces for 400, 500, 700 and 900
+  from Fontshare's official files, unaltered, in a PRIVATE repo. A consumer
+  that declares only some weights draws every weight with the nearest face it
+  has (only Black declared means body text in Black). Old commits still
+  contain the .otf files; purging history needs a force-push and is Don's
+  call. `src/tokens/typography.test.ts` fails if a font file or a font URL
+  comes back. Storybook renders the system stack unless you drop your own
+  WOFF2s into the gitignored `.storybook/local-fonts/`, which only
+  `storybook dev` serves; `storybook build` never includes them.
 
 - **`BloomField` is GPU work and belongs on a hero and a footer only**
   (AUTM-1475, Don 2026-09-28). It is `GradientGround` with a WebGL2 canvas

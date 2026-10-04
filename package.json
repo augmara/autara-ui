@@ -28,8 +28,7 @@
     "dist",
     "src/tokens",
     "src/utilities",
-    "src/preset",
-    "src/fonts"
+    "src/preset"
   ],
   "scripts": {
     "build": "tsc && node scripts/fix-esm-extensions.mjs",
