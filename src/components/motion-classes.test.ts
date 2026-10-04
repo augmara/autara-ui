@@ -143,6 +143,7 @@ describe('every animated surface is wired to a rule that exists', () => {
         ['PhoneInput.tsx', ['floating-panel']],
         ['Popover.tsx', ['floating-panel']],
         ['NavigationMenu.tsx', ['nav-menu-content', 'nav-menu-viewport', 'nav-menu-indicator']],
+        ['ServiceCard.tsx', ['service-card-reveal']],
     ]
 
     it.each(WIRING)('%s carries its motion classes', (file, classes) => {

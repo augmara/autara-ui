@@ -162,6 +162,14 @@ docs/
   Prefer it for new marketing work; `ScrollReveal` stays for consumers that
   already use it.
 
+- **Never put type or colour classes on an `h1` to `h6`; put them on an
+  element inside it.** merchant-mobile (`src/main.css`) and customer-web
+  (`src/app/globals.css`) both style headings with an UNLAYERED rule (colour
+  `--text-strong`, line-height 1.1, -0.02em tracking), and unlayered CSS beats
+  every Tailwind utility on the same element. Storybook's own heading rule is
+  layered, so a story looks right while a consumer paints, for example,
+  ServiceCard's selected name ink on deep purple. Found under AUTM-1694;
+  `ServiceCard.test.tsx` pins it.
 - Storybook 10's default canvas is dark; `storybook.css` forces
   warm-cream via `!important` on `html`, `body`, `#storybook-root`,
   `.docs-story`, `.sb-show-main`, `.sbdocs-*` so stories render in the
