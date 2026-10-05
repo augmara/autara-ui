@@ -28,11 +28,11 @@ describe('PageContainer', () => {
         expect(screen.getByTestId('track').firstElementChild).toHaveClass('page-measure')
     })
 
-    it('grows to 1440px of content with a gutter from 16px to 96px, and a 68ch measure', () => {
+    it('grows to 1440px of content with a gutter from 16px to 96px, and a 30em measure', () => {
         const tokens = css('tokens/layout.css')
         expect(tokens).toMatch(/--page-max:\s*90rem;/)
         expect(tokens).toMatch(/--page-gutter:\s*clamp\(1rem,[^;]+,\s*6rem\);/)
-        expect(tokens).toMatch(/--page-measure:\s*68ch;/)
+        expect(tokens).toMatch(/--page-measure:\s*30em;/)
         const rules = css('utilities/layout.css')
         expect(rules).toMatch(/max-width:\s*calc\(var\(--page-max\) \+ 2 \* var\(--page-gutter\)\)/)
         expect(rules).toMatch(/padding-inline:\s*var\(--page-gutter\)/)

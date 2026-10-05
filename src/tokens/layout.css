@@ -10,10 +10,14 @@
  *   --page-gutter   the side gutter, fluid: 16px on a 390 phone, rising
  *                   with the screen to 96px at 1440 and holding there. In
  *                   rem, so 200% text doubles the floor and the cap with it.
- *   --page-measure  the readable line for long body text, about 65 to 70
- *                   characters of the body face. Wide pages put sections,
- *                   grids and product visuals on the full track and keep
- *                   running text to this.
+ *   --page-measure  the readable line for long body text: 30em, which is
+ *                   67 characters a line on average in Satoshi (63 to 72,
+ *                   measured over three paragraphs of product copy). Not
+ *                   `ch`: a ch is the width of "0", which Satoshi draws
+ *                   wide, so 68ch set lines of about 103 characters. In
+ *                   em, so it follows the text's own size. Wide pages put
+ *                   sections, grids and product visuals on the full track
+ *                   and keep running text to this.
  *
  * `.page-container` (utilities/layout.css) and the PageContainer component
  * use them. One value per idea, so both sites move together.
@@ -22,5 +26,5 @@
 :host {
     --page-max: 90rem;
     --page-gutter: clamp(1rem, 7.62vw - 0.857rem, 6rem);
-    --page-measure: 68ch;
+    --page-measure: 30em;
 }

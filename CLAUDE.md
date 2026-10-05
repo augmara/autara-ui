@@ -189,7 +189,9 @@ docs/
 - **`PageContainer` / `.page-container` is the page track** (AUTM-1739):
   1440px of content (`--page-max`) between a fluid `--page-gutter` (16px to
   96px). Sections, grids and product visuals take the full track; running
-  text takes `.page-measure` (68ch). Change the tokens, not the class.
+  text takes `.page-measure` (30em, about 67 characters of Satoshi). Never
+  `ch` for a measure here: Satoshi's "0" is wide, so 68ch set ~103
+  characters a line. Change the tokens, not the class.
 - **`ScrollStory` pins at `top: 0`, never under a header offset** (AUTM-1679).
   The room for a fixed header is padding inside the pin
   (`--scroll-story-top`), so a header that hides and shows on scroll
