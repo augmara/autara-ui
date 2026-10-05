@@ -2,7 +2,8 @@
 export {
     GradientBar,
     Button, buttonVariants, type ButtonProps,
-    IconButton, type IconButtonProps,
+    IconButton, type IconButtonProps, type IconButtonTone, type IconButtonSize, resolveIconButtonTone,
+    CloseButton, type CloseButtonProps, CloseGlyph,
     Input, inputVariants, type InputProps,
     PhoneInput, DEFAULT_COUNTRIES, findCountryByIso, type PhoneInputProps, type PhoneCountry,
     Textarea, textareaVariants, type TextareaProps,

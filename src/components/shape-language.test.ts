@@ -66,9 +66,10 @@ const KEEPS: Record<string, string> = {
     'Stepper.tsx': 'the 28px step discs and the bars\' round caps, canvas v44 "Steps and progress" (AUTM-1594)',
     'ProgressSteps.tsx': 'a state bar per step; the round cap is what makes it read as fill, as Progress',
     'Countdown.tsx': 'the countdown is a 32px pill on canvas v44 (AUTM-1594), a status not an action',
-    'Dialog.tsx': 'the 44px close disc, an icon disc like IconButton (AUTM-1594)',
-    'Sheet.tsx': 'the close disc, drawn at 28px with a 44px hit area, the quiet sibling of Dialog\'s (AUTM-1594); the bottom sheet\'s grabber pill',
-    'Toast.tsx': 'the status dot, and the action pill and dismiss disc on the capsule (AUTM-1594)',
+    // AUTM-1756: Dialog's close is CloseButton now, so Dialog.tsx draws no
+    // round of its own and came off this list; the disc is Button's size="icon".
+    'Sheet.tsx': 'the bottom sheet\'s grabber pill (AUTM-1594); the close is CloseButton, Button\'s icon disc (AUTM-1756)',
+    'Toast.tsx': 'the status dot and the action pill on the capsule (AUTM-1594); the dismiss is CloseButton (AUTM-1756)',
     'EmptyState.tsx': 'the 44px icon disc, canvas v44 "Empty" (AUTM-1594)',
     'LockedFeature.tsx': 'the optional icon disc (AUTM-1594)',
     'SwatchRadioGroup.tsx': 'colour swatches are 44px circles on canvas v50, a choice of colour, not an action (AUTM-1591)',

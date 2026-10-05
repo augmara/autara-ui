@@ -212,6 +212,26 @@
     --hairline: rgba(17, 24, 39, 0.08);
     /* Inputs, the code boxes and the mobile social button: one legible edge. */
     --field-edge: rgba(14, 10, 26, 0.48);
+    /* AUTM-1756 (Don, 2026-10-05): the icon disc. Every icon-only control
+     * (IconButton, and the close on every dialog, sheet and toast) is a FILLED
+     * circle that reads on its ground, never a bare glyph or a faint ring.
+     * Neutral: ONE mid lavender grey with a white glyph (4.9:1), in both
+     * themes, because a mid tone is the only fill that reads on light AND
+     * dark grounds: 4.9:1 on paper, 4.4:1 on band, 4.0:1 on ink, and in dark
+     * 3.6:1 on band and 3.2:1 on raised. That is what lets an inverse toast
+     * (ink in light, white in dark) and a dark sidebar in a light app carry
+     * the same disc. Hover and press step darker here, lighter in dark.
+     * On-brand: a white disc with a brand-deep glyph, for purple grounds
+     * (9.5:1 on brand, 14.7:1 on brand-deep). Pinned by
+     * IconButton.colour.test.ts. */
+    --icon-disc: #746c89;
+    --icon-disc-hover: #6b6480;
+    --icon-disc-press: #625a74;
+    --on-icon-disc: #ffffff;
+    --icon-disc-onbrand: #ffffff;
+    --icon-disc-onbrand-hover: #efeaf9;
+    --icon-disc-onbrand-press: #e2d9f7;
+    --on-icon-disc-onbrand: #2e1070;
 }
 
 /* ─── Dark theme — set `data-theme="dark"` on <html> ───────────────────
@@ -377,6 +397,16 @@
     --scrim: rgba(0, 0, 0, 0.6);
     --hairline: rgba(255, 255, 255, 0.1);
     --field-edge: rgba(255, 255, 255, 0.48);
+    /* AUTM-1756: the same mid disc as light (see there). Hover and press
+     * step LIGHTER in dark, so neither sinks into the dark ground. */
+    --icon-disc: #746c89;
+    --icon-disc-hover: #7a7290;
+    --icon-disc-press: #7a7290;
+    --on-icon-disc: #ffffff;
+    --icon-disc-onbrand: #ffffff;
+    --icon-disc-onbrand-hover: #efeaf9;
+    --icon-disc-onbrand-press: #e2d9f7;
+    --on-icon-disc-onbrand: #2e1070;
 }
 
 @theme inline {
