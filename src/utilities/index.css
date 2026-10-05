@@ -9,6 +9,9 @@
 @import "./editorial.css";
 @import "./noise.css";
 @import "./animations.css";
+/* AUTM-1739 — the page track, and scrollbars in the base layer. */
+@import "./layout.css";
+@import "./scrollbars.css";
 @import "./scroll-story.css";
 @import "./disclosure.css";
 @import "./autohide.css";

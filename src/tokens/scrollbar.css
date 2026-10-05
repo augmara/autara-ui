@@ -1,0 +1,21 @@
+/* ─── Autara Scrollbar Tokens (AUTM-1739) ───────────────────────────────
+ *
+ * Don, 2026-10-05: "scroll bars in windows pretty much ugly default, need
+ * visual perfection on scroll views as well." The rules that use these are
+ * in utilities/scrollbars.css, in the base layer, so every consumer's page
+ * and inner scroll areas take them with the version bump.
+ *
+ * Neutral on the light ground: the theme's strong text colour, mixed toward
+ * transparent, so it follows dark mode on its own. On a brand-deep ground
+ * (`.scroll-on-deep`, or `data-ground="deep"`): a lighter purple, the brand
+ * mixed into white, on a transparent track. Subtle at rest, firmer on hover.
+ */
+:root,
+:host {
+    --scrollbar-thumb: color-mix(in srgb, var(--text-strong) 30%, transparent);
+    --scrollbar-thumb-hover: color-mix(in srgb, var(--text-strong) 50%, transparent);
+    --scrollbar-track: transparent;
+    /* On a brand-deep ground. */
+    --scrollbar-thumb-deep: color-mix(in srgb, var(--brand) 42%, var(--on-deep));
+    --scrollbar-thumb-deep-hover: color-mix(in srgb, var(--brand) 22%, var(--on-deep));
+}

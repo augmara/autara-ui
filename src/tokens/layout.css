@@ -1,0 +1,30 @@
+/* ─── Autara Page Layout Tokens (AUTM-1739) ─────────────────────────────
+ *
+ * Don, 2026-10-05: "all Autara websites feel contained; widen the content,
+ * see Wise." Wise caps its containers at 1440px and grows them with the
+ * screen; the merchant site kept a 1216px track at 1440 and at 1920 (352px
+ * empty either side), with sections capped narrower still.
+ *
+ *   --page-max      the content track's widest: 1440px. At 1920 the header
+ *                   and sections span 1440 and the rest is margin.
+ *   --page-gutter   the side gutter, fluid: 16px on a 390 phone, rising
+ *                   with the screen to 96px at 1440 and holding there. In
+ *                   rem, so 200% text doubles the floor and the cap with it.
+ *   --page-measure  the readable line for long body text: 30em, which is
+ *                   67 characters a line on average in Satoshi (63 to 72,
+ *                   measured over three paragraphs of product copy). Not
+ *                   `ch`: a ch is the width of "0", which Satoshi draws
+ *                   wide, so 68ch set lines of about 103 characters. In
+ *                   em, so it follows the text's own size. Wide pages put
+ *                   sections, grids and product visuals on the full track
+ *                   and keep running text to this.
+ *
+ * `.page-container` (utilities/layout.css) and the PageContainer component
+ * use them. One value per idea, so both sites move together.
+ */
+:root,
+:host {
+    --page-max: 90rem;
+    --page-gutter: clamp(1rem, 7.62vw - 0.857rem, 6rem);
+    --page-measure: 30em;
+}

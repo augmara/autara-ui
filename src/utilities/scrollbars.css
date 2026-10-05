@@ -1,0 +1,63 @@
+/* ─── Scrollbars (AUTM-1739) ────────────────────────────────────────────
+ *
+ * Don, 2026-10-05: "scroll bars in windows pretty much ugly default, need
+ * visual perfection on scroll views as well." In the base layer, so every
+ * consumer's page and every inner scroll area (dialogs, sheets, dropdown
+ * lists, rails, tables) takes them with the version bump, and any consumer
+ * rule still wins.
+ *
+ * The standard properties first: `scrollbar-width: thin` and
+ * `scrollbar-color` from the tokens (tokens/scrollbar.css). Chromium 121+,
+ * Firefox and Safari 26 read those and ignore the `::-webkit-scrollbar`
+ * rules below, which are the fallback for older WebKit. The thumb firms on
+ * hover: the standard properties cannot target the thumb itself, so an inner
+ * scroll area's thumb firms while the pointer is over that area; the WebKit
+ * fallback hovers the thumb itself.
+ *
+ * On a brand-deep ground, `.scroll-on-deep` (or `data-ground="deep"`) takes
+ * the lighter purple thumb on a transparent track. A page's own scrollbar
+ * belongs to the root element: put the class on <html> for a page that is
+ * deep end to end, and give <html> the deep background, or the transparent
+ * track shows whatever is behind the canvas.
+ *
+ * Under forced colours (Windows High Contrast) none of this applies: the
+ * system draws its own scrollbars. Nothing here hides a scrollbar; content
+ * that scrolls keeps one.
+ */
+@layer base {
+    @media (forced-colors: none) {
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+        }
+        /* Inner scroll areas only: the page's own (on <html>) would read as
+           hovered whenever the pointer is anywhere on the page. */
+        :where(body *):hover {
+            scrollbar-color: var(--scrollbar-thumb-hover) var(--scrollbar-track);
+        }
+        .scroll-on-deep,
+        [data-ground="deep"] {
+            --scrollbar-thumb: var(--scrollbar-thumb-deep);
+            --scrollbar-thumb-hover: var(--scrollbar-thumb-deep-hover);
+        }
+
+        /* Older WebKit: the same colours, a 6px thumb in a 10px gutter. */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        ::-webkit-scrollbar-track,
+        ::-webkit-scrollbar-corner {
+            background: var(--scrollbar-track);
+        }
+        ::-webkit-scrollbar-thumb {
+            border: 2px solid transparent;
+            border-radius: 9999px;
+            background-color: var(--scrollbar-thumb);
+            background-clip: padding-box;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: var(--scrollbar-thumb-hover);
+        }
+    }
+}
