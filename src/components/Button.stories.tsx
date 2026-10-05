@@ -16,6 +16,8 @@ import { SocialButton } from "./SocialButton";
  *   - `ondeep`   translucent white on a brand-deep hero
  *   - `link`     brand text, 44px tall
  *   - `ghost`    no fill, for toolbars (not on the sheet)
+ *   - `brand`    purple with white: the action on the customer site's light
+ *                ground (AUTM-1683)
  *
  * Sizes: `sm` 44, `md` 48, `lg` 52; `icon` is a 44px disc (use IconButton).
  * Pills, by a radius of half each size's height. Legacy variant names still
@@ -28,7 +30,7 @@ const meta = {
   argTypes: {
     variant: {
       control: { type: "select" },
-      options: ["primary", "strong", "quiet", "ondeep", "link", "ghost"],
+      options: ["primary", "strong", "quiet", "ondeep", "link", "ghost", "brand"],
     },
     size: { control: { type: "select" }, options: ["sm", "md", "lg"] },
     disabled: { control: "boolean" },
@@ -86,6 +88,33 @@ export const Strong: Story = { args: { variant: "strong", children: "Confirm" } 
 export const Quiet: Story = { args: { variant: "quiet", children: "Add service", leadingIcon: <Tag /> } };
 export const Link: Story = { args: { variant: "link", size: "sm", children: "View all bookings" } };
 export const Ghost: Story = { args: { variant: "ghost", children: "Skip" } };
+
+/**
+ * AUTM-1683 (Don, 2026-10-05): purple buttons on autara.au's warm light
+ * ground. White on brand is 9.5:1; the hover steps toward ink in light and
+ * toward white in dark. Shown on each ground the customer site uses it on.
+ */
+export const Brand: Story = {
+  args: { variant: "brand", children: "Join the waiting list", size: "lg" },
+  render: (args) => (
+    <div className="flex flex-col gap-3">
+      {[
+        { label: "Paper", bg: "var(--paper)" },
+        { label: "Band (the warm ground)", bg: "var(--band)" },
+        { label: "Lavender card", bg: "color-mix(in srgb, var(--brand) 8%, var(--paper))" },
+      ].map((g) => (
+        <div key={g.label} className="flex items-center gap-4 rounded-[1.25rem] p-4" style={{ background: g.bg }}>
+          <Button {...args} />
+          <span className="text-sm text-[var(--text-muted)]">{g.label}</span>
+        </div>
+      ))}
+      <div data-theme="dark" className="flex items-center gap-4 rounded-[1.25rem] bg-[var(--background)] p-4">
+        <Button {...args} />
+        <span className="text-sm text-[var(--text-muted)]">Dark</span>
+      </div>
+    </div>
+  ),
+};
 export const Busy: Story = { args: { busy: true, children: "Save changes" } };
 
 /**
@@ -128,7 +157,7 @@ export const Disabled: Story = {
   ),
 };
 
-const SHEET_VARIANTS = ["primary", "strong", "quiet", "ghost", "link"] as const;
+const SHEET_VARIANTS = ["primary", "strong", "quiet", "ghost", "link", "brand"] as const;
 
 /**
  * AUTM-1719 (Don, 2026-10-04): "don't mute the button colours even if
@@ -334,7 +363,7 @@ export const FocusRingPerVariant: Story = {
         <div key={col.label} data-theme={col.theme} className="space-y-3 rounded-[1.5rem] bg-[var(--background)] p-5">
           <p className="text-sm font-medium text-[var(--text-muted)]">{col.label}</p>
           <div className="flex flex-wrap items-center gap-4">
-            {(["primary", "strong", "quiet", "link", "ghost"] as const).map((variant) => (
+            {(["primary", "strong", "quiet", "link", "ghost", "brand"] as const).map((variant) => (
               <Button key={variant} variant={variant} className="ring-2 ring-[var(--accent)] ring-offset-2 ring-offset-[var(--background)]">
                 {variant}
               </Button>
@@ -404,6 +433,11 @@ export const Sheet: Story = {
             <Button busy>Save changes</Button>
             <Button disabled aria-describedby="specimen-disabled-reason">New booking</Button>
             <span id="specimen-disabled-reason" className="text-sm text-[var(--text-muted)]">Finish your profile to take bookings.</span>
+          </Specimen>
+          <Specimen name="Brand" component="Button variant=brand" note="Purple with white. The action on the customer site's warm light ground (AUTM-1683).">
+            <Button variant="brand" size="lg">Join the waiting list</Button>
+            <Button variant="brand" size="md">Book now</Button>
+            <Button variant="brand" size="sm">Save</Button>
           </Specimen>
           <Specimen name="Text" component="Button variant=link">
             <Button variant="link" size="sm">View all bookings</Button>

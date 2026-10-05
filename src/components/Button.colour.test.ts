@@ -65,7 +65,26 @@ const VARIANTS: [string, string, (t: Theme) => RGB][] = [
     ['link', 'accent', (t) => token('background', t)],
     // Translucent white over the brand-deep hero it is drawn for.
     ['ondeep', 'on-deep', (t) => over([255, 255, 255], 0.14, token('hero', t))],
+    // AUTM-1683: purple with white text, at rest.
+    ['brand', 'on-brand', (t) => token('brand', t)],
+    // ...and its hover: 86% brand mixed with --strong (ink in light, white in dark).
+    ['brand (hover)', 'on-brand', (t) => over(token('brand', t), 0.86, token('strong', t))],
 ]
+
+/**
+ * AUTM-1683: the brand fill is drawn on light paper, band and lavender, and
+ * in dark on the dark page. A filled button needs no ground contrast for its
+ * text to pass, but in dark its hover must not step DOWN into the page: it
+ * steps toward white, so the hover is lighter than the rest.
+ */
+describe('Button brand: the dark hover lifts away from the page', () => {
+    it('dark: the hover is further from the paper than the rest', () => {
+        const paper = token('paper', 'dark')
+        const rest = token('brand', 'dark')
+        const hover = over(rest, 0.86, token('strong', 'dark'))
+        expect(ratio(hover, paper)).toBeGreaterThan(ratio(rest, paper))
+    })
+})
 
 describe('Button: every variant label reads on its fill, which is now also its disabled and busy colour', () => {
     it('the variant table above is still what Button.tsx draws', () => {
@@ -74,6 +93,7 @@ describe('Button: every variant label reads on its fill, which is now also its d
         expect(BUTTON).toContain('bg-[var(--band)] text-[var(--text-strong)]')
         expect(BUTTON).toContain('bg-[rgba(255,255,255,0.14)] text-[var(--on-deep)]')
         expect(BUTTON).toContain('text-[var(--accent)]')
+        expect(BUTTON).toContain('bg-[var(--brand)] text-[var(--on-brand)] not-disabled:hover:bg-[color-mix(in_srgb,var(--brand)_86%,var(--strong))]')
     })
 
     for (const theme of THEMES) {
