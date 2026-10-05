@@ -23,6 +23,14 @@ import { AutaraLoader, type AutaraLoaderSize } from "./AutaraLoader";
  *   - `link`     brand text, 44px tall, no fill.
  *   - `ghost`    no fill, ink text, band on hover. Not on the sheet: kept for
  *                toolbars where a band pill would be one too many.
+ *   - `brand`    purple with white text (AUTM-1683, Don 2026-10-05). The one
+ *                action on the customer site's warm light ground, where Don
+ *                wants purple for buttons and lime stays the merchant face.
+ *                Reads on paper, band and lavender alike: white on brand is
+ *                9.5:1, on its hover 10.8:1 in light and 7.0:1 in dark. The
+ *                hover steps toward ink in light and toward white in dark, so
+ *                it never sinks into a dark page (brand-deep on dark paper is
+ *                1.32:1).
  *
  * Sizes: `sm` 44 → `md`/`default` 48 → `lg` 52; `icon` is a 44px disc
  * (prefer `IconButton`, which requires the label an icon-only control needs).
@@ -56,7 +64,7 @@ import { AutaraLoader, type AutaraLoaderSize } from "./AutaraLoader";
  * via `asChild`. autara-ui never imports next/link or react-router-dom.
  */
 
-type SheetVariant = "primary" | "strong" | "quiet" | "ondeep" | "link" | "ghost";
+type SheetVariant = "primary" | "strong" | "quiet" | "ondeep" | "link" | "ghost" | "brand";
 
 type LegacyVariant =
   | "dark"
@@ -156,6 +164,9 @@ const VARIANT_CLASSES: Record<SheetVariant, string> = {
   link: "bg-transparent px-0 text-[var(--accent)] underline-offset-4 not-disabled:hover:underline",
   ghost:
     "bg-transparent text-[var(--text-strong)] not-disabled:hover:bg-[var(--band)]",
+  // AUTM-1683: 14% toward --strong, which is ink in light and white in dark.
+  brand:
+    "bg-[var(--brand)] text-[var(--on-brand)] not-disabled:hover:bg-[color-mix(in_srgb,var(--brand)_86%,var(--strong))]",
 };
 
 /** The busy mark per size: 20px in a 44 or 48px button, 24px in the 52px one. */
