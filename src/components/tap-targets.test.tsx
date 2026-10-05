@@ -123,8 +123,8 @@ describe('AUTM-1594 — the sheet\'s 24px choice controls keep a 44px hit area',
     })
 })
 
-describe('AUTM-1594 — Sheet\'s close control is 44px to touch', () => {
-    it.each(['right', 'left', 'top', 'bottom'] as const)('side="%s": drawn at 28px, 44px hit area', (side) => {
+describe('AUTM-1756 — Sheet\'s close control is a drawn 44px disc, 48px to a finger', () => {
+    it.each(['right', 'left', 'top', 'bottom'] as const)('side="%s"', (side) => {
         render(
             <Sheet defaultOpen>
                 <SheetContent side={side}>
@@ -134,17 +134,13 @@ describe('AUTM-1594 — Sheet\'s close control is 44px to touch', () => {
             </Sheet>,
         )
         const close = screen.getByRole('button', { name: 'Close drawer' })
-        // The drawn disc: unchanged, so the sheet keeps its quiet close.
-        expect(close.className).toContain('h-7')
-        expect(close.className).toContain('w-7')
-        // The hit area: the pseudo-element, centred on the disc.
-        expect(close.className).toContain('before:size-11')
-        expect(close.className).toContain('before:absolute')
-        expect(close.className).toContain('before:-translate-x-1/2')
-        expect(close.className).toContain('before:-translate-y-1/2')
-        expect(close.className).toContain("before:content-['']")
-        // It is positioned, so the pseudo-element is placed against it.
+        // AUTM-1594 drew it at 28px with an unpainted 44px area; Don asked for
+        // a close you can see. The disc itself is the target now.
+        expect(close.className).toContain('size-11')
+        expect(close.className).toContain('pointer-coarse:size-12')
         expect(close.className).toContain('absolute')
+        expect(close.className).not.toContain('h-7')
+        expect(close).toHaveAttribute('data-tone', 'neutral')
     })
 })
 

@@ -18,13 +18,18 @@ import { cn } from '../lib/cn'
  * (autara-merchant-mobile/src/components/BackButton.tsx) so every
  * surface renders the same anatomy:
  *
- *   - 40×40 circle, hairline border, cream surface, ink chevron
+ *   - AUTM-1756: the icon disc, as IconButton draws it: a FILLED 44px
+ *     circle (48px to a finger) in `--icon-disc` with a 20px chevron (soft
+ *     lavender grey with an ink chevron in light, a lighter step with a
+ *     white one in dark).
+ *     It was a 40px hairline ring on cream, which Don read as a bare icon
+ *     ("every button should have that vibe, don't show only the icon").
+ *     `tone="onbrand"` is the white disc for purple grounds.
  *   - Solar AltArrowLeft-style Linear glyph, inlined (autara-ui must
  *     not depend on @solar-icons/react)
- *   - Hover bumps the border + chevron to brand purple
+ *   - Hover and press step the disc's fill
  *   - Soft purple focus ring
- *   - Effective hit area ≥44px (`before:` inset extension + min-h-11
- *     root), per the cross-stack tap-target rule
+ *   - The disc itself is the 44px hit area
  *
  * Optional `label` renders a context word ("Bookings", "Menu") beside
  * the circle inside the SAME interactive element, so the label grows
@@ -50,14 +55,16 @@ export interface BackButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>
     ariaLabel?: string
     /** Compose with another component (e.g. framework Link) via Radix Slot. */
     asChild?: boolean
+    /** The disc's fill (AUTM-1756): `neutral` (default) or `onbrand` on purple. */
+    tone?: 'neutral' | 'onbrand'
 }
 
 const ChevronGlyph = () => (
-    <svg width={18} height={18} viewBox="0 0 24 24" fill="none" aria-hidden>
+    <svg width={20} height={20} viewBox="0 0 24 24" fill="none" aria-hidden>
         <path
             d="M15 19l-7-7 7-7"
             stroke="currentColor"
-            strokeWidth="1.8"
+            strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
         />
@@ -65,20 +72,22 @@ const ChevronGlyph = () => (
 )
 
 export const BackButton = forwardRef<HTMLButtonElement, BackButtonProps>(
-    function BackButton({ label, ariaLabel = 'Back', asChild, className, children, ...rest }, ref) {
+    function BackButton({ label, ariaLabel = 'Back', asChild, tone = 'neutral', className, children, ...rest }, ref) {
         const Comp = asChild ? Slot : 'button'
 
         const content = (
             <>
                 <span
                     aria-hidden
-                    /* before:-inset-0.5 pads the hit area to 44px around the
-                       40px circle without changing the rendered size. */
+                    data-tone={tone}
+                    /* AUTM-1756: IconButton's disc, filled, 44px (48px to a
+                       finger), so the circle is the hit area. */
                     className={cn(
-                        'relative grid h-10 w-10 shrink-0 place-items-center rounded-full',
-                        'border border-[var(--border-subtle)] bg-[var(--surface)] text-[var(--text-strong)]',
-                        'transition-colors group-hover:border-[rgba(78,27,189,0.35)] group-hover:text-[var(--color-autara-purple)]',
-                        "before:absolute before:-inset-0.5 before:rounded-full before:content-['']",
+                        'relative grid size-11 shrink-0 place-items-center rounded-full pointer-coarse:size-12',
+                        'transition-colors',
+                        tone === 'onbrand'
+                            ? 'bg-[var(--icon-disc-onbrand)] text-[var(--on-icon-disc-onbrand)] group-hover:bg-[var(--icon-disc-onbrand-hover)] group-active:bg-[var(--icon-disc-onbrand-press)]'
+                            : 'bg-[var(--icon-disc)] text-[var(--on-icon-disc)] group-hover:bg-[var(--icon-disc-hover)] group-active:bg-[var(--icon-disc-press)]',
                     )}
                 >
                     <ChevronGlyph />
@@ -104,7 +113,7 @@ export const BackButton = forwardRef<HTMLButtonElement, BackButtonProps>(
                 ref={ref}
                 aria-label={label ? undefined : ariaLabel}
                 className={cn(
-                    'group inline-flex min-h-11 items-center gap-2.5 rounded-full',
+                    'group motion-press inline-flex min-h-11 items-center gap-2.5 rounded-full',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]',
                     className,
                 )}

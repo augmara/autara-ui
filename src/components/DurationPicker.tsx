@@ -5,6 +5,7 @@ import * as React from 'react'
 import { cn } from '../lib/cn'
 import { useLabelFor } from '../lib/use-label-for'
 import { Button } from './Button'
+import { IconButton } from './IconButton'
 import {
     Dialog,
     DialogBody,
@@ -585,16 +586,14 @@ const DaysStepper = React.forwardRef<HTMLDivElement, DaysStepperProps>(function 
             data-value={days}
             className="flex flex-wrap items-center gap-x-5 gap-y-2"
         >
-            <Button
-                variant="quiet"
-                size="icon"
-                aria-label="Fewer working days"
+            {/* AUTM-1756: the library's icon disc, filled. */}
+            <IconButton
+                label="Fewer working days"
+                icon={<StepGlyph plus={false} />}
                 disabled={disabled || days <= min}
                 onClick={() => onChange(fewer)}
                 data-testid={testId ? `${testId}-days-fewer` : undefined}
-            >
-                <StepGlyph plus={false} />
-            </Button>
+            />
             {/* The live region is the <output>; the NAME comes from the span
                 inside it. Chrome leaves an <output> (role status) out of an
                 aria-labelledby name, so pointing at it named the group
@@ -610,16 +609,14 @@ const DaysStepper = React.forwardRef<HTMLDivElement, DaysStepperProps>(function 
                     <span className="text-[1rem] font-medium">working {days === 1 ? 'day' : 'days'}</span>
                 </span>
             </output>
-            <Button
-                variant="quiet"
-                size="icon"
-                aria-label="More working days"
+            {/* AUTM-1756: the library's icon disc, filled. */}
+            <IconButton
+                label="More working days"
+                icon={<StepGlyph plus />}
                 disabled={disabled || days >= max}
                 onClick={() => onChange(more)}
                 data-testid={testId ? `${testId}-days-more` : undefined}
-            >
-                <StepGlyph plus />
-            </Button>
+            />
         </div>
     )
 })
