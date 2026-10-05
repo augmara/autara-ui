@@ -325,6 +325,16 @@ export { Banner, type BannerProps } from './Banner'
 export { ConfirmDialog, type ConfirmDialogProps } from './ConfirmDialog'
 export { NativeSelect, type NativeSelectProps } from './NativeSelect'
 export { MoneyBreakdown, type MoneyBreakdownProps, type MoneyRow } from './MoneyBreakdown'
+// AUTM-1737 — one invoice status colour system: due and overdue red, partially
+// paid amber, paid lime, draft and void neutral.
+export {
+    InvoiceStatusBadge,
+    invoiceStatusTone,
+    invoiceStatusLabel,
+    type InvoiceStatusBadgeProps,
+    type InvoicePaymentState,
+    type InvoiceStatusTone,
+} from './InvoiceStatusBadge'
 // ─── AUTM-1195 — pick one of a few, as cards: a real radio group ────────
 export { ChoiceCard, ChoiceGroup, type ChoiceCardProps, type ChoiceGroupProps } from './ChoiceCard'
 export { SwatchRadioGroup, type SwatchRadioGroupProps, type SwatchOption } from './SwatchRadioGroup'

@@ -127,6 +127,8 @@ export {
     ConfirmDialog, type ConfirmDialogProps,
     NativeSelect, type NativeSelectProps,
     MoneyBreakdown, type MoneyBreakdownProps, type MoneyRow,
+    // AUTM-1737 — one invoice status colour system.
+    InvoiceStatusBadge, invoiceStatusTone, invoiceStatusLabel, type InvoiceStatusBadgeProps, type InvoicePaymentState, type InvoiceStatusTone,
     // AUTM-1221 — graduated from customer-web (plan item U5)
     Countdown, remainingLabel, type CountdownProps,
     PolicyTimeline, type PolicyTimelineProps, type PolicyTimelineStep,
