@@ -8,8 +8,9 @@
 @import "./shadows.css";
 @import "./radii.css";
 @import "./typography.css";
-/* AUTM-1739 — the page track and its gutter. */
+/* AUTM-1739 — the page track and its gutter, and the scrollbar colours. */
 @import "./layout.css";
+@import "./scrollbar.css";
 
 /* ─── Dark variant (AUTM-734) ────────────────────────────────────────────
  * `dark:` utilities key off the `data-theme` attribute, NOT the OS
