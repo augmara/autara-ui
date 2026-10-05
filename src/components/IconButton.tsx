@@ -12,24 +12,30 @@ import { cn } from "../lib/cn";
  * AUTM-1756 (Don, 2026-10-05): "make it large and highlight it like a rounded
  * one, not only a cross", then, of a bare sidebar chevron, "every button
  * should have that vibe, don't show only the icon". So the disc is always
- * FILLED and always reads on its ground, never a bare glyph and never a faint
- * band ring:
+ * FILLED, never a bare glyph and never a faint ring:
  *
- *   - `tone="neutral"` (default) — the `--icon-disc` mid lavender grey with
- *     a white glyph, the same in both themes. 3:1 or better against paper,
- *     band, ink and the dark grounds, so one tone serves a dialog, the warm
- *     ground, a dark sidebar and an inverse toast.
+ *   - `tone="neutral"` (default) — the Wise pattern. On light grounds a soft
+ *     lavender grey disc (`--icon-disc`) with an ink glyph; on dark grounds a
+ *     disc a step lighter than the surface with a white glyph. (Don rejected
+ *     a mid grey disc with a white glyph: "too much dark on white screen".)
+ *     A dark island in a light app, such as an ink sidebar or the inverse
+ *     toast, gets the dark disc by carrying `data-theme="dark"`.
  *   - `tone="onbrand"` — a white disc with a brand-deep glyph, for purple
  *     grounds (brand, brand-deep, the hero).
  *   - `tone="strong"` — the ink disc (white in dark), for the one icon action
  *     that must lead.
  *
+ * The glyph is what identifies the control, so it is held to 4.5:1 on its
+ * disc; the disc is held to a visibility floor on its ground rather than to
+ * 3:1 (IconButton.colour.test.ts says why).
+ *
  * Sizes: `md` (default) is 44px, and 48px under a coarse pointer (a finger);
  * `lg` is 48px everywhere. The glyph is 20px in `md` and 24px in `lg`,
  * whatever size the caller drew it at, so a 14px cross cannot creep back.
  *
- * Hover and press step the fill (darker in light, lighter in dark); the press
- * also scales to 97% (Button's `motion-press`). Focus is Button's one ring.
+ * Hover and press step the fill one token each (darker in light, lighter in
+ * dark); the press also scales to 97% (Button's `motion-press`). Focus is
+ * Button's one ring.
  * Disabled and busy keep the real colour (AUTM-1719).
  *
  * `variant` is the pre-1756 name and still works: `quiet` and `ghost` (both

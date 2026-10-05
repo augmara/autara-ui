@@ -3,21 +3,32 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 /**
- * AUTM-1756 (Don, 2026-10-05): every icon-only control is a FILLED disc that
- * reads on its ground. Two ratios, read from the token file so a token change
- * that breaks either fails here:
+ * AUTM-1756 (Don, 2026-10-05): every icon-only control is a FILLED disc, never
+ * a bare glyph or a faint ring. On light grounds it is the Wise pattern, a
+ * soft lavender grey disc with an ink glyph (Don, of a mid grey disc with a
+ * white glyph: "too much dark on white screen"); on dark grounds a disc a
+ * step lighter than the surface with a white glyph.
  *
- *   - the glyph on its disc, at rest, hover and press: 4.5:1 (held to the
- *     text bar although an icon needs 3:1, because the cross is the only
- *     thing that says what the control does);
- *   - the disc against every ground it is drawn on, at rest: 3:1 (WCAG
- *     1.4.11, the non-text bar), so the control is visible as a control and
- *     not only as a glyph.
+ * WHAT IS HELD TO WHICH BAR, and why. WCAG 1.4.11 (non-text contrast) asks for
+ * 3:1 on the visual information REQUIRED TO IDENTIFY a control. For an icon
+ * button that information is the icon: it says the control is there and what
+ * it does. The W3C's Understanding note for 1.4.11 says as much for buttons
+ * whose text or icon identifies them: the boundary or fill behind it is not
+ * required to meet 3:1. So:
  *
- * Neutral is one mid tone in both themes, so it is measured against light
- * AND dark grounds in both: paper, band, ink (a dark sidebar, an inverse
- * toast) and, in dark, band and raised. On-brand is measured on brand and
- * brand-deep.
+ *   - the GLYPH against its disc is held to 4.5:1 (above the 3:1 it needs,
+ *     because the cross is the one thing that says "close"), at rest, hover
+ *     and press, in both themes;
+ *   - the DISC against its ground is held to a VISIBILITY floor, 1.2:1, not
+ *     to 3:1. It has to read as a filled circle, so a target is visible and
+ *     Don's "faint ring" cannot come back, but it does not identify the
+ *     control. Holding it to 3:1 is what produced the mid grey disc Don
+ *     rejected.
+ *   - hover and press must visibly CHANGE the disc, in the right direction:
+ *     darker on light, lighter on dark, by at least 1.05:1 a step.
+ *
+ * All values are read from the token file, so a token change that breaks any
+ * of these fails here.
  */
 
 type RGB = [number, number, number]
@@ -52,10 +63,11 @@ function token(name: string, theme: Theme): RGB {
 }
 
 const THEMES: Theme[] = ['light', 'dark']
-const INK: RGB = hex('#0e0a1a')
-const WHITE: RGB = hex('#ffffff')
+const GLYPH = 4.5
+const VISIBLE = 1.2
+const STEP = 1.05
 
-describe('IconButton: the glyph reads on its disc, at rest, hover and press', () => {
+describe('IconButton: the glyph identifies the control, so it is held to 4.5:1 on its disc', () => {
     for (const theme of THEMES) {
         it.each([
             ['neutral', 'icon-disc', 'on-icon-disc'],
@@ -66,38 +78,66 @@ describe('IconButton: the glyph reads on its disc, at rest, hover and press', ()
             ['onbrand press', 'icon-disc-onbrand-press', 'on-icon-disc-onbrand'],
         ])(`${theme}: %s is at least 4.5:1`, (_name, disc, glyph) => {
             const r = ratio(token(glyph, theme), token(disc, theme))
-            expect(r, `${r.toFixed(2)}:1`).toBeGreaterThanOrEqual(4.5)
+            expect(r, `${r.toFixed(2)}:1`).toBeGreaterThanOrEqual(GLYPH)
         })
     }
+
+    it('light: the glyph is ink, a dark glyph on a soft disc (the Wise pattern)', () => {
+        expect(token('on-icon-disc', 'light')).toEqual(token('strong', 'light'))
+        expect(lum(token('icon-disc', 'light'))).toBeGreaterThan(0.5)
+    })
+
+    it('dark: the glyph is white, on a disc a step lighter than the surface', () => {
+        expect(token('on-icon-disc', 'dark')).toEqual(hex('#ffffff'))
+        expect(lum(token('icon-disc', 'dark'))).toBeGreaterThan(lum(token('raised', 'dark')))
+    })
 })
 
-describe('IconButton: the disc is visible against its ground (3:1), so it reads as a control', () => {
+describe('IconButton: the disc is visible on its ground (1.2:1 floor, not the 3:1 bar)', () => {
     for (const theme of THEMES) {
-        const grounds: [string, RGB][] = [
-            ['paper', token('paper', theme)],
-            ['band', token('band', theme)],
-            ['raised', token('raised', theme)],
-            // A dark sidebar in a light app, and the inverse toast in either theme.
-            ['ink', INK],
-            ['white', WHITE],
-        ]
-        it.each(grounds)(`${theme}: the neutral disc on %s`, (_g, ground) => {
-            const r = ratio(token('icon-disc', theme), ground)
-            expect(r, `${r.toFixed(2)}:1`).toBeGreaterThanOrEqual(3)
+        it.each(['paper', 'band', 'raised'])(`${theme}: the neutral disc shows on %s`, (ground) => {
+            const r = ratio(token('icon-disc', theme), token(ground, theme))
+            expect(r, `${r.toFixed(2)}:1`).toBeGreaterThanOrEqual(VISIBLE)
         })
-        it.each([
-            ['brand', token('brand', theme)],
-            ['brand-deep', token('brand-deep', theme)],
-            ['hero', token('hero', theme)],
-        ] as [string, RGB][])(`${theme}: the on-brand disc on %s`, (_g, ground) => {
-            const r = ratio(token('icon-disc-onbrand', theme), ground)
-            expect(r, `${r.toFixed(2)}:1`).toBeGreaterThanOrEqual(3)
+        it.each(['brand', 'brand-deep', 'hero'])(`${theme}: the on-brand disc shows on %s`, (ground) => {
+            const r = ratio(token('icon-disc-onbrand', theme), token(ground, theme))
+            expect(r, `${r.toFixed(2)}:1`).toBeGreaterThanOrEqual(VISIBLE)
         })
     }
 
-    it('dark: hover and press step lighter, away from the dark page', () => {
-        const paper = token('paper', 'dark')
-        expect(ratio(token('icon-disc-hover', 'dark'), paper)).toBeGreaterThanOrEqual(ratio(token('icon-disc', 'dark'), paper))
-        expect(ratio(token('icon-disc-press', 'dark'), paper)).toBeGreaterThanOrEqual(ratio(token('icon-disc', 'dark'), paper))
+    // The inverse toast is ink in light and white in dark; its dismiss carries
+    // data-theme="dark", so it is the DARK disc on both.
+    it.each([
+        ['ink (the light theme inverse toast, an ink sidebar)', hex('#0e0a1a')],
+        ['white (the dark theme inverse toast)', hex('#ffffff')],
+    ] as [string, RGB][])('the dark-island disc shows on %s', (_g, ground) => {
+        const r = ratio(token('icon-disc', 'dark'), ground)
+        expect(r, `${r.toFixed(2)}:1`).toBeGreaterThanOrEqual(VISIBLE)
+    })
+})
+
+describe('IconButton: hover and press visibly change the disc, in the right direction', () => {
+    it.each([
+        ['light', 'darker'],
+        ['dark', 'lighter'],
+    ] as [Theme, 'darker' | 'lighter'][])('%s: each step is %s, by at least 1.05:1', (theme, dir) => {
+        const rest = token('icon-disc', theme)
+        const hover = token('icon-disc-hover', theme)
+        const press = token('icon-disc-press', theme)
+        const sign = dir === 'darker' ? -1 : 1
+        expect(Math.sign(lum(hover) - lum(rest))).toBe(sign)
+        expect(Math.sign(lum(press) - lum(hover))).toBe(sign)
+        expect(ratio(rest, hover)).toBeGreaterThanOrEqual(STEP)
+        expect(ratio(hover, press)).toBeGreaterThanOrEqual(STEP)
+    })
+
+    it('on-brand: hover and press step down from white', () => {
+        const rest = token('icon-disc-onbrand', 'light')
+        const hover = token('icon-disc-onbrand-hover', 'light')
+        const press = token('icon-disc-onbrand-press', 'light')
+        expect(lum(hover)).toBeLessThan(lum(rest))
+        expect(lum(press)).toBeLessThan(lum(hover))
+        expect(ratio(rest, hover)).toBeGreaterThanOrEqual(STEP)
+        expect(ratio(hover, press)).toBeGreaterThanOrEqual(STEP)
     })
 })

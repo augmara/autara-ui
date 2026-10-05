@@ -19,7 +19,9 @@ import { cn } from '../lib/cn'
  * surface renders the same anatomy:
  *
  *   - AUTM-1756: the icon disc, as IconButton draws it: a FILLED 44px
- *     circle (48px to a finger) in `--icon-disc` with a white 20px chevron.
+ *     circle (48px to a finger) in `--icon-disc` with a 20px chevron (soft
+ *     lavender grey with an ink chevron in light, a lighter step with a
+ *     white one in dark).
  *     It was a 40px hairline ring on cream, which Don read as a bare icon
  *     ("every button should have that vibe, don't show only the icon").
  *     `tone="onbrand"` is the white disc for purple grounds.

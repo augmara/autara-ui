@@ -13,8 +13,9 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
  * cross", and of a bare sidebar chevron, "every button should have that vibe,
  * don't show only the icon". So every icon-only control is a FILLED disc:
  *
- *   - `tone="neutral"` (default): one mid lavender grey with a white glyph,
- *     the same in both themes, reading on paper, band, ink and the dark grounds
+ *   - `tone="neutral"` (default): the Wise pattern. A soft lavender grey disc
+ *     with an ink glyph on light grounds; a disc a step lighter than the
+ *     surface with a white glyph on dark ones
  *   - `tone="onbrand"`: a white disc with a brand-deep glyph, for purple grounds
  *   - `tone="strong"`: the ink disc, for the one icon action that leads
  *
@@ -116,9 +117,11 @@ function Ground({ name, note, theme, bg, children }: { name: string; note: strin
 }
 
 /**
- * Every ground the disc is drawn on, at both sizes. Neutral is ONE tone in
- * both themes: it holds 3:1 or better on paper, band, ink and the dark
- * grounds (IconButton.colour.test.ts). On purple it is the on-brand disc.
+ * Every ground the disc is drawn on, at both sizes. On light grounds the
+ * neutral disc is soft with an ink glyph; on dark grounds it is a step
+ * lighter than the surface with a white glyph. On purple it is the on-brand
+ * disc. The glyph is 4.5:1 or better on its disc everywhere; the disc is held
+ * to a visibility floor on its ground (IconButton.colour.test.ts).
  */
 export const EveryGround: Story = {
   name: "Every ground, both sizes",
@@ -134,11 +137,15 @@ export const EveryGround: Story = {
         <Row />
         <Row size="lg" />
       </Ground>
-      <Ground name="Light, ink" note="a dark sidebar, an inverse toast" bg="var(--strong)">
+      <Ground name="Dark island in a light app" note='an ink sidebar, the inverse toast: data-theme="dark"' theme="dark" bg="#0e0a1a">
         <Row />
         <Row size="lg" />
       </Ground>
       <Ground name="Dark, paper" note="a dark dialog or sheet" theme="dark" bg="var(--paper)">
+        <Row />
+        <Row size="lg" />
+      </Ground>
+      <Ground name="Dark, band" note="a dark card" theme="dark" bg="var(--band)">
         <Row />
         <Row size="lg" />
       </Ground>

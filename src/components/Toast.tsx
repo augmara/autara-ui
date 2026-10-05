@@ -412,9 +412,15 @@ function ToastItem({
                 </button>
             )}
             {/* AUTM-1756: the library's one close control. It was a 20px
-                bare cross that only showed a disc on hover. The mid disc reads
-                on both toasts in both themes (band, and ink or white). */}
-            <CloseButton label="Dismiss notification" onClick={handleDismiss} className="-my-1 -mr-1.5 ml-0.5 shrink-0" />
+                bare cross that only showed a disc on hover. On the inverse
+                toast (ink in light, white in dark) it carries the dark disc,
+                a step lighter than ink, by the theming contract's island. */}
+            <CloseButton
+                label="Dismiss notification"
+                onClick={handleDismiss}
+                data-theme={isDark ? 'dark' : undefined}
+                className="-my-1 -mr-1.5 ml-0.5 shrink-0"
+            />
             <style>{`
                 .autara-toast-content { animation: autaraToastMorph 220ms ease-out; }
                 @keyframes autaraToastMorph {
