@@ -11,8 +11,8 @@ import { PageContainer } from './PageContainer'
  * the gutters, and the numbers are measured live.
  *
  * Sections, grids and product visuals take the full track; running text
- * keeps a readable line with `measure` or `.page-measure` (about 65 to 70
- * characters).
+ * keeps a readable line with `measure` or `.page-measure` (30em, about 67
+ * characters of Satoshi).
  */
 const meta = {
     title: 'Layout/PageContainer',
@@ -27,8 +27,10 @@ function Ruler() {
     return (
         <div
             ref={(el) => {
-                if (!el) return
-                const track = el.parentElement as HTMLElement
+                // The track is the PageContainer this sits in, not the band
+                // around it: the band's own padding is not the gutter.
+                const track = el?.closest<HTMLElement>('.page-container')
+                if (!el || !track) return
                 const write = () => {
                     const cs = getComputedStyle(track)
                     const content = track.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)
@@ -36,6 +38,7 @@ function Ruler() {
                 }
                 write()
                 window.addEventListener('resize', write)
+                return () => window.removeEventListener('resize', write)
             }}
             style={{ font: '500 0.875rem/1.4 var(--font-brand)', color: 'var(--on-deep)' }}
         />
