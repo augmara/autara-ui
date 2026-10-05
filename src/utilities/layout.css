@@ -1,0 +1,22 @@
+/* ─── Page layout (AUTM-1739) ───────────────────────────────────────────
+ *
+ * `.page-container`: the page's content track. Full width up to
+ * --page-max (1440px) of content, with --page-gutter either side, centred.
+ * At 1920 that is 1440 of content and 240px of margin each side; at 1440,
+ * 1248 of content between 96px gutters; on a 390 phone, 358 between 16px
+ * gutters. The PageContainer component renders it.
+ *
+ * `.page-measure`: running text kept to a readable line (--page-measure,
+ * about 65 to 70 characters) inside a wide track. Put it on paragraphs and
+ * leads, not on the section: grids and product visuals take the full track.
+ */
+.page-container {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: calc(var(--page-max) + 2 * var(--page-gutter));
+    margin-inline: auto;
+    padding-inline: var(--page-gutter);
+}
+.page-measure {
+    max-width: var(--page-measure);
+}

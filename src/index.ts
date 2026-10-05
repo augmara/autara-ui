@@ -19,6 +19,8 @@ export {
     // that opens and closes smoothly.
     ScrollStory, SCROLL_STORY_STILL_QUERY, type ScrollStoryProps, type ScrollStoryStep, type ScrollStoryStepState, type ScrollStoryPhase,
     Disclosure, type DisclosureProps,
+    // AUTM-1739 — the page's content track: 1440px of content, a fluid gutter.
+    PageContainer, type PageContainerProps,
     Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, cardVariants, type CardProps,
     BackButton, type BackButtonProps,
     Badge, badgeVariants, type BadgeProps,

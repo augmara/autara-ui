@@ -354,6 +354,8 @@ export {
     type ScrollStoryPhase,
 } from './ScrollStory'
 export { Disclosure, type DisclosureProps } from './Disclosure'
+// AUTM-1739 — the page's content track: 1440px of content, a fluid gutter.
+export { PageContainer, type PageContainerProps } from './PageContainer'
 
 // SocialButton: the one social sign-in button, Google, Apple and mobile (AUTM-1513).
 export { SocialButton, type SocialButtonProps, type SocialButtonProvider } from './SocialButton'

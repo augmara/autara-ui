@@ -1,0 +1,26 @@
+/* ─── Autara Page Layout Tokens (AUTM-1739) ─────────────────────────────
+ *
+ * Don, 2026-10-05: "all Autara websites feel contained; widen the content,
+ * see Wise." Wise caps its containers at 1440px and grows them with the
+ * screen; the merchant site kept a 1216px track at 1440 and at 1920 (352px
+ * empty either side), with sections capped narrower still.
+ *
+ *   --page-max      the content track's widest: 1440px. At 1920 the header
+ *                   and sections span 1440 and the rest is margin.
+ *   --page-gutter   the side gutter, fluid: 16px on a 390 phone, rising
+ *                   with the screen to 96px at 1440 and holding there. In
+ *                   rem, so 200% text doubles the floor and the cap with it.
+ *   --page-measure  the readable line for long body text, about 65 to 70
+ *                   characters of the body face. Wide pages put sections,
+ *                   grids and product visuals on the full track and keep
+ *                   running text to this.
+ *
+ * `.page-container` (utilities/layout.css) and the PageContainer component
+ * use them. One value per idea, so both sites move together.
+ */
+:root,
+:host {
+    --page-max: 90rem;
+    --page-gutter: clamp(1rem, 7.62vw - 0.857rem, 6rem);
+    --page-measure: 68ch;
+}

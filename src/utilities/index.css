@@ -9,6 +9,8 @@
 @import "./editorial.css";
 @import "./noise.css";
 @import "./animations.css";
+/* AUTM-1739 — the page track. */
+@import "./layout.css";
 @import "./scroll-story.css";
 @import "./disclosure.css";
 @import "./autohide.css";
