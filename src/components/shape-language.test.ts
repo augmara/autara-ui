@@ -68,6 +68,7 @@ const KEEPS: Record<string, string> = {
     'Countdown.tsx': 'the countdown is a 32px pill on canvas v44 (AUTM-1594), a status not an action',
     // AUTM-1756: Dialog's close is CloseButton now, so Dialog.tsx draws no
     // round of its own and came off this list; the disc is Button's size="icon".
+    'BackButton.tsx': 'the icon disc, as IconButton draws it, filled (AUTM-1756); the label rides inside the same round target',
     'Sheet.tsx': 'the bottom sheet\'s grabber pill (AUTM-1594); the close is CloseButton, Button\'s icon disc (AUTM-1756)',
     'Toast.tsx': 'the status dot and the action pill on the capsule (AUTM-1594); the dismiss is CloseButton (AUTM-1756)',
     'EmptyState.tsx': 'the 44px icon disc, canvas v44 "Empty" (AUTM-1594)',
@@ -92,10 +93,11 @@ const KEEPS: Record<string, string> = {
  *
  * `Dialog.tsx`, `EmptyState.tsx` and `Stepper.tsx` also came off under
  * AUTM-1221 (the close control, the icon tile, the progress track).
+ *
+ * AUTM-1756: `CarouselHeader.tsx` came off (its arrows are IconButton now)
+ * and `BackButton.tsx` moved to KEEPS (its circle is the filled icon disc).
  */
 const PENDING: Record<string, string> = {
-    'BackButton.tsx': 'circular icon button, an action, should move',
-    'CarouselHeader.tsx': 'prev/next icon buttons, actions, should move',
     'ImageCropDialog.tsx': 'range-slider track, a state bar, likely a keep',
     'MultiSelect.tsx': 'value chips + clear button, chips go to 8px',
     'StepCard.tsx': 'step numeral medallion, a numeral in a circle, likely a keep',
