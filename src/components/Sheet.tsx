@@ -4,6 +4,7 @@ import * as React from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '../lib/cn'
+import { useReturnFocus } from '../lib/use-return-focus'
 
 /**
  * Sheet — Radix dialog primitive as an edge-anchored drawer.
@@ -30,6 +31,10 @@ import { cn } from '../lib/cn'
  *
  * Dark companion (for sheets over photo / ink contexts) deferred to a
  * future PR.
+ *
+ * AUTM-1768: closing a sheet returns keyboard focus to the control that
+ * opened it, with or without a `SheetTrigger` (see `Dialog` and
+ * `lib/use-return-focus.ts`).
  */
 const Sheet = DialogPrimitive.Root
 const SheetTrigger = DialogPrimitive.Trigger
@@ -99,7 +104,10 @@ interface SheetContentProps
 const SheetContent = React.forwardRef<
     React.ComponentRef<typeof DialogPrimitive.Content>,
     SheetContentProps
->(({ side = 'right', className, children, ...props }, ref) => {
+>(({ side = 'right', className, children, onOpenAutoFocus, onCloseAutoFocus, ...props }, ref) => {
+    // AUTM-1768: focus goes back to the control that opened the sheet,
+    // trigger or not. See use-return-focus.ts.
+    const returnFocus = useReturnFocus(onOpenAutoFocus, onCloseAutoFocus)
     // The close button is absolutely positioned, so the container's
     // `pt-[env(safe-area-inset-top)]` doesn't move it — it carries its own
     // inset. A bottom sheet sits mid-screen and keeps the plain top-4.
@@ -114,6 +122,8 @@ const SheetContent = React.forwardRef<
                 ref={ref}
                 className={cn(sheetVariants({ side }), className)}
                 {...props}
+                onOpenAutoFocus={returnFocus.onOpenAutoFocus}
+                onCloseAutoFocus={returnFocus.onCloseAutoFocus}
             >
                 {side === 'bottom' ? (
                     // The sheet's grabber: 40 x 5, a hairline pill. Decoration;
