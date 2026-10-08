@@ -399,3 +399,44 @@ export const ResponsiveText200: Story = {
         return <AddressDialog />
     },
 }
+
+/**
+ * AUTM-1768: opened from state, with no `DialogTrigger`, the way most
+ * consumer dialogs are (a Confirm button that sets `open`). Tab to "Confirm
+ * booking", press Enter, then Escape: focus lands back on "Confirm booking",
+ * not at the top of the page. Before this, Radix had no trigger to return to
+ * and focus fell to `<body>`.
+ */
+export const FocusReturnsWithoutTrigger: Story = {
+    name: 'Focus returns, opened from state',
+    render: function FocusReturnsWithoutTriggerStory() {
+        const [open, setOpen] = React.useState(false)
+        return (
+            <div className="flex flex-col items-start gap-3">
+                <Button variant="quiet">Message customer</Button>
+                <Button variant="strong" onClick={() => setOpen(true)}>
+                    Confirm booking
+                </Button>
+                <Button variant="quiet">Decline</Button>
+                <Dialog open={open} onOpenChange={setOpen}>
+                    <DialogContent layout="responsive">
+                        <DialogHeader>
+                            <DialogTitle>Confirm this booking?</DialogTitle>
+                            <DialogDescription>
+                                Sam is told straight away and the time is held for them.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter>
+                            <Button variant="quiet" onClick={() => setOpen(false)}>
+                                Not yet
+                            </Button>
+                            <Button variant="strong" onClick={() => setOpen(false)}>
+                                Confirm
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+            </div>
+        )
+    },
+}

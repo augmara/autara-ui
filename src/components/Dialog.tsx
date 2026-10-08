@@ -3,6 +3,7 @@
 import * as React from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { cn } from '../lib/cn'
+import { useReturnFocus } from '../lib/use-return-focus'
 
 /**
  * Dialog — Radix dialog primitive styled for the Autara cream canvas.
@@ -61,6 +62,15 @@ import { cn } from '../lib/cn'
  *
  * The default (`layout="centered"`) renders exactly as it did before, so
  * every existing dialog is unchanged.
+ *
+ * ─── AUTM-1768: focus goes back where it came from ──────────────────────
+ *
+ * Radix returns focus on close to `DialogTrigger` only, so a dialog opened
+ * from state (a button that sets `open`) dropped keyboard focus on `<body>`
+ * and the next Tab restarted at the top of the page. `DialogContent` now
+ * remembers the focused element when it opens and puts focus back there when
+ * Radix leaves it nowhere. A trigger, or a consumer's own `onCloseAutoFocus`
+ * that calls `preventDefault()`, still wins. `SheetContent` does the same.
  */
 const Dialog = DialogPrimitive.Root
 const DialogTrigger = DialogPrimitive.Trigger
@@ -231,10 +241,15 @@ const DialogContent = React.forwardRef<
             size = 'md',
             closeLabel = 'Close dialog',
             theme: _theme,
+            onOpenAutoFocus,
+            onCloseAutoFocus,
             ...props
         },
         ref
     ) => {
+        // AUTM-1768: focus goes back to the control that opened the dialog,
+        // trigger or not. See use-return-focus.ts.
+        const returnFocus = useReturnFocus(onOpenAutoFocus, onCloseAutoFocus)
         const [scrolled, setScrolled] = React.useState(false)
         // State, not a ref: the panel mounts inside Radix's Portal a render
         // after this component, and an effect keyed on a ref would never see
@@ -266,6 +281,8 @@ const DialogContent = React.forwardRef<
                         className
                     )}
                     {...props}
+                    onOpenAutoFocus={returnFocus.onOpenAutoFocus}
+                    onCloseAutoFocus={returnFocus.onCloseAutoFocus}
                 >
                     <DialogLayoutContext.Provider value={state}>
                         {children}
