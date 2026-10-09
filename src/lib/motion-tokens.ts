@@ -58,12 +58,26 @@ export const motionDurations = {
     pageOut: 120,
     skeleton: 1400,
     crossfade: 160,
+    // AUTM-1781: the app vocabulary. Uses and reduced-motion forms in the
+    // "App motion" block at the end of utilities/animations.css.
+    enter: 550,
+    enterStagger: 60,
+    row: 400,
+    rowStagger: 30,
+    slide: 450,
+    count: 900,
+    pop: 500,
+    sheetSoft: 350,
 } as const
 
 /** `--motion-ease-out` (enters) and `--motion-ease-in` (exits). */
 export const motionEasings = {
     out: [0.16, 1, 0.3, 1],
     in: [0.4, 0, 1, 1],
+    /** AUTM-1781: the app vocabulary's soft ease-out, for almost everything it moves. */
+    soft: [0.22, 1, 0.36, 1],
+    /** AUTM-1781: a small overshoot, for pops only (a chip chosen, a pill arriving). */
+    pop: [0.34, 1.56, 0.64, 1],
 } as const satisfies Record<string, MotionBezier>
 
 export type MotionDurationName = keyof typeof motionDurations
@@ -74,7 +88,10 @@ export type MotionDurationName = keyof typeof motionDurations
  * (use `motionStaggerDelay()` and `motionDurations.settleDelay`), and
  * `skeleton` is a loop on `ease-in-out`, not an enter or an exit.
  */
-export type MotionTransitionName = Exclude<MotionDurationName, 'stagger' | 'settleDelay' | 'skeleton'>
+export type MotionTransitionName = Exclude<
+    MotionDurationName,
+    'stagger' | 'settleDelay' | 'skeleton' | 'enterStagger' | 'rowStagger'
+>
 
 /**
  * Children 1 to 6 step by `--motion-stagger`; the seventh onward share the
@@ -114,4 +131,19 @@ export function motionTransition(name: MotionTransitionName): {
 export function motionStaggerDelay(index: number): number {
     const step = Math.min(Math.max(Math.floor(index), 0), MOTION_STAGGER_CAP - 1)
     return step * motionDurations.stagger
+}
+
+/**
+ * AUTM-1781: the app vocabulary as a framer-motion or Web Animations timing,
+ * on the soft curve (or the pop curve for `pop`). Durations in MILLISECONDS,
+ * which `element.animate()` takes; divide by 1000 for framer-motion.
+ *
+ *     el.animate(keyframes, softTiming('slide'))
+ */
+export function softTiming(name: 'enter' | 'row' | 'slide' | 'count' | 'pop' | 'sheetSoft'): {
+    duration: number
+    easing: string
+} {
+    const curve = name === 'pop' ? motionEasings.pop : motionEasings.soft
+    return { duration: motionDurations[name], easing: `cubic-bezier(${curve.join(', ')})` }
 }

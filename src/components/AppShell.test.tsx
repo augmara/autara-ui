@@ -55,21 +55,79 @@ describe('AppTabBar (AUTM-1781)', () => {
         expect(screen.getByText('99+')).toBeInTheDocument()
     })
 
-    it('the bar is fixed to the bottom, clear of the home indicator, with tabs at least 56px tall', () => {
+    it('the dock floats above the bottom edge, clear of the home indicator, on ink', () => {
         render(<AppTabBar items={items} />)
         const nav = screen.getByRole('navigation')
         expect(nav.className).toContain('fixed')
         expect(nav.className).toContain('bottom-0')
-        expect(nav.className).toContain('pb-[env(safe-area-inset-bottom)]')
+        expect(nav.className).toContain('pb-[calc(1rem+env(safe-area-inset-bottom))]')
         expect(nav.className).toContain('md:hidden')
-        expect(screen.getByTestId('app-tab-account').className).toContain('min-h-14')
+        expect(nav.querySelector('[data-tab-track]')?.className).toContain('bg-[var(--surface-inverse)]')
     })
 
-    it('inline sits in the flow, at least 44px tall', () => {
+    it('an inactive tab is a 56 by 52 icon whose name stays in the tree; the current one opens into the lime pill', () => {
+        render(<AppTabBar items={items} />)
+        const account = screen.getByTestId('app-tab-account')
+        expect(account.className).toContain('h-[52px]')
+        expect(account.className).toContain('w-14')
+        // Its name is visually hidden, never removed: it is still the link's name.
+        expect(within(account).getByText('Account').className).toContain('sr-only')
+        const messages = screen.getByTestId('app-tab-messages')
+        expect(messages.querySelector('[data-tab-pill]')?.className).toContain('bg-[var(--lime)]')
+        expect(within(messages).getByText('Messages').className).not.toContain('sr-only')
+        // Only the current tab carries the pill.
+        expect(account.querySelector('[data-tab-pill]')).toBeNull()
+    })
+
+    it('the count is a brand disc ringed in the colour behind it', () => {
+        render(<AppTabBar items={items} />)
+        const onLime = within(screen.getByTestId('app-tab-messages')).getByText('3')
+        expect(onLime.className).toContain('bg-[var(--brand)]')
+        expect(onLime.className).toContain('border-[var(--lime)]')
+        const onInk = within(screen.getByTestId('app-tab-bookings')).getByText('1')
+        expect(onInk.className).toContain('border-[var(--surface-inverse)]')
+    })
+
+    it('slides the pill when the current tab changes, from where the last bar left it', () => {
+        const animate = vi.fn(() => ({ cancel: () => {} }) as unknown as Animation)
+        const original = Element.prototype.animate
+        Element.prototype.animate = animate as unknown as typeof Element.prototype.animate
+        try {
+            const at = (key: string) => items.map((i) => ({ ...i, active: i.key === key }))
+            const { rerender } = render(<AppTabBar items={at('bookings')} label="Slide" />)
+            expect(animate).not.toHaveBeenCalled()
+            rerender(<AppTabBar items={at('messages')} label="Slide" />)
+            // jsdom lays nothing out, so every box is zero: nothing travels,
+            // but the new name still fades in.
+            expect(animate).toHaveBeenCalledWith([{ opacity: 0 }, { opacity: 1 }], expect.objectContaining({ fill: 'backwards' }))
+        } finally {
+            Element.prototype.animate = original
+        }
+    })
+
+    it('does not move under reduced motion', () => {
+        const animate = vi.fn()
+        const original = Element.prototype.animate
+        const mm = window.matchMedia
+        Element.prototype.animate = animate as unknown as typeof Element.prototype.animate
+        window.matchMedia = ((q: string) => ({ matches: q.includes('reduce'), media: q, addEventListener() {}, removeEventListener() {} })) as unknown as typeof window.matchMedia
+        try {
+            const at = (key: string) => items.map((i) => ({ ...i, active: i.key === key }))
+            const { rerender } = render(<AppTabBar items={at('bookings')} label="Still" />)
+            rerender(<AppTabBar items={at('account')} label="Still" />)
+            expect(animate).not.toHaveBeenCalled()
+        } finally {
+            Element.prototype.animate = original
+            window.matchMedia = mm
+        }
+    })
+
+    it('inline sits in the flow, every name shown, at least 44px tall', () => {
         render(<AppTabBar items={items} variant="inline" testIdPrefix="nav" />)
         const nav = screen.getByRole('navigation')
         expect(nav.className).not.toContain('fixed')
         expect(screen.getByTestId('nav-account').className).toContain('min-h-11')
+        expect(within(screen.getByTestId('nav-account')).getByText('Account').className).not.toContain('sr-only')
     })
 })
 
@@ -171,6 +229,94 @@ describe('ActionBar (AUTM-1781)', () => {
     it('renders nothing with no actions', () => {
         const { container } = render(<ActionBar label="x" actions={[]} />)
         expect(container.firstChild).toBeNull()
+    })
+})
+
+describe('ActionBar 8.5 contract: one primary, two icons or one secondary (AUTM-1781)', () => {
+    const icon = <Glyph />
+
+    it('draws the primary lime and last, the icons as named band discs before it', () => {
+        render(
+            <ActionBar
+                label="Booking actions"
+                primary={{ key: 'directions', label: 'Directions', icon, href: 'https://maps.example', external: true }}
+                icons={[
+                    { key: 'message', label: 'Message Fitzroy Paint Co', icon, onSelect: () => {} },
+                    { key: 'call', label: 'Call', icon, href: 'tel:+61400000000' },
+                ]}
+                testIdPrefix="bk"
+            />,
+        )
+        const group = screen.getByRole('group', { name: 'Booking actions' })
+        expect(group.dataset.shape).toBe('icons')
+        const controls = Array.from(group.querySelectorAll('a, button'))
+        expect(controls.map((c) => c.getAttribute('data-testid'))).toEqual(['bk-message', 'bk-call', 'bk-directions'])
+        const primary = screen.getByTestId('bk-directions')
+        expect(primary.className).toContain('bg-[var(--lime)]')
+        expect(primary.className).toContain('min-h-14')
+        expect(primary).toHaveAttribute('data-primary')
+        expect(primary).toHaveAttribute('target', '_blank')
+        // An icon action is named by its label, shown from lg.
+        const message = screen.getByRole('button', { name: 'Message Fitzroy Paint Co' })
+        expect(message.className).toContain('size-14')
+        expect(within(message).getByText('Message Fitzroy Paint Co').className).toContain('sr-only lg:not-sr-only')
+    })
+
+    it('a secondary is a band pill beside the primary, and it pushes icons out', () => {
+        render(
+            <ActionBar
+                label="Answer"
+                primary={{ key: 'accept', label: 'Accept Sunday' }}
+                secondary={{ key: 'keep', label: 'Keep Saturday' }}
+                icons={[{ key: 'message', label: 'Message', icon }]}
+            />,
+        )
+        expect(screen.getByRole('group').dataset.shape).toBe('secondary')
+        expect(screen.getByRole('button', { name: 'Keep Saturday' }).className).toContain('bg-[var(--band)]')
+        expect(screen.queryByRole('button', { name: 'Message' })).toBeNull()
+    })
+
+    it('holds two icons at most', () => {
+        render(
+            <ActionBar
+                label="x"
+                primary={{ key: 'p', label: 'Primary' }}
+                icons={['a', 'b', 'c'].map((k) => ({ key: k, label: k, icon }))}
+            />,
+        )
+        expect(screen.getAllByRole('button')).toHaveLength(3)
+    })
+
+    it('is a fixed bar rising in below lg, in the flow from lg', () => {
+        render(<ActionBar label="x" primary={{ key: 'p', label: 'Pay $454' }} />)
+        const group = screen.getByRole('group')
+        for (const c of ['motion-bar-in', 'fixed', 'bottom-0', 'border-t', 'lg:static', 'lg:bg-transparent']) {
+            expect(group.className, c).toContain(c)
+        }
+    })
+
+    it('clones a framework link, and calls its handler', async () => {
+        const onSelect = vi.fn()
+        render(
+            <ActionBar
+                label="x"
+                primary={{ key: 'again', label: 'Book again', element: <FakeLink to="/m/1" />, onSelect }}
+            />,
+        )
+        const link = screen.getByRole('link', { name: 'Book again' })
+        expect(link).toHaveAttribute('data-router')
+        await userEvent.click(link)
+        expect(onSelect).toHaveBeenCalled()
+    })
+
+    it('a disabled primary is a disabled button, never a live link', () => {
+        render(<ActionBar label="x" primary={{ key: 'p', label: 'Pay', href: '/pay', disabled: true }} />)
+        expect(screen.getByRole('button', { name: 'Pay' })).toBeDisabled()
+    })
+
+    it('renders nothing with nothing to do', () => {
+        const { container } = render(<ActionBar label="x" />)
+        expect(container).toBeEmptyDOMElement()
     })
 })
 

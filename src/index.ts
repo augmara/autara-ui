@@ -89,7 +89,9 @@ export {
     // AUTM-1781 — the signed-in app shell.
     AppBar, type AppBarProps,
     AppTabBar, type AppTabBarProps, type AppTabBarItem,
-    ActionBar, type ActionBarProps, type ActionBarAction,
+    ActionBar, type ActionBarProps, type ActionBarAction, type ActionBarControl,
+    MediaFrame, initialsOf, type MediaFrameProps,
+    CountUp, type CountUpProps,
     ModeChip, type ModeChipProps, type BookingMode,
     Logo, type LogoProps,
     SearchInput, type SearchInputProps,
@@ -163,10 +165,19 @@ export {
     // AUTM-1678: page content motion
     motionStaggerDelay,
     MOTION_STAGGER_CAP,
+    // AUTM-1781: the app motion vocabulary
+    softTiming,
     type MotionBezier,
     type MotionDurationName,
     type MotionTransitionName,
 } from './lib/motion-tokens'
+
+/* AUTM-1781 — the direction of the next screen change, for `.motion-screen`. */
+export {
+    markNavigation,
+    listenForBackNavigation,
+    type NavigationDirection,
+} from './lib/navigation-motion'
 
 /* AUTM-1679 — a fixed header that steps out of the way on the way down and
  * comes back on the way up (utilities/autohide.css). */

@@ -3,52 +3,63 @@ import type { ReactElement, ReactNode } from 'react'
 import { cn } from '../lib/cn'
 
 /**
- * ActionBar: the few things a person can do on a detail screen, always in
- * reach (AUTM-1781).
+ * ActionBar: what a person can do next on a detail screen, under the thumb
+ * (AUTM-1781).
  *
- * Built for the customer's booking page, where Message sat 1,700px down a
- * phone and Change time and Cancel were page-size cards: one bar that holds
- * only the actions that are true right now, in the same place on every
- * status.
+ * The contract (the customer research, decision of 2026-10-09, and the
+ * customer app's AppBookingDetail and AppBookingLive boards):
  *
- * One list, two presentations, switched at `lg` (64rem) by CSS so the
- * actions exist once in the DOM:
- *
- *   PHONE AND TABLET, below lg: a dock fixed to the bottom edge, paper with a
- *   hairline above, clear of the home indicator. Three to five actions are
- *   equal tiles (a 40px icon disc over a 12px label, at least 56px tall); the
- *   `primary` one's disc is the brand fill. One or two actions are pills side
- *   by side, the primary in the brand fill. Thumb reach is the point: this is
- *   where the eye and the thumb go on a phone (Uber, Lyft, Fresha's bar).
+ *   - ONE `primary`: the thing that matters now, a lime pill, 56px tall.
+ *   - Beside it, EITHER up to two `icons` (Message and Call on the day: band
+ *     discs, 56px, the label as their accessible name) OR one `secondary`
+ *     (a band pill: "Keep Saturday" beside "Accept Sunday").
+ *   - Nothing else. Cancel, Change time and Help are never in it: they live
+ *     in the page (a row, the top bar), because a bar that holds everything
+ *     makes the one right action hard to find.
  *
  *     ┌──────────────────────────────────────────────┐
- *     │   (✉)       (➤)        (⟳)        (✕)        │
- *     │ Message  Directions Change time  Cancel       │
+ *     │  (✉) (✆)  ╭──────────── Directions ───────╮  │
+ *     │           ╰───────────────────────────────╯  │
  *     └──────────────────────────────────────────────┘
  *
- *   DESKTOP, from lg: an in-flow list for a side panel. The primary is a
- *   full-width brand pill; the rest are rows, an icon disc, the label and a
- *   chevron (Fresha's action rows), with `description` as a second line.
+ * PHONE AND TABLET, below lg: fixed to the bottom edge, paper with a hairline
+ * above, clear of the home indicator, rising into place when it mounts. DESKTOP,
+ * from lg: in the flow, for a side panel: every control full width, the
+ * icon actions as band pills with their names shown, because there is room
+ * to, and the primary last.
  *
- * Rules the component keeps so callers cannot break them:
- *   - At most one primary: purple acts, so two purple controls is no signal.
- *   - `tone="danger"` colours the label and glyph, never a red fill (the
- *     sheet's rule: the consequence is said in danger text, and the caller's
- *     confirm asks first).
- *   - Every action has a visible label; there are no icon-only actions.
- *   - Five at most in the dock. A sixth would push every label under 70px.
+ * Under the fixed bar the page needs room: below lg give it a bottom padding
+ * of `calc(6rem + env(safe-area-inset-bottom))`. At very large text on a
+ * narrow phone a fixed bar covers too much of the screen; the caller can put
+ * it back in the flow with `position: static` in a container query and render
+ * it where it reads in order.
  *
- * Under a fixed dock the page needs room: below lg give it a bottom padding
- * of `calc(7rem + env(safe-area-inset-bottom))` (rem, so it grows with the
- * text the way the dock does). At very large text on a narrow phone a fixed
- * bar covers too much of the screen; the caller can return it to the flow
- * with `position: static` in a container query, and should then render it
- * where it reads in order (customer-web puts it straight after the status).
+ * Links: autara-ui never imports a router. `element` takes an EMPTY framework
+ * link and the control's content is cloned into it; `href` renders a plain
+ * anchor (`external` opens a new tab and says so).
  *
- * Links: autara-ui never imports a router. `element` takes an EMPTY
- * framework link and the action's content is cloned into it; `href` renders
- * a plain anchor (`external` opens a new tab and says so).
+ * `actions` is the 8.4 list contract, kept so nothing that adopted it breaks;
+ * it is deprecated and renders as it did.
  */
+
+/** One control in the bar. */
+export interface ActionBarControl {
+    /** Stable key. Also seeds the default `data-testid`. */
+    key: string
+    /** The visible name; an icon action's accessible name. */
+    label: string
+    /** About 22px. Required on an icon action; optional on the pills. */
+    icon?: ReactNode
+    onSelect?: () => void
+    href?: string
+    /** With `href`: a new tab, said to a screen reader. */
+    external?: boolean
+    /** An EMPTY framework link; the control's content is cloned into it. */
+    element?: ReactElement
+    disabled?: boolean
+    /** Overrides the derived `data-testid`. A shipped one is public API. */
+    testId?: string
+}
 
 export interface ActionBarAction {
     /** Stable key. Also seeds the default `data-testid`. */
@@ -73,7 +84,17 @@ export interface ActionBarAction {
 }
 
 export interface ActionBarProps {
-    actions: ActionBarAction[]
+    /** The one thing that matters now. */
+    primary?: ActionBarControl
+    /** A quieter alternative beside the primary. Not with `icons`. */
+    secondary?: ActionBarControl
+    /** Up to two icon actions beside the primary (Message, Call). Not with `secondary`. */
+    icons?: ActionBarControl[]
+    /**
+     * @deprecated since 8.5 (AUTM-1781): use `primary`, `secondary` and
+     * `icons`. The 8.4 list, rendered as it was.
+     */
+    actions?: ActionBarAction[]
     /** The group's accessible name, e.g. "Booking actions". */
     label: string
     className?: string
@@ -137,7 +158,13 @@ function Chevron({ show }: { show: boolean }) {
     )
 }
 
-export function ActionBar({ actions, label, className, testIdPrefix = 'action-bar', testId }: ActionBarProps) {
+function LegacyActionBar({
+    actions,
+    label,
+    className,
+    testIdPrefix = 'action-bar',
+    testId,
+}: Omit<ActionBarProps, 'actions'> & { actions: ActionBarAction[] }) {
     if (actions.length === 0) return null
     const pills = actions.length <= 2
 
@@ -228,6 +255,129 @@ export function ActionBar({ actions, label, className, testIdPrefix = 'action-ba
                     )
                 })}
             </ul>
+        </div>
+    )
+}
+
+/* ─── The 8.5 contract: one primary, then two icons or one secondary ─── */
+
+const BAR =
+    'motion-bar-in fixed inset-x-0 bottom-0 z-40 border-t border-[var(--hairline)] bg-[var(--paper)] px-5 pt-3.5 pb-[max(1.75rem,calc(0.875rem+env(safe-area-inset-bottom)))] ' +
+    'lg:static lg:z-auto lg:border-0 lg:bg-transparent lg:p-0'
+
+const ROW = 'mx-auto flex w-full max-w-2xl items-center gap-2.5 lg:max-w-none lg:flex-col lg:items-stretch lg:gap-2'
+
+const PILL_BASE =
+    'motion-press inline-flex min-h-14 min-w-0 items-center justify-center gap-2 rounded-full px-5 py-2 text-center text-[1.0625rem] leading-tight font-medium [overflow-wrap:break-word] ' +
+    'disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:opacity-50'
+
+/** Lime on paper: the one action that leads. */
+const NEXT_PRIMARY = `${PILL_BASE} flex-1 bg-[var(--lime)] text-[var(--on-lime)] not-disabled:hover:bg-[var(--lime-press)] lg:w-full lg:flex-none`
+
+/** Band: the quieter choice beside it. */
+const NEXT_SECONDARY = `${PILL_BASE} flex-1 bg-[var(--band)] text-[var(--text-strong)] not-disabled:hover:bg-[var(--band-press)] lg:w-full lg:flex-none`
+
+/** A 56px band disc below lg; a band pill with its name from lg. */
+const NEXT_ICON =
+    'motion-press inline-flex size-14 shrink-0 items-center justify-center gap-2 rounded-full bg-[var(--band)] text-[var(--text-strong)] not-disabled:hover:bg-[var(--band-press)] ' +
+    'lg:h-auto lg:min-h-12 lg:w-full lg:px-5 lg:text-base lg:font-medium'
+
+function Control({
+    control,
+    className,
+    iconOnly,
+    testId,
+    primary,
+}: {
+    control: ActionBarControl
+    className: string
+    iconOnly: boolean
+    testId: string
+    primary?: boolean
+}) {
+    const cls = cn(className, FOCUS)
+    const content = (
+        <>
+            {control.icon ? (
+                <span aria-hidden className="grid shrink-0 place-items-center [&>svg]:size-[22px]">
+                    {control.icon}
+                </span>
+            ) : null}
+            {/* An icon action's name is its accessible name below lg and its
+                visible name from lg. */}
+            <span className={iconOnly ? 'sr-only lg:not-sr-only' : 'min-w-0'}>{control.label}</span>
+            {control.href && control.external ? <span className="sr-only">(opens in a new tab)</span> : null}
+        </>
+    )
+    const shared = {
+        className: cls,
+        'data-testid': testId,
+        'data-primary': primary ? '' : undefined,
+    }
+    if (control.element) {
+        return React.cloneElement(
+            control.element as ReactElement<Record<string, unknown>>,
+            {
+                ...shared,
+                className: cn((control.element.props as { className?: string }).className, cls),
+                onClick: control.onSelect,
+                'aria-disabled': control.disabled || undefined,
+            },
+            content,
+        )
+    }
+    if (control.href && !control.disabled) {
+        return (
+            <a
+                href={control.href}
+                {...shared}
+                onClick={control.onSelect}
+                {...(control.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+            >
+                {content}
+            </a>
+        )
+    }
+    return (
+        <button type="button" {...shared} onClick={control.onSelect} disabled={control.disabled}>
+            {content}
+        </button>
+    )
+}
+
+export function ActionBar(props: ActionBarProps) {
+    const { primary, secondary, icons, actions, label, className, testIdPrefix = 'action-bar', testId } = props
+    if (actions && !primary && !secondary && !icons) {
+        return <LegacyActionBar {...props} actions={actions} />
+    }
+    /* The contract, kept by the component: two icons at most, and never icons
+       and a secondary together (the secondary wins, it carries words). */
+    const iconActions = secondary ? [] : (icons ?? []).slice(0, 2)
+    if (!primary && !secondary && iconActions.length === 0) return null
+    const id = (c: ActionBarControl) => c.testId ?? `${testIdPrefix}-${c.key}`
+
+    return (
+        <div
+            role="group"
+            aria-label={label}
+            data-testid={testId}
+            data-shape={secondary ? 'secondary' : iconActions.length ? 'icons' : 'primary'}
+            className={cn(BAR, className)}
+        >
+            <div className={ROW}>
+                {/* One order everywhere, so the focus order is the reading
+                    order: the quieter controls first, the primary last, on the
+                    right under a phone's thumb and at the foot of a panel. */}
+                {iconActions.map((c) => (
+                    <Control key={c.key} control={c} className={NEXT_ICON} iconOnly testId={id(c)} />
+                ))}
+                {secondary ? (
+                    <Control control={secondary} className={NEXT_SECONDARY} iconOnly={false} testId={id(secondary)} />
+                ) : null}
+                {primary ? (
+                    <Control control={primary} className={NEXT_PRIMARY} iconOnly={false} testId={id(primary)} primary />
+                ) : null}
+            </div>
         </div>
     )
 }

@@ -64,7 +64,7 @@ describe('motion tokens match utilities/animations.css', () => {
         // A regex that stopped matching would otherwise pass every check below
         // against an empty list.
         expect(durations.length).toBeGreaterThanOrEqual(10)
-        expect(easings).toHaveLength(2)
+        expect(easings).toHaveLength(4)
     })
 
     it('every duration in the stylesheet is in motionDurations, at the same value', () => {

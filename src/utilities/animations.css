@@ -213,10 +213,27 @@
     --motion-skeleton: 1400ms;
     --motion-crossfade: 160ms;
 
+    /* AUTM-1781: the app vocabulary (Don, 2026-10-09: "can we apply slight
+     * animation in our app too", after the Fernly reference; the spec is in
+     * the "App motion" block at the end of this file). Additive: no token
+     * above changes, so a surface opts in by using these. */
+    --motion-enter: 550ms;
+    --motion-enter-stagger: 60ms;
+    --motion-row: 400ms;
+    --motion-row-stagger: 30ms;
+    --motion-slide: 450ms;
+    --motion-count: 900ms;
+    --motion-pop: 500ms;
+    --motion-sheet-soft: 350ms;
+
     /* The house easing — the same curve `.animate-on-scroll` above uses, so
      * a panel and a reveal feel like one product. */
     --motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
     --motion-ease-in: cubic-bezier(0.4, 0, 1, 1);
+    /* AUTM-1781: the app vocabulary's one soft ease-out, and the small
+     * overshoot it allows for a pop. */
+    --motion-ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+    --motion-ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* ─── Scrim — the ink behind a Dialog or a Sheet ─────────────────────── */
@@ -832,4 +849,164 @@
     .motion-crossfade {
         animation-duration: var(--motion-crossfade) !important;
     }
+}
+
+/* ─── App motion (AUTM-1781) ─────────────────────────────────────────────
+ *
+ * Don, 2026-10-09, after a reference he liked: "can we apply slight animation
+ * in our app too". The vocabulary was measured off that reference and written
+ * down by the CTO session (motion spec, 2026-10-09); only the vocabulary is
+ * borrowed, none of its code or look. One soft ease-out for almost everything,
+ * a small overshoot only for a pop.
+ *
+ *   class / helper          what moves                          token
+ *   .motion-screen          a screen arriving in a direction:   --motion-slide
+ *                           6% sideways and a fade (push from
+ *                           the right, back from the left, a
+ *                           tab from the side it sits on)
+ *   .motion-rise            a screen's sections arriving:       --motion-enter,
+ *                           18px up, 98.5% to full size, fade,  --motion-enter-stagger
+ *                           60ms apart in reading order
+ *   .motion-rows            list rows arriving: 4px up and a    --motion-row,
+ *                           fade, 30ms apart, the first 12      --motion-row-stagger
+ *   .motion-pop             a chip, a slot or a tab chosen:     --motion-pop,
+ *                           1, 1.04, .99, 1                     --motion-ease-pop
+ *   .motion-sheet-soft      on a Dialog or Sheet panel: the     --motion-sheet-soft
+ *                           sheet rises, the dialog settles
+ *                           14px and from 98%
+ *   .motion-bar-in          a bar at the bottom edge rising     --motion-sheet-soft
+ *                           into place on mount (below lg)
+ *   CountUp (component)     a number counting up once           --motion-count
+ *   AppTabBar (component)   the dock's lime pill sliding        --motion-slide
+ *
+ * Rules that travel with it: transform and opacity only; nothing blocks
+ * input; content is readable and present at once (every `from` is opacity
+ * 0.001, never hidden, and the DOM holds the final text from the first
+ * frame); once per arrival, never on a re-render or a poll; slight, not
+ * showy. Every rule below sits inside `prefers-reduced-motion:
+ * no-preference`, so a reduced-motion user gets the end state at once.
+ *
+ * `.motion-screen` must never be an ancestor of a fixed bar: a transformed
+ * ancestor turns `position: fixed` into "fixed to me" while it animates, and
+ * the bar would ride down the page. Its direction is read off
+ * `html[data-nav]`, which `markNavigation()` (lib/navigation-motion) sets just
+ * before the router changes the page and clears once the screen has arrived,
+ * so a first load and a later re-render never slide.
+ */
+
+@keyframes autara-screen-push {
+    from { opacity: 0.001; transform: translateX(6%); }
+    to { opacity: 1; transform: none; }
+}
+@keyframes autara-screen-back {
+    from { opacity: 0.001; transform: translateX(-6%); }
+    to { opacity: 1; transform: none; }
+}
+@keyframes autara-rise {
+    from { opacity: 0.001; transform: translateY(18px) scale(0.985); }
+    to { opacity: 1; transform: none; }
+}
+@keyframes autara-row-in {
+    from { opacity: 0.001; transform: translateY(4px); }
+    to { opacity: 1; transform: none; }
+}
+@keyframes autara-pop {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.04); }
+    75% { transform: scale(0.99); }
+    100% { transform: scale(1); }
+}
+@keyframes autara-sheet-soft-in {
+    from { transform: translateY(100%); }
+    to { transform: none; }
+}
+@keyframes autara-dialog-soft-in {
+    from { opacity: 0.001; transform: translateY(14px) scale(0.98); }
+    to { opacity: 1; transform: none; }
+}
+@keyframes autara-bar-in {
+    from { transform: translateY(100%); }
+    to { transform: none; }
+}
+
+/* The index for `.motion-rise` (cap 6) and `.motion-rows` (cap 12), by
+ * position, so server HTML carries it with no script. Outside the
+ * `--motion-` namespace, which holds tokens only. */
+.motion-rise > *,
+.motion-rows > * { --rise-i: 0; }
+.motion-rise > :nth-child(2), .motion-rows > :nth-child(2) { --rise-i: 1; }
+.motion-rise > :nth-child(3), .motion-rows > :nth-child(3) { --rise-i: 2; }
+.motion-rise > :nth-child(4), .motion-rows > :nth-child(4) { --rise-i: 3; }
+.motion-rise > :nth-child(5), .motion-rows > :nth-child(5) { --rise-i: 4; }
+.motion-rise > :nth-child(n + 6), .motion-rows > :nth-child(6) { --rise-i: 5; }
+.motion-rows > :nth-child(7) { --rise-i: 6; }
+.motion-rows > :nth-child(8) { --rise-i: 7; }
+.motion-rows > :nth-child(9) { --rise-i: 8; }
+.motion-rows > :nth-child(10) { --rise-i: 9; }
+.motion-rows > :nth-child(11) { --rise-i: 10; }
+.motion-rows > :nth-child(n + 12) { --rise-i: 11; }
+
+@media (prefers-reduced-motion: no-preference) {
+    html[data-nav="push"] .motion-screen {
+        animation: autara-screen-push var(--motion-slide) var(--motion-ease-soft) both;
+    }
+    html[data-nav="back"] .motion-screen {
+        animation: autara-screen-back var(--motion-slide) var(--motion-ease-soft) both;
+    }
+    html[data-nav="tab"] .motion-screen {
+        animation: autara-fade-in var(--motion-slide) var(--motion-ease-soft) both;
+    }
+    .motion-rise > * {
+        animation: autara-rise var(--motion-enter) var(--motion-ease-soft) both;
+        animation-delay: calc(var(--rise-i, 0) * var(--motion-enter-stagger));
+    }
+    .motion-rows > * {
+        animation: autara-row-in var(--motion-row) var(--motion-ease-soft) both;
+        animation-delay: calc(var(--rise-i, 0) * var(--motion-row-stagger));
+    }
+    .motion-pop:is([aria-checked="true"], [aria-pressed="true"], [aria-selected="true"], [data-state="checked"], [data-state="on"], [data-selected]) {
+        animation: autara-pop var(--motion-pop) var(--motion-ease-pop);
+    }
+    .sheet-panel.motion-sheet-soft[data-state="open"],
+    .dialog-panel--responsive.motion-sheet-soft[data-state="open"] {
+        animation: autara-sheet-soft-in var(--motion-sheet-soft) var(--motion-ease-soft);
+    }
+    .modal-panel.motion-sheet-soft[data-state="open"] {
+        animation: autara-dialog-soft-in var(--motion-sheet-soft) var(--motion-ease-soft);
+    }
+}
+@media (prefers-reduced-motion: no-preference) and (min-width: 40rem) {
+    /* The responsive dialog is a card from sm: it settles, it does not rise. */
+    .dialog-panel--responsive.motion-sheet-soft[data-state="open"] {
+        animation: autara-dialog-soft-in var(--motion-sheet-soft) var(--motion-ease-soft);
+    }
+}
+/* Below lg only (64rem), where bars are fixed to the edge; from lg the same
+ * bar sits in a side panel and does not travel. Transform only: the bar is
+ * opaque. */
+@media (prefers-reduced-motion: no-preference) and (max-width: 63.999rem) {
+    .motion-bar-in {
+        animation: autara-bar-in var(--motion-sheet-soft) var(--motion-ease-soft) both;
+    }
+}
+
+/* CountUp's drawn digits: the element's own text (the final value) is
+ * invisible while a generated copy counts over it, in the same box, so the
+ * layout never moves. Generated content with an empty alternative, so a
+ * screen reader and `innerText` only ever meet the final value; the first
+ * `content` is for an engine without the alternative syntax. */
+.motion-count {
+    position: relative;
+    display: inline-block;
+}
+.motion-count[data-counting] > .motion-count-value {
+    opacity: 0;
+}
+.motion-count[data-counting]::after {
+    content: attr(data-counting);
+    content: attr(data-counting) / "";
+    position: absolute;
+    inset: 0;
+    white-space: nowrap;
+    pointer-events: none;
 }
