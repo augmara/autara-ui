@@ -228,7 +228,7 @@ export {
     type ListSectionRowProps,
 } from './ListSection'
 export { ModeChip, type ModeChipProps, type BookingMode } from './ModeChip'
-export { Logo, type LogoProps } from './Logo'
+export { Logo, type LogoProps, type LogoTone } from './Logo'
 export { SearchInput, type SearchInputProps } from './SearchInput'
 export {
     FilterChipRow,

@@ -97,7 +97,7 @@ export {
     // CountUp is exported once, beside Tabs above (AUTM-1792; AUTM-1781 added its server-safe props).
     MediaFrame, initialsOf, type MediaFrameProps,
     ModeChip, type ModeChipProps, type BookingMode,
-    Logo, type LogoProps,
+    Logo, type LogoProps, type LogoTone,
     SearchInput, type SearchInputProps,
     FilterChipRow, type FilterChipRowProps, type FilterChipOption,
     // v2.1.0 — customer-web marketing harvest (AUTAA-UI-007)
