@@ -9,6 +9,7 @@ import {
   useState,
   type CSSProperties,
   type ElementType,
+  type MouseEvent as ReactMouseEvent,
   type ReactNode,
   type Ref,
 } from "react";
@@ -52,6 +53,9 @@ import { cn } from "../lib/cn";
  *
  * In every mode the description's More toggle sits above the stretched hit
  * area, so reading more never books or selects anything.
+ *
+ * A press anywhere else on the card is the card's, by mouse, touch or pen,
+ * even under a consumer's own press styles (AUTM-1786; see `HIT`).
  *
  * Layouts: `horizontal` (a list row, photo left), `vertical` (a grid tile,
  * photo on top), `adaptive` (a row on a phone, a tile from 640px). A
@@ -249,11 +253,90 @@ const FOOT: Record<ServiceCardLayout, string> = {
 /* The name's type, on the element inside the heading (see the note there). */
 const NAME_TEXT = "block text-base font-bold leading-snug tracking-normal [overflow-wrap:anywhere]";
 
-/* The stretched hit area: the link or label's ::after covers the card. Every
- * element between it and the card root stays unpositioned, or the ::after
- * would be confined to that element instead. */
+/* The stretched hit area: the link or label's ::after covers the card. It
+ * covers the card only while the card root is its containing block, so every
+ * element between the two stays unpositioned and untransformed.
+ *
+ * AUTM-1786: a press on the photo opened nothing on qa.autara.au, because
+ * customer-web scales every `a[href]` to 98.5% while it is pressed, and a
+ * scaled element is the containing block of its own ::after: mid-press the hit
+ * area shrank from the card to the name, the release landed on the photo, and
+ * the browser sent the click to a plain element. So:
+ *
+ *   - The link or label itself is pinned with `!` (an important declaration
+ *     in a layer beats a consumer's unlayered rule): static, and no
+ *     transform, scale, translate or rotate. The card presses as a whole;
+ *     its name does not press on its own.
+ *   - The card's own press shrinks it to 98.5%, the ::after with it, so a
+ *     press held at the very edge would end just outside. While pressed, the
+ *     ::after reaches out by exactly what the press takes in, (1 - 1/0.985)/2
+ *     of each side (about 0.76%), so even fully pressed it covers every point
+ *     of the card at rest. Only while pressed, so a card flush with a
+ *     viewport edge never scrolls sideways by a few invisible pixels. Change
+ *     the two numbers together.
+ *
+ * `forwardStrayClick` below is the backstop for anything else that confines
+ * the ::after. ServiceCard.browser.test.tsx holds all three in a real browser;
+ * jsdom cannot hit-test. */
 const HIT =
-  "cursor-pointer outline-none after:absolute after:inset-0 after:z-[1] after:rounded-[1.5rem] after:content-['']";
+  "cursor-pointer outline-none static! transform-none! scale-none! translate-none! rotate-none! after:absolute after:inset-0 motion-safe:active:after:inset-[calc((1_-_1/0.985)*50%)] after:z-[1] after:rounded-[1.5rem] after:content-['']";
+
+/* Controls in the card that own their clicks: the link, the label and the
+ * radio, More, and anything interactive a consumer puts in a slot. */
+const OWNS_CLICK = 'a[href], button, input, label, select, textarea, summary, [role="button"], [role="link"]';
+
+/**
+ * AUTM-1786, the backstop: a click that lands anywhere on the card but on
+ * none of its controls is the card's, so it goes to the link or the label.
+ *
+ * The browser sends a click to the element the press both began and ended on,
+ * or to their nearest common ancestor. When the stretched ::after is confined
+ * by CSS this component cannot see (a consumer that positions or transforms
+ * the heading, say), a press on the photo begins or ends on the photo, the
+ * click lands on a plain element of the card, and nothing opens. Here it
+ * still does. A link gets a click carrying the same modifier keys, so the
+ * consumer's link component (Next's Link reads them) sees the press it was
+ * given; a label is clicked, which selects its radio.
+ *
+ * Never for a click a control already took (no second navigation), nor after
+ * a text selection inside the card.
+ */
+function forwardStrayClick(event: ReactMouseEvent<HTMLDivElement>) {
+  const card = event.currentTarget;
+  const hit = card.querySelector<HTMLElement>("[data-hit]");
+  if (!hit || event.defaultPrevented) return;
+  // By node type, not `instanceof Element`, which fails across documents.
+  const target = event.target as Node;
+  const el = target.nodeType === 1 ? (target as Element) : target.parentElement;
+  const owner = el ? el.closest(OWNS_CLICK) : null;
+  if (owner && card.contains(owner)) return;
+  const selection = card.ownerDocument.getSelection();
+  if (selection && !selection.isCollapsed && card.contains(selection.anchorNode)) return;
+  if (hit.tagName === "LABEL") {
+    hit.click();
+    return;
+  }
+  // The card's own window, not the global one, so this holds in an iframe.
+  const view = card.ownerDocument.defaultView;
+  if (!view) return;
+  hit.dispatchEvent(
+    new view.MouseEvent("click", {
+      bubbles: true,
+      cancelable: true,
+      detail: event.detail,
+      screenX: event.screenX,
+      screenY: event.screenY,
+      clientX: event.clientX,
+      clientY: event.clientY,
+      ctrlKey: event.ctrlKey,
+      shiftKey: event.shiftKey,
+      altKey: event.altKey,
+      metaKey: event.metaKey,
+      button: event.button,
+      buttons: event.buttons,
+    }),
+  );
+}
 
 export const ServiceCard = forwardRef<HTMLElement, ServiceCardProps>(
   function ServiceCard(
@@ -353,6 +436,7 @@ export const ServiceCard = forwardRef<HTMLElement, ServiceCardProps>(
         data-selected={selected || undefined}
         data-testid={testId}
         style={style}
+        onClick={interactive ? forwardStrayClick : undefined}
         className={cn(
           "group/service relative flex h-full flex-col rounded-[1.5rem] p-2.5 text-left @container",
           "transition-[background-color,scale] duration-[var(--motion-panel-in)] ease-[var(--motion-ease-out)]",
