@@ -18,7 +18,12 @@ import { cn } from '../lib/cn'
  *
  * Counts are the `count` variants: a 22px disc that widens with the number,
  * 12px Bold. Purple in navigation, paper with a hairline when quiet, red on
- * the bell and the dock (`count-alert`).
+ * the bell and the dock (`count-alert`), and lime with ink on an ACTIVE or
+ * SELECTED row (`count-selected`: the current rail item, the chosen filter
+ * chip). AUTM-1753, Don 2026-10-09: `count-quiet` on the selected fill drew
+ * "99+" as a dark pill on purple in dark mode, "fix that with a better one,
+ * like a lime green badge". Lime on ink is 16.9:1 in both themes, and lime
+ * is already the colour that means "this one" on the selected row's fill.
  *
  * The shape is a pill by default now; the sheet supersedes AUTM-211's
  * parallelogram default. `shape="parallelogram"` still draws the tilted slab
@@ -46,6 +51,7 @@ type SheetTone =
     | 'count'
     | 'count-quiet'
     | 'count-alert'
+    | 'count-selected'
 
 type LegacyTone =
     | 'purple'
@@ -108,6 +114,7 @@ const TONES: Record<SheetTone, string> = {
     count: `${COUNT} bg-[var(--brand)] text-[var(--on-brand)]`,
     'count-quiet': `${COUNT} bg-[var(--paper)] text-[var(--brand-deep)] shadow-[inset_0_0_0_1px_var(--hairline)]`,
     'count-alert': `${COUNT} bg-[var(--alert)] text-[var(--on-alert)]`,
+    'count-selected': `${COUNT} bg-[var(--lime)] text-[var(--on-lime)]`,
 }
 
 const VARIANTS = {
