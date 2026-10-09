@@ -245,7 +245,15 @@ export function StatTile({
                         // The sheet's figure: 40px Black. On the hero it is
                         // lime, which AUTM-1592 asked for (the figure and the
                         // label could not be coloured separately).
-                        'text-[2.5rem] font-black leading-none tabular-nums',
+                        //
+                        // AUTM-1792: sized to the tile, down to 24px, so a
+                        // long figure ("$13,880" in a phone's half-width
+                        // tile) fits instead of running out of it. `cqi` is
+                        // the tile's width when the tile is a size container
+                        // (StatsStrip makes it one); with no container it
+                        // resolves against the viewport, so a tile outside a
+                        // strip is 40px as before.
+                        'stat-tile-figure text-[clamp(1.5rem,22cqi,2.5rem)] font-black leading-none tabular-nums whitespace-nowrap',
                         hero ? 'text-[var(--lime)]' : 'text-[var(--text-strong)]',
                     )}
                 >

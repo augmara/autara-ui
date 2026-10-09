@@ -71,20 +71,48 @@ export function StatsStrip({
     className,
 }: StatsStripProps) {
     const cols: 2 | 3 | 4 = columns ?? (Math.min(stats.length, 4) as 2 | 3 | 4)
+    /* AUTM-1792 — on a phone the strip is two columns, and three stats left
+       the third alone on a row with the hero squeezed into half a phone,
+       where "$13,880" ran out of its tile. With an odd count the hero now
+       leads the full width (or, with no hero, the last tile takes the row);
+       from `sm` every tile is a column again. */
+    const odd = stats.length % 2 === 1
+    const heroIndex = stats.findIndex((s) => s.hero)
+    const wideIndex = !odd ? -1 : heroIndex >= 0 ? heroIndex : stats.length - 1
     return (
-        <div className={cn('grid grid-cols-2 gap-3', COLUMN_CLASS[cols], className)}>
-            {stats.map((s, i) => (
-                <StatTile
-                    key={i}
-                    label={s.label}
-                    value={s.value}
-                    caption={s.caption}
-                    icon={s.icon}
-                    tone={s.tone}
-                    hero={s.hero}
-                    loading={loading}
-                />
-            ))}
+        /* The strip's own container, so it can go to ONE column when the text
+           is large (an em container query: 200% text reads as less room). */
+        <div className="stats-strip-host @container">
+            <div
+                className={cn(
+                    'stats-strip grid grid-flow-row-dense grid-cols-2 gap-3 @max-[20em]:grid-cols-1',
+                    COLUMN_CLASS[cols],
+                    className
+                )}
+            >
+                {stats.map((s, i) => (
+                    <div
+                        key={i}
+                        /* Each tile is a size container, so its figure can
+                           size to it (StatTile `stat-tile-figure`). */
+                        className={cn(
+                            'grid min-w-0 [container-type:inline-size]',
+                            i === wideIndex && 'col-span-2 @max-[20em]:col-span-1 sm:col-span-1',
+                            i === wideIndex && i === heroIndex && 'order-first sm:order-none'
+                        )}
+                    >
+                        <StatTile
+                            label={s.label}
+                            value={s.value}
+                            caption={s.caption}
+                            icon={s.icon}
+                            tone={s.tone}
+                            hero={s.hero}
+                            loading={loading}
+                        />
+                    </div>
+                ))}
+            </div>
         </div>
     )
 }
