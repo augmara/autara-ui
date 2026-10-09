@@ -14,6 +14,7 @@ import {
   type Ref,
 } from "react";
 import { cn } from "../lib/cn";
+import { Badge } from "./Badge";
 
 /**
  * ServiceCard: one bookable service, the same card on the merchant page's
@@ -66,6 +67,26 @@ import { cn } from "../lib/cn";
  * The card is an inline-size container (`@container`), so it must get its
  * width from its parent (a list, a grid cell). Inside a shrink-to-fit parent
  * it collapses.
+ *
+ * AUTM-1812 (Don, 2026-10-09, on the merchant portal's Packages screen:
+ * "redesign the package card as well with the discount and beautiful UI",
+ * then "services card also"). The same card is the merchant's catalogue tile,
+ * so a pro sees their menu the way a customer will. Five optional parts, none
+ * of which changes a card that does not pass them:
+ *
+ *   - `status`: a solid pill on the photo's corner (Active lime, Draft amber,
+ *     Inactive band, the tones the service editor already uses), read with
+ *     the card by a screen reader.
+ *   - `noPhotoLabel`: words on the no-photo panel, e.g. "No photo yet" in the
+ *     catalogue, where the missing cover is what stands between a draft and
+ *     Publish.
+ *   - `includes`: what a package holds, by name, three then "+ N more".
+ *   - `compareAtPriceLabel` and `savingLabel`: a figure struck through after
+ *     the headline and a solid brand "Save $X" pill beside it. The card draws
+ *     the saving only beside a struck figure, and never works one out:
+ *     `packageSaving` (lib/package-listing) does, from the server's figures.
+ *
+ * `PackageCard` is this card with a package's words; reach for it first.
  */
 
 export type ServiceCardLayout = "horizontal" | "vertical" | "adaptive";
@@ -83,10 +104,36 @@ export interface ServiceCardPriceLine {
   value: ReactNode;
 }
 
+/**
+ * The tones a catalogue status takes, the service editor's own (AUTM-1567):
+ * `live` lime (Active), `draft` amber, `off` band (Inactive, paused).
+ */
+export type ServiceCardStatusTone = "live" | "draft" | "off";
+
+/** A status pill on the photo's corner. The consumer words it, e.g. `{ label: "Draft", tone: "draft" }`. */
+export interface ServiceCardStatus {
+  label: string;
+  tone: ServiceCardStatusTone;
+}
+
+const STATUS_BADGE: Record<ServiceCardStatusTone, "lime" | "amber" | "band"> = {
+  live: "lime",
+  draft: "amber",
+  off: "band",
+};
+
 /** `data-testid`s for the parts E2E locates. Treat each as public API. */
 export interface ServiceCardTestIds {
   /** The link (link mode) or the radio input (select mode). */
   action?: string;
+  /** The status pill. */
+  status?: string;
+  /** The included names list. */
+  includes?: string;
+  /** The struck-through figure after the headline. */
+  compareAtPrice?: string;
+  /** The saving pill. */
+  saving?: string;
   /** The price headline. */
   price?: string;
   /** The list of price lines. */
@@ -131,8 +178,41 @@ export interface ServiceCardProps {
   media?: ReactNode;
   /** Replaces the designed no-photo panel. */
   fallback?: ReactNode;
-  /** Decoration over the photo's top-left corner, e.g. a Badge. */
+  /** Decoration over the photo's top-left corner, e.g. a Badge. Drawn after `status`. */
   badge?: ReactNode;
+  /**
+   * A solid status pill on the photo's top-left corner, for a merchant's own
+   * catalogue. Part of the card's accessible description.
+   */
+  status?: ServiceCardStatus | null;
+  /**
+   * Words on the designed no-photo panel, e.g. "No photo yet". Shown only
+   * when there is no photo; part of the card's accessible description then.
+   */
+  noPhotoLabel?: string | null;
+  /**
+   * What the card includes, by name: a package's services. The first
+   * `includesShown` are listed, then "+ N more". Full names stay in the DOM.
+   */
+  includes?: ReadonlyArray<string> | null;
+  /** How many of `includes` are listed before "+ N more". Default 3. */
+  includesShown?: number;
+  /**
+   * A higher figure the headline is measured against, struck through after
+   * it: a package's services booked separately. Pre-formatted.
+   */
+  compareAtPriceLabel?: string | null;
+  /**
+   * Read before the struck figure, because screen readers do not announce a
+   * strike-through. Default "Usually".
+   */
+  compareAtPriceDescription?: string;
+  /**
+   * A solid brand pill beside the price, e.g. "Save $52". Drawn only with
+   * `compareAtPriceLabel`, so a saving never stands without what it is
+   * measured against. Work it out with `packageSaving`, never by hand.
+   */
+  savingLabel?: string | null;
   /** Default `horizontal`. */
   layout?: ServiceCardLayout;
 
@@ -250,6 +330,24 @@ const FOOT: Record<ServiceCardLayout, string> = {
   adaptive: "px-1.5 pb-1.5 max-sm:@min-[19rem]:col-span-2",
 };
 
+/* The price row (headline, struck figure, saving) when a deal is drawn. It
+ * follows the foot's own alignment: right-aligned only where the foot is the
+ * right-hand column of a wide horizontal row. */
+const DEAL_ROW: Record<ServiceCardLayout, string> = {
+  vertical: "",
+  horizontal: "@min-[40rem]:justify-end",
+  adaptive: "",
+};
+
+/* With both a description and an included list, the photo of a 19 to 40rem
+ * row spans three rows (name, description, list), not two, so no empty cell
+ * opens under it. */
+const MEDIA_SPAN_THREE: Record<ServiceCardLayout, string> = {
+  vertical: "",
+  horizontal: "@min-[19rem]:@max-[40rem]:row-span-3",
+  adaptive: "max-sm:@min-[19rem]:row-span-3",
+};
+
 /* The name's type, on the element inside the heading (see the note there). */
 const NAME_TEXT = "block text-base font-bold leading-snug tracking-normal [overflow-wrap:anywhere]";
 
@@ -355,6 +453,13 @@ export const ServiceCard = forwardRef<HTMLElement, ServiceCardProps>(
       media,
       fallback,
       badge,
+      status,
+      noPhotoLabel,
+      includes,
+      includesShown = 3,
+      compareAtPriceLabel,
+      compareAtPriceDescription = "Usually",
+      savingLabel,
       layout = "horizontal",
       href,
       as,
@@ -379,11 +484,24 @@ export const ServiceCard = forwardRef<HTMLElement, ServiceCardProps>(
     const priceId = `${uid}-price`;
     const descId = `${uid}-desc`;
     const inputId = `${uid}-input`;
+    const statusId = `${uid}-status`;
+    const includesId = `${uid}-includes`;
+    const noPhotoId = `${uid}-no-photo`;
 
     // Which URL failed, rather than a flag: a new URL gets its own chance to
     // load without an effect to reset anything.
     const [failedUrl, setFailedUrl] = useState<string | null>(null);
     const imageFailed = Boolean(coverImageUrl) && failedUrl === coverImageUrl;
+    const showsNoPhoto = !media && !fallback && (!coverImageUrl || imageFailed);
+    const hasNoPhotoLabel = showsNoPhoto && Boolean(noPhotoLabel);
+
+    const included = includes ? includes.filter((n) => n.trim().length > 0) : [];
+    const shownCount = Math.max(1, Math.floor(includesShown));
+    const includedShown = included.slice(0, shownCount);
+    const includedMore = included.length - includedShown.length;
+    // A saving never stands alone: no struck figure, no pill.
+    const showSaving = Boolean(compareAtPriceLabel) && Boolean(savingLabel);
+    const hasDeal = Boolean(compareAtPriceLabel);
 
     const allChips: ServiceCardChip[] = [];
     if (workingDaysLabel) {
@@ -395,7 +513,15 @@ export const ServiceCard = forwardRef<HTMLElement, ServiceCardProps>(
     if (chips) allChips.push(...chips);
     if (addonsHint) allChips.push({ label: addonsHint, icon: <PlusIcon /> });
 
-    const describedBy = [allChips.length > 0 ? metaId : null, priceId].filter(Boolean).join(" ");
+    const describedBy = [
+      status ? statusId : null,
+      hasNoPhotoLabel ? noPhotoId : null,
+      included.length > 0 ? includesId : null,
+      allChips.length > 0 ? metaId : null,
+      priceId,
+    ]
+      .filter(Boolean)
+      .join(" ");
 
     const Heading = nameAs as ElementType;
     const LinkComp = (as ?? "a") as ElementType;
@@ -418,7 +544,14 @@ export const ServiceCard = forwardRef<HTMLElement, ServiceCardProps>(
       );
     } else {
       mediaContent = fallback ?? (
-        <NoPhotoPanel figure={workingDaysLabel ?? durationLabel} multiDay={Boolean(workingDaysLabel)} />
+        <NoPhotoPanel
+          figure={workingDaysLabel ?? durationLabel}
+          multiDay={Boolean(workingDaysLabel)}
+          label={noPhotoLabel}
+          labelId={noPhotoId}
+          // A badge alone keeps the old panel, so existing consumers render as before.
+          cornerTaken={Boolean(status) || (Boolean(badge) && Boolean(noPhotoLabel))}
+        />
       );
     }
 
@@ -474,6 +607,7 @@ export const ServiceCard = forwardRef<HTMLElement, ServiceCardProps>(
             className={cn(
               "relative aspect-[4/3] overflow-hidden rounded-2xl bg-[var(--paper)] @container/media",
               MEDIA_BOX[layout],
+              description && included.length > 0 && MEDIA_SPAN_THREE[layout],
             )}
           >
             <div
@@ -485,7 +619,25 @@ export const ServiceCard = forwardRef<HTMLElement, ServiceCardProps>(
             >
               {mediaContent}
             </div>
-            {badge ? <div className="absolute left-2 top-2 flex">{badge}</div> : null}
+            {status ? (
+              <div className="absolute left-2 right-2 top-2 flex flex-wrap items-start gap-1.5">
+                <Badge
+                  id={statusId}
+                  variant={STATUS_BADGE[status.tone]}
+                  data-slot="status"
+                  data-tone={status.tone}
+                  data-testid={testIds?.status}
+                >
+                  {status.label}
+                  {/* A full stop the eye never sees, so the description
+                      reads "Draft. 45 min" rather than "Draft 45 min". */}
+                  <span className="sr-only">.</span>
+                </Badge>
+                {badge ? <div className="flex">{badge}</div> : null}
+              </div>
+            ) : badge ? (
+              <div className="absolute left-2 top-2 flex">{badge}</div>
+            ) : null}
           </div>
 
           <div className={cn("flex min-w-0 flex-col gap-2", CONTENT[layout])}>
@@ -528,6 +680,50 @@ export const ServiceCard = forwardRef<HTMLElement, ServiceCardProps>(
               />
             ) : null}
 
+            {included.length > 0 ? (
+              /* What the package holds, one name a line with a check, cut to
+                 one line each so a long name never pushes the price out of
+                 line with the next tile's; the full name stays in the DOM for
+                 a screen reader. "Includes" is said, not drawn: the checks
+                 say it to the eye. */
+              <div id={includesId} data-testid={testIds?.includes} className={cn("min-w-0", DESC[layout])}>
+                <span className="sr-only">Includes </span>
+                <ul className="flex flex-col gap-1">
+                  {includedShown.map((name, i) => (
+                    <li
+                      key={`${i}-${name}`}
+                      className={cn(
+                        "flex min-w-0 items-center gap-1.5 text-sm leading-snug",
+                        selected ? "text-[var(--on-selected)]" : "text-[var(--text-strong)]",
+                      )}
+                    >
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          "flex shrink-0",
+                          selected ? "text-[var(--on-selected)]" : "text-[var(--text-muted)]",
+                        )}
+                      >
+                        <CheckIcon small />
+                      </span>
+                      <span className="min-w-0 truncate">{name}</span>
+                      {i < includedShown.length - 1 || includedMore > 0 ? <span className="sr-only">, </span> : null}
+                    </li>
+                  ))}
+                  {includedMore > 0 ? (
+                    <li
+                      className={cn(
+                        "pl-5 text-sm font-medium leading-snug",
+                        selected ? "text-[var(--on-selected)]" : "text-[var(--text-muted)]",
+                      )}
+                    >
+                      + {includedMore} more
+                    </li>
+                  ) : null}
+                </ul>
+              </div>
+            ) : null}
+
             {allChips.length > 0 ? (
               <div id={metaId} className={cn("flex flex-wrap content-start gap-1.5", CHIPS[layout])}>
                 {allChips.map((chip, i) => (
@@ -558,20 +754,63 @@ export const ServiceCard = forwardRef<HTMLElement, ServiceCardProps>(
 
           <div className={cn("flex flex-wrap items-end justify-between gap-x-3 gap-y-2", FOOT[layout])}>
             <div id={priceId} className="min-w-0">
-              <p className="text-lg font-bold leading-tight tabular-nums">
-                {pricePrefix ? (
-                  <span
+              {hasDeal ? (
+                /* AUTM-1812: the deal reads left to right as the eye does the
+                   sum. The price large, what the parts cost separately struck
+                   through beside it, the saving as a solid brand pill. One
+                   wrapping row, so at 200% text the pill drops under the
+                   figures rather than squeezing them. */
+                <div className={cn("flex flex-wrap items-center gap-x-2 gap-y-1.5", DEAL_ROW[layout])}>
+                  <p className="text-xl font-bold leading-tight tabular-nums">
+                    {pricePrefix ? (
+                      <span
+                        className={cn(
+                          "mr-1 text-sm font-medium",
+                          selected ? "text-[var(--on-selected)]" : "text-[var(--text-muted)]",
+                        )}
+                      >
+                        {pricePrefix}
+                      </span>
+                    ) : null}
+                    <span data-testid={testIds?.price}>{priceLabel}</span>
+                    <span className="sr-only">, </span>
+                  </p>
+                  <p
                     className={cn(
-                      "mr-1 text-sm font-medium",
+                      "text-[0.9375rem] font-medium leading-tight tabular-nums",
                       selected ? "text-[var(--on-selected)]" : "text-[var(--text-muted)]",
                     )}
                   >
-                    {pricePrefix}
-                  </span>
-                ) : null}
-                <span data-testid={testIds?.price}>{priceLabel}</span>
-                {priceLines && priceLines.length > 0 ? <span className="sr-only">, </span> : null}
-              </p>
+                    <span className="sr-only">{compareAtPriceDescription} </span>
+                    <s data-slot="compare-at" data-testid={testIds?.compareAtPrice}>
+                      {compareAtPriceLabel}
+                    </s>
+                    {showSaving || (priceLines && priceLines.length > 0) ? (
+                      <span className="sr-only">, </span>
+                    ) : null}
+                  </p>
+                  {showSaving ? (
+                    <Badge variant="brand" data-slot="saving" data-testid={testIds?.saving}>
+                      {savingLabel}
+                    </Badge>
+                  ) : null}
+                </div>
+              ) : (
+                <p className="text-lg font-bold leading-tight tabular-nums">
+                  {pricePrefix ? (
+                    <span
+                      className={cn(
+                        "mr-1 text-sm font-medium",
+                        selected ? "text-[var(--on-selected)]" : "text-[var(--text-muted)]",
+                      )}
+                    >
+                      {pricePrefix}
+                    </span>
+                  ) : null}
+                  <span data-testid={testIds?.price}>{priceLabel}</span>
+                  {priceLines && priceLines.length > 0 ? <span className="sr-only">, </span> : null}
+                </p>
+              )}
               {priceLines && priceLines.length > 0 ? (
                 /* One line per part, stacked under the total. The spaces
                    are real text, so the block reads as one sentence to a
@@ -701,19 +940,55 @@ function Description({
  * themes and under hover, with the service's own duration or working days set
  * as a figure. Decorative; the same facts are in the chips.
  */
-function NoPhotoPanel({ figure, multiDay }: { figure?: string | null; multiDay: boolean }) {
+function NoPhotoPanel({
+  figure,
+  multiDay,
+  label,
+  labelId,
+  cornerTaken,
+}: {
+  figure?: string | null;
+  multiDay: boolean;
+  /** AUTM-1812: e.g. "No photo yet". Read through the card's description. */
+  label?: string | null;
+  labelId: string;
+  /**
+   * A status or badge holds the top-left corner. The glyph steps aside and
+   * the words go under the figure, so the pill never lands on them.
+   */
+  cornerTaken: boolean;
+}) {
+  /* Hidden with the panel, yet still read: the card's link names this id in
+     aria-describedby, and a node referenced that way is read even when
+     hidden. */
+  const words = label ? (
+    <span id={labelId} className="text-[0.8125rem] font-medium leading-tight text-[var(--text-muted)]">
+      {label}
+      <span className="sr-only">.</span>
+    </span>
+  ) : null;
   return (
     <div
       aria-hidden="true"
       data-slot="media-fallback"
       className="flex h-full w-full flex-col justify-between bg-[var(--paper)] p-3 text-[var(--text-strong)]"
     >
-      <span className="flex text-[var(--text-muted)]">
-        {figure ? multiDay ? <CalendarIcon large /> : <ClockIcon large /> : <SparkleIcon />}
-      </span>
-      {figure ? (
-        <span className="line-clamp-2 text-sm font-bold leading-tight @min-[11rem]/media:text-2xl @min-[11rem]/media:font-black @min-[16rem]/media:text-4xl">
-          {figure}
+      {cornerTaken ? (
+        <span />
+      ) : (
+        <span className="flex items-center gap-1.5 text-[var(--text-muted)]">
+          {figure ? multiDay ? <CalendarIcon large /> : <ClockIcon large /> : <SparkleIcon />}
+          {words}
+        </span>
+      )}
+      {figure || (cornerTaken && words) ? (
+        <span className="flex flex-col gap-1">
+          {figure ? (
+            <span className="line-clamp-2 text-sm font-bold leading-tight @min-[11rem]/media:text-2xl @min-[11rem]/media:font-black @min-[16rem]/media:text-4xl">
+              {figure}
+            </span>
+          ) : null}
+          {cornerTaken ? words : null}
         </span>
       ) : null}
     </div>
@@ -793,11 +1068,11 @@ function PlusIcon() {
   );
 }
 
-function CheckIcon() {
+function CheckIcon({ small }: { small?: boolean }) {
   return (
     <svg
       viewBox="0 0 24 24"
-      className="size-4"
+      className={small ? "size-3.5" : "size-4"}
       fill="none"
       stroke="currentColor"
       strokeWidth="2.75"

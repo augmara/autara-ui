@@ -74,6 +74,9 @@ export {
     CarouselHeader, type CarouselHeaderProps,
     ServiceCard, ServiceCardSkeleton, type ServiceCardProps, type ServiceCardSkeletonProps,
     type ServiceCardLayout, type ServiceCardChip, type ServiceCardPriceLine, type ServiceCardTestIds,
+    type ServiceCardStatus, type ServiceCardStatusTone,
+    PackageCard, type PackageCardProps,
+    CardGrid, type CardGridProps, type CardGridColumns,
     TrustItem, type TrustItemProps,
     SectionBand, type SectionBandProps,
     StepCard, type StepCardProps,
@@ -266,3 +269,9 @@ export {
     type ListingPriceInput,
     type ListingPriceOptions,
 } from './lib/service-listing'
+export {
+    packageSaving,
+    includedServicesLabel,
+    type PackageSaving,
+    type PackageSavingInput,
+} from './lib/package-listing'
