@@ -383,3 +383,5 @@ export { MediaFrame, type MediaFrameProps } from './MediaFrame'
 export { initialsOf } from '../lib/initials'
 // AUTM-1787: a list row's everyday actions, a menu on a phone, discs and labels with room.
 export { RowActions, type RowAction, type RowActionsProps } from './RowActions'
+// AUTM-1755: a list beside its record, with a splitter that drags, keys and remembers.
+export { SplitPane, type SplitPaneProps } from './SplitPane'
