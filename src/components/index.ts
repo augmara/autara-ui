@@ -369,3 +369,6 @@ export { PageContainer, type PageContainerProps } from './PageContainer'
 
 // SocialButton: the one social sign-in button, Google, Apple and mobile (AUTM-1513).
 export { SocialButton, type SocialButtonProps, type SocialButtonProvider } from './SocialButton'
+
+// AUTM-1787: a list row's everyday actions, a menu on a phone, discs and labels with room.
+export { RowActions, type RowAction, type RowActionsProps } from './RowActions'
