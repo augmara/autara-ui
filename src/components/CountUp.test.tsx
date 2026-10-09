@@ -92,3 +92,64 @@ describe('CountUp under StrictMode (AUTM-1792)', () => {
         expect(screen.getAllByText('$407')).toHaveLength(1)
     })
 })
+
+/**
+ * AUTM-1781: the props a server component can pass (`text`, `formatOptions`,
+ * `locale`, `testId`), moved here from utilities/app-motion.test.ts when the
+ * two CountUps became one. Same promises: the final text is in the DOM from
+ * the first frame and only one element ever reads it.
+ */
+describe('CountUp, server-safe formatting (AUTM-1781)', () => {
+    const counting = () => document.querySelector('[data-count-up] [aria-hidden="true"]')
+    const AUD = { style: 'currency', currency: 'AUD' } as const
+
+    beforeEach(() => {
+        vi.useFakeTimers({ toFake: ['requestAnimationFrame', 'cancelAnimationFrame', 'performance'] })
+    })
+    afterEach(() => vi.useRealTimers())
+
+    it('holds the final text in the DOM from the first frame, under its test id', () => {
+        mockReducedMotion(false)
+        render(<CountUp value={85.5} text="$85.50" formatOptions={AUD} testId="n" />)
+        expect(screen.getAllByText('$85.50')).toHaveLength(1)
+        expect(screen.getByTestId('n').contains(screen.getByText('$85.50'))).toBe(true)
+        expect(counting()?.textContent).toBe('$0.00')
+    })
+
+    it('counts in the formatOptions units, then leaves only the real value', () => {
+        mockReducedMotion(false)
+        render(<CountUp value={100} formatOptions={AUD} />)
+        act(() => {
+            vi.advanceTimersByTime(450)
+        })
+        const mid = Number(counting()?.textContent?.replace(/[^\d.]/g, ''))
+        expect(mid).toBeGreaterThan(50)
+        expect(mid).toBeLessThan(100)
+        act(() => {
+            vi.advanceTimersByTime(600)
+        })
+        expect(counting()).toBeNull()
+        expect(screen.getAllByText('$100.00')).toHaveLength(1)
+    })
+
+    it('does not count under reduced motion', () => {
+        mockReducedMotion(true)
+        render(<CountUp value={40} text="$40" formatOptions={AUD} testId="n" />)
+        expect(counting()).toBeNull()
+        expect(screen.getByTestId('n').textContent).toBe('$40')
+    })
+
+    it('format wins over formatOptions, and a data-testid passed as an attribute still lands', () => {
+        mockReducedMotion(true)
+        render(<CountUp value={7} format={(n) => `${n} jobs`} formatOptions={AUD} data-testid="jobs" />)
+        expect(screen.getByTestId('jobs').textContent).toBe('7 jobs')
+    })
+
+    it('keeps the AUTM-1792 element: the caller\'s class on the data-count-up span, no class of its own added', () => {
+        mockReducedMotion(true)
+        render(<CountUp value={12} testId="n" className="tabular-nums extra" />)
+        const el = screen.getByTestId('n')
+        expect(el).toHaveAttribute('data-count-up')
+        expect(el.className).toBe('relative inline-block tabular-nums extra')
+    })
+})

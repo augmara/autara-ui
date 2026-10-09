@@ -247,6 +247,18 @@ docs/
   reduced-motion clamp shortens duration but not delay, so a staggered rule
   outside `prefers-reduced-motion: no-preference` leaves a reduced-motion user
   staring at invisible items. `motion-system.test.ts` holds both.
+- **One motion vocabulary for every app** (AUTM-1792 and AUTM-1781, built in
+  parallel and merged into one before either shipped). One ease-out
+  (`--motion-ease-out`; no "soft" second curve), `--motion-ease-pop` only for
+  a menu's movement; `--motion-tab` is every 450ms slide (TabsList's pill,
+  AppTabBar's pill, `.motion-screen`); sheets and dialogs are the plain Sheet
+  and Dialog on `--motion-sheet-in`/`-modal-in`, no opt-in class; one
+  `CountUp` (`format` for client code, `text` plus `formatOptions` from a
+  server component). `.motion-pop` plays when the class is put on: add it at
+  the moment of choice (FilterChipRow), never on every option of a group, or
+  the one already chosen pops on arrival. Before adding a motion token or
+  class, search `animations.css` for the job: a second name for the same
+  move is the failure this rule exists for. `app-motion.test.ts` holds it.
 - **A stretched hit area dies the moment anything between it and its card
   becomes a containing block** (AUTM-1786). ServiceCard is one link (or one
   radio label) whose `::after` covers the card; a transform, `scale`,

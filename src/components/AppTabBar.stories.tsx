@@ -1,10 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { useState } from 'react'
 import { AppTabBar, type AppTabBarItem } from './AppTabBar'
 import { CalendarGlyph, ChatGlyph, UserGlyph } from './_shellGlyphs'
 
 /**
- * AUTM-1781: a signed-in app's destinations. On a phone, the bottom tab bar;
- * from md, the same items inline in the top bar (see AppBar's stories).
+ * AUTM-1781: a signed-in app's destinations. On a phone, the floating dock
+ * from the customer app design (canvas AppBookings): ink, icons, the current
+ * tab a lime pill with its name. From md, the same items inline in the top
+ * bar (see AppBar's stories).
  */
 const meta: Meta<typeof AppTabBar> = {
     title: 'App shell/AppTabBar',
@@ -36,7 +39,7 @@ const items = (active: string, counts: { bookings?: number; messages?: number } 
     { key: 'account', label: 'Account', icon: <UserGlyph />, href: '#account', active: active === 'account' },
 ]
 
-/** The phone bar. Fixed to the bottom of the frame, as in the app. */
+/** The phone dock. Floating above the bottom of the frame, as in the app. */
 export const Default: Story = {
     parameters: { viewport: { defaultViewport: 'phone' } },
     render: () => (
@@ -57,7 +60,7 @@ export const WithCounts: Story = {
     ),
 }
 
-/** Edge: a count past 99, and labels at 200% text, which wrap rather than clip. */
+/** Edge: a count past 99, and the name at 200% text, which grows the pill rather than clipping. */
 export const LargeCountAndText: Story = {
     parameters: { viewport: { defaultViewport: 'phoneSmall' } },
     render: () => (
@@ -74,4 +77,33 @@ export const Inline: Story = {
             <AppTabBar label="Account" variant="inline" items={items('bookings', { bookings: 1, messages: 3 })} testIdPrefix="nav" />
         </div>
     ),
+}
+
+/**
+ * Motion: tap a tab. The lime pill slides to it while the tabs make room and
+ * the name fades in (450ms, the soft curve). With reduced motion on, it is
+ * simply there.
+ */
+export const Switching: Story = {
+    parameters: { viewport: { defaultViewport: 'phone' } },
+    render: function Switching() {
+        const [active, setActive] = useState('bookings')
+        const list = items(active, { bookings: 1, messages: 3 }).map((i) => ({
+            ...i,
+            href: undefined,
+            element: (
+                <button
+                    type="button"
+                    onClick={() => setActive(i.key)}
+                    style={{ border: 0, background: 'transparent', font: 'inherit', cursor: 'pointer' }}
+                />
+            ),
+        }))
+        return (
+            <div className="min-h-[24rem] bg-[var(--surface)] p-4 text-[var(--text-muted)]">
+                Tap Messages, then Account, then Bookings.
+                <AppTabBar label="Switching" items={list} hideFrom="never" />
+            </div>
+        )
+    },
 }

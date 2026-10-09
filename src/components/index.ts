@@ -73,6 +73,7 @@ export { PickerTrigger, type PickerTriggerProps } from './PickerTrigger'
 export { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from './Accordion'
 export { Tabs, TabsList, TabsTrigger, TabsContent, type TabsListProps } from './Tabs'
 // AUTM-1792: a figure that counts up to its value once, as it arrives.
+// AUTM-1781 added `text`, `formatOptions`, `locale` and `testId`, for a server component.
 export { CountUp, type CountUpProps } from './CountUp'
 
 export {
@@ -376,6 +377,9 @@ export { SocialButton, type SocialButtonProps, type SocialButtonProvider } from 
 // phone, inline in the top bar from md) and a detail screen's action bar.
 export { AppBar, type AppBarProps } from './AppBar'
 export { AppTabBar, type AppTabBarProps, type AppTabBarItem } from './AppTabBar'
-export { ActionBar, type ActionBarProps, type ActionBarAction } from './ActionBar'
+export { ActionBar, type ActionBarProps, type ActionBarAction, type ActionBarControl } from './ActionBar'
+// AUTM-1781: the slot where a screen shows its subject: a photo, a map, or initials on deep purple.
+export { MediaFrame, type MediaFrameProps } from './MediaFrame'
+export { initialsOf } from '../lib/initials'
 // AUTM-1787: a list row's everyday actions, a menu on a phone, discs and labels with room.
 export { RowActions, type RowAction, type RowActionsProps } from './RowActions'

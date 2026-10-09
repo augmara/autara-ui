@@ -222,7 +222,9 @@
      *   menu-in / -out   a menu, dropdown or popover popping open, and closing
      *                    faster than it opened
      *   pop              a chip, a slot or a tab being chosen
-     *   tab              a segmented control's selected pill sliding across
+     *   tab              every 450ms slide: a segmented control's or the
+     *                    dock's selected pill sliding across, and a screen
+     *                    pushed or popped (AUTM-1781, `.motion-screen`)
      *   row / row-stagger a list's rows rising in, capped at the twelfth
      *   count            a figure counting up to its value, once per arrival */
     --motion-menu-in: 300ms;
@@ -232,6 +234,11 @@
     --motion-row: 400ms;
     --motion-row-stagger: 30ms;
     --motion-count: 900ms;
+    /* AUTM-1781: a screen's sections arriving (`.motion-rise`), one
+     * `--motion-stagger` apart. The customer app's other moves use the tokens
+     * above: sheets and dialogs `--motion-sheet-in` and `--motion-modal-in`,
+     * rows, pops and counts the AUTM-1792 set. */
+    --motion-enter: 550ms;
 
     /* The house easing — the same curve `.animate-on-scroll` above uses, so
      * a panel and a reveal feel like one product. */
@@ -239,7 +246,9 @@
     --motion-ease-in: cubic-bezier(0.4, 0, 1, 1);
     /* AUTM-1792: a small overshoot, for things that POP (a menu opening, a
      * chip chosen). Transform only: it would push opacity past 1 for nothing.
-     * Never for a sheet, a dialog, a page or a list; those stay calm. */
+     * Never for a sheet, a dialog, a page or a list; those stay calm.
+     * AUTM-1781: there is no second ease-out. The customer app's vocabulary
+     * runs on `--motion-ease-out` like everything else. */
     --motion-ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -692,23 +701,30 @@
 /* ─── Stagger index ──────────────────────────────────────────────────────
  *
  * `--stagger-i` is a direct child's position, 0 to 5, for `.reveal-stagger`
- * (scroll-driven, above) and `.motion-stagger` (timed, below). Set by
+ * (scroll-driven, above), `.motion-stagger` (timed, below) and `.motion-rise`
+ * (a screen's sections, AUTM-1781, at the end of the file). Set by
  * position so server HTML carries it with no script. A consumer can override
  * it with an inline style when DOM order is not reading order. Outside the
  * `--motion-` namespace on purpose: that one holds tokens, and
  * motion-tokens.test.ts reads every name in it as one. */
 .reveal-stagger > *,
-.motion-stagger > * { --stagger-i: 0; }
+.motion-stagger > *,
+.motion-rise > * { --stagger-i: 0; }
 .reveal-stagger > :nth-child(2),
-.motion-stagger > :nth-child(2) { --stagger-i: 1; }
+.motion-stagger > :nth-child(2),
+.motion-rise > :nth-child(2) { --stagger-i: 1; }
 .reveal-stagger > :nth-child(3),
-.motion-stagger > :nth-child(3) { --stagger-i: 2; }
+.motion-stagger > :nth-child(3),
+.motion-rise > :nth-child(3) { --stagger-i: 2; }
 .reveal-stagger > :nth-child(4),
-.motion-stagger > :nth-child(4) { --stagger-i: 3; }
+.motion-stagger > :nth-child(4),
+.motion-rise > :nth-child(4) { --stagger-i: 3; }
 .reveal-stagger > :nth-child(5),
-.motion-stagger > :nth-child(5) { --stagger-i: 4; }
+.motion-stagger > :nth-child(5),
+.motion-rise > :nth-child(5) { --stagger-i: 4; }
 .reveal-stagger > :nth-child(n + 6),
-.motion-stagger > :nth-child(n + 6) { --stagger-i: 5; }
+.motion-stagger > :nth-child(n + 6),
+.motion-rise > :nth-child(n + 6) { --stagger-i: 5; }
 
 /* ─── Timed stagger: a list or a group arriving on first paint ───────────
  *
@@ -991,5 +1007,79 @@
 @media (prefers-reduced-motion: reduce) {
     .motion-shimmer::after {
         display: none;
+    }
+}
+
+/* ─── App screens (AUTM-1781) ────────────────────────────────────────────
+ *
+ * Don, 2026-10-09, the same request as the block above, for the customer
+ * app (spec: the CTO session's motion spec of 2026-10-09). Only what the
+ * block above and the overlay rules do not already do: a screen arriving in
+ * a direction, its sections rising, and a bar rising at the bottom edge. A
+ * sheet and a dialog are the plain Sheet and Dialog (`--motion-sheet-in` and
+ * `--motion-modal-in`, the 14px settle); rows, pops and counts are the
+ * AUTM-1792 classes; the dock's pill is AppTabBar on `--motion-tab`.
+ *
+ *   class / helper          what moves                          token
+ *   .motion-screen          a screen arriving in a direction:   --motion-tab
+ *                           6% sideways and a fade (push from
+ *                           the right, back from the left, a
+ *                           tab fades)
+ *   .motion-rise            a screen's sections arriving:       --motion-enter,
+ *                           18px up, 98.5% to full size, fade,  --motion-stagger
+ *                           one stagger apart, capped at the
+ *                           sixth (the `--stagger-i` index)
+ *   .motion-bar-in          a bar at the bottom edge rising     --motion-sheet-in
+ *                           into place on mount (below lg)
+ *
+ * Rules that travel with it: transform and opacity only; nothing blocks
+ * input; content is readable and present at once (every `from` is opacity
+ * 0.001, never hidden); once per arrival, never on a re-render or a poll.
+ * Every rule below sits inside `prefers-reduced-motion: no-preference`, so a
+ * reduced-motion user gets the end state at once.
+ *
+ * `.motion-screen` must never be an ancestor of a fixed bar: a transformed
+ * ancestor turns `position: fixed` into "fixed to me" while it animates, and
+ * the bar would ride down the page. Its direction is read off
+ * `html[data-nav]`, which `markNavigation()` (lib/navigation-motion) sets just
+ * before the router changes the page and clears once the screen has arrived,
+ * so a first load and a later re-render never slide.
+ */
+
+@keyframes autara-screen-push {
+    from { opacity: 0.001; transform: translateX(6%); }
+    to { opacity: 1; transform: none; }
+}
+@keyframes autara-screen-back {
+    from { opacity: 0.001; transform: translateX(-6%); }
+    to { opacity: 1; transform: none; }
+}
+@keyframes autara-rise {
+    from { opacity: 0.001; transform: translateY(18px) scale(0.985); }
+    to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    html[data-nav="push"] .motion-screen {
+        animation: autara-screen-push var(--motion-tab) var(--motion-ease-out) both;
+    }
+    html[data-nav="back"] .motion-screen {
+        animation: autara-screen-back var(--motion-tab) var(--motion-ease-out) both;
+    }
+    html[data-nav="tab"] .motion-screen {
+        animation: autara-fade-in var(--motion-tab) var(--motion-ease-out) both;
+    }
+    .motion-rise > * {
+        animation: autara-rise var(--motion-enter) var(--motion-ease-out) both;
+        animation-delay: calc(var(--stagger-i, 0) * var(--motion-stagger));
+    }
+}
+/* Below lg only (64rem), where bars are fixed to the edge; from lg the same
+ * bar sits in a side panel and does not travel. The sheet's own keyframes,
+ * from the foot. Transform only: the bar is opaque. */
+@media (prefers-reduced-motion: no-preference) and (max-width: 63.999rem) {
+    .motion-bar-in {
+        --sheet-from: translateY(100%);
+        animation: sheet-panel-in var(--motion-sheet-in) var(--motion-ease-out) both;
     }
 }

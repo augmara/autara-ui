@@ -82,3 +82,32 @@ export const Zero: Story = {
         </Tile>
     ),
 }
+
+/**
+ * AUTM-1781: from a server component, where `format` (a function) cannot be
+ * passed. `text` is the figure exactly as the page prints it; `formatOptions`
+ * formats the frames on the way there. The customer app's payment tiles.
+ */
+export const FromAServerComponent: Story = {
+    name: 'From a server component (text and formatOptions)',
+    render: () => (
+        <div className="grid max-w-md grid-cols-2 gap-4">
+            <Tile label="Paid">
+                <CountUp
+                    value={85.5}
+                    text="$85.50"
+                    formatOptions={{ style: 'currency', currency: 'AUD', minimumFractionDigits: 2 }}
+                    testId="count-up-paid"
+                />
+            </Tile>
+            <Tile label="After the job">
+                <CountUp
+                    value={364}
+                    text="$364"
+                    formatOptions={{ style: 'currency', currency: 'AUD', minimumFractionDigits: 0 }}
+                    testId="count-up-after"
+                />
+            </Tile>
+        </div>
+    ),
+}

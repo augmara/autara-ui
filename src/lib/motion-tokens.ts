@@ -68,6 +68,12 @@ export const motionDurations = {
     row: 400,
     rowStagger: 30,
     count: 900,
+    // AUTM-1781: a screen's sections arriving (`.motion-rise`), one
+    // `stagger` apart. The rest of the customer app's vocabulary is the
+    // AUTM-1792 set above: `tab` is every 450ms slide (a tab pill, the
+    // dock's pill, a screen pushed), `sheetIn` and `modalIn` every sheet and
+    // dialog.
+    enter: 550,
 } as const
 
 /**
@@ -75,6 +81,10 @@ export const motionDurations = {
  * `--motion-ease-pop` (AUTM-1792), the small overshoot for things that pop:
  * a menu opening, a chip chosen. Transform only; never a sheet, a dialog or
  * a page. `motionTransition()` never picks it, so ask for it by name.
+ *
+ * One ease-out for everything that arrives (AUTM-1781): the customer app's
+ * vocabulary was drafted on its own soft curve, (0.22, 1, 0.36, 1), and runs
+ * on `out` instead, so a menu, a sheet and a screen feel like one product.
  */
 export const motionEasings = {
     out: [0.16, 1, 0.3, 1],
@@ -130,4 +140,20 @@ export function motionTransition(name: MotionTransitionName): {
 export function motionStaggerDelay(index: number): number {
     const step = Math.min(Math.max(Math.floor(index), 0), MOTION_STAGGER_CAP - 1)
     return step * motionDurations.stagger
+}
+
+/**
+ * The same token as a Web Animations timing (AUTM-1781): the duration in
+ * MILLISECONDS, which `element.animate()` takes, and the curve as a CSS
+ * string, paired exactly as `motionTransition()` pairs it (exits on ease-in,
+ * everything else on ease-out).
+ *
+ *     el.animate(keyframes, motionTiming('tab'))
+ */
+export function motionTiming(name: MotionTransitionName): {
+    duration: number
+    easing: string
+} {
+    const curve = name.endsWith('Out') ? motionEasings.in : motionEasings.out
+    return { duration: motionDurations[name], easing: `cubic-bezier(${curve.join(', ')})` }
 }
