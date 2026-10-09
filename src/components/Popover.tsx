@@ -227,6 +227,8 @@ const PopoverContent = React.forwardRef<
                     // working. This component gains the small side-aware
                     // nudge the shared class carries.
                     'floating-panel',
+                    // AUTM-1792: pops open with a small overshoot, as menus do.
+                    'floating-panel--pop',
                     'z-50 flex flex-col overflow-hidden outline-none',
                     // Never wider than the viewport, and never taller than
                     // the space Radix measured. Both matter most at 200%

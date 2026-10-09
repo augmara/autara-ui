@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { cn } from '../lib/cn'
 
 /**
@@ -73,6 +73,11 @@ export function FilterChipRow<V>({
     chipClassName,
     press = true,
 }: FilterChipRowProps<V>) {
+    /* AUTM-1792: the chip the merchant just chose pops (`.motion-pop`, 100 to
+       104 to 99%, off under reduced motion). Only a CHOICE pops: the chip
+       selected on first render stays still, because a pop on every screen
+       arrival is noise. Choosing the chip that is already on does not pop. */
+    const [popped, setPopped] = useState<number | null>(null)
     return (
         <div
             role="tablist"
@@ -94,7 +99,10 @@ export function FilterChipRow<V>({
                         type="button"
                         role="tab"
                         aria-selected={active}
-                        onClick={() => onChange(o.value)}
+                        onClick={() => {
+                            setPopped(i)
+                            onChange(o.value)
+                        }}
                         className={cn(
                             /* A pill (canvas v44), which supersedes the 8px rung
                                the 2026-09-01 shape rule gave chips. */
@@ -117,6 +125,7 @@ export function FilterChipRow<V>({
                                 ? 'bg-[var(--selected)] text-[var(--on-selected)]'
                                 : 'bg-[var(--band)] text-[var(--text-strong)] hover:bg-[var(--band-press)]',
                             press && 'motion-press',
+                            popped === i && active && 'motion-pop',
                             chipClassName,
                         )}
                     >
