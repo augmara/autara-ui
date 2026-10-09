@@ -13,10 +13,12 @@ import {
 import { markNavigation } from '../lib/navigation-motion'
 
 /**
- * AUTM-1781: the app motion vocabulary (Don, 2026-10-09: "can we apply slight
- * animation in our app too"). One soft ease-out, a small overshoot only for a
- * pop, transform and opacity only, once per arrival, nothing under reduced
- * motion. Classes and tokens are in utilities/animations.css, "App motion".
+ * AUTM-1781: the customer app's motion (Don, 2026-10-09: "can we apply slight
+ * animation in our app too"), on the one vocabulary it shares with AUTM-1792
+ * (Foundations/Motion, "Pops, rows and shimmer"). The house ease-out for
+ * everything, transform and opacity only, once per arrival, nothing under
+ * reduced motion. Classes and tokens are in utilities/animations.css, "Pops,
+ * rows and counts" and "App screens".
  *
  * Each story has a Replay control, because every movement here runs once.
  */
@@ -47,7 +49,7 @@ const Card = ({ children }: { children: ReactNode }) => (
     <div className="rounded-3xl bg-[var(--band)] p-4 text-[var(--text-strong)]">{children}</div>
 )
 
-/** `.motion-rise`: a screen's sections rise 18px from 98.5%, 60ms apart. */
+/** `.motion-rise`: a screen's sections rise 18px from 98.5%, one `--motion-stagger` (60ms) apart. */
 export const ScreenEnter: Story = {
     render: () => (
         <Replay>
@@ -108,10 +110,15 @@ export const Numbers: Story = {
     ),
 }
 
-/** `.motion-pop`: a chip pops when it is chosen (1, 1.04, .99, 1, on the overshoot). */
+/**
+ * `.motion-pop`: the reason the customer taps pops (1, 1.04, .99, 1). The
+ * class goes on at the moment of choice, as FilterChipRow does it, so the
+ * reason already chosen when the sheet opens stays still.
+ */
 export const Pop: Story = {
     render: function Pop() {
         const [chosen, setChosen] = useState<string | null>(null)
+        const [popped, setPopped] = useState<string | null>(null)
         return (
             <div role="radiogroup" aria-label="Why are you cancelling?" className="flex max-w-[390px] flex-wrap gap-2">
                 {['Plans changed', 'Found another time', 'Booked by mistake', 'Price', 'Something else'].map((r) => (
@@ -120,9 +127,13 @@ export const Pop: Story = {
                         type="button"
                         role="radio"
                         aria-checked={chosen === r}
-                        onClick={() => setChosen(r)}
+                        onClick={() => {
+                            setPopped(r)
+                            setChosen(r)
+                        }}
                         className={
-                            'motion-pop min-h-11 rounded-full px-4 text-base font-medium ' +
+                            (popped === r ? 'motion-pop ' : '') +
+                            'min-h-11 rounded-full px-4 text-base font-medium ' +
                             (chosen === r
                                 ? 'bg-[var(--brand)] text-[var(--on-brand)]'
                                 : 'bg-[var(--band)] text-[var(--text-strong)]')
@@ -136,7 +147,11 @@ export const Pop: Story = {
     },
 }
 
-/** `.motion-sheet-soft` on a responsive Dialog: a sheet rises on a phone, a card settles from sm. */
+/**
+ * A plain responsive Dialog: a sheet rises on a phone, a card settles 14px
+ * from 98% from sm, both on 350ms. This is the library's default since
+ * AUTM-1792, so the customer app needs no class of its own for it.
+ */
 export const Sheet: Story = {
     render: function Sheet() {
         const [open, setOpen] = useState(false)
@@ -150,7 +165,7 @@ export const Sheet: Story = {
                     Review the extra
                 </button>
                 <Dialog open={open} onOpenChange={setOpen}>
-                    <DialogContent layout="responsive" className="motion-sheet-soft">
+                    <DialogContent layout="responsive">
                         <DialogHeader>
                             <DialogTitle>Fitzroy Paint Co found something</DialogTitle>
                             <DialogDescription>Nothing is charged unless you approve it.</DialogDescription>

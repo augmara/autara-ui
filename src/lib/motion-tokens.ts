@@ -38,11 +38,12 @@ export type MotionBezier = readonly [number, number, number, number]
 export const motionDurations = {
     panelIn: 160,
     panelOut: 120,
-    modalIn: 200,
+    // AUTM-1792: dialogs and sheets at 350ms in, per Don's 2026-10-09 reference.
+    modalIn: 350,
     modalOut: 150,
     scrimIn: 200,
     scrimOut: 150,
-    sheetIn: 280,
+    sheetIn: 350,
     sheetOut: 200,
     navIn: 250,
     navOut: 200,
@@ -58,25 +59,36 @@ export const motionDurations = {
     pageOut: 120,
     skeleton: 1400,
     crossfade: 160,
-    // AUTM-1781: the app vocabulary. Uses and reduced-motion forms in the
-    // "App motion" block at the end of utilities/animations.css.
-    enter: 550,
-    enterStagger: 60,
+    // AUTM-1792: pops, rows and counts. Uses in the "Pops, rows and counts"
+    // block of utilities/animations.css.
+    menuIn: 300,
+    menuOut: 150,
+    pop: 450,
+    tab: 450,
     row: 400,
     rowStagger: 30,
-    slide: 450,
     count: 900,
-    pop: 500,
-    sheetSoft: 350,
+    // AUTM-1781: a screen's sections arriving (`.motion-rise`), one
+    // `stagger` apart. The rest of the customer app's vocabulary is the
+    // AUTM-1792 set above: `tab` is every 450ms slide (a tab pill, the
+    // dock's pill, a screen pushed), `sheetIn` and `modalIn` every sheet and
+    // dialog.
+    enter: 550,
 } as const
 
-/** `--motion-ease-out` (enters) and `--motion-ease-in` (exits). */
+/**
+ * `--motion-ease-out` (enters) and `--motion-ease-in` (exits), and
+ * `--motion-ease-pop` (AUTM-1792), the small overshoot for things that pop:
+ * a menu opening, a chip chosen. Transform only; never a sheet, a dialog or
+ * a page. `motionTransition()` never picks it, so ask for it by name.
+ *
+ * One ease-out for everything that arrives (AUTM-1781): the customer app's
+ * vocabulary was drafted on its own soft curve, (0.22, 1, 0.36, 1), and runs
+ * on `out` instead, so a menu, a sheet and a screen feel like one product.
+ */
 export const motionEasings = {
     out: [0.16, 1, 0.3, 1],
     in: [0.4, 0, 1, 1],
-    /** AUTM-1781: the app vocabulary's soft ease-out, for almost everything it moves. */
-    soft: [0.22, 1, 0.36, 1],
-    /** AUTM-1781: a small overshoot, for pops only (a chip chosen, a pill arriving). */
     pop: [0.34, 1.56, 0.64, 1],
 } as const satisfies Record<string, MotionBezier>
 
@@ -84,14 +96,11 @@ export type MotionDurationName = keyof typeof motionDurations
 
 /**
  * The tokens that time a transition, which `motionTransition()` takes. The
- * other three are not transitions: `stagger` and `settleDelay` are DELAYS
+ * others are not transitions: `stagger`, `rowStagger` and `settleDelay` are DELAYS
  * (use `motionStaggerDelay()` and `motionDurations.settleDelay`), and
  * `skeleton` is a loop on `ease-in-out`, not an enter or an exit.
  */
-export type MotionTransitionName = Exclude<
-    MotionDurationName,
-    'stagger' | 'settleDelay' | 'skeleton' | 'enterStagger' | 'rowStagger'
->
+export type MotionTransitionName = Exclude<MotionDurationName, 'stagger' | 'settleDelay' | 'skeleton' | 'rowStagger'>
 
 /**
  * Children 1 to 6 step by `--motion-stagger`; the seventh onward share the
@@ -134,16 +143,17 @@ export function motionStaggerDelay(index: number): number {
 }
 
 /**
- * AUTM-1781: the app vocabulary as a framer-motion or Web Animations timing,
- * on the soft curve (or the pop curve for `pop`). Durations in MILLISECONDS,
- * which `element.animate()` takes; divide by 1000 for framer-motion.
+ * The same token as a Web Animations timing (AUTM-1781): the duration in
+ * MILLISECONDS, which `element.animate()` takes, and the curve as a CSS
+ * string, paired exactly as `motionTransition()` pairs it (exits on ease-in,
+ * everything else on ease-out).
  *
- *     el.animate(keyframes, softTiming('slide'))
+ *     el.animate(keyframes, motionTiming('tab'))
  */
-export function softTiming(name: 'enter' | 'row' | 'slide' | 'count' | 'pop' | 'sheetSoft'): {
+export function motionTiming(name: MotionTransitionName): {
     duration: number
     easing: string
 } {
-    const curve = name === 'pop' ? motionEasings.pop : motionEasings.soft
+    const curve = name.endsWith('Out') ? motionEasings.in : motionEasings.out
     return { duration: motionDurations[name], easing: `cubic-bezier(${curve.join(', ')})` }
 }

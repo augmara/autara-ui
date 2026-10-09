@@ -21,9 +21,9 @@
 export type NavigationDirection = 'push' | 'back' | 'tab'
 
 /**
- * Long enough for the slowest entrance (`--motion-sheet-in`, 280ms) plus a
- * route that takes a moment to render; short enough that a screen rendered
- * well after the navigation does not animate.
+ * Long enough for the screen's slide (`--motion-tab`, 450ms) plus a route
+ * that takes a moment to render; short enough that a screen rendered well
+ * after the navigation does not animate.
  */
 const MARK_MS = 900
 

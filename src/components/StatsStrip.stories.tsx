@@ -78,3 +78,24 @@ export const PartialLoading: Story = {
         ],
     },
 }
+
+/**
+ * AUTM-1792: three stats on a phone. The hero leads the full width (no tile
+ * left alone on a row), and a long figure fits its tile instead of running
+ * out of it. Check at 390 and with 200% text, where the strip is one column.
+ */
+export const PhoneOddWithLongFigure: Story = {
+    name: 'Phone, three stats, a long figure (AUTM-1792)',
+    parameters: { viewport: { defaultViewport: 'mobile1' } },
+    render: () => (
+        <div className="max-w-[390px]">
+            <StatsStrip
+                stats={[
+                    { label: 'Total', value: '8' },
+                    { label: 'Customer spend', value: '$13,880', hero: true },
+                    { label: 'Avg per customer', value: '$1,735' },
+                ]}
+            />
+        </div>
+    ),
+}

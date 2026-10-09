@@ -366,6 +366,9 @@ function ToastItem({
                    reserved for avatars and status dots (glass rule 3); the
                    capsule was the last pill in the feedback set. */
                 'pointer-events-auto inline-flex max-w-[min(560px,calc(100vw-32px))] items-center gap-2.5 rounded-2xl px-4 py-3 text-[0.9375rem] leading-snug transition-all duration-[180ms] ease-out',
+                /* AUTM-1792: a toast floats over the page, so it takes the
+                   lift. Without it the band toast sat on band and vanished. */
+                'shadow-float',
                 variantCls,
                 isVisible && !isLeaving
                     ? 'translate-y-0 opacity-100'

@@ -3,51 +3,47 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { act, render, screen } from '@testing-library/react'
 import { createElement } from 'react'
-import { CountUp } from '../components/CountUp'
 import { MediaFrame } from '../components/MediaFrame'
 import { initialsOf } from '../lib/initials'
 import { listenForBackNavigation, markNavigation } from '../lib/navigation-motion'
-import { motionDurations, softTiming } from '../lib/motion-tokens'
+import { motionDurations } from '../lib/motion-tokens'
 
 /**
- * AUTM-1781: the app motion vocabulary (Don, 2026-10-09, after the Fernly
- * reference). jsdom has no stylesheet, so the CSS rules are read out of
- * utilities/animations.css; the components and helpers are rendered.
+ * AUTM-1781: the customer app's motion (Don, 2026-10-09, after the Fernly
+ * reference), on the one vocabulary it shares with AUTM-1792. jsdom has no
+ * stylesheet, so the CSS rules are read out of utilities/animations.css; the
+ * components and helpers are rendered. CountUp's tests are in
+ * components/CountUp.test.tsx; the tokens' in lib/motion-tokens.test.ts.
  */
 
 const CSS = readFileSync(resolve(process.cwd(), 'src/utilities/animations.css'), 'utf8')
 const CODE = CSS.replace(/\/\*[\s\S]*?\*\//g, '')
+/** The "App screens" block: from its first keyframes to the end of the file. */
 const APP = CODE.slice(CODE.indexOf('@keyframes autara-screen-push'))
 
-function keyframes(name: string): string {
-    const at = APP.indexOf(`@keyframes ${name} {`)
+function keyframes(name: string, from = CODE): string {
+    const at = from.indexOf(`@keyframes ${name} {`)
     if (at < 0) throw new Error(`@keyframes ${name} not found`)
     let depth = 0
-    for (let i = APP.indexOf('{', at); i < APP.length; i++) {
-        if (APP[i] === '{') depth++
-        else if (APP[i] === '}' && --depth === 0) return APP.slice(at, i + 1)
+    for (let i = from.indexOf('{', at); i < from.length; i++) {
+        if (from[i] === '{') depth++
+        else if (from[i] === '}' && --depth === 0) return from.slice(at, i + 1)
     }
     throw new Error('unbalanced')
 }
 
 describe('the app motion CSS', () => {
-    it.each([
-        'autara-screen-push',
-        'autara-screen-back',
-        'autara-rise',
-        'autara-row-in',
-        'autara-pop',
-        'autara-sheet-soft-in',
-        'autara-dialog-soft-in',
-        'autara-bar-in',
-    ])('@keyframes %s animates transform and opacity only', (name) => {
-        const props = [...keyframes(name).matchAll(/([a-z-]+)\s*:/g)].map((m) => m[1])
-        expect(props.length).toBeGreaterThan(0)
-        expect(props.filter((p) => p !== 'transform' && p !== 'opacity')).toEqual([])
-    })
+    it.each(['autara-screen-push', 'autara-screen-back', 'autara-rise', 'autara-row-in', 'autara-pop', 'sheet-panel-in'])(
+        '@keyframes %s animates transform and opacity only',
+        (name) => {
+            const props = [...keyframes(name).matchAll(/([a-z-]+)\s*:/g)].map((m) => m[1])
+            expect(props.length).toBeGreaterThan(0)
+            expect(props.filter((p) => p !== 'transform' && p !== 'opacity')).toEqual([])
+        }
+    )
 
     it('every entrance starts present: opacity 0.001, never 0 or hidden', () => {
-        for (const name of ['autara-screen-push', 'autara-screen-back', 'autara-rise', 'autara-row-in', 'autara-dialog-soft-in']) {
+        for (const name of ['autara-screen-push', 'autara-screen-back', 'autara-rise', 'autara-row-in']) {
             expect(keyframes(name), name).toContain('opacity: 0.001')
         }
         expect(APP).not.toMatch(/visibility:\s*hidden/)
@@ -59,12 +55,13 @@ describe('the app motion CSS', () => {
         expect(outside).not.toMatch(/animation:/)
     })
 
-    it('runs on the soft curve, the pop on the overshoot', () => {
-        expect(CSS).toContain('--motion-ease-soft: cubic-bezier(0.22, 1, 0.36, 1);')
-        expect(CSS).toContain('--motion-ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1);')
-        for (const m of APP.matchAll(/animation: (autara-[\w-]+) var\(--motion-[\w-]+\) var\(--motion-ease-([\w]+)\)/g)) {
-            expect(m[2], m[1]).toBe(m[1] === 'autara-pop' ? 'pop' : 'soft')
-        }
+    it('runs on the house ease-out: there is no second ease-out', () => {
+        // AUTM-1781 drafted its own soft curve; the vocabulary is one, so it is gone.
+        expect(CSS).not.toContain('--motion-ease-soft')
+        const curves = [...APP.matchAll(/animation: ([\w-]+) var\(--motion-[\w-]+\) var\(--motion-ease-([\w]+)\)/g)]
+        expect(curves.length).toBeGreaterThanOrEqual(5)
+        for (const m of curves) expect(m[2], m[1]).toBe('out')
+        expect(CODE).toMatch(/animation: autara-pop var\(--motion-pop\) var\(--motion-ease-out\)/)
     })
 
     it('rises 18px from 98.5%, rows 4px, the screen 6% sideways', () => {
@@ -74,28 +71,38 @@ describe('the app motion CSS', () => {
         expect(keyframes('autara-screen-back')).toContain('translateX(-6%)')
     })
 
-    it('staggers sections 60ms capped at the sixth, rows 30ms capped at the twelfth', () => {
-        expect(APP).toContain('calc(var(--rise-i, 0) * var(--motion-enter-stagger))')
-        expect(APP).toContain('calc(var(--rise-i, 0) * var(--motion-row-stagger))')
-        expect(APP).toContain('.motion-rise > :nth-child(n + 6), .motion-rows > :nth-child(6) { --rise-i: 5; }')
-        expect(APP).toContain('.motion-rows > :nth-child(n + 12) { --rise-i: 11; }')
-        expect(motionDurations.enterStagger).toBe(60)
+    it('staggers sections on the page stagger (60ms, capped at the sixth), rows 30ms capped at the twelfth', () => {
+        expect(APP).toContain('calc(var(--stagger-i, 0) * var(--motion-stagger))')
+        expect(CODE).toContain('.motion-rise > :nth-child(n + 6) { --stagger-i: 5; }')
+        expect(CODE).toContain('calc(var(--row-i, 0) * var(--motion-row-stagger))')
+        expect(CODE).toContain('.motion-rows > :nth-child(n + 12) { --row-i: 11; }')
+        expect(motionDurations.stagger).toBe(60)
         expect(motionDurations.rowStagger).toBe(30)
+        expect(CODE).not.toContain('--motion-enter-stagger')
     })
 
-    it('a screen slides only while html is marked, so a first load never does', () => {
+    it('a screen slides only while html is marked, so a first load never does, on the tab pill\'s slide', () => {
         expect(APP).toMatch(/html\[data-nav="push"\] \.motion-screen \{/)
         expect(APP).not.toMatch(/^\.motion-screen \{/m)
+        expect(APP).toContain('autara-screen-push var(--motion-tab) var(--motion-ease-out)')
+        expect(CODE).not.toContain('--motion-slide')
     })
 
-    it('a counting figure hides its real text by opacity and draws the count as generated content with no alternative', () => {
-        expect(CODE).toContain('.motion-count[data-counting] > .motion-count-value {\n    opacity: 0;')
-        expect(CODE).toContain('content: attr(data-counting) / "";')
+    it('a sheet and a dialog are the plain Sheet and Dialog: no second sheet class', () => {
+        expect(CODE).not.toMatch(/motion-sheet-soft/)
+        expect(keyframes('modal-panel-in')).toContain('translateY(14px) scale(0.98)')
+        expect(motionDurations.sheetIn).toBe(350)
+        expect(motionDurations.modalIn).toBe(350)
+        // The bar rises on the sheet's own keyframes and token.
+        expect(APP).toContain('animation: sheet-panel-in var(--motion-sheet-in) var(--motion-ease-out) both;')
     })
 
-    it('softTiming gives the Web Animations timing on the soft curve', () => {
-        expect(softTiming('slide')).toEqual({ duration: 450, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' })
-        expect(softTiming('pop')).toEqual({ duration: 500, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)' })
+    it('a pop is the AUTM-1792 one: the class plays when it is put on, so a choice adds it', () => {
+        // The customer app drafted a second, state-gated .motion-pop; the
+        // published contract (autara-ui 8.5.0) is "add the class at the
+        // moment of choice", as FilterChipRow does, so it is the only rule.
+        const pops = [...CODE.matchAll(/^\s*(\.motion-pop[^{]*)\{/gm)].map((m) => m[1].trim())
+        expect(pops).toEqual(['.motion-pop'])
     })
 })
 
@@ -130,54 +137,6 @@ describe('markNavigation', () => {
         stop()
         window.dispatchEvent(new PopStateEvent('popstate'))
         expect(document.documentElement.dataset.nav).toBeUndefined()
-    })
-})
-
-describe('CountUp', () => {
-    it('holds the final value in the DOM from the first frame', () => {
-        render(createElement(CountUp, { value: 85.5, text: '$85.50', testId: 'n' }))
-        expect(screen.getByTestId('n').textContent).toBe('$85.50')
-    })
-
-    it('counts over the value as an attribute, then removes it', () => {
-        const frames: FrameRequestCallback[] = []
-        const raf = vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
-            frames.push(cb)
-            return frames.length
-        })
-        const now = vi.spyOn(performance, 'now').mockReturnValue(0)
-        try {
-            render(
-                createElement(CountUp, {
-                    value: 100,
-                    formatOptions: { style: 'currency', currency: 'AUD' },
-                    testId: 'n',
-                })
-            )
-            const el = screen.getByTestId('n')
-            expect(el.getAttribute('data-counting')).toBe('$0.00')
-            act(() => frames.shift()!(450))
-            const mid = Number(el.getAttribute('data-counting')!.replace(/[^\d.]/g, ''))
-            expect(mid).toBeGreaterThan(50)
-            expect(mid).toBeLessThan(100)
-            expect(el.textContent).toBe('$100.00')
-            act(() => frames.shift()!(motionDurations.count + 1))
-            expect(el.hasAttribute('data-counting')).toBe(false)
-        } finally {
-            raf.mockRestore()
-            now.mockRestore()
-        }
-    })
-
-    it('does not count under reduced motion', () => {
-        const mm = window.matchMedia
-        window.matchMedia = ((q: string) => ({ matches: q.includes('reduce'), media: q })) as unknown as typeof window.matchMedia
-        try {
-            render(createElement(CountUp, { value: 40, text: '$40', testId: 'n' }))
-            expect(screen.getByTestId('n').hasAttribute('data-counting')).toBe(false)
-        } finally {
-            window.matchMedia = mm
-        }
     })
 })
 

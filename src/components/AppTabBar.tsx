@@ -3,7 +3,7 @@
 import * as React from 'react'
 import type { ReactElement, ReactNode } from 'react'
 import { cn } from '../lib/cn'
-import { motionDurations, motionEasings } from '../lib/motion-tokens'
+import { motionDurations, motionTiming } from '../lib/motion-tokens'
 
 /**
  * AppTabBar: an app's top-level destinations, one tap away (AUTM-1781).
@@ -33,7 +33,8 @@ import { motionDurations, motionEasings } from '../lib/motion-tokens'
  * Motion. When the current destination changes, the lime pill slides from the
  * tab it left to the tab it lands on while the tabs move to their new places
  * and the new name fades in: FLIP, transform and opacity only, on the app
- * vocabulary's `--motion-slide` (450ms) and soft curve. It also plays when the bar is
+ * vocabulary's `--motion-tab` (450ms, the slide TabsList's pill makes) on the
+ * house ease-out. It also plays when the bar is
  * mounted again by the next page (an app whose every page draws its own bar),
  * because the last positions are remembered per `label`. Under
  * `prefers-reduced-motion: reduce` nothing moves; the pill is simply there.
@@ -130,8 +131,6 @@ function prefersReducedMotion(): boolean {
 /** A layout effect in the browser, a no-op warning-free effect on the server. */
 const useIsoLayoutEffect = typeof window === 'undefined' ? React.useEffect : React.useLayoutEffect
 
-/** The app vocabulary's soft curve (utilities/animations.css, App motion). */
-const EASE = `cubic-bezier(${motionEasings.soft.join(', ')})`
 
 /**
  * Slide from the remembered layout to this one. Every tab moves from its old x
@@ -141,7 +140,8 @@ const EASE = `cubic-bezier(${motionEasings.soft.join(', ')})`
  */
 function playSlide(list: HTMLUListElement, prev: Snapshot, next: Snapshot, activeKey: string | null) {
     if (typeof list.animate !== 'function') return
-    const timing = { duration: motionDurations.slide, easing: EASE }
+    // The same slide TabsList's pill makes: `--motion-tab` on the house ease-out.
+    const timing = motionTiming('tab')
 
     const track = list.querySelector<HTMLElement>('[data-tab-track]')
     if (track && prev.track.width > 0 && next.track.width > 0) {
@@ -173,9 +173,8 @@ function playSlide(list: HTMLUListElement, prev: Snapshot, next: Snapshot, activ
         }
         const name = li.querySelector<HTMLElement>('[data-tab-name]')
         name?.animate([{ opacity: 0 }, { opacity: 1 }], {
-            duration: motionDurations.row,
-            delay: motionDurations.enterStagger,
-            easing: EASE,
+            ...motionTiming('row'),
+            delay: motionDurations.stagger,
             fill: 'backwards',
         })
     }

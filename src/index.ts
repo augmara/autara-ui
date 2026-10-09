@@ -33,7 +33,9 @@ export {
     PickerSheet, type PickerOption, type PickerRowRender, type PickerSheetProps,
     PickerTrigger, type PickerTriggerProps,
     Accordion, AccordionItem, AccordionTrigger, AccordionContent,
-    Tabs, TabsList, TabsTrigger, TabsContent,
+    Tabs, TabsList, TabsTrigger, TabsContent, type TabsListProps,
+    // AUTM-1792
+    CountUp, type CountUpProps,
     DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuGroup, DropdownMenuPortal, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent, type DropdownMenuContentProps,
     // AUTM-965 — anchored floating panel for CONTENT (DropdownMenu gives its
     // children `menuitem` semantics, which a list of content must not have).
@@ -90,8 +92,8 @@ export {
     AppBar, type AppBarProps,
     AppTabBar, type AppTabBarProps, type AppTabBarItem,
     ActionBar, type ActionBarProps, type ActionBarAction, type ActionBarControl,
+    // CountUp is exported once, beside Tabs above (AUTM-1792; AUTM-1781 added its server-safe props).
     MediaFrame, initialsOf, type MediaFrameProps,
-    CountUp, type CountUpProps,
     ModeChip, type ModeChipProps, type BookingMode,
     Logo, type LogoProps,
     SearchInput, type SearchInputProps,
@@ -165,8 +167,8 @@ export {
     // AUTM-1678: page content motion
     motionStaggerDelay,
     MOTION_STAGGER_CAP,
-    // AUTM-1781: the app motion vocabulary
-    softTiming,
+    // AUTM-1781: the same tokens as a Web Animations timing
+    motionTiming,
     type MotionBezier,
     type MotionDurationName,
     type MotionTransitionName,
