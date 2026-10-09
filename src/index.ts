@@ -86,6 +86,10 @@ export {
     DeviceFrame, type DeviceFrameProps, type DeviceKind,
     InfoRow, type InfoRowProps,
     ListSection, ListSectionRow, type ListSectionProps, type ListSectionRowProps,
+    // AUTM-1781 — the signed-in app shell.
+    AppBar, type AppBarProps,
+    AppTabBar, type AppTabBarProps, type AppTabBarItem,
+    ActionBar, type ActionBarProps, type ActionBarAction,
     ModeChip, type ModeChipProps, type BookingMode,
     Logo, type LogoProps,
     SearchInput, type SearchInputProps,
