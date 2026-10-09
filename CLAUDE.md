@@ -40,6 +40,9 @@ pnpm storybook       # http://localhost:6006
 pnpm build           # tsc → dist/
 pnpm build-storybook # storybook-static/ — deployable to Vercel
 pnpm typecheck       # tsc --noEmit
+pnpm test            # vitest in jsdom
+pnpm test:browser    # vitest in real Chromium (*.browser.test.tsx); first run:
+                     # pnpm exec playwright install chromium
 ```
 
 ## File layout
@@ -244,6 +247,19 @@ docs/
   reduced-motion clamp shortens duration but not delay, so a staggered rule
   outside `prefers-reduced-motion: no-preference` leaves a reduced-motion user
   staring at invisible items. `motion-system.test.ts` holds both.
+- **A stretched hit area dies the moment anything between it and its card
+  becomes a containing block** (AUTM-1786). ServiceCard is one link (or one
+  radio label) whose `::after` covers the card; a transform, `scale`,
+  `translate`, `filter` or `position` on the link, the heading or any wrapper
+  shrinks that `::after` to the element. On qa.autara.au customer-web's press
+  rule scaled every `a[href]` to 98.5% while pressed, so mid-press the hit area
+  became the name and a tap on the photo opened nothing. The card now pins its
+  link with important resets, reaches its `::after` out by what its own 98.5%
+  press takes in (only while pressed), and forwards any other click on the card
+  to the link (`forwardStrayClick`). jsdom cannot hit-test: the guard is
+  `ServiceCard.browser.test.tsx` (`pnpm test:browser`, real Chromium, run in
+  CI), which runs the card under customer-web's actual rule. Never add a
+  transform or a position to anything between a `[data-hit]` and its card.
 - **Never put type or colour classes on an `h1` to `h6`; put them on an
   element inside it.** merchant-mobile (`src/main.css`) and customer-web
   (`src/app/globals.css`) both style headings with an UNLAYERED rule (colour

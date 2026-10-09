@@ -138,6 +138,145 @@ describe('ServiceCard link mode (merchant page)', () => {
     })
 })
 
+describe('ServiceCard hit area (AUTM-1786)', () => {
+    /* The hit test itself needs a real browser: ServiceCard.browser.test.tsx.
+       These pin the classes that make it, and the backstop's decisions. */
+    const LinkCard = ({ onOpen }: { onOpen: (trusted: boolean) => void }) => {
+        const Recording = forwardRef<HTMLAnchorElement, AnchorHTMLAttributes<HTMLAnchorElement>>(
+            function Recording(props, ref) {
+                return (
+                    <a
+                        ref={ref}
+                        {...props}
+                        onClick={(event) => {
+                            event.preventDefault()
+                            onOpen(event.nativeEvent.isTrusted)
+                        }}
+                    />
+                )
+            },
+        )
+        return (
+            <ServiceCard
+                name="Interior steam clean"
+                description="Hot-water extraction on carpets and cloth seats."
+                priceLabel="$188.82"
+                coverImageUrl="https://cdn.example/interior.jpg"
+                href="/x"
+                as={Recording}
+                testIds={{ price: 'price' }}
+            />
+        )
+    }
+
+    it('pins the link so a consumer press cannot shrink its hit area to the name', () => {
+        render(<ServiceCard name="Wash" priceLabel="$80" href="/x" />)
+        const link = screen.getByRole('link')
+        for (const pin of ['static!', 'transform-none!', 'scale-none!', 'translate-none!', 'rotate-none!']) {
+            expect(link.className.split(' ')).toContain(pin)
+        }
+    })
+
+    it('reaches out by what the card press takes in, only while pressed', () => {
+        render(<ServiceCard name="Wash" priceLabel="$80" href="/x" />)
+        const classes = screen.getByRole('link').className.split(' ')
+        expect(classes).toContain('after:inset-0')
+        expect(classes).toContain('motion-safe:active:after:inset-[calc((1_-_1/0.985)*50%)]')
+        // The press it compensates: change the two together.
+        const card = screen.getByRole('link').closest('[data-slot="service-card"]') as HTMLElement
+        expect(card.className).toContain('motion-safe:has-[[data-hit]:active]:scale-[0.985]')
+    })
+
+    it('forwards a click on the photo, the description or the price to the link, once each', () => {
+        const onOpen = vi.fn()
+        const { container } = render(<LinkCard onOpen={onOpen} />)
+        fireEvent.click(container.querySelector('[data-slot="media"] img') as Element)
+        fireEvent.click(screen.getByText('Hot-water extraction on carpets and cloth seats.'))
+        fireEvent.click(screen.getByTestId('price'))
+        expect(onOpen).toHaveBeenCalledTimes(3)
+    })
+
+    it('carries the modifier keys, so Cmd-click still opens a new tab', () => {
+        const seen: boolean[] = []
+        const Recording = forwardRef<HTMLAnchorElement, AnchorHTMLAttributes<HTMLAnchorElement>>(
+            function Recording(props, ref) {
+                return (
+                    <a
+                        ref={ref}
+                        {...props}
+                        onClick={(event) => {
+                            event.preventDefault()
+                            seen.push(event.metaKey)
+                        }}
+                    />
+                )
+            },
+        )
+        const { container } = render(<ServiceCard name="Wash" priceLabel="$80" href="/x" as={Recording} />)
+        fireEvent.click(container.querySelector('[data-slot="media"]') as Element, { metaKey: true })
+        expect(seen).toEqual([true])
+    })
+
+    it('never doubles a click the link took itself', () => {
+        const onOpen = vi.fn()
+        render(<LinkCard onOpen={onOpen} />)
+        fireEvent.click(screen.getByRole('link'))
+        expect(onOpen).toHaveBeenCalledTimes(1)
+    })
+
+    it('leaves a click on More to More', () => {
+        const onOpen = vi.fn()
+        render(
+            <ServiceCard
+                name="Wash"
+                priceLabel="$80"
+                href="/x"
+                description="Long enough to clamp."
+                as={forwardRef<HTMLAnchorElement, AnchorHTMLAttributes<HTMLAnchorElement>>(function R(props, ref) {
+                    return <a ref={ref} {...props} onClick={(e) => (e.preventDefault(), onOpen())} />
+                })}
+            />,
+        )
+        // jsdom measures nothing, so More only shows once it is forced open
+        // in a real browser; any button in the card stands in for it here.
+        const card = screen.getByRole('link').closest('[data-slot="service-card"]') as HTMLElement
+        const button = document.createElement('button')
+        card.querySelector('[data-slot="media"]')?.append(button)
+        fireEvent.click(button)
+        expect(onOpen).not.toHaveBeenCalled()
+    })
+
+    it('leaves a click alone after a text selection in the card', () => {
+        const onOpen = vi.fn()
+        render(<LinkCard onOpen={onOpen} />)
+        const text = screen.getByText('Hot-water extraction on carpets and cloth seats.')
+        const range = document.createRange()
+        range.selectNodeContents(text)
+        window.getSelection()?.removeAllRanges()
+        window.getSelection()?.addRange(range)
+        fireEvent.click(text)
+        window.getSelection()?.removeAllRanges()
+        expect(onOpen).not.toHaveBeenCalled()
+    })
+
+    it('selects through the label when the click lands elsewhere on a picker card', () => {
+        const onSelect = vi.fn()
+        const { container } = render(
+            <ServiceCard name="Wash" priceLabel="$80" groupName="g" value="s1" onSelect={onSelect} />,
+        )
+        fireEvent.click(container.querySelector('[data-slot="media"]') as Element)
+        // Once, through the label and its radio; `selected` is the consumer's.
+        expect(onSelect).toHaveBeenCalledTimes(1)
+    })
+
+    it('forwards nothing on a static card', () => {
+        const { container } = render(<ServiceCard name="Wash" priceLabel="$80" />)
+        const card = container.querySelector('[data-slot="service-card"]') as HTMLElement
+        expect(() => fireEvent.click(card)).not.toThrow()
+        expect(card.querySelector('[data-hit]')).toBeNull()
+    })
+})
+
 describe('ServiceCard select mode (booking picker)', () => {
     function Picker({ onSelect, selected }: { onSelect: (id: string) => void; selected: string | null }) {
         return (

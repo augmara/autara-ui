@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { createContext, forwardRef, useContext, useState, type AnchorHTMLAttributes } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ServiceCard, ServiceCardSkeleton } from "./ServiceCard";
 import { Badge } from "./Badge";
@@ -428,6 +428,128 @@ export const MerchantPageList: Story = {
       </ul>
     </section>
   ),
+};
+
+/* customer-web's own press rule (src/components/waitlist-aw/waitlist.css),
+ * scoped to the story: every link and radio label scales to 98.5% while
+ * pressed. It is what shrank the card's hit area to the name on QA. */
+const CONSUMER_PRESS = `
+.consumer-press :is(a[href], button, summary, [role="button"], label:has(input[type="radio"], input[type="checkbox"])) {
+  transition-property: color, background-color, border-color, text-decoration-color, opacity, translate, scale;
+  transition-duration: var(--motion-hover), var(--motion-hover), var(--motion-hover), var(--motion-hover), var(--motion-hover), var(--motion-hover), var(--motion-press);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .consumer-press :is(button:not(:disabled), [role="button"]:not([aria-disabled="true"])):active { scale: 0.97; }
+  .consumer-press :is(a[href], summary, label:has(input[type="radio"]:not(:disabled), input[type="checkbox"]:not(:disabled))):active { scale: 0.985; }
+}`;
+
+/* A link that handles its own click, as Next's Link does, and says where it went. */
+const OpenedContext = createContext<(href: string) => void>(() => {});
+const DemoLink = forwardRef<HTMLAnchorElement, AnchorHTMLAttributes<HTMLAnchorElement>>(function DemoLink(
+  { onClick, ...props },
+  ref,
+) {
+  const onOpen = useContext(OpenedContext);
+  return (
+    <a
+      ref={ref}
+      {...props}
+      onClick={(event) => {
+        onClick?.(event);
+        event.preventDefault();
+        onOpen(props.href ?? "");
+      }}
+    />
+  );
+});
+
+/**
+ * AUTM-1786: a press anywhere on the card is the card's. Tap the photo, the
+ * description, the chips or the price: on the pro's page the line under the
+ * list names the booking it opened, in the picker the service it selected.
+ * More only expands. The keyboard is unchanged: Tab to a card, then Enter (a
+ * link) or Space (a radio).
+ *
+ * Both lists sit under customer-web's own press rule, which scales every link
+ * and radio label to 98.5% while pressed; on qa.autara.au that shrank the hit
+ * area to the name, so only a tap on the name opened booking. The same press,
+ * with real pointer input at 390, 834 and 1440, is ServiceCard.browser.test.tsx.
+ */
+export const TapAnywhere: Story = {
+  parameters: { layout: "fullscreen" },
+  render: function Render() {
+    const [opened, setOpened] = useState<string | null>(null);
+    const [chosen, setChosen] = useState<string | null>(null);
+    const services = MENU.slice(0, 3);
+    const nameOf = (id: string | null) => services.find((s) => s.id === id)?.name;
+    return (
+      <div className="consumer-press mx-auto flex max-w-5xl flex-col gap-10 px-4 py-8 sm:px-6">
+        <style>{CONSUMER_PRESS}</style>
+        <section aria-labelledby="tap-page-heading">
+          <h2 id="tap-page-heading" className="text-xl font-bold text-[var(--text-strong)]">
+            On the pro&apos;s page
+          </h2>
+          <OpenedContext.Provider value={(href) => setOpened(href.replace("#book-", ""))}>
+            <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {services.map((s) => (
+                <li key={s.id} className="flex flex-col">
+                  <ServiceCard
+                    layout="adaptive"
+                    name={s.name}
+                    description={s.description}
+                    coverImageUrl={s.photo}
+                    durationLabel={s.duration}
+                    workingDaysLabel={s.workingDays}
+                    chips={s.workingDays ? [DROP_OFF] : undefined}
+                    priceLabel={s.price}
+                    priceLines={s.parts}
+                    href={`#book-${s.id}`}
+                    as={DemoLink}
+                    actionLabel="Book"
+                  />
+                </li>
+              ))}
+            </ul>
+          </OpenedContext.Provider>
+          <p className="mt-3 text-sm text-[var(--text-muted)]" aria-live="polite">
+            {opened ? `Opened booking for ${nameOf(opened)}` : "Tap anywhere on a card"}
+          </p>
+        </section>
+        <section aria-labelledby="tap-picker-heading">
+          <h2 id="tap-picker-heading" className="text-xl font-bold text-[var(--text-strong)]">
+            In the booking picker
+          </h2>
+          <fieldset aria-labelledby="tap-picker-heading" className="m-0 mt-4 min-w-0 border-0 p-0">
+            <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {services.map((s) => (
+                <li key={s.id} className="flex flex-col">
+                  <ServiceCard
+                    layout="adaptive"
+                    nameAs="h3"
+                    name={s.name}
+                    description={s.description}
+                    coverImageUrl={s.photo}
+                    durationLabel={s.duration}
+                    workingDaysLabel={s.workingDays}
+                    chips={s.workingDays ? [DROP_OFF] : undefined}
+                    priceLabel={s.price}
+                    priceLines={s.parts}
+                    groupName="tap-anywhere"
+                    value={s.id}
+                    selected={chosen === s.id}
+                    onSelect={() => setChosen(s.id)}
+                  />
+                </li>
+              ))}
+            </ul>
+          </fieldset>
+          <p className="mt-3 text-sm text-[var(--text-muted)]" aria-live="polite">
+            {chosen ? `${nameOf(chosen)} selected` : "Tap anywhere on a card to choose it"}
+          </p>
+        </section>
+      </div>
+    );
+  },
 };
 
 /** Dark: the band card on dark paper, the selected fill, and the no-photo panel. */
