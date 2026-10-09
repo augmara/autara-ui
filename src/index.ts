@@ -3,7 +3,7 @@ export {
     GradientBar,
     Button, buttonVariants, type ButtonProps,
     IconButton, type IconButtonProps,
-    // AUTM-1787 — a list row's everyday actions.
+    // AUTM-1787: a list row's everyday actions.
     RowActions, type RowAction, type RowActionsProps,
     Input, inputVariants, type InputProps,
     PhoneInput, DEFAULT_COUNTRIES, findCountryByIso, type PhoneInputProps, type PhoneCountry,

@@ -3,7 +3,7 @@ import { RowActions, type RowAction } from "./RowActions";
 import { InvoiceStatusBadge } from "./InvoiceStatusBadge";
 
 /**
- * RowActions (AUTM-1787) — a list row's everyday actions without opening the
+ * RowActions (AUTM-1787): a list row's everyday actions without opening the
  * record. The ROW is the container (`row-actions-host`): under 36em a More
  * menu, from 36em icon discs, from 60em icon and label. Resize the frames, or
  * use the 200% text story, to see each.

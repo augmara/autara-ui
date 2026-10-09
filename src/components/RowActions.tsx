@@ -10,7 +10,7 @@ import {
 import { cn } from "../lib/cn";
 
 /**
- * RowActions — a list row's everyday actions, without opening the record
+ * RowActions: a list row's everyday actions, without opening the record
  * (AUTM-1787, graduated from the merchant portal's AUTM-1777).
  *
  * Del's ask on the Invoices list was a Download on every row; the CTO sweep

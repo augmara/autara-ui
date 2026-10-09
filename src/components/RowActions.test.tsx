@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { RowActions } from "./RowActions";
 
 /**
- * AUTM-1787 — which controls render is CSS (a container query); these pin the
+ * AUTM-1787: which controls render is CSS (a container query); these pin the
  * contract the markup carries: names, targets, test ids, links and the menu.
  */
 const icon = <svg aria-hidden="true" />;
