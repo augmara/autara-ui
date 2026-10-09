@@ -43,7 +43,8 @@ describe('the lift itself', () => {
     const glass = code(read('src/utilities/glass.css'))
 
     it('defines the edge and the shadow in both themes', () => {
-        const light = /:root,\s*:host\s*\{([^}]*)\}/.exec(shadows)?.[1] ?? ''
+        // AUTM-1800: the light block also scopes a light island, `[data-theme="light"]`.
+        const light = /:root,\s*:host(?:,\s*\[data-theme="light"\])?\s*\{([^}]*)\}/.exec(shadows)?.[1] ?? ''
         const dark = /\[data-theme="dark"\]\s*\{([^}]*)\}/.exec(shadows)?.[1] ?? ''
         for (const block of [light, dark]) {
             expect(block).toContain('--float-edge')

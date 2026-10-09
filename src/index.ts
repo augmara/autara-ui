@@ -149,6 +149,13 @@ export {
     // AUTM-1195 — pick one of a few, as cards
     ChoiceCard, ChoiceGroup, type ChoiceCardProps, type ChoiceGroupProps,
     SwatchRadioGroup, type SwatchRadioGroupProps, type SwatchOption,
+    // AUTM-1800: a pro's public profile, as /m draws it and the portal previews it.
+    CategoryArt, categoryArtKind, type CategoryArtKind,
+    MerchantProfileCover, MerchantProfileCoverArt, MerchantProfileHeader,
+    type MerchantProfileCoverProps, type MerchantProfileCoverArtProps, type MerchantProfileHeaderProps,
+    type MerchantProfileLayout, type MerchantProfileStatus,
+    ProfileSections, ProfileSection, ProfileBio,
+    type ProfileSectionsProps, type ProfileSectionProps, type ProfileBioProps,
 } from './components'
 export { SocialButton, type SocialButtonProps, type SocialButtonProvider } from './components/SocialButton'
 
@@ -216,3 +223,26 @@ export {
     isISODate,
     isISOTime,
 } from './lib/calendar'
+
+/* AUTM-1800: what a pro's public profile says about them (the door state, the
+ * kicker, where they work), shared by customer-web's /m and the portal's
+ * preview so the two cannot word a pro differently. */
+export {
+    PROFILE_DEFAULT_LOCALE,
+    PROFILE_DEFAULT_TIMEZONE,
+    merchantLocalClock,
+    getMerchantOpenState,
+    openStateCopy,
+    describeOpenState,
+    formatPauseUntil,
+    deriveLocationLabel,
+    profileKicker,
+    bookingModeLabel,
+    profileMonogram,
+    type ProfileBookingMode,
+    type ProfilePlaceInput,
+    type MerchantHours,
+    type MerchantOpenState,
+    type MerchantOpenStatus,
+    type LocationLabel,
+} from './lib/merchant-profile'
