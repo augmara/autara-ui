@@ -113,7 +113,11 @@ export {
     // chat / conversation primitives (AUTM-159)
     MessageBubble, type MessageBubbleProps, type MessageSide,
     MessageComposer, type MessageComposerProps,
-    MessageThread, type MessageThreadProps, type MessageItem,
+    MessageThread, type MessageThreadProps, type MessageItem, type MessageSendStatus,
+    // AUTM-1806 — cards, quick replies and the attach menu for the booking thread
+    MessageCard, type MessageCardProps, type MessageCardAction, type MessageCardState,
+    QuickReplies, type QuickRepliesProps, type QuickReply,
+    ComposerAttachMenu, attachMenuGlyphs, type ComposerAttachMenuProps, type AttachMenuItem,
     // Media — pick-then-crop dialog (AUTM-163)
     ImageCropDialog, type ImageCropDialogProps,
     // Wizard step indicator (AUTM-322)

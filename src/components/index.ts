@@ -195,7 +195,11 @@ export { ErrorCard, type ErrorCardProps } from './ErrorCard'
 // ─── Chat / conversation primitives (AUTM-159) ───────────────────────────
 export { MessageBubble, type MessageBubbleProps, type MessageSide } from './MessageBubble'
 export { MessageComposer, type MessageComposerProps } from './MessageComposer'
-export { MessageThread, type MessageThreadProps, type MessageItem } from './MessageThread'
+export { MessageThread, type MessageThreadProps, type MessageItem, type MessageSendStatus } from './MessageThread'
+// AUTM-1806 — cards, quick replies and the attach menu for the booking thread
+export { MessageCard, type MessageCardProps, type MessageCardAction, type MessageCardState } from './MessageCard'
+export { QuickReplies, type QuickRepliesProps, type QuickReply } from './QuickReplies'
+export { ComposerAttachMenu, attachMenuGlyphs, type ComposerAttachMenuProps, type AttachMenuItem } from './ComposerAttachMenu'
 
 // v1.3.0 introduced a standalone TrendingPill component for marker
 // pills. AUTAA-UI-006 (v1.2.0+ — or whatever semantic-release picks)

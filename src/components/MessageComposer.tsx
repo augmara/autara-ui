@@ -1,4 +1,4 @@
-import { type KeyboardEvent, type ReactNode } from "react";
+import { useId, type KeyboardEvent, type ReactNode } from "react";
 import { Button } from "./Button";
 import { Textarea } from "./Textarea";
 import { cn } from "../lib/cn";
@@ -54,10 +54,20 @@ export interface MessageComposerProps {
    * consumer owns its styling + handler.
    */
   leading?: ReactNode;
+  /**
+   * AUTM-1806: the longest message the API accepts (both APIs cap at 2,000
+   * since AUTM-1807). The field stops there, and from 200 characters out a
+   * line under it says how many are left, so nobody types past the cap and
+   * learns about it from a failed send.
+   */
+  maxLength?: number;
   /** Centered-measure class shared with MessageThread. */
   measureClassName?: string;
   className?: string;
 }
+
+/** How close to the cap the "characters left" line appears. */
+const NEAR_CAP = 200;
 
 export function MessageComposer({
   value,
@@ -68,10 +78,14 @@ export function MessageComposer({
   placeholder = "Type a message",
   sendLabel = "Send",
   leading,
+  maxLength,
   measureClassName = "max-w-[680px]",
   className,
 }: MessageComposerProps) {
   const canSend = value.trim().length > 0 && !sending;
+  const countId = useId();
+  const left = maxLength != null ? maxLength - value.length : null;
+  const showCount = left != null && left <= NEAR_CAP;
 
   function handleKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -96,6 +110,8 @@ export function MessageComposer({
           placeholder={placeholder}
           rows={1}
           disabled={sending}
+          maxLength={maxLength}
+          aria-describedby={showCount ? countId : undefined}
           aria-label="Message"
           className="max-h-32 min-h-[44px]! flex-1 resize-none!"
         />
@@ -110,6 +126,18 @@ export function MessageComposer({
           {sendLabel}
         </Button>
       </div>
+      {showCount ? (
+        <p
+          id={countId}
+          className={cn(
+            "mx-auto mt-1.5 w-full text-right text-[0.8125rem] tabular-nums",
+            left <= 0 ? "font-medium text-[var(--danger)]" : "text-[var(--text-subtle)]",
+            measureClassName,
+          )}
+        >
+          {left <= 0 ? "That's the limit for one message" : `${left} ${left === 1 ? "character" : "characters"} left`}
+        </p>
+      ) : null}
       {error ? (
         <p
           role="alert"
