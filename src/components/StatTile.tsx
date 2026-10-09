@@ -62,8 +62,14 @@ const TREND: Record<StatTrend, string> = {
 
 export interface StatTileProps {
     label: string
-    /** Pre-formatted. `null`/`undefined` renders the skeleton, not a zero. */
-    value?: string | number | null
+    /**
+     * Pre-formatted. `null`/`undefined` renders the skeleton, not a zero.
+     *
+     * AUTM-1792: any node, so a figure can count up as it arrives
+     * (`<CountUp value={407} format={aud} />`). It was always rendered as
+     * `{value}`, so a string or a number still means exactly what it did.
+     */
+    value?: ReactNode
     caption?: string | null
     /**
      * @deprecated AUTM-1161 — the 3px tick this drove is gone; see the note
