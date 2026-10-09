@@ -60,3 +60,19 @@ describe('the business lockup stays on one line (AUTM-1792)', () => {
         expect(screen.getByText('for business').className).toContain('whitespace-nowrap')
     })
 })
+
+describe('every logo has its own orb gradient (AUTM-1792)', () => {
+    it('gives two logos on one page different gradient ids, each used by its own orb', () => {
+        const { container } = render(
+            <>
+                <Logo />
+                <Logo lockup="business" />
+            </>
+        )
+        const ids = Array.from(container.querySelectorAll('linearGradient')).map((g) => g.id)
+        expect(ids).toHaveLength(2)
+        expect(new Set(ids).size).toBe(2)
+        const fills = Array.from(container.querySelectorAll('path[fill^="url(#"]')).map((p) => p.getAttribute('fill'))
+        expect(fills).toEqual(ids.map((id) => `url(#${id})`))
+    })
+})
