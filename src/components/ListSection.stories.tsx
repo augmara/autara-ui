@@ -179,3 +179,54 @@ export const Press: Story = {
         </div>
     ),
 }
+
+/**
+ * AUTM-1781: `variant="plain"`, the grouped list on the page's white ground,
+ * hairlines between rows instead of a cream box. A row can be a link (here an
+ * external one, with its arrow), carry an avatar as `leading`, and wrap.
+ */
+export const Plain: Story = {
+    render: () => (
+        <div className="w-[480px] bg-[var(--surface)] p-4">
+            <ListSection variant="plain" title="When and where" titleId="when-where">
+                <ListSectionRow icon={<ShopIcon />} label="Thu 16 Oct, 11:00 am AEDT" description="About 3 hours" />
+                <ListSectionRow
+                    icon={<ShopIcon />}
+                    label="41 Smith Street, Fitzroy VIC 3065"
+                    description="Drop the car at the workshop"
+                    wrap
+                    href="https://maps.google.com"
+                    external
+                />
+            </ListSection>
+            <ListSection
+                variant="plain"
+                title="Change or cancel"
+                lead="Free to cancel until 24 hours before. After that, 50% of the deposit is kept."
+            >
+                <ListSectionRow icon={<BellIcon />} label="Change time" onTap={() => {}} />
+                <ListSectionRow icon={<LogoutIcon />} label="Cancel booking" destructive onTap={() => {}} />
+            </ListSection>
+        </div>
+    ),
+}
+
+/** In context: the pro once, as a link to their page, with a monogram. */
+export const PlainWithLeading: Story = {
+    render: () => (
+        <div className="w-[480px] bg-[var(--surface)] p-4">
+            <ListSection variant="plain">
+                <ListSectionRow
+                    leading={
+                        <span className="grid size-12 place-items-center rounded-full bg-[var(--band)] font-bold text-[var(--accent)]">
+                            FP
+                        </span>
+                    }
+                    label="Fitzroy Paint Co"
+                    description="Rated 4.9 from 31 reviews · Fitzroy, VIC"
+                    href="#"
+                />
+            </ListSection>
+        </div>
+    ),
+}

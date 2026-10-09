@@ -74,6 +74,8 @@ const KEEPS: Record<string, string> = {
     'SwatchRadioGroup.tsx': 'colour swatches are 44px circles on canvas v50, a choice of colour, not an action (AUTM-1591)',
     'DurationPicker.tsx': 'the Hours | Working days switch, canvas v44 "Segmented" drawn as Tabs draws it (AUTM-1575); the stepper uses Button\'s icon disc',
     'ServiceCard.tsx': 'the duration and working-days chips, MetaChip\'s 28px pill drawn on raised so it shows on the band card; the select indicator, a 24px state light like Radio\'s (AUTM-1694)',
+    'AppTabBar.tsx': 'the current tab\'s capsule behind its icon (the merchant dock\'s indicator, a state light) and the count disc on the icon (AUTM-1781)',
+    'ActionBar.tsx': 'the 40px icon disc on each tile, like IconButton; one or two actions are pills, the sheet\'s button shape (AUTM-1781)',
 }
 
 /**

@@ -369,3 +369,9 @@ export { PageContainer, type PageContainerProps } from './PageContainer'
 
 // SocialButton: the one social sign-in button, Google, Apple and mobile (AUTM-1513).
 export { SocialButton, type SocialButtonProps, type SocialButtonProvider } from './SocialButton'
+
+// AUTM-1781 — the signed-in app shell: the top bar, the tab bar (bottom on a
+// phone, inline in the top bar from md) and a detail screen's action bar.
+export { AppBar, type AppBarProps } from './AppBar'
+export { AppTabBar, type AppTabBarProps, type AppTabBarItem } from './AppTabBar'
+export { ActionBar, type ActionBarProps, type ActionBarAction } from './ActionBar'
