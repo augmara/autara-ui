@@ -236,7 +236,9 @@ const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
                             position="popper"
                             sideOffset={6}
                             className={cn(
-                                'z-50 max-h-[18rem] min-w-[18rem] overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-[var(--surface)] py-1',
+                                // AUTM-1792: lifted, as every floating list is.
+                                'z-50 max-h-[18rem] min-w-[18rem] overflow-hidden rounded-xl border bg-[var(--surface)] py-1',
+                                'floating-surface',
                                 // AUTM-967 — was `animate-in zoom-in-95`,
                                 // which resolved to nothing. Real CSS, from
                                 // utilities/animations.css.

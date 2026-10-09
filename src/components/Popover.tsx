@@ -213,6 +213,9 @@ const PopoverContent = React.forwardRef<
                     'glass-surface',
                     tone === 'strong' && 'glass-surface--strong',
                     !blur && 'glass-surface--flat',
+                    // AUTM-1792: lifted off the page. Declared after the
+                    // glass rules, so its edge and shadow win here.
+                    'floating-surface',
                     // Enter/exit. Real CSS — see utilities/animations.css.
                     //
                     // AUTM-967 folded this into the shared `.floating-panel`
