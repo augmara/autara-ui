@@ -385,3 +385,23 @@ export { initialsOf } from '../lib/initials'
 export { RowActions, type RowAction, type RowActionsProps } from './RowActions'
 // AUTM-1755: a list beside its record, with a splitter that drags, keys and remembers.
 export { SplitPane, type SplitPaneProps } from './SplitPane'
+// AUTM-1800: a pro's public profile, as /m draws it and the portal previews it.
+export { CategoryArt, categoryArtKind, type CategoryArtKind } from './CategoryArt'
+export {
+    MerchantProfileCover,
+    MerchantProfileCoverArt,
+    MerchantProfileHeader,
+    type MerchantProfileCoverProps,
+    type MerchantProfileCoverArtProps,
+    type MerchantProfileHeaderProps,
+    type MerchantProfileLayout,
+    type MerchantProfileStatus,
+} from './MerchantProfileHeader'
+export {
+    ProfileSections,
+    ProfileSection,
+    ProfileBio,
+    type ProfileSectionsProps,
+    type ProfileSectionProps,
+    type ProfileBioProps,
+} from './ProfileSection'

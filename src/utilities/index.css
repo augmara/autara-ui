@@ -19,3 +19,5 @@
 @import "./social.css";
 /* AUTM-1787: a list row's actions, by the room the row has. */
 @import "./row-actions.css";
+/* AUTM-1800: a pro's public profile, shared by customer-web and the portal preview. */
+@import "./merchant-profile.css";

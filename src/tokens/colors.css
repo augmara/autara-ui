@@ -55,7 +55,14 @@
  */
 
 :root,
-:host {
+:host,
+/* AUTM-1800: a light island inside a dark app, the mirror of the dark island
+ * below. The merchant portal previews a pro's public profile, which is
+ * light only, while the portal itself may be dark. On <html> this matches
+ * exactly what `:root` does. `dark:` utilities still follow the nearest
+ * `[data-theme="dark"]` ancestor, so what sits in a light island draws
+ * from tokens, as the profile components do. */
+[data-theme="light"] {
     color-scheme: light;
 
     /* ─── Semantic surface stack — primary API ───────────────────────── */
