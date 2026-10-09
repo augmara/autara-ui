@@ -299,3 +299,42 @@ export const TextScale200: Story = {
         </RootScaled>
     ),
 }
+
+/* ─── AUTM-1792: the selected pill slides ────────────────────────────────
+ *
+ * `<TabsList slide>`: the pill moves to the tab you choose instead of jumping,
+ * one shared shape travelling on `--motion-tab` (450ms). Off by default. It is
+ * drawn as two round caps and a scaled bar, so nothing animates a width and
+ * the pill never squashes between a short label and a long one. Under reduced
+ * motion it jumps, as before. Try Day to Month and back, and the 200% text
+ * story above with `slide` added.
+ */
+const VIEWS = ['Day', 'Today', 'Week', 'Month', 'List']
+
+const Sliding = () => (
+    <Tabs defaultValue="Day">
+        <TabsList slide>
+            {VIEWS.map((v) => (
+                <TabsTrigger key={v} value={v}>
+                    {v}
+                </TabsTrigger>
+            ))}
+        </TabsList>
+        {VIEWS.map((v) => (
+            <TabsContent key={v} value={v}>
+                <Pane>The {v.toLowerCase()} view of the schedule.</Pane>
+            </TabsContent>
+        ))}
+    </Tabs>
+)
+
+export const SlidingPill: Story = {
+    name: 'Sliding pill (AUTM-1792)',
+    render: () => <Sliding />,
+}
+
+export const SlidingPillDark: Story = {
+    name: 'Sliding pill, dark (AUTM-1792)',
+    globals: { theme: 'dark' },
+    render: () => <Sliding />,
+}

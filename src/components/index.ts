@@ -71,7 +71,9 @@ export {
 export { PickerTrigger, type PickerTriggerProps } from './PickerTrigger'
 
 export { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from './Accordion'
-export { Tabs, TabsList, TabsTrigger, TabsContent } from './Tabs'
+export { Tabs, TabsList, TabsTrigger, TabsContent, type TabsListProps } from './Tabs'
+// AUTM-1792: a figure that counts up to its value once, as it arrives.
+export { CountUp, type CountUpProps } from './CountUp'
 
 export {
     DropdownMenu,

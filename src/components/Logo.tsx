@@ -1,3 +1,4 @@
+import { useId } from 'react'
 import { cn } from '../lib/cn'
 
 /**
@@ -87,6 +88,13 @@ export function Logo({
     size = 'lg',
     'aria-hidden': ariaHidden,
 }: LogoProps) {
+    /* AUTM-1792: the orb's gradient id is per instance. It was a fixed
+       "autara-logo-orb", and with two logos on a page the second one's
+       `url(#...)` resolved to the FIRST one's gradient; when that first copy
+       sat in a display:none subtree (the merchant portal's rail on a phone)
+       the orb on the visible one drew nothing. `useId` is in React's server
+       build, so this stays usable from a server component. */
+    const orbId = `autara-logo-orb-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`
     if (lockup === 'business' && !textOnly) {
         const s = LOCKUP_SIZES[size]
         return (
@@ -106,10 +114,14 @@ export function Logo({
                         s.rule,
                     )}
                 />
+                {/* AUTM-1792: never wraps. In the merchant portal's rail the
+                    lockup has exactly its own width, and the descriptor
+                    broke onto two lines ("for / business"), which is the
+                    stacked lockup Don ruled wrong on 2026-10-09. */}
                 <span
                     aria-hidden
                     className={cn(
-                        'font-medium text-[var(--text-subtle)]',
+                        'whitespace-nowrap font-medium text-[var(--text-subtle)]',
                         s.text,
                     )}
                 >
@@ -149,7 +161,7 @@ export function Logo({
         >
             <defs>
                 <linearGradient
-                    id="autara-logo-orb"
+                    id={orbId}
                     x1="84.7"
                     y1="237"
                     x2="176.7"
@@ -173,7 +185,7 @@ export function Logo({
             </g>
 
             <path
-                fill="url(#autara-logo-orb)"
+                fill={`url(#${orbId})`}
                 d="M130.7,64.5c-35.5,0-64.2,28.7-64.2,64.2s28.7,64.2,64.2,64.2,64.2-28.7,64.2-64.2-28.7-64.2-64.2-64.2ZM130.7,160.8c-17.7,0-32.1-14.4-32.1-32.1s14.4-32.1,32.1-32.1,32.1,14.4,32.1,32.1-14.4,32.1-32.1,32.1ZM166.1,241.3h-70.8l35.4-36.6,35.4,36.6ZM95.3,16h70.8l-35.4,36.6-35.4-36.6ZM243.3,93.3v70.8l-36.6-35.4,36.6-35.4ZM18,164.1v-70.8l36.6,35.4-36.6,35.4ZM235.3,183.3l-50.1,50.1-.9-50.9,50.9.9ZM26,74.1l50.1-50.1.9,50.9-50.9-.9ZM185.3,24l50.1,50.1-50.9.9.9-50.9ZM76,233.4l-50.1-50.1,50.9-.9-.9,50.9Z"
             />
         </svg>

@@ -33,7 +33,9 @@ export {
     PickerSheet, type PickerOption, type PickerRowRender, type PickerSheetProps,
     PickerTrigger, type PickerTriggerProps,
     Accordion, AccordionItem, AccordionTrigger, AccordionContent,
-    Tabs, TabsList, TabsTrigger, TabsContent,
+    Tabs, TabsList, TabsTrigger, TabsContent, type TabsListProps,
+    // AUTM-1792
+    CountUp, type CountUpProps,
     DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuGroup, DropdownMenuPortal, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent, type DropdownMenuContentProps,
     // AUTM-965 — anchored floating panel for CONTENT (DropdownMenu gives its
     // children `menuitem` semantics, which a list of content must not have).

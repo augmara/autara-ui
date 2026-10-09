@@ -64,7 +64,7 @@ describe('motion tokens match utilities/animations.css', () => {
         // A regex that stopped matching would otherwise pass every check below
         // against an empty list.
         expect(durations.length).toBeGreaterThanOrEqual(10)
-        expect(easings).toHaveLength(2)
+        expect(easings).toHaveLength(3)
     })
 
     it('every duration in the stylesheet is in motionDurations, at the same value', () => {
@@ -87,7 +87,7 @@ describe('motion tokens match utilities/animations.css', () => {
 
 describe('motionTransition', () => {
     it('gives framer-motion seconds, and the curve the stylesheet pairs', () => {
-        expect(motionTransition('sheetIn')).toEqual({ duration: 0.28, ease: motionEasings.out })
+        expect(motionTransition('sheetIn')).toEqual({ duration: 0.35, ease: motionEasings.out })
         expect(motionTransition('sheetOut')).toEqual({ duration: 0.2, ease: motionEasings.in })
         expect(motionTransition('panelOut')).toEqual({ duration: 0.12, ease: motionEasings.in })
     })
