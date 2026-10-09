@@ -376,7 +376,8 @@ export { AppBar, type AppBarProps } from './AppBar'
 export { AppTabBar, type AppTabBarProps, type AppTabBarItem } from './AppTabBar'
 export { ActionBar, type ActionBarProps, type ActionBarAction, type ActionBarControl } from './ActionBar'
 // AUTM-1781: the slot where a screen shows its subject: a photo, a map, or initials on deep purple.
-export { MediaFrame, initialsOf, type MediaFrameProps } from './MediaFrame'
+export { MediaFrame, type MediaFrameProps } from './MediaFrame'
+export { initialsOf } from '../lib/initials'
 // AUTM-1781: a figure that counts up once when it arrives (the app motion vocabulary).
 export { CountUp, type CountUpProps } from './CountUp'
 // AUTM-1787: a list row's everyday actions, a menu on a phone, discs and labels with room.

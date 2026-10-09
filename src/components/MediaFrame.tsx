@@ -64,14 +64,6 @@ const SHAPE: Record<NonNullable<MediaFrameProps['shape']>, string> = {
     round: 'aspect-square rounded-full',
 }
 
-/** "Fitzroy Paint Co" is "FP"; one word is its first two letters' first. */
-export function initialsOf(name: string | null | undefined): string {
-    const words = (name ?? '').trim().split(/\s+/).filter(Boolean)
-    if (words.length === 0) return ''
-    if (words.length === 1) return words[0].slice(0, 1).toUpperCase()
-    return (words[0][0] + words[1][0]).toUpperCase()
-}
-
 export function MediaFrame({
     src,
     alt = '',

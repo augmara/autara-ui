@@ -58,7 +58,7 @@ function Row({ row, total }: { row: MoneyRow; total?: boolean }) {
             data-testid={row.testId}
             className={cn(
                 'flex items-baseline justify-between gap-4 leading-snug text-[var(--text-strong)]',
-                total ? 'text-base' : 'text-[0.9375rem]',
+                total ? 'border-t border-[var(--hairline)] pt-2.5 text-base' : 'text-[0.9375rem]',
                 row.emphasis && !total && 'font-bold',
                 row.muted && 'text-[var(--text-subtle)]',
             )}
@@ -92,11 +92,10 @@ export function MoneyBreakdown({
                 {rows.map((row, i) => (
                     <Row key={i} row={row} />
                 ))}
-                {total ? (
-                    <div className="border-t border-[var(--hairline)] pt-2.5">
-                        <Row row={total} total />
-                    </div>
-                ) : null}
+                {/* AUTM-1781: the total row carries its own rule. It was
+                    wrapped in a div, which put its dt and dd two levels
+                    under the dl (axe definition-list, dlitem). */}
+                {total ? <Row row={total} total /> : null}
             </dl>
             {note ? (
                 <p className={cn('text-[0.8125rem] leading-relaxed text-[var(--text-subtle)]', !card && 'mt-2')}>{note}</p>

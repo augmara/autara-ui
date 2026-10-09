@@ -187,6 +187,26 @@ function TabContent({ item, variant }: { item: AppTabBarItem; variant: 'bar' | '
     const count = typeof item.badge === 'number' && item.badge > 0 ? item.badge : 0
     const icon = item.active && item.activeIcon ? item.activeIcon : item.icon
     const dock = variant === 'bar'
+    /* The count disc: in the dock at the tab's top right (the design's
+       position, clear of the icon); inline, on the icon's corner, so it never
+       sits on the name. */
+    const badge =
+        count > 0 ? (
+            <span
+                aria-hidden
+                className={cn(
+                    'absolute grid h-5 min-w-5 place-items-center rounded-full border-2 bg-[var(--brand)] px-[5px] text-xs leading-none font-bold text-[var(--on-brand)] tabular-nums',
+                    dock ? 'top-1 right-1.5' : '-top-2.5 -right-3',
+                    item.active
+                        ? 'border-[var(--lime)]'
+                        : dock
+                          ? 'border-[var(--surface-inverse)]'
+                          : 'border-[var(--surface)]',
+                )}
+            >
+                {countText(count)}
+            </span>
+        ) : null
     return (
         <>
             {item.active ? (
@@ -208,6 +228,7 @@ function TabContent({ item, variant }: { item: AppTabBarItem; variant: 'bar' | '
                 )}
             >
                 {icon}
+                {dock ? null : badge}
             </span>
             <span
                 data-tab-name=""
@@ -223,21 +244,7 @@ function TabContent({ item, variant }: { item: AppTabBarItem; variant: 'bar' | '
             >
                 {item.label}
             </span>
-            {count > 0 ? (
-                <span
-                    aria-hidden
-                    className={cn(
-                        'absolute top-1 right-1.5 grid h-5 min-w-5 place-items-center rounded-full border-2 bg-[var(--brand)] px-[5px] text-xs leading-none font-bold text-[var(--on-brand)] tabular-nums',
-                        item.active
-                            ? 'border-[var(--lime)]'
-                            : dock
-                              ? 'border-[var(--surface-inverse)]'
-                              : 'border-[var(--surface)]',
-                    )}
-                >
-                    {countText(count)}
-                </span>
-            ) : null}
+            {dock ? badge : null}
         </>
     )
 }
@@ -287,8 +294,8 @@ export function AppTabBar({
                     ? 'min-h-[52px] gap-2 pr-5 pl-4'
                     : 'h-[52px] w-14 justify-center'
                 : active
-                  ? 'min-h-11 gap-2 pr-4 pl-3'
-                  : 'min-h-11 gap-2 px-3 hover:bg-[var(--band)]',
+                  ? 'min-h-11 gap-3 pr-4 pl-3'
+                  : 'min-h-11 gap-3 px-3 hover:bg-[var(--band)]',
         )
 
     return (
