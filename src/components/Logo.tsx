@@ -106,10 +106,14 @@ export function Logo({
                         s.rule,
                     )}
                 />
+                {/* AUTM-1792: never wraps. In the merchant portal's rail the
+                    lockup has exactly its own width, and the descriptor
+                    broke onto two lines ("for / business"), which is the
+                    stacked lockup Don ruled wrong on 2026-10-09. */}
                 <span
                     aria-hidden
                     className={cn(
-                        'font-medium text-[var(--text-subtle)]',
+                        'whitespace-nowrap font-medium text-[var(--text-subtle)]',
                         s.text,
                     )}
                 >

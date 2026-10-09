@@ -53,3 +53,10 @@ describe('Logo', () => {
         expect(screen.queryByText('for business')).toBeNull()
     })
 })
+
+describe('the business lockup stays on one line (AUTM-1792)', () => {
+    it('never lets the descriptor wrap', () => {
+        render(<Logo lockup="business" size="sm" />)
+        expect(screen.getByText('for business').className).toContain('whitespace-nowrap')
+    })
+})
