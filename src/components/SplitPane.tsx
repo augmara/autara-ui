@@ -138,7 +138,6 @@ export function SplitPane({
 }: SplitPaneProps) {
   const primaryId = useId();
   const rootRef = useRef<HTMLDivElement | null>(null);
-  const handleRef = useRef<HTMLDivElement | null>(null);
   // The user's width in rem, or null for the default.
   const [sizeRem, setSizeRem] = useState<number | null>(() => readStored(storageKey));
   const [measure, setMeasure] = useState({ width: 0, rem: 16 });
@@ -216,8 +215,9 @@ export function SplitPane({
 
   const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
     if (event.button !== 0) return;
-    event.preventDefault();
-    handleRef.current?.focus({ preventScroll: true });
+    // No preventDefault and no scripted focus: the press focuses the handle
+    // the way a click does (so Escape can cancel the drag) without matching
+    // :focus-visible, which a scripted focus would, ringing a mouse drag.
     event.currentTarget.setPointerCapture?.(event.pointerId);
     drag.current = { startX: event.clientX, startPx: currentPx, px: currentPx, moved: false, frame: 0 };
     setDragging(true);
@@ -283,7 +283,6 @@ export function SplitPane({
         {primary}
       </div>
       <div
-        ref={handleRef}
         role="separator"
         tabIndex={0}
         aria-orientation="vertical"
@@ -306,11 +305,15 @@ export function SplitPane({
         className={cn(
           // The visible line is this 1px flex item; the hit area is its
           // ::before, 44px (2.75rem) wide and mostly over the end pane.
-          "group/split relative z-10 w-px shrink-0 cursor-col-resize touch-none select-none bg-[var(--hairline)] outline-none",
+          // `split-pane-handle` is a stable hook for a consumer whose global
+          // focus outline would box the 1px line; the handle draws its own.
+          "split-pane-handle group/split relative z-10 w-px shrink-0 cursor-col-resize touch-none select-none bg-[var(--hairline)] outline-none focus-visible:outline-none",
           "before:absolute before:inset-y-0 before:left-[-1rem] before:w-[2.75rem] before:content-['']",
           // Hover, focus and drag: the line takes the accent, 2px wide,
-          // drawn with ::after so the layout never moves.
-          "after:pointer-events-none after:absolute after:inset-y-0 after:left-[-0.5px] after:w-[2px] after:bg-[var(--accent)] after:opacity-0 after:transition-opacity after:duration-150 after:content-[''] motion-reduce:after:transition-none",
+          // drawn with ::after so the layout never moves, and on the START
+          // side of the line: a glass bar at the end pane's edge samples the
+          // pixels it touches, and an accent pixel there smears purple.
+          "after:pointer-events-none after:absolute after:inset-y-0 after:left-[-1px] after:w-[2px] after:bg-[var(--accent)] after:opacity-0 after:transition-opacity after:duration-150 after:content-[''] motion-reduce:after:transition-none",
           "hover:after:opacity-100 focus-visible:after:opacity-100 data-[dragging]:after:opacity-100",
         )}
       >
