@@ -5,6 +5,8 @@ export {
     IconButton, type IconButtonProps,
     // AUTM-1787: a list row's everyday actions.
     RowActions, type RowAction, type RowActionsProps,
+    // AUTM-1755: a list beside its record, with a splitter.
+    SplitPane, type SplitPaneProps,
     Input, inputVariants, type InputProps,
     PhoneInput, DEFAULT_COUNTRIES, findCountryByIso, type PhoneInputProps, type PhoneCountry,
     Textarea, textareaVariants, type TextareaProps,

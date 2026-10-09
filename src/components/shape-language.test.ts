@@ -77,6 +77,7 @@ const KEEPS: Record<string, string> = {
     'AppTabBar.tsx': 'the customer app dock as designed (canvas AppBookings): an ink pill, the current tab a lime capsule (a state light), the count a disc (AUTM-1781)',
     'ActionBar.tsx': 'the customer app bar as designed (AppBookingDetail): pill buttons, the sheet\'s button shape, and 56px icon discs like IconButton (AUTM-1781)',
     'MediaFrame.tsx': 'the round shape is a person (a pro in a chat header or on the live booking), as Avatar (AUTM-1781)',
+    'SplitPane.tsx': 'the splitter\'s grip, the sibling of Sheet\'s grabber pill: a 6px bar that says the line drags, never a button (AUTM-1755)',
 }
 
 /**
