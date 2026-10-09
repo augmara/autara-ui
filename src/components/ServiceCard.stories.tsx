@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ServiceCard, ServiceCardSkeleton } from "./ServiceCard";
 import { Badge } from "./Badge";
 import { Button } from "./Button";
+import { listingPrice, serviceDurationLabel, workingDaysLabel, DROP_OFF_TAG } from "../lib/service-listing";
 
 /**
  * AUTM-1694: one card for the merchant page's service list and the booking
@@ -588,6 +589,48 @@ export const Dark: Story = {
       </div>
     </div>
   ),
+};
+
+/** The same words as the page (AUTM-1800): what the server quoted, through `listingPrice`, `serviceDurationLabel` and the multi-day labels. Fee above the minimum, the 99c minimum, fee off, and a multi-day job. */
+const quoteOf = (service: number, fee: number) => ({
+  bookingFeeLabel: "Booking fee",
+  serviceTotalCents: service,
+  bookingFeeTotalCents: fee,
+  totalCents: service + fee,
+});
+
+export const PricedFromAQuote: Story = {
+  name: "Priced from a server quote",
+  render: (args) => {
+    const rows = [
+      { name: "Exterior hand wash", priceCents: 8000, quote: quoteOf(8000, 392), minutes: 45, days: null },
+      { name: "Tyre shine", priceCents: 1000, quote: quoteOf(1000, 99), minutes: 15, days: null },
+      { name: "Interior vacuum", priceCents: 6000, quote: quoteOf(6000, 0), minutes: 60, days: null },
+      { name: "Ceramic coating", priceCents: 120000, quote: quoteOf(120000, 5880), minutes: 4320, days: 3 },
+    ];
+    return (
+      <ul className="service-card-grid" role="list" style={{ maxWidth: 390 }}>
+        {rows.map((row) => {
+          const price = listingPrice({ priceCents: row.priceCents, priceBreakdown: row.quote });
+          const multiDay = row.days !== null;
+          return (
+            <li key={row.name}>
+              <ServiceCard
+                {...args}
+                layout="horizontal"
+                name={row.name}
+                priceLabel={price.headline}
+                priceLines={price.lines ?? undefined}
+                durationLabel={multiDay ? null : serviceDurationLabel(row.minutes)}
+                workingDaysLabel={multiDay ? workingDaysLabel(row.days as number) : null}
+                chips={multiDay ? [{ label: DROP_OFF_TAG, icon: <DropOffIcon /> }] : undefined}
+              />
+            </li>
+          );
+        })}
+      </ul>
+    );
+  },
 };
 
 /** Solar-style drop-off glyph for the consumer chip in these stories. */

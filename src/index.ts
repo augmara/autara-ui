@@ -246,3 +246,23 @@ export {
     type MerchantOpenStatus,
     type LocationLabel,
 } from './lib/merchant-profile'
+
+/* AUTM-1800: how a service is listed to a customer (the price from the
+ * server's quote, its length, the multi-day words), shared by customer-web and
+ * the portal's preview so a card cannot be worded two ways. */
+export {
+    formatPriceCents,
+    hasBookingFee,
+    listingPrice,
+    fromPrice,
+    serviceDurationLabel,
+    isMultiDay,
+    workingDaysLabel,
+    DROP_OFF_TAG,
+    type ListingPriceBreakdown,
+    type ListingPrice,
+    type ListingPriceParts,
+    type ListingPriceLine,
+    type ListingPriceInput,
+    type ListingPriceOptions,
+} from './lib/service-listing'
