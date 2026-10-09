@@ -172,7 +172,7 @@ export {
     type MotionTransitionName,
 } from './lib/motion-tokens'
 
-/* AUTM-1781 — the direction of the next screen change, for `.motion-screen`. */
+/* AUTM-1781: the direction of the next screen change, for `.motion-screen`. */
 export {
     markNavigation,
     listenForBackNavigation,
