@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, render, screen } from '@testing-library/react'
+import { StrictMode } from 'react'
 import { CountUp } from './CountUp'
 
 /**
@@ -68,5 +69,26 @@ describe('CountUp', () => {
         rerender(<CountUp value={456} format={aud} />)
         expect(document.querySelector('[data-count-up] [aria-hidden="true"]')).toBeNull()
         expect(screen.getByText('$456')).toBeTruthy()
+    })
+})
+
+describe('CountUp under StrictMode (AUTM-1792)', () => {
+    beforeEach(() => {
+        vi.useFakeTimers({ toFake: ['requestAnimationFrame', 'cancelAnimationFrame', 'performance'] })
+        mockReducedMotion(false)
+    })
+    afterEach(() => vi.useRealTimers())
+
+    it('still finishes when React mounts it twice', () => {
+        render(
+            <StrictMode>
+                <CountUp value={407} format={aud} duration={900} />
+            </StrictMode>
+        )
+        act(() => {
+            vi.advanceTimersByTime(1200)
+        })
+        expect(document.querySelector('[data-count-up] [aria-hidden="true"]')).toBeNull()
+        expect(screen.getAllByText('$407')).toHaveLength(1)
     })
 })

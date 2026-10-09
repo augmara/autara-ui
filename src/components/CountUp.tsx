@@ -60,26 +60,36 @@ export function CountUp({
 }: CountUpProps) {
     const finalText = format(value)
     const [shown, setShown] = React.useState<string | null>(null)
-    const started = React.useRef(false)
+    // Set once the count has FINISHED (or was skipped). Not "started": React's
+    // StrictMode mounts, cleans up and mounts again in development, and a
+    // started flag stopped the second mount from counting, which left the
+    // counting copy on screen for good.
+    const finished = React.useRef(false)
     const formatRef = React.useRef(format)
     formatRef.current = format
 
     useIsoLayoutEffect(() => {
-        if (started.current) return
-        started.current = true
-        if (prefersReducedMotion() || value === from || !Number.isFinite(value)) return
+        if (finished.current) return
+        if (prefersReducedMotion() || value === from || !Number.isFinite(value)) {
+            finished.current = true
+            return
+        }
         const target = value
         const print = formatRef.current
         const end = print(target)
         let frame = 0
         const t0 = performance.now()
         setShown(print(from))
-        const tick = (now: number) => {
-            const t = Math.min((now - t0) / duration, 1)
+        // The clock is read here, not taken from rAF's argument: the two share
+        // an origin in a browser but not under a test's fake clock, where the
+        // count then never finished.
+        const tick = () => {
+            const t = Math.max(0, Math.min((performance.now() - t0) / duration, 1))
             const text = print(from + (target - from) * easeOut(t))
             // Stop before the copy would read the final figure, so only the
             // real value ever does.
             if (t >= 1 || text === end) {
+                finished.current = true
                 setShown(null)
                 return
             }
@@ -87,7 +97,10 @@ export function CountUp({
             frame = requestAnimationFrame(tick)
         }
         frame = requestAnimationFrame(tick)
-        return () => cancelAnimationFrame(frame)
+        return () => {
+            cancelAnimationFrame(frame)
+            if (!finished.current) setShown(null)
+        }
         // Once per arrival: a later value is shown at once (see the header),
         // so this deliberately depends on nothing.
     }, [])
