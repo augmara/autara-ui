@@ -119,4 +119,15 @@ describe('MoneyBreakdown chips (AUTM-1799)', () => {
             expect([...row.children].map((c) => c.tagName)).toEqual(['DT', 'DD'])
         }
     })
+
+    it('keeps an amount whole', () => {
+        const rows = [
+            { label: 'On hold today', value: '$25.18', tone: 'flight' as const },
+            { label: 'After the job', value: '$58.74' },
+        ]
+        const { container } = render(<MoneyBreakdown variant="chips" label="When you pay" rows={rows} />)
+        const dd = container.querySelector('dd')!
+        expect(dd.className).toContain('whitespace-nowrap')
+        expect(dd.className).not.toContain('overflow-wrap:anywhere')
+    })
 })
