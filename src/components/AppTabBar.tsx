@@ -40,6 +40,17 @@ import { motionDurations, motionTiming } from '../lib/motion-tokens'
  * `prefers-reduced-motion: reduce` nothing moves; the pill is simply there.
  *
  * Counts are a small brand disc on the tab, ringed in the colour behind it.
+ * In the dock, the CURRENT tab carries its count inside the lime pill, right
+ * after the name: an ink disc with a lime figure, centred, no ring and no
+ * overlap, the pill growing to fit (AUTM-1802, Don 2026-10-10).
+ *
+ * Large text (AUTM-1816). The current tab's name in the dock never wraps.
+ * When the dock cannot fit it on one line (200% text on a phone), the pill
+ * shows the icon and the count only; the name stays in the accessibility tree
+ * and the tab is still announced "Messages, 3 unread". Whether it fits is
+ * measured, not guessed from a breakpoint: the dock's natural width with the
+ * name (the same answer whether the name is drawn or not, so it cannot
+ * flip-flop) against the room the dock has. Never a sideways scroll.
  * The disc is drawn, not read: `badgeLabel` is what a screen reader hears,
  * joined to the tab's name ("Messages, 3 unread"), because a bare number means
  * nothing out of sight. A tab's name is always in the accessibility tree, also
@@ -182,17 +193,39 @@ function playSlide(list: HTMLUListElement, prev: Snapshot, next: Snapshot, activ
 
 /* ─── The tab ──────────────────────────────────────────────────────────── */
 
-function TabContent({ item, variant }: { item: AppTabBarItem; variant: 'bar' | 'inline' }) {
+function TabContent({
+    item,
+    variant,
+    compact = false,
+}: {
+    item: AppTabBarItem
+    variant: 'bar' | 'inline'
+    /** Dock only: the current tab draws its icon and count, not its name (it does not fit). */
+    compact?: boolean
+}) {
     const count = typeof item.badge === 'number' && item.badge > 0 ? item.badge : 0
     const icon = item.active && item.activeIcon ? item.activeIcon : item.icon
     const dock = variant === 'bar'
+    const hideName = dock && !!item.active && compact
+    /* AUTM-1802: the dock's current tab carries its count inside the pill,
+       after the name: an ink disc, a lime figure, no ring, in the flow. */
+    const inPill = dock && !!item.active && count > 0
     /* The count disc: in the dock at the tab's top right (the design's
        position, clear of the icon); inline, on the icon's corner, so it never
        sits on the name. */
-    const badge =
+    const badge = inPill ? (
+        <span
+            aria-hidden
+            data-tab-count="selected"
+            className="relative grid h-5 min-w-5 shrink-0 place-items-center rounded-full bg-[var(--on-lime)] px-[5px] text-xs leading-none font-bold text-[var(--lime)] tabular-nums"
+        >
+            {countText(count)}
+        </span>
+    ) :
         count > 0 ? (
             <span
                 aria-hidden
+                data-tab-count="count"
                 className={cn(
                     'absolute grid h-5 min-w-5 place-items-center rounded-full border-2 bg-[var(--brand)] px-[5px] text-xs leading-none font-bold text-[var(--on-brand)] tabular-nums',
                     dock ? 'top-1 right-1.5' : '-top-2.5 -right-3',
@@ -231,14 +264,21 @@ function TabContent({ item, variant }: { item: AppTabBarItem; variant: 'bar' | '
             </span>
             <span
                 data-tab-name=""
+                data-name-hidden={hideName ? '' : undefined}
                 className={cn(
-                    'relative min-w-0 leading-none font-bold [overflow-wrap:anywhere]',
-                    dock ? 'text-base' : 'text-[0.9375rem]',
+                    'leading-none font-bold',
+                    /* AUTM-1816: in the dock the name never wraps (it read
+                       "Me/ssa/ge/s" at 200% text); it hides instead. */
+                    dock ? 'text-base whitespace-nowrap' : 'min-w-0 text-[0.9375rem] [overflow-wrap:anywhere]',
+                    /* A hidden name is sr-only and nothing else: `relative`
+                       would put its 1px and a gap back in the row. */
                     item.active
-                        ? 'text-[var(--on-lime)]'
+                        ? hideName
+                            ? 'sr-only'
+                            : 'relative text-[var(--on-lime)]'
                         : dock
                           ? 'sr-only'
-                          : 'font-medium text-[var(--text-muted)] group-hover:text-[var(--text-strong)]',
+                          : 'relative font-medium text-[var(--text-muted)] group-hover:text-[var(--text-strong)]',
                 )}
             >
                 {item.label}
@@ -246,6 +286,48 @@ function TabContent({ item, variant }: { item: AppTabBarItem; variant: 'bar' | '
             {dock ? badge : null}
         </>
     )
+}
+
+/* ─── Does the dock fit its current tab's name? (AUTM-1816) ─────────────── */
+
+let measureCtx: CanvasRenderingContext2D | null | undefined
+
+/** The name's width on one line, from its own computed font (also while it is hidden). */
+function nameWidth(name: HTMLElement): number {
+    if (measureCtx === undefined) {
+        try {
+            measureCtx = document.createElement('canvas').getContext('2d')
+        } catch {
+            measureCtx = null
+        }
+    }
+    if (!measureCtx) return 0
+    const cs = getComputedStyle(name)
+    measureCtx.font = cs.font || `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`
+    return Math.ceil(measureCtx.measureText(name.textContent ?? '').width)
+}
+
+/**
+ * The dock's natural width with every name it would draw, against the room
+ * it has. The same answer whether the current name is drawn or hidden: a
+ * hidden one (`data-name-hidden`) is added back with its gap.
+ */
+function dockNeedsCompact(nav: HTMLElement, list: HTMLElement): boolean {
+    const ns = getComputedStyle(nav)
+    const room = nav.clientWidth - (parseFloat(ns.paddingLeft) || 0) - (parseFloat(ns.paddingRight) || 0)
+    if (room <= 0) return false
+    const ls = getComputedStyle(list)
+    const tabs = Array.from(list.querySelectorAll<HTMLElement>(':scope > li > *'))
+    let needed =
+        (parseFloat(ls.paddingLeft) || 0) +
+        (parseFloat(ls.paddingRight) || 0) +
+        (parseFloat(ls.columnGap) || 0) * Math.max(0, tabs.length - 1)
+    for (const tab of tabs) {
+        needed += Math.max(tab.scrollWidth, tab.offsetWidth)
+        const hidden = tab.querySelector<HTMLElement>('[data-name-hidden]')
+        if (hidden) needed += nameWidth(hidden) + (parseFloat(getComputedStyle(tab).columnGap) || 0)
+    }
+    return needed > room + 0.5
 }
 
 export function AppTabBar({
@@ -260,6 +342,32 @@ export function AppTabBar({
     const dock = variant === 'bar'
     const activeKey = items.find((i) => i.active)?.key ?? null
     const memoryKey = `${variant}:${label}`
+
+    /* AUTM-1816: the dock's current tab drops its name when the dock cannot
+       fit it. Measured before paint, and again when the dock's room or its
+       contents change size (rotation, text size, the font arriving). */
+    const navRef = React.useRef<HTMLElement>(null)
+    const [compact, setCompact] = React.useState(false)
+    const fit = React.useCallback(() => {
+        const nav = navRef.current
+        const list = listRef.current
+        if (!dock || !nav || !list) return
+        setCompact(dockNeedsCompact(nav, list))
+    }, [dock])
+    const signature = items.map((i) => `${i.key}:${i.label}:${i.badge ?? 0}:${i.active ? 1 : 0}`).join('|')
+    useIsoLayoutEffect(fit, [fit, signature])
+    React.useEffect(() => {
+        if (!dock || typeof ResizeObserver === 'undefined') return
+        const ro = new ResizeObserver(() => fit())
+        if (navRef.current) ro.observe(navRef.current)
+        if (listRef.current) ro.observe(listRef.current)
+        const fonts = typeof document !== 'undefined' ? document.fonts : undefined
+        fonts?.addEventListener?.('loadingdone', fit)
+        return () => {
+            ro.disconnect()
+            fonts?.removeEventListener?.('loadingdone', fit)
+        }
+    }, [dock, fit])
 
     /* Measure after layout, before paint: slide from the remembered layout
        when the current tab is not the one it remembers, then remember this. */
@@ -279,7 +387,7 @@ export function AppTabBar({
         memory.set(memoryKey, next)
         if (!prev || prev.active === activeKey || !activeKey || prefersReducedMotion()) return
         playSlide(list, prev, next, activeKey)
-    }, [activeKey, memoryKey, items.length])
+    }, [activeKey, memoryKey, items.length, compact])
 
     const tabClass = (active: boolean) =>
         cn(
@@ -288,10 +396,13 @@ export function AppTabBar({
             dock
                 ? 'focus-visible:ring-[var(--lime)] focus-visible:ring-offset-[var(--surface-inverse)]'
                 : 'focus-visible:ring-[var(--accent)] focus-visible:ring-offset-[var(--background)]',
+            /* AUTM-1816: the dock's spacing is in px (the values it always
+               had at 100%), so 200% text grows the words, not the gaps: at
+               rem, two icon tabs alone took 224px of a 390 phone. */
             dock
                 ? active
-                    ? 'min-h-[52px] gap-2 pr-5 pl-4'
-                    : 'h-[52px] w-14 justify-center'
+                    ? 'min-h-[52px] gap-[8px] pr-[20px] pl-[16px]'
+                    : 'h-[52px] w-[56px] justify-center'
                 : active
                   ? 'min-h-11 gap-3 pr-4 pl-3'
                   : 'min-h-11 gap-3 px-3 hover:bg-[var(--band)]',
@@ -299,12 +410,14 @@ export function AppTabBar({
 
     return (
         <nav
+            ref={navRef}
             aria-label={label}
             data-variant={variant}
+            data-compact={dock && compact ? '' : undefined}
             className={cn(
                 dock
                     ? cn(
-                          'pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center px-3 pb-[calc(1rem+env(safe-area-inset-bottom))]',
+                          'pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center px-[12px] pb-[calc(1rem+env(safe-area-inset-bottom))]',
                           HIDE_FROM[hideFrom],
                       )
                     : 'flex items-center',
@@ -314,8 +427,8 @@ export function AppTabBar({
             <ul
                 ref={listRef}
                 className={cn(
-                    'relative m-0 flex max-w-full list-none items-center gap-1 p-0',
-                    dock ? 'pointer-events-auto p-1.5' : '',
+                    'relative m-0 flex max-w-full list-none items-center p-0',
+                    dock ? 'pointer-events-auto gap-[4px] p-[6px]' : 'gap-1',
                 )}
             >
                 {dock ? (
@@ -337,7 +450,7 @@ export function AppTabBar({
                         'data-testid': item.testId ?? `${testIdPrefix}-${item.key}`,
                         'data-active': item.active ? '' : undefined,
                     }
-                    const content = <TabContent item={item} variant={variant} />
+                    const content = <TabContent item={item} variant={variant} compact={compact} />
                     const control = item.element ? (
                         React.cloneElement(
                             item.element as ReactElement<Record<string, unknown>>,

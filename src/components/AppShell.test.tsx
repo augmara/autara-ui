@@ -81,11 +81,40 @@ describe('AppTabBar (AUTM-1781)', () => {
 
     it('the count is a brand disc ringed in the colour behind it', () => {
         render(<AppTabBar items={items} />)
-        const onLime = within(screen.getByTestId('app-tab-messages')).getByText('3')
-        expect(onLime.className).toContain('bg-[var(--brand)]')
-        expect(onLime.className).toContain('border-[var(--lime)]')
         const onInk = within(screen.getByTestId('app-tab-bookings')).getByText('1')
+        expect(onInk).toHaveAttribute('data-tab-count', 'count')
+        expect(onInk.className).toContain('bg-[var(--brand)]')
         expect(onInk.className).toContain('border-[var(--surface-inverse)]')
+        // Inline (the top bar), the current tab's disc is still brand, ringed lime.
+        const { unmount } = render(<AppTabBar items={items} variant="inline" testIdPrefix="nav" />)
+        const inlineCurrent = within(screen.getByTestId('nav-messages')).getByText('3')
+        expect(inlineCurrent.className).toContain('bg-[var(--brand)]')
+        expect(inlineCurrent.className).toContain('border-[var(--lime)]')
+        unmount()
+    })
+
+    it("in the dock the current tab's count sits in the pill after the name: ink disc, lime figure, no ring (AUTM-1802)", () => {
+        render(<AppTabBar items={items} />)
+        const tab = screen.getByTestId('app-tab-messages')
+        const count = within(tab).getByText('3')
+        expect(count).toHaveAttribute('data-tab-count', 'selected')
+        expect(count.className).toContain('bg-[var(--on-lime)]')
+        expect(count.className).toContain('text-[var(--lime)]')
+        expect(count.className).not.toMatch(/\babsolute\b|border-/)
+        // In the flow, right after the name.
+        const name = within(tab).getByText('Messages')
+        expect(name.nextElementSibling).toBe(count)
+        // Drawn, not read: the tab says it once.
+        expect(count).toHaveAttribute('aria-hidden')
+        expect(screen.getByRole('link', { name: 'Messages, 3 unread' })).toBeInTheDocument()
+    })
+
+    it("the dock's current name never wraps (AUTM-1816)", () => {
+        render(<AppTabBar items={items} />)
+        const name = within(screen.getByTestId('app-tab-messages')).getByText('Messages')
+        expect(name.className).toContain('whitespace-nowrap')
+        expect(name.className).not.toContain('overflow-wrap')
+        expect(name).not.toHaveAttribute('data-name-hidden')
     })
 
     it('slides the pill when the current tab changes, from where the last bar left it', () => {
