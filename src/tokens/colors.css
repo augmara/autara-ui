@@ -219,6 +219,25 @@
     --hairline: rgba(17, 24, 39, 0.08);
     /* Inputs, the code boxes and the mobile social button: one legible edge. */
     --field-edge: rgba(14, 10, 26, 0.48);
+
+    /* ─── Conversation (AUTM-1806, canvas v53 AppChat) ─────────────────
+     * The canvas board is the source of truth (Don, 2026-10-09): your own
+     * message is a brand bubble with white text, the other side's is band
+     * with ink, and Send is the lime primary. `-meta` is the time and the
+     * send status inside or under a bubble. White on brand is 9.5:1 and
+     * the meta white at .78 is 6.4:1; ink on band is 17:1.
+     * Change a value here and both apps' threads move together. */
+    --message-own: #4e1bbd;
+    --on-message-own: #ffffff;
+    --message-own-meta: rgba(255, 255, 255, 0.78);
+    --message-incoming: #f4f2ec;
+    --on-message-incoming: #0e0a1a;
+    --message-incoming-meta: rgba(14, 10, 26, 0.72);
+    /* A card in the thread (an extra to approve): band, with its quiet
+     * action raised on it, since a band button on band is invisible. */
+    --message-card: #f4f2ec;
+    --message-card-action: #ffffff;
+    --message-card-action-hover: #e9e6dc;
 }
 
 /* ─── Dark theme — set `data-theme="dark"` on <html> ───────────────────
@@ -384,6 +403,19 @@
     --scrim: rgba(0, 0, 0, 0.6);
     --hairline: rgba(255, 255, 255, 0.1);
     --field-edge: rgba(255, 255, 255, 0.48);
+
+    /* Conversation, dark: brand holds (white on it is 9.5:1); the other
+     * side's bubble is raised, because band (#1b1626) on dark paper is
+     * 1.1:1 and the bubble edge would vanish. */
+    --message-own: #4e1bbd;
+    --on-message-own: #ffffff;
+    --message-own-meta: rgba(255, 255, 255, 0.78);
+    --message-incoming: #262036;
+    --on-message-incoming: #ffffff;
+    --message-incoming-meta: rgba(255, 255, 255, 0.74);
+    --message-card: #262036;
+    --message-card-action: #0e0a1a;
+    --message-card-action-hover: #1b1626;
 }
 
 @theme inline {

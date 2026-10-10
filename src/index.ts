@@ -100,7 +100,7 @@ export {
     // CountUp is exported once, beside Tabs above (AUTM-1792; AUTM-1781 added its server-safe props).
     MediaFrame, initialsOf, type MediaFrameProps,
     ModeChip, type ModeChipProps, type BookingMode,
-    Logo, type LogoProps,
+    Logo, type LogoProps, type LogoTone,
     SearchInput, type SearchInputProps,
     FilterChipRow, type FilterChipRowProps, type FilterChipOption,
     // v2.1.0 — customer-web marketing harvest (AUTAA-UI-007)
@@ -116,7 +116,11 @@ export {
     // chat / conversation primitives (AUTM-159)
     MessageBubble, type MessageBubbleProps, type MessageSide,
     MessageComposer, type MessageComposerProps,
-    MessageThread, type MessageThreadProps, type MessageItem,
+    MessageThread, type MessageThreadProps, type MessageItem, type MessageSendStatus,
+    // AUTM-1806 — cards, quick replies and the attach menu for the booking thread
+    MessageCard, type MessageCardProps, type MessageCardAction, type MessageCardState,
+    QuickReplies, type QuickRepliesProps, type QuickReply,
+    ComposerAttachMenu, attachMenuGlyphs, type ComposerAttachMenuProps, type AttachMenuItem,
     // Media — pick-then-crop dialog (AUTM-163)
     ImageCropDialog, type ImageCropDialogProps,
     // Wizard step indicator (AUTM-322)

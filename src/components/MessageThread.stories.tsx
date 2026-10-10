@@ -1,7 +1,10 @@
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { MessageThread, type MessageItem } from "./MessageThread";
 import { MessageComposer } from "./MessageComposer";
+import { MessageCard } from "./MessageCard";
+import { QuickReplies } from "./QuickReplies";
+import { ComposerAttachMenu, attachMenuGlyphs } from "./ComposerAttachMenu";
 
 // Fixed base time so timestamp separators render deterministically.
 const BASE = Date.UTC(2026, 4, 15, 9, 17);
@@ -61,9 +64,11 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-function Frame({ children }: { children: ReactNode }) {
+function Frame({ children, tall }: { children: ReactNode; tall?: boolean }) {
   return (
-    <div className="flex h-[520px] flex-col bg-[var(--background)]">{children}</div>
+    <div className={tall ? "flex h-[860px] flex-col bg-[var(--background)]" : "flex h-[520px] flex-col bg-[var(--background)]"}>
+      {children}
+    </div>
   );
 }
 
@@ -108,4 +113,166 @@ export const InContext: Story = {
       <MessageComposer value="" onChange={() => {}} onSend={() => {}} />
     </Frame>
   ),
+};
+
+function useLargeText() {
+  useEffect(() => {
+    const prev = document.documentElement.style.fontSize;
+    document.documentElement.style.fontSize = "200%";
+    return () => {
+      document.documentElement.style.fontSize = prev;
+    };
+  }, []);
+}
+
+/**
+ * AUTM-1806 (U1): send status on your own bubble. "Sending" while the call is
+ * in flight, then nothing once it landed; a failed send keeps its text and
+ * offers a 44px retry. The failure is also said once, politely.
+ */
+export const SendStatus: Story = {
+  render: function SendStatusStory() {
+    const [items, setItems] = useState<MessageItem[]>([
+      ...SAMPLE,
+      { id: "5", side: "own", text: "See you at nine.", createdAt: BASE - 2 * MIN, status: "sending" },
+      {
+        id: "6",
+        side: "own",
+        text: "Gate code is 4821.",
+        createdAt: BASE - MIN,
+        status: "failed",
+        onRetry: () =>
+          setItems((prev) =>
+            prev.map((m) => (m.id === "6" ? { ...m, status: "sending", onRetry: undefined } : m)),
+          ),
+      },
+    ]);
+    return (
+      <Frame tall>
+        <MessageThread items={items} logLabel="Messages with Sam" retryTestId="booking-chat-message-retry" />
+      </Frame>
+    );
+  },
+};
+
+const BOOKED = Date.UTC(2026, 8, 23, 8, 41);
+
+/** AUTM-1806: a card as a thread row, sorted with the messages by time. */
+const WITH_CARD: MessageItem[] = [
+  {
+    id: "m1",
+    side: "incoming",
+    text: "Hi Sam, started on the inside. The rear seats have a lot of pet hair.",
+    createdAt: BOOKED,
+  },
+  {
+    id: "x1",
+    side: "incoming",
+    createdAt: BOOKED + 30 * 1000,
+    testId: "booking-detail-chat-extra-card",
+    body: (
+      <MessageCard
+        kicker="Extra to approve, from Kerbside Car Care"
+        title="Pet hair removal, rear seats"
+        figure="+$40.00"
+        body="Heavy hair woven into the fabric. It needs a rubber brush pass before the vacuum, about 30 minutes."
+        balance="If you approve, your balance becomes $190.00."
+        state="waiting"
+        stateLabel="Waiting for you"
+        secondaryAction={{ label: "No thanks", onClick: () => {} }}
+        primaryAction={{ label: "Approve", onClick: () => {} }}
+        footnote="Charged with your final balance, not now. You are not charged unless you approve."
+      />
+    ),
+  },
+  { id: "m2", side: "own", text: "Looks right, go ahead.", createdAt: BOOKED + 2 * MIN },
+];
+
+/** The whole Phase 1A screen: thread with a card, quick replies, the plus. */
+export const WithCardsAndQuickReplies: Story = {
+  render: function WithCardsStory() {
+    const [value, setValue] = useState("");
+    return (
+      <Frame tall>
+        <MessageThread items={WITH_CARD} logLabel="Messages with Kerbside Car Care" />
+        <div className="mx-auto w-full max-w-[680px] px-4 pb-2">
+          <QuickReplies
+            replies={[
+              { id: "late", label: "I'm running late" },
+              { id: "here", label: "I'm here" },
+              { id: "park", label: "Where do I park?" },
+            ]}
+            onSelect={(r) => setValue(r.label)}
+            chipTestId="booking-detail-chat-quick-reply"
+          />
+        </div>
+        <MessageComposer
+          value={value}
+          onChange={setValue}
+          onSend={() => setValue("")}
+          maxLength={2000}
+          placeholder="Message Kerbside Car Care"
+          leading={
+            <ComposerAttachMenu
+              triggerTestId="booking-detail-chat-attach-open"
+              items={[
+                {
+                  id: "ask",
+                  label: "Ask about an extra",
+                  icon: attachMenuGlyphs.question,
+                  onSelect: () => {},
+                  testId: "booking-detail-chat-extra-ask",
+                },
+              ]}
+            />
+          }
+        />
+      </Frame>
+    );
+  },
+};
+
+/** Near the 2,000-character cap the composer says how many are left. */
+export const NearTheCap: Story = {
+  render: function NearTheCapStory() {
+    const [value, setValue] = useState("a".repeat(1890));
+    return (
+      <Frame>
+        <MessageThread items={SAMPLE} />
+        <MessageComposer value={value} onChange={setValue} onSend={() => setValue("")} maxLength={2000} />
+      </Frame>
+    );
+  },
+};
+
+export const Dark: Story = {
+  render: () => (
+    <div data-theme="dark" className="flex h-[860px] flex-col bg-[var(--paper)]">
+      <MessageThread
+        items={[
+          ...WITH_CARD,
+          { id: "f", side: "own", text: "Gate code is 4821.", createdAt: BOOKED + 3 * MIN, status: "failed", onRetry: () => {} },
+        ]}
+      />
+      <MessageComposer value="" onChange={() => {}} onSend={() => {}} />
+    </div>
+  ),
+};
+
+/** 200% text on a small phone: bubbles, the card and the retry line wrap. */
+export const LargeText: Story = {
+  parameters: { viewport: { defaultViewport: "phoneSmall" } },
+  render: function LargeTextStory() {
+    useLargeText();
+    return (
+      <div className="flex h-[1400px] flex-col bg-[var(--paper)]">
+        <MessageThread
+          items={[
+            ...WITH_CARD,
+            { id: "f", side: "own", text: "Gate code is 4821.", createdAt: BOOKED + 3 * MIN, status: "failed", onRetry: () => {} },
+          ]}
+        />
+      </div>
+    );
+  },
 };
