@@ -142,26 +142,6 @@ const CHECKOUT_ROWS = [
     },
 ]
 
-/**
- * AUTM-1799: `stackWhenNarrow`. In a phone's card (left, 318px) the chips
- * stack one per row, full width; in a wider one (right, 400px, a desktop
- * rail) they sit side by side. Without the prop they sit side by side in
- * both (the booking screen's chips).
- */
-export const ChipsStacked: Story = {
-    args: { variant: 'chips', label: 'When you pay', stackWhenNarrow: true, rows: CHECKOUT_ROWS },
-    render: (args) => (
-        <div className="flex flex-wrap items-start gap-6">
-            <div className="w-[318px] rounded-[1.5rem] border border-[var(--hairline)] p-4">
-                <MoneyBreakdown {...args} />
-            </div>
-            <div className="w-[400px] rounded-[1.5rem] border border-[var(--hairline)] p-4">
-                <MoneyBreakdown {...args} />
-            </div>
-        </div>
-    ),
-}
-
 /** The root at 200%, as a reader's large text sets it; restored when the story leaves. */
 function LargeText({ children }: { children: ReactNode }) {
     useEffect(() => {
@@ -176,21 +156,15 @@ function LargeText({ children }: { children: ReactNode }) {
 }
 
 /**
- * AUTM-1799: 200% text at 390. Each amount stays one figure on one line
- * ("$25.18", never "$25.1" over "8"): the default chips (left) and the
- * stacked ones (right).
+ * AUTM-1799: 200% text in a 270px card (about checkout's at 390). Each
+ * amount stays one figure on one line ("$25.18", never "$25.1" over "8").
  */
 export const ChipsLargeText: Story = {
     args: { variant: 'chips', label: 'When you pay', rows: CHECKOUT_ROWS },
     render: (args) => (
         <LargeText>
-            <div className="flex flex-wrap items-start gap-6">
-                <div className="w-[358px]">
-                    <MoneyBreakdown {...args} />
-                </div>
-                <div className="w-[358px]">
-                    <MoneyBreakdown {...args} stackWhenNarrow />
-                </div>
+            <div className="w-[270px]">
+                <MoneyBreakdown {...args} />
             </div>
         </LargeText>
     ),

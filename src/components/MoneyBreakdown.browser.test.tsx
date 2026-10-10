@@ -4,9 +4,8 @@
  * measure (container queries, line boxes, 200% text).
  *
  * At 200% text the chip's amount broke mid-number ("$25.1" over "8"), because
- * the figure could wrap anywhere. It is whole now. `stackWhenNarrow` lays the
- * chips one per row, full width, while the list is narrower than 22rem;
- * without it they sit side by side as they always have (the booking screen).
+ * the figure could wrap anywhere. It is whole now, and the chips still sit
+ * side by side as they always have (the booking screen).
  */
 import "../../.storybook/storybook.css";
 import { cleanup, render } from "@testing-library/react";
@@ -27,10 +26,10 @@ const ROWS: MoneyRow[] = [
     { label: "After the job", value: "$58.74" },
 ];
 
-function mount(width: number, stackWhenNarrow = false) {
+function mount(width: number) {
     const { container } = render(
         <div style={{ width }}>
-            <MoneyBreakdown variant="chips" label="When you pay" rows={ROWS} stackWhenNarrow={stackWhenNarrow} />
+            <MoneyBreakdown variant="chips" label="When you pay" rows={ROWS} />
         </div>,
     );
     const dl = container.querySelector("dl")!;
@@ -60,38 +59,18 @@ describe("MoneyBreakdown chips (AUTM-1799)", () => {
         document.documentElement.style.fontSize = "200%";
         /* 270px: about a chip's width in checkout's card at 390, where
            "$25.18" at 64px is wider than the chip's content box. */
-        for (const stack of [false, true]) {
-            const { chips } = mount(270, stack);
-            for (const chip of chips) {
-                const dd = chip.querySelector("dd")!;
-                expect(lines(dd)).toBe(1);
-                const range = document.createRange();
-                range.selectNodeContents(dd);
-                expect(range.getBoundingClientRect().right).toBeLessThanOrEqual(chip.getBoundingClientRect().right);
-            }
-            cleanup();
+        const { chips } = mount(270);
+        for (const chip of chips) {
+            const dd = chip.querySelector("dd")!;
+            expect(lines(dd)).toBe(1);
+            const range = document.createRange();
+            range.selectNodeContents(dd);
+            expect(range.getBoundingClientRect().right).toBeLessThanOrEqual(chip.getBoundingClientRect().right);
         }
     });
 
-    it("without stackWhenNarrow, sits side by side in a phone's card, as the booking screen does", () => {
+    it("still sits side by side in a phone's card, as the booking screen does", () => {
         const { chips } = mount(318);
         expect(sideBySide(chips)).toBe(true);
-    });
-
-    it("with stackWhenNarrow, stacks full width under 22rem and sits side by side above it", () => {
-        const narrow = mount(318, true);
-        expect(sideBySide(narrow.chips)).toBe(false);
-        for (const chip of narrow.chips) expect(chip.offsetWidth).toBe(narrow.dl.clientWidth);
-        cleanup();
-
-        const wide = mount(400, true);
-        expect(sideBySide(wide.chips)).toBe(true);
-    });
-
-    it("with stackWhenNarrow at 200% text, a desktop rail's width is narrow too", () => {
-        document.documentElement.style.fontSize = "200%";
-        const { chips, dl } = mount(400, true);
-        expect(sideBySide(chips)).toBe(false);
-        for (const chip of chips) expect(chip.offsetWidth).toBe(dl.clientWidth);
     });
 });
