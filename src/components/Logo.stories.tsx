@@ -80,7 +80,7 @@ export const BusinessLockupAtAppBarSize: Story = {
 }
 
 /**
- * AUTM-1792 — the mark alone.
+ * AUTM-1792: the mark alone.
  *
  * Don, 2026-10-09, looking at the merchant portal's rail in dark mode: show
  * only the white icon, not the text logo. `wordmark={false}` draws the orb
@@ -106,7 +106,7 @@ export const MarkOnly: Story = {
 }
 
 /**
- * AUTM-1792 — the business lockup without the lettering: mark, hairline,
+ * AUTM-1792: the business lockup without the lettering: mark, hairline,
  * "for business". Same row height, gap and hairline as the full lockup at each
  * size, so swapping it in moves nothing. The accessible name is still
  * "Autara for business", once; the mark inside is decorative.
