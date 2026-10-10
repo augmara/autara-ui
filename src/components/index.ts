@@ -353,6 +353,14 @@ export { SwatchRadioGroup, type SwatchRadioGroupProps, type SwatchOption } from 
 // Countdown: a deadline the server enforces, counted down and announced
 // once a minute; PolicyTimeline: the tiers of a policy with the live one lit.
 export { Countdown, remainingLabel, type CountdownProps } from './Countdown'
+// AUTM-1819 — the time left as a solid pill: purple, amber, red; pops in once,
+// breathes slowly in the last stretch. Today's requests and the booking record.
+export {
+    CountdownPill,
+    countdownPillVariant,
+    type CountdownPillProps,
+    type CountdownPillTone,
+} from './CountdownPill'
 export {
     PolicyTimeline,
     type PolicyTimelineProps,
