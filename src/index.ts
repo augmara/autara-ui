@@ -155,6 +155,8 @@ export {
     InvoiceStatusBadge, invoiceStatusTone, invoiceStatusLabel, type InvoiceStatusBadgeProps, type InvoicePaymentState, type InvoiceStatusTone,
     // AUTM-1221 — graduated from customer-web (plan item U5)
     Countdown, remainingLabel, type CountdownProps,
+    // AUTM-1819 — the time left as a solid pill (Today's requests, the booking record).
+    CountdownPill, countdownPillVariant, type CountdownPillProps, type CountdownPillTone,
     PolicyTimeline, type PolicyTimelineProps, type PolicyTimelineStep,
     // AUTM-1195 — pick one of a few, as cards
     ChoiceCard, ChoiceGroup, type ChoiceCardProps, type ChoiceGroupProps,

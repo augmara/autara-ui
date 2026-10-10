@@ -88,6 +88,9 @@ const NEW_KEYFRAMES = [
     'autara-shimmer',
     'modal-panel-in',
     'modal-panel-out',
+    // AUTM-1819
+    'autara-badge-in',
+    'autara-breathe-soft',
 ]
 
 describe('AUTM-1678: transform and opacity only', () => {
@@ -138,6 +141,9 @@ describe('AUTM-1678: reduced motion is designed, not only clamped', () => {
         ['.motion-pop', 'animation'],
         ['.motion-rows > *', 'animation'],
         ['.motion-shimmer::after', 'animation'],
+        // AUTM-1819
+        ['.motion-badge-in', 'animation'],
+        ['.motion-breathe-soft', 'animation'],
     ])('%s moves only inside prefers-reduced-motion: no-preference', (selector, prop) => {
         const moving = ALL.filter(
             (r) => r.selector.startsWith(selector) && properties(r.body).includes(prop)

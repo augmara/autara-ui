@@ -70,6 +70,8 @@ export const motionDurations = {
     count: 900,
     // AUTM-1799: a step track's current disc breathing (`.motion-breathe`).
     breathe: 2400,
+    // AUTM-1819: a small pill arriving (`.motion-badge-in`).
+    badgeIn: 240,
     // AUTM-1781: a screen's sections arriving (`.motion-rise`), one
     // `stagger` apart. The rest of the customer app's vocabulary is the
     // AUTM-1792 set above: `tab` is every 450ms slide (a tab pill, the

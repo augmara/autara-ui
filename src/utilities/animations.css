@@ -238,6 +238,10 @@
      * a ring that grows and fades, once per breath, while the booking waits
      * on someone. Reduced: no ring at all. */
     --motion-breathe: 2400ms;
+    /* AUTM-1819: a small pill arriving (`.motion-badge-in`), a scale-in and
+     * a fade, once. `.motion-breathe-soft` (a pill breathing in opacity)
+     * reuses `--motion-breathe`. */
+    --motion-badge-in: 240ms;
     /* AUTM-1781: a screen's sections arriving (`.motion-rise`), one
      * `--motion-stagger` apart. The customer app's other moves use the tokens
      * above: sheets and dialogs `--motion-sheet-in` and `--motion-modal-in`,
@@ -701,6 +705,8 @@
  *   skeleton                        pulse off: a still placeholder
  *   crossfade                       stays, opacity only, 160ms
  *   draw-x, breathe (AUTM-1799)     none: the track's line is drawn, no ring
+ *   badge-in, breathe-soft          none: the pill is there, still
+ *   (AUTM-1819)
  */
 
 /* ─── Stagger index ──────────────────────────────────────────────────────
@@ -1116,5 +1122,47 @@
         border-radius: inherit;
         background: inherit;
         animation: autara-breathe var(--motion-breathe) var(--motion-ease-out) infinite;
+    }
+}
+
+/* ─── A countdown pill (AUTM-1819) ───────────────────────────────────────
+ * CountdownPill, and anything else small that arrives and may need to say
+ * "soon" without blinking (Don, 2026-10-10: "this blink is super ugly").
+ *
+ *   class                  what moves                          token
+ *   .motion-badge-in       a pill arriving: 92% to full size   --motion-badge-in
+ *                          and a fade, once, on mount          on ease-out
+ *   .motion-breathe-soft   the element's own opacity, 100% to  --motion-breathe
+ *                          85% and back, for as long as the    on ease-in-out
+ *                          class is on
+ *
+ * The breathe is a loop, so it runs on the symmetric `ease-in-out`, as the
+ * skeleton pulse and the loader do: an ease-out loop turns sharply at each
+ * end, which reads as a blink. 85% is the floor because the element's own
+ * label dims with it: white on the danger fill at 85% over white paper is
+ * still 5.1:1 (CountdownPill.contrast.test.ts measures every tone on paper,
+ * band and raised in both themes). Unlike `.motion-breathe` (AUTM-1799) there
+ * is no ring: nothing grows past the pill's own edge.
+ *
+ * Transform and opacity only. Both inside `no-preference`, so a
+ * reduced-motion reader sees the pill at rest. `.motion-badge-in` plays when
+ * the element is inserted; adding `.motion-breathe-soft` later (the deadline
+ * crossing a line) starts the breathe without replaying the arrival, as long
+ * as the two are on different elements (CountdownPill puts the arrival on its
+ * root and the breathe on its fill). */
+@keyframes autara-badge-in {
+    from { opacity: 0.001; transform: scale(0.92); }
+    to { opacity: 1; transform: none; }
+}
+@keyframes autara-breathe-soft {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.85; }
+}
+@media (prefers-reduced-motion: no-preference) {
+    .motion-badge-in {
+        animation: autara-badge-in var(--motion-badge-in) var(--motion-ease-out) both;
+    }
+    .motion-breathe-soft {
+        animation: autara-breathe-soft var(--motion-breathe) ease-in-out infinite;
     }
 }
