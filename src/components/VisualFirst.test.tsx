@@ -85,6 +85,20 @@ describe('ProgressSteps with icons (AUTM-1799)', () => {
         expect(items[0].querySelector('.sr-only')).toHaveTextContent('Sent')
         expect(items[1].querySelector('.sr-only')).toBeNull()
     })
+
+    it('sets its columns by a variable, so very large text can fold it to two', () => {
+        render(
+            <ProgressSteps
+                steps={['Sent', 'Accepted', 'The job']}
+                current={0}
+                icons={[<i key="1" />, <i key="2" />, <i key="3" />]}
+            />,
+        )
+        const track = screen.getByRole('list')
+        // An inline grid-template-columns would beat the @max-[20rem] class.
+        expect(track.style.gridTemplateColumns).toBe('')
+        expect(track.style.getPropertyValue('--steps')).toBe('3')
+    })
 })
 
 describe('MoneyBreakdown chips (AUTM-1799)', () => {

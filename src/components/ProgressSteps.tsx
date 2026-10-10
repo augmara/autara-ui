@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { cn } from "../lib/cn";
 
 /**
@@ -47,8 +47,14 @@ export function ProgressSteps({ steps, current, label = "Progress", icons, doneI
       <ol
         aria-label={label}
         data-variant="track"
-        className={cn("m-0 grid w-full list-none p-0 @max-[20rem]:grid-cols-2 @max-[20rem]:gap-y-3", className)}
-        style={{ gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))` }}
+        // The count rides in a variable, not an inline grid-template-columns:
+        // an inline style beats the class, so at very large text the track
+        // stayed one row of four and "Accepted" broke mid-word.
+        className={cn(
+          "m-0 grid w-full list-none grid-cols-[repeat(var(--steps),minmax(0,1fr))] p-0 @max-[20rem]:grid-cols-2 @max-[20rem]:gap-y-3",
+          className,
+        )}
+        style={{ "--steps": steps.length } as CSSProperties}
       >
         {steps.map((step, i) => {
           const state = i < at ? "done" : i === at ? "current" : "todo";

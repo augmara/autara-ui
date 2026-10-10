@@ -107,16 +107,18 @@ export interface WhenBlockProps extends Omit<DateTileProps, 'size' | 'className'
 
 /**
  * When, as a pass draws it: the tile, the time as a figure, one fact under it.
- * Drawn for a deep surface (BookingPass): the fact is `--on-deep-muted`.
+ * Drawn for a deep surface (BookingPass): the fact is `--on-deep-muted`. It
+ * queries the pass (its container): under 15.5rem (very large text, or a
+ * phone of 320px or less) the tile and the time stack and the time steps down.
  * A screen reader hears "Sat 17 Oct, 9:00 am, 3 hr".
  */
 export function WhenBlock({ iso, timeZone, locale, time, sub, dayLabel, testId, className }: WhenBlockProps) {
     return (
-        <div data-slot="when-block" className={cn('flex min-w-0 items-center gap-4 @max-[20rem]:flex-wrap', className)}>
+        <div data-slot="when-block" className={cn('flex min-w-0 items-center gap-4 @max-[15.5rem]:flex-wrap', className)}>
             <DateTile iso={iso} timeZone={timeZone} locale={locale} />
             <p data-testid={testId} className="m-0 flex min-w-0 flex-col gap-1">
                 {dayLabel ? <span className="sr-only">{dayLabel}, </span> : null}
-                <span className="text-[2.125rem] leading-[1.05] font-black tracking-[-0.02em] tabular-nums [overflow-wrap:anywhere] @max-[20rem]:text-[1.625rem]">
+                <span className="text-[2.125rem] leading-[1.05] font-black tracking-[-0.02em] tabular-nums [overflow-wrap:anywhere] @max-[15.5rem]:text-[1.625rem]">
                     {time}
                 </span>
                 {sub ? <span className="text-base font-medium text-[var(--on-deep-muted)]">{sub}</span> : null}

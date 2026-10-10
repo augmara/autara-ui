@@ -17,7 +17,8 @@ import { MediaFrame } from './MediaFrame'
  * The name is a plain anchor when `href` is given: the package never imports
  * a router (a full navigation to the pro's public page is fine). No shadow:
  * the deep fill is the edge. A query container, so WhenBlock steps its figure
- * down at very large text (rem follows the reader's text size).
+ * down at very large text (rem follows the reader's text size), under
+ * 15.5rem of the pass's content box (a 320px screen less the paddings).
  */
 export interface BookingPassProps {
     /** The pro's trading name. */
@@ -65,7 +66,12 @@ export function BookingPass({
                 className,
             )}
         >
-            <div className="flex min-w-0 items-center gap-3.5 @max-[20rem]:flex-wrap">
+            {/* The pass is its own container, so the fold is measured on its
+                content box: 15.5rem there is a 20rem (320px) screen less the
+                page's and the pass's padding (about 76px). It folds where the
+                customer-web original folded, at very large text or on a phone
+                of 320px or less, never at 390 or 375 at normal text. */}
+            <div className="flex min-w-0 items-center gap-3.5 @max-[15.5rem]:flex-wrap">
                 {/* The initials disc is brand on the deep pass, so the face reads as a face. */}
                 <MediaFrame
                     shape="round"
@@ -74,7 +80,10 @@ export function BookingPass({
                     initials={initialsOf(name)}
                     className="size-14 [--brand-deep:var(--brand)]"
                 />
-                <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                {/* Grows from its content (basis auto, not flex-1's 0), so at very
+                    large text the row wraps: the face over the name, not the
+                    name squeezed to a word a line beside it. */}
+                <div className="flex min-w-0 flex-[1_1_auto] flex-col gap-0.5">
                     {href ? (
                         <a
                             href={href}
