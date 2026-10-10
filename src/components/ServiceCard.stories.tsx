@@ -1,6 +1,7 @@
 import { createContext, forwardRef, useContext, useState, type AnchorHTMLAttributes } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ServiceCard, ServiceCardSkeleton } from "./ServiceCard";
+import { CardGrid } from "./CardGrid";
 import { Badge } from "./Badge";
 import { Button } from "./Button";
 import { listingPrice, serviceDurationLabel, workingDaysLabel, DROP_OFF_TAG } from "../lib/service-listing";
@@ -589,6 +590,77 @@ export const Dark: Story = {
       </div>
     </div>
   ),
+};
+
+/**
+ * AUTM-1812: the merchant's own catalogue. Every card says where it stands,
+ * as a solid pill on the photo, in the service editor's own words and tones:
+ * Active lime, Draft amber, Inactive band. A draft with no cover says so on
+ * the panel, because the cover is what stands between it and Publish. An
+ * add-on hint is the existing `addonsHint` chip.
+ */
+export const CatalogueGrid: Story = {
+  parameters: { layout: "fullscreen" },
+  render: () => (
+    <div className="p-4">
+      <CardGrid aria-label="Services">
+        <li>
+          <ServiceCard
+            layout="vertical"
+            href="#edit"
+            name="Exterior hand wash"
+            description="Two-bucket hand wash, wheel faces, door shuts and a spray sealant."
+            priceLabel="$80"
+            durationLabel="45m"
+            coverImageUrl={PHOTO.wash}
+            status={{ label: "Active", tone: "live" }}
+            addonsHint="2 add-ons"
+          />
+        </li>
+        <li>
+          <ServiceCard
+            layout="vertical"
+            href="#edit"
+            name="Interior deep clean"
+            description="Steam, extraction and a leather wipe-down."
+            priceLabel="$200"
+            durationLabel="2h 30m"
+            noPhotoLabel="No photo yet"
+            status={{ label: "Draft", tone: "draft" }}
+          />
+        </li>
+        <li>
+          <ServiceCard
+            layout="vertical"
+            href="#edit"
+            name="Ceramic coating, two layers"
+            priceLabel="$900"
+            workingDaysLabel="3 working days"
+            coverImageUrl={PHOTO.sport}
+            status={{ label: "Active", tone: "live" }}
+          />
+        </li>
+        <li>
+          <ServiceCard
+            layout="vertical"
+            href="#edit"
+            name="Headlight restoration"
+            priceLabel="$120"
+            durationLabel="1h"
+            coverImageUrl={PHOTO.bay}
+            status={{ label: "Inactive", tone: "off" }}
+          />
+        </li>
+      </CardGrid>
+    </div>
+  ),
+};
+
+/** The catalogue in dark. */
+export const CatalogueGridDark: Story = {
+  ...CatalogueGrid,
+  globals: { theme: "dark" },
+  parameters: { layout: "fullscreen", backgrounds: { default: "Paper, dark" } },
 };
 
 /** The same words as the page (AUTM-1800): what the server quoted, through `listingPrice`, `serviceDurationLabel` and the multi-day labels. Fee above the minimum, the 99c minimum, fee off, and a multi-day job. */
