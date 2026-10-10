@@ -335,7 +335,7 @@ export { InlineAlert, type InlineAlertProps, type InlineAlertTone } from './Inli
 export { Banner, type BannerProps } from './Banner'
 export { ConfirmDialog, type ConfirmDialogProps } from './ConfirmDialog'
 export { NativeSelect, type NativeSelectProps } from './NativeSelect'
-export { MoneyBreakdown, type MoneyBreakdownProps, type MoneyRow } from './MoneyBreakdown'
+export { MoneyBreakdown, type MoneyBreakdownProps, type MoneyRow, type MoneyTone } from './MoneyBreakdown'
 // AUTM-1737 — one invoice status colour system: due and overdue red, partially
 // paid amber, paid lime, draft and void neutral.
 export {
@@ -388,6 +388,12 @@ export { AppTabBar, type AppTabBarProps, type AppTabBarItem } from './AppTabBar'
 export { ActionBar, type ActionBarProps, type ActionBarAction, type ActionBarControl } from './ActionBar'
 // AUTM-1781: the slot where a screen shows its subject: a photo, a map, or initials on deep purple.
 export { MediaFrame, type MediaFrameProps } from './MediaFrame'
+// AUTM-1799 (AUTM-1797, visual first): a booking drawn, not told. A date as a
+// calendar leaf and the time as a figure, the booking as a pass, place and car
+// as icon rows.
+export { DateTile, WhenBlock, dateTileParts, type DateTileProps, type DateTileParts, type WhenBlockProps } from './DateTile'
+export { BookingPass, type BookingPassProps } from './BookingPass'
+export { FactRows, type FactRowsProps, type FactRow } from './FactRows'
 export { initialsOf } from '../lib/initials'
 // AUTM-1787: a list row's everyday actions, a menu on a phone, discs and labels with room.
 export { RowActions, type RowAction, type RowActionsProps } from './RowActions'

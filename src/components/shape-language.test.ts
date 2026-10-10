@@ -64,7 +64,7 @@ const KEEPS: Record<string, string> = {
     'StatTile.tsx': 'the 28px icon disc beside the label (AUTM-1594)',
     'ListSection.tsx': 'the row icon disc and the 4px accent bar\'s round caps (AUTM-1594)',
     'Stepper.tsx': 'the 28px step discs and the bars\' round caps, canvas v44 "Steps and progress" (AUTM-1594)',
-    'ProgressSteps.tsx': 'a state bar per step; the round cap is what makes it read as fill, as Progress',
+    'ProgressSteps.tsx': 'a state bar per step; the round cap is what makes it read as fill, as Progress. With icons, the 36px step discs and their joining line\'s caps, state lights like Stepper\'s (AUTM-1799)',
     'Countdown.tsx': 'the countdown is a 32px pill on canvas v44 (AUTM-1594), a status not an action',
     'Dialog.tsx': 'the 44px close disc, an icon disc like IconButton (AUTM-1594)',
     'Sheet.tsx': 'the close disc, drawn at 28px with a 44px hit area, the quiet sibling of Dialog\'s (AUTM-1594); the bottom sheet\'s grabber pill',
@@ -77,6 +77,8 @@ const KEEPS: Record<string, string> = {
     'AppTabBar.tsx': 'the customer app dock as designed (canvas AppBookings): an ink pill, the current tab a lime capsule (a state light), the count a disc (AUTM-1781)',
     'ActionBar.tsx': 'the customer app bar as designed (AppBookingDetail): pill buttons, the sheet\'s button shape, and 56px icon discs like IconButton (AUTM-1781)',
     'MediaFrame.tsx': 'the round shape is a person (a pro in a chat header or on the live booking), as Avatar (AUTM-1781)',
+    'BookingPass.tsx': 'the tear line\'s two notches, half circles cut into the pass the way a ticket is cut, never a control; the face is MediaFrame\'s round person (AUTM-1799)',
+    'FactRows.tsx': 'the 40px icon disc beside each value, a glyph in a circle like ChoiceCard and ListSection (AUTM-1799)',
     'SplitPane.tsx': 'the splitter\'s grip, the sibling of Sheet\'s grabber pill: a 6px bar that says the line drags, never a button (AUTM-1755)',
 }
 

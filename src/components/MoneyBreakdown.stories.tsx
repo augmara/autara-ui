@@ -76,3 +76,45 @@ export const LongLabelsNarrow: Story = {
         </div>
     ),
 }
+
+/**
+ * AUTM-1797 / AUTM-1799: the same rows as chips, the amount over its words,
+ * coloured by what the money is: a hold in flight (aqua), paid or refunded
+ * (lime), yours to pay (purple), the rest band.
+ */
+export const Chips: Story = {
+    args: {
+        variant: 'chips',
+        label: 'When you pay',
+        title: 'Payment',
+        rows: [
+            { label: 'On hold', value: '$54', tone: 'flight' },
+            { label: 'After the job', value: '$126' },
+        ],
+    },
+    render: (args) => (
+        <div className="max-w-[390px]">
+            <MoneyBreakdown {...args} />
+        </div>
+    ),
+}
+
+/** Every tone side by side, and a long qualifier wrapping inside its chip. */
+export const ChipTones: Story = {
+    args: {
+        variant: 'chips',
+        label: 'Money',
+        rows: [
+            { label: 'Paid', value: '$54', tone: 'money' },
+            { label: 'To pay', value: '$126', tone: 'act' },
+            { label: 'Refunded Thu 8 Oct', value: '$54', tone: 'money' },
+            { label: 'Refund on its way', value: '$27', tone: 'flight' },
+            { label: 'Kept by the pro', value: '$27' },
+        ],
+    },
+    render: (args) => (
+        <div className="max-w-[390px]">
+            <MoneyBreakdown {...args} />
+        </div>
+    ),
+}
