@@ -157,14 +157,20 @@ function LargeText({ children }: { children: ReactNode }) {
 
 /**
  * AUTM-1799: 200% text in a 270px card (about checkout's at 390). Each
- * amount stays one figure on one line ("$25.18", never "$25.1" over "8").
+ * amount stays one figure on one line ("$25.18", never "$25.1" over "8"),
+ * and one too wide for its chip scales down to fit (right: "$1,234.50").
  */
 export const ChipsLargeText: Story = {
     args: { variant: 'chips', label: 'When you pay', rows: CHECKOUT_ROWS },
     render: (args) => (
         <LargeText>
-            <div className="w-[270px]">
-                <MoneyBreakdown {...args} />
+            <div className="flex flex-wrap items-start gap-6">
+                <div className="w-[270px]">
+                    <MoneyBreakdown {...args} />
+                </div>
+                <div className="w-[270px]">
+                    <MoneyBreakdown {...args} rows={[{ label: 'Paid', value: '$1,234.50', tone: 'money' }]} />
+                </div>
             </div>
         </LargeText>
     ),

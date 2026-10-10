@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { cn } from '../lib/cn'
+import { MoneyFigure } from './MoneyFigure'
 
 /**
  * MoneyBreakdown — lines of money, then the one that matters.
@@ -34,8 +35,10 @@ import { cn } from '../lib/cn'
  * still comes first for a screen reader as "On hold, 54 dollars".
  *
  * A chip's amount is never split: "$25.18" stays one figure on one line, at
- * any text size (it used to break mid-number at 200% text). The chips sit
- * side by side down to 8rem each.
+ * any text size (it used to break mid-number at 200% text), and never runs
+ * out of its chip: where the whole figure is wider than the chip, it scales
+ * down to fit (MoneyFigure measures it). The chips sit side by side down to
+ * 8rem each.
  */
 export interface MoneyRow {
     label: ReactNode
@@ -89,10 +92,8 @@ function Chip({ row }: { row: MoneyRow }) {
             )}
         >
             <dt className="min-w-0 text-[0.9375rem] leading-snug font-medium">{row.label}</dt>
-            {/* Whole: an amount never breaks mid-number. */}
-            <dd className="m-0 text-[2rem] leading-[1.1] font-black tracking-[-0.02em] whitespace-nowrap tabular-nums">
-                {row.value}
-            </dd>
+            {/* Whole: an amount never breaks mid-number, and fits its chip. */}
+            <MoneyFigure className="leading-[1.1] font-black tracking-[-0.02em] tabular-nums">{row.value}</MoneyFigure>
         </div>
     )
 }
