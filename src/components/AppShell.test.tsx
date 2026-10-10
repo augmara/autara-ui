@@ -69,7 +69,8 @@ describe('AppTabBar (AUTM-1781)', () => {
         render(<AppTabBar items={items} />)
         const account = screen.getByTestId('app-tab-account')
         expect(account.className).toContain('h-[52px]')
-        expect(account.className).toContain('w-14')
+        // 56px in px (AUTM-1816): large text grows the words, not the tabs.
+        expect(account.className).toContain('w-[56px]')
         // Its name is visually hidden, never removed: it is still the link's name.
         expect(within(account).getByText('Account').className).toContain('sr-only')
         const messages = screen.getByTestId('app-tab-messages')
