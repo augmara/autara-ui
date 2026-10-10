@@ -112,7 +112,11 @@ const TONES: Record<SheetTone, string> = {
     waiting: `${PILL} bg-[var(--strong)] text-[var(--on-strong)]`,
     off: `${PILL} bg-[var(--band)] text-[var(--danger)]`,
     count: `${COUNT} bg-[var(--brand)] text-[var(--on-brand)]`,
-    'count-quiet': `${COUNT} bg-[var(--paper)] text-[var(--brand-deep)] shadow-[inset_0_0_0_1px_var(--hairline)]`,
+    // AUTM-1812: --accent, not --brand-deep. Brand-deep is #2e1070 in BOTH
+    // themes, so on dark paper the quiet count measured about 1.4:1 (the
+    // portal's Services filter chips in dark mode). Text-grade purple is
+    // --accent: 9.5:1 on paper in light, 10.3:1 in dark (Badge.contrast.test).
+    'count-quiet': `${COUNT} bg-[var(--paper)] text-[var(--accent)] shadow-[inset_0_0_0_1px_var(--hairline)]`,
     'count-alert': `${COUNT} bg-[var(--alert)] text-[var(--on-alert)]`,
     'count-selected': `${COUNT} bg-[var(--lime)] text-[var(--on-lime)]`,
 }

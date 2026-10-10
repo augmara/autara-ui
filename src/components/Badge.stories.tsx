@@ -453,3 +453,55 @@ export const CountOnSelectedRows: Story = {
         </div>
     ),
 }
+
+/**
+ * AUTM-1812: the quiet count on unselected filter chips, in both themes. It
+ * painted --brand-deep, the same dark purple in both themes, so in dark the
+ * number all but vanished (about 1.4:1). It is --accent now: 9.5:1 in light,
+ * 10.3:1 in dark (Badge.contrast.test.ts). The chosen chip keeps lime.
+ */
+function QuietCountChips() {
+    const chip = 'inline-flex min-h-11 items-center gap-1.5 rounded-full px-4 text-[0.8125rem] font-medium'
+    return (
+        <div className="flex flex-wrap gap-2">
+            <span className={`${chip} bg-[var(--selected)] text-[var(--on-selected)]`}>
+                All <Badge variant="count-selected">5</Badge>
+            </span>
+            <span className={`${chip} bg-[var(--band)] text-[var(--text-strong)]`}>
+                Active <Badge variant="count-quiet">3</Badge>
+            </span>
+            <span className={`${chip} bg-[var(--band)] text-[var(--text-strong)]`}>
+                Drafts <Badge variant="count-quiet">1</Badge>
+            </span>
+            <span className={`${chip} bg-[var(--band)] text-[var(--text-strong)]`}>
+                Inactive <Badge variant="count-quiet">12</Badge>
+            </span>
+        </div>
+    )
+}
+
+export const QuietCountOnChips: Story = {
+    name: 'Counts — quiet on unselected chips, both themes',
+    parameters: { layout: 'padded' },
+    render: () => (
+        <div className="grid gap-6">
+            <div className="rounded-3xl bg-[var(--paper)] p-5">
+                <QuietCountChips />
+            </div>
+            <div data-theme="dark" className="rounded-3xl bg-[var(--paper)] p-5">
+                <QuietCountChips />
+            </div>
+        </div>
+    ),
+}
+
+export const QuietCountOnChipsDark: Story = {
+    name: 'Counts — quiet on unselected chips, dark',
+    globals: { theme: 'dark' },
+    parameters: { layout: 'padded', backgrounds: { default: 'Paper, dark' } },
+    render: () => (
+        <div className="rounded-3xl bg-[var(--paper)] p-5">
+            <QuietCountChips />
+        </div>
+    ),
+}
