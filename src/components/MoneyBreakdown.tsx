@@ -24,6 +24,14 @@ import { cn } from '../lib/cn'
  * The values are ReactNode on purpose: the consumer formats money in its
  * own locale and currency (`A$54.00`); this component never touches a
  * number.
+ *
+ * AUTM-1797 / AUTM-1799: `variant="chips"` draws each row as a chip, the
+ * amount in Black over its few words ("$54" over "On hold"), side by side,
+ * coloured by what the money IS, in the house palette: `money` lime (paid,
+ * refunded), `flight` aqua (on hold, a refund on its way), `act` purple
+ * (yours to pay or confirm), `neutral` band (after the job, kept by the
+ * pro). The same `<dl>`, the same ids: only the drawing changes, the value
+ * still comes first for a screen reader as "On hold, 54 dollars".
  */
 export interface MoneyRow {
     label: ReactNode
@@ -34,6 +42,18 @@ export interface MoneyRow {
     emphasis?: boolean
     /** `data-testid` on the row, so a spec can read one line. */
     testId?: string
+    /** `variant="chips"`: what the money is. */
+    tone?: MoneyTone
+}
+
+/** The chips' palette: lime money in, aqua in flight, purple yours to act on, band otherwise. */
+export type MoneyTone = 'money' | 'flight' | 'act' | 'neutral'
+
+const CHIP_TONE: Record<MoneyTone, string> = {
+    money: 'bg-[var(--lime)] text-[var(--on-lime)] [&>dt]:text-[color-mix(in_srgb,var(--on-lime)_78%,transparent)]',
+    flight: 'bg-[var(--aqua)] text-[var(--on-aqua)] [&>dt]:text-[color-mix(in_srgb,var(--on-aqua)_78%,transparent)]',
+    act: 'bg-[var(--brand)] text-[var(--on-brand)] [&>dt]:text-[var(--on-deep-muted)]',
+    neutral: 'bg-[var(--band)] text-[var(--text-strong)] [&>dt]:text-[var(--text-muted)]',
 }
 
 export interface MoneyBreakdownProps {
@@ -48,8 +68,28 @@ export interface MoneyBreakdownProps {
     title?: ReactNode
     /** Draw the band card around it, as the sheet's specimen. */
     card?: boolean
+    /** `list` (default): label and amount on a line. `chips`: each row a chip. */
+    variant?: 'list' | 'chips'
     testId?: string
     className?: string
+}
+
+function Chip({ row }: { row: MoneyRow }) {
+    return (
+        <div
+            data-testid={row.testId}
+            data-tone={row.tone ?? 'neutral'}
+            className={cn(
+                'flex min-w-0 flex-col-reverse justify-end gap-0.5 rounded-[1.25rem] px-4 pt-3.5 pb-[0.9375rem]',
+                CHIP_TONE[row.tone ?? 'neutral'],
+            )}
+        >
+            <dt className="min-w-0 text-[0.9375rem] leading-snug font-medium">{row.label}</dt>
+            <dd className="m-0 text-[2rem] leading-[1.1] font-black tracking-[-0.02em] tabular-nums [overflow-wrap:anywhere]">
+                {row.value}
+            </dd>
+        </div>
+    )
 }
 
 function Row({ row, total }: { row: MoneyRow; total?: boolean }) {
@@ -76,9 +116,28 @@ export function MoneyBreakdown({
     label,
     title,
     card = false,
+    variant = 'list',
     testId,
     className,
 }: MoneyBreakdownProps) {
+    if (variant === 'chips') {
+        return (
+            <div data-testid={testId} className={cn('flex flex-col gap-2.5', className)}>
+                {title ? <p className="text-base leading-snug font-bold text-[var(--text-strong)]">{title}</p> : null}
+                <dl
+                    aria-label={label}
+                    data-variant="chips"
+                    className="m-0 grid grid-cols-[repeat(auto-fit,minmax(min(100%,8rem),1fr))] gap-2.5"
+                >
+                    {rows.map((row, i) => (
+                        <Chip key={i} row={row} />
+                    ))}
+                    {total ? <Chip row={total} /> : null}
+                </dl>
+                {note ? <p className="m-0 text-[0.8125rem] leading-relaxed text-[var(--text-subtle)]">{note}</p> : null}
+            </div>
+        )
+    }
     return (
         <div
             data-testid={testId}

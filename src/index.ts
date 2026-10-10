@@ -99,6 +99,9 @@ export {
     ActionBar, type ActionBarProps, type ActionBarAction, type ActionBarControl,
     // CountUp is exported once, beside Tabs above (AUTM-1792; AUTM-1781 added its server-safe props).
     MediaFrame, initialsOf, type MediaFrameProps,
+    DateTile, WhenBlock, dateTileParts, type DateTileProps, type DateTileParts, type WhenBlockProps,
+    BookingPass, type BookingPassProps,
+    FactRows, type FactRowsProps, type FactRow,
     ModeChip, type ModeChipProps, type BookingMode,
     Logo, type LogoProps, type LogoTone,
     SearchInput, type SearchInputProps,
@@ -147,7 +150,7 @@ export {
     Banner, type BannerProps,
     ConfirmDialog, type ConfirmDialogProps,
     NativeSelect, type NativeSelectProps,
-    MoneyBreakdown, type MoneyBreakdownProps, type MoneyRow,
+    MoneyBreakdown, type MoneyBreakdownProps, type MoneyRow, type MoneyTone,
     // AUTM-1737 — one invoice status colour system.
     InvoiceStatusBadge, invoiceStatusTone, invoiceStatusLabel, type InvoiceStatusBadgeProps, type InvoicePaymentState, type InvoiceStatusTone,
     // AUTM-1221 — graduated from customer-web (plan item U5)

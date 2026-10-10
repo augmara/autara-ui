@@ -234,6 +234,10 @@
     --motion-row: 400ms;
     --motion-row-stagger: 30ms;
     --motion-count: 900ms;
+    /* AUTM-1799 (AUTM-1797's step track): the current step's disc breathes,
+     * a ring that grows and fades, once per breath, while the booking waits
+     * on someone. Reduced: no ring at all. */
+    --motion-breathe: 2400ms;
     /* AUTM-1781: a screen's sections arriving (`.motion-rise`), one
      * `--motion-stagger` apart. The customer app's other moves use the tokens
      * above: sheets and dialogs `--motion-sheet-in` and `--motion-modal-in`,
@@ -696,6 +700,7 @@
  *                                   `motion-reduce`, so this follows that.
  *   skeleton                        pulse off: a still placeholder
  *   crossfade                       stays, opacity only, 160ms
+ *   draw-x, breathe (AUTM-1799)     none: the track's line is drawn, no ring
  */
 
 /* ─── Stagger index ──────────────────────────────────────────────────────
@@ -1081,5 +1086,35 @@
     .motion-bar-in {
         --sheet-from: translateY(100%);
         animation: sheet-panel-in var(--motion-sheet-in) var(--motion-ease-out) both;
+    }
+}
+
+/* ─── A step track (AUTM-1799) ─────────────────────────────────────────
+ * ProgressSteps with icons: the line joining two steps draws in from the
+ * left, once, on the count's length (`.motion-draw-x`, on the line's
+ * `::before`); the current step's disc breathes (`.motion-breathe`, a ring
+ * on `::after` in the disc's own colour that grows and fades). Transform and
+ * opacity only; none of it under reduced motion. */
+@keyframes autara-draw-x {
+    from { transform: scaleX(0); }
+    to { transform: none; }
+}
+@keyframes autara-breathe {
+    0% { transform: scale(1); opacity: 0.55; }
+    70%, 100% { transform: scale(1.7); opacity: 0.001; }
+}
+@media (prefers-reduced-motion: no-preference) {
+    .motion-draw-x::before {
+        transform-origin: left;
+        animation: autara-draw-x var(--motion-count) var(--motion-ease-out) both;
+    }
+    .motion-breathe::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        border-radius: inherit;
+        background: inherit;
+        animation: autara-breathe var(--motion-breathe) var(--motion-ease-out) infinite;
     }
 }
