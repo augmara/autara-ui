@@ -119,4 +119,24 @@ describe('MoneyBreakdown chips (AUTM-1799)', () => {
             expect([...row.children].map((c) => c.tagName)).toEqual(['DT', 'DD'])
         }
     })
+
+    it('keeps an amount whole, and stacks only when asked', () => {
+        const rows = [
+            { label: 'On hold today', value: '$25.18', tone: 'flight' as const },
+            { label: 'After the job', value: '$58.74' },
+        ]
+        const { container, rerender } = render(<MoneyBreakdown variant="chips" label="When you pay" rows={rows} />)
+        const dd = container.querySelector('dd')!
+        expect(dd.className).toContain('whitespace-nowrap')
+        expect(dd.className).not.toContain('overflow-wrap:anywhere')
+        // The booking screen's chips: no container, no stacking.
+        expect(container.querySelector('dl')).not.toHaveAttribute('data-stack')
+        expect(container.querySelector('dl')!.className).not.toContain('grid-cols-1')
+
+        rerender(<MoneyBreakdown variant="chips" label="When you pay" rows={rows} stackWhenNarrow />)
+        const dl = container.querySelector('dl')!
+        expect(dl).toHaveAttribute('data-stack', 'narrow')
+        expect(dl.className).toContain('@max-[22rem]:grid-cols-1')
+        expect(dl.parentElement!.className).toContain('@container')
+    })
 })

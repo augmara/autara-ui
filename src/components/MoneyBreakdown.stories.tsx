@@ -1,3 +1,4 @@
+import { useEffect, type ReactNode } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { MoneyBreakdown } from './MoneyBreakdown'
 
@@ -116,5 +117,81 @@ export const ChipTones: Story = {
         <div className="max-w-[390px]">
             <MoneyBreakdown {...args} />
         </div>
+    ),
+}
+
+const CHECKOUT_ROWS = [
+    {
+        label: (
+            <span className="flex flex-col">
+                <span>On hold today</span>
+                <span className="text-xs font-normal">Deposit $24 + booking fee $1.18</span>
+            </span>
+        ),
+        value: '$25.18',
+        tone: 'flight' as const,
+    },
+    {
+        label: (
+            <span className="flex flex-col">
+                <span>After the job</span>
+                <span className="text-xs font-normal">Balance $56 + booking fee $2.74</span>
+            </span>
+        ),
+        value: '$58.74',
+    },
+]
+
+/**
+ * AUTM-1799: `stackWhenNarrow`. In a phone's card (left, 318px) the chips
+ * stack one per row, full width; in a wider one (right, 400px, a desktop
+ * rail) they sit side by side. Without the prop they sit side by side in
+ * both (the booking screen's chips).
+ */
+export const ChipsStacked: Story = {
+    args: { variant: 'chips', label: 'When you pay', stackWhenNarrow: true, rows: CHECKOUT_ROWS },
+    render: (args) => (
+        <div className="flex flex-wrap items-start gap-6">
+            <div className="w-[318px] rounded-[1.5rem] border border-[var(--hairline)] p-4">
+                <MoneyBreakdown {...args} />
+            </div>
+            <div className="w-[400px] rounded-[1.5rem] border border-[var(--hairline)] p-4">
+                <MoneyBreakdown {...args} />
+            </div>
+        </div>
+    ),
+}
+
+/** The root at 200%, as a reader's large text sets it; restored when the story leaves. */
+function LargeText({ children }: { children: ReactNode }) {
+    useEffect(() => {
+        const root = document.documentElement
+        const was = root.style.fontSize
+        root.style.fontSize = '200%'
+        return () => {
+            root.style.fontSize = was
+        }
+    }, [])
+    return <>{children}</>
+}
+
+/**
+ * AUTM-1799: 200% text at 390. Each amount stays one figure on one line
+ * ("$25.18", never "$25.1" over "8"): the default chips (left) and the
+ * stacked ones (right).
+ */
+export const ChipsLargeText: Story = {
+    args: { variant: 'chips', label: 'When you pay', rows: CHECKOUT_ROWS },
+    render: (args) => (
+        <LargeText>
+            <div className="flex flex-wrap items-start gap-6">
+                <div className="w-[358px]">
+                    <MoneyBreakdown {...args} />
+                </div>
+                <div className="w-[358px]">
+                    <MoneyBreakdown {...args} stackWhenNarrow />
+                </div>
+            </div>
+        </LargeText>
     ),
 }

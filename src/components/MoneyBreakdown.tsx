@@ -32,6 +32,12 @@ import { cn } from '../lib/cn'
  * (yours to pay or confirm), `neutral` band (after the job, kept by the
  * pro). The same `<dl>`, the same ids: only the drawing changes, the value
  * still comes first for a screen reader as "On hold, 54 dollars".
+ *
+ * A chip's amount is never split: "$25.18" stays one figure on one line, at
+ * any text size (it used to break mid-number at 200% text). The chips sit
+ * side by side down to 8rem each; `stackWhenNarrow` lays them one per row,
+ * full width, while the list is narrower than 22rem (a phone's card, or any
+ * card at large text), for a surface whose amounts need the whole width.
  */
 export interface MoneyRow {
     label: ReactNode
@@ -70,6 +76,11 @@ export interface MoneyBreakdownProps {
     card?: boolean
     /** `list` (default): label and amount on a line. `chips`: each row a chip. */
     variant?: 'list' | 'chips'
+    /**
+     * `variant="chips"`: one chip per row, full width, while the list is
+     * narrower than 22rem; side by side above it. Off by default.
+     */
+    stackWhenNarrow?: boolean
     testId?: string
     className?: string
 }
@@ -85,7 +96,8 @@ function Chip({ row }: { row: MoneyRow }) {
             )}
         >
             <dt className="min-w-0 text-[0.9375rem] leading-snug font-medium">{row.label}</dt>
-            <dd className="m-0 text-[2rem] leading-[1.1] font-black tracking-[-0.02em] tabular-nums [overflow-wrap:anywhere]">
+            {/* Whole: an amount never breaks mid-number. */}
+            <dd className="m-0 text-[2rem] leading-[1.1] font-black tracking-[-0.02em] whitespace-nowrap tabular-nums">
                 {row.value}
             </dd>
         </div>
@@ -117,17 +129,22 @@ export function MoneyBreakdown({
     title,
     card = false,
     variant = 'list',
+    stackWhenNarrow = false,
     testId,
     className,
 }: MoneyBreakdownProps) {
     if (variant === 'chips') {
         return (
-            <div data-testid={testId} className={cn('flex flex-col gap-2.5', className)}>
+            <div data-testid={testId} className={cn('flex flex-col gap-2.5', stackWhenNarrow && '@container', className)}>
                 {title ? <p className="text-base leading-snug font-bold text-[var(--text-strong)]">{title}</p> : null}
                 <dl
                     aria-label={label}
                     data-variant="chips"
-                    className="m-0 grid grid-cols-[repeat(auto-fit,minmax(min(100%,8rem),1fr))] gap-2.5"
+                    data-stack={stackWhenNarrow ? 'narrow' : undefined}
+                    className={cn(
+                        'm-0 grid grid-cols-[repeat(auto-fit,minmax(min(100%,8rem),1fr))] gap-2.5',
+                        stackWhenNarrow && '@max-[22rem]:grid-cols-1',
+                    )}
                 >
                     {rows.map((row, i) => (
                         <Chip key={i} row={row} />
