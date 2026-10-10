@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { useState } from 'react'
+import { useLayoutEffect, useState, type ReactNode } from 'react'
 import { AppTabBar, type AppTabBarItem } from './AppTabBar'
 import { CalendarGlyph, ChatGlyph, UserGlyph } from './_shellGlyphs'
 
@@ -60,13 +60,80 @@ export const WithCounts: Story = {
     ),
 }
 
-/** Edge: a count past 99, and the name at 200% text, which grows the pill rather than clipping. */
+/**
+ * 200% text the way a phone gives it: the ROOT font size doubles, so every rem
+ * in the dock grows (a wrapper's `font-size: 200%` scales none of them, which
+ * is how the old story missed AUTM-1816). Restored when the story unmounts.
+ */
+function RootFontSize({ size, children }: { size: string; children: ReactNode }) {
+    useLayoutEffect(() => {
+        const root = document.documentElement
+        const before = root.style.fontSize
+        root.style.fontSize = size
+        return () => {
+            root.style.fontSize = before
+        }
+    }, [size])
+    return <>{children}</>
+}
+
+/** Docks stacked in one frame: each is fixed, so each sits in its own transformed box. */
+function DockFrame({ caption, children }: { caption: string; children: ReactNode }) {
+    return (
+        <div className="relative h-[8.5rem] border-b border-[var(--hairline)] bg-[var(--band)]" style={{ transform: 'translateZ(0)' }}>
+            <p className="px-3 pt-1 text-xs text-[var(--text-muted)]">{caption}</p>
+            {children}
+        </div>
+    )
+}
+
+/**
+ * AUTM-1802: the current tab's own count sits in the lime pill after the
+ * name, an ink disc with a lime figure, the pill growing to fit. The other
+ * tabs keep the brand disc on the icon. Messages current, 3 and 12 unread.
+ */
+export const CurrentTabCount: Story = {
+    parameters: { viewport: { defaultViewport: 'phone' } },
+    render: () => (
+        <div className="bg-[var(--surface)]">
+            {[3, 12].map((n) => (
+                <DockFrame key={n} caption={`${n} unread`}>
+                    <AppTabBar label={`Account ${n}`} items={items('messages', { bookings: 1, messages: n })} hideFrom="never" />
+                </DockFrame>
+            ))}
+        </div>
+    ),
+}
+
+/**
+ * AUTM-1816: the same at 200% text. The name never wraps; when the dock
+ * cannot fit it, the pill shows the icon and the count, and the tab is still
+ * announced "Messages, 12 unread". No sideways scroll.
+ */
+export const CurrentTabCountLargeText: Story = {
+    parameters: { viewport: { defaultViewport: 'phone' } },
+    render: () => (
+        <RootFontSize size="200%">
+            <div className="bg-[var(--surface)]">
+                {[3, 12].map((n) => (
+                    <DockFrame key={n} caption={`${n} unread, 200% text`}>
+                        <AppTabBar label={`Account ${n}`} items={items('messages', { bookings: 1, messages: n })} hideFrom="never" />
+                    </DockFrame>
+                ))}
+            </div>
+        </RootFontSize>
+    ),
+}
+
+/** Edge: a count past 99 on another tab, and Account current at 200% text (the root's, see above). */
 export const LargeCountAndText: Story = {
     parameters: { viewport: { defaultViewport: 'phoneSmall' } },
     render: () => (
-        <div className="min-h-[24rem] bg-[var(--surface)] text-[200%]">
-            <AppTabBar label="Account" items={items('account', { messages: 140 })} hideFrom="never" />
-        </div>
+        <RootFontSize size="200%">
+            <div className="min-h-[24rem] bg-[var(--surface)]">
+                <AppTabBar label="Account" items={items('account', { messages: 140 })} hideFrom="never" />
+            </div>
+        </RootFontSize>
     ),
 }
 
